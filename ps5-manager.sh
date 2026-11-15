@@ -294,8 +294,29 @@ while true; do
                     zenity --info --text="Kernel installé avec succès !" --width=300
                     ;;
                 2)
-                    KERNELS=$(rpm -qa kernel | sort -V)
-                    zenity --info --title="Kernels installés" --text="$KERNELS" --width=400 --height=300
+                    KERNELS=$(rpm -qa kernel-core --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' | sort -V)
+                    if [ -z "$KERNELS" ]; then
+                        zenity --error --text="Aucun kernel trouvé sur le système." --width=300
+                    else
+                        LIST_ARGS=()
+                        while read -r k; do
+                            [ -n "$k" ] && LIST_ARGS+=("$k" "Activer par défaut")
+                        done <<< "$KERNELS"
+                        
+                        CHOSEN_KERNEL=$(zenity --list \
+                            --title="Sélection du Kernel" \
+                            --text="Choisissez le kernel à utiliser par défaut :" \
+                            --width=500 --height=350 \
+                            --column="Version du Kernel" --column="Statut" \
+                            "${LIST_ARGS[@]}")
+                        
+                        if [ -n "$CHOSEN_KERNEL" ]; then
+                            zenity --info --text="Kernel sélectionné : $CHOSEN_KERNEL\nMise à jour de Grub en cours..." --width=350
+                            sudo grub2-set-default "$(grep -E "$CHOSEN_KERNEL" /boot/grub2/grub.cfg | head -n 1 | cut -d\' -f2)" || true
+                            sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+                            zenity --info --text="Le kernel par défaut a été configuré avec succès !" --width=350
+                        fi
+                    fi
                     ;;
             esac
             ;;
