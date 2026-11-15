@@ -3,9 +3,9 @@
 # PS5 Fedora Manager - Script Principal (Interface Graphique Zenity)
 # ==============================================================================
 
-# Vérification des dépendances graphiques
+# Vérification et installation automatique de Zenity si absent
 if ! command -v zenity &>/dev/null; then
-    dnf install -y zenity
+    sudo dnf install -y zenity
 fi
 
 # Définition des chemins
@@ -13,18 +13,21 @@ INSTALL_DIR="/opt/ps5-manager"
 MODULES_DIR="$INSTALL_DIR/modules"
 REPO_URL="https://github.com/nexgen999/ps5-fedora-manager.git"
 
-# Fonction de mise à jour automatique
+# Fonction de mise à jour forcée (Écrase proprement l'ancien sans conflit Git)
 update_manager() {
     if [ -d "$INSTALL_DIR/.git" ]; then
-        cd "$INSTALL_DIR" && git pull origin main
-        chmod +x "$INSTALL_DIR"/*.sh "$MODULES_DIR"/*.sh 2>/dev/null || true
-        cp -f "$INSTALL_DIR/ps5-manager.desktop" /usr/share/applications/ps5-manager.desktop 2>/dev/null || true
-        update-desktop-database /usr/share/applications/ 2>/dev/null || true
-        zenity --info --title="Mise à jour" --text="Le gestionnaire et les modules ont été mis à jour avec succès !" --width=350
+        cd "$INSTALL_DIR"
+        sudo git fetch --all
+        sudo git reset --hard origin/main
+        sudo chmod +x "$INSTALL_DIR"/*.sh "$MODULES_DIR"/*.sh 2>/dev/null || true
+        sudo cp -f "$INSTALL_DIR/ps5-manager.desktop" /usr/share/applications/ps5-manager.desktop 2>/dev/null || true
+        sudo update-desktop-database /usr/share/applications/ 2>/dev/null || true
+        zenity --info --title="Mise à jour" --text="Le gestionnaire a été mis à jour et forcé avec succès !" --width=350
     else
-        mkdir -p "$INSTALL_DIR"
-        git clone "$REPO_URL" "$INSTALL_DIR"
-        zenity --info --title="Installation" --text="Dépôt cloné avec succès dans $INSTALL_DIR !" --width=350
+        sudo mkdir -p "$INSTALL_DIR"
+        sudo git clone "$REPO_URL" "$INSTALL_DIR"
+        sudo chmod +x "$INSTALL_DIR"/*.sh "$MODULES_DIR"/*.sh 2>/dev/null || true
+        zenity --info --title="Installation" --text="Dépôt cloné avec succès !" --width=350
     fi
 }
 
@@ -32,7 +35,7 @@ update_manager() {
 OS_VER=$(grep -E '^PRETTY_NAME=' /etc/os-release | cut -d'"' -f2 | sed 's/ (.*//')
 K_VER=$(uname -r | cut -d'-' -f1)
 
-# Boucle principale du Menu Graphique (Style Tableau Zenity)
+# Boucle principale du Menu Graphique (Zenity)
 while true; do
     CHOICE=$(zenity --list \
         --title="PS5 Linux Universal Manager (nexgen999)" \
@@ -54,21 +57,17 @@ while true; do
         "12" "Logithèque PS5"        "Installer/gérer Steam, Heroic, ProtonUp-Qt, Decky, Brave..." \
         "13" "Software Presets"      "Déployer un pack complet : Gaming, Bureautique ou Dev")
 
-    # Si l'utilisateur clique sur Cancel ou ferme la fenêtre
-    if [ $? -ne 0 ] || [ -z "$CHOICE" ]; then
-        exit 0
-    fi
+    [ $? -ne 0 ] || [ -z "$CHOICE" ] && exit 0
 
-    # Exécution de l'action choisie (dans un terminal propre si le sous-module utilise whiptail)
     case $CHOICE in
         1)
             SUB=$(zenity --list --title="Gestion du Manager" --text="Choisissez une action :" --width=450 --height=250 \
                 --column="ID" --column="Action" \
-                "1" "Vérifier et mettre à jour depuis GitHub" \
+                "1" "Forcer la mise à jour depuis GitHub" \
                 "2" "Désinstaller complètement le Manager")
             [ "$SUB" = "1" ] && update_manager
             if [ "$SUB" = "2" ]; then
-                rm -rf "$INSTALL_DIR" /usr/local/bin/ps5-manager /usr/share/applications/ps5-manager.desktop /usr/share/pixmaps/ps5-manager.png
+                sudo rm -rf "$INSTALL_DIR" /usr/local/bin/ps5-manager /usr/share/applications/ps5-manager.desktop /usr/share/pixmaps/ps5-manager.png
                 zenity --info --text="PS5 Fedora Manager a été désinstallé." --width=300
                 exit 0
             fi
