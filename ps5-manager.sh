@@ -13,7 +13,7 @@ INSTALL_DIR="/opt/ps5-manager"
 MODULES_DIR="$INSTALL_DIR/modules"
 REPO_URL="https://github.com/nexgen999/ps5-fedora-manager.git"
 
-# Fonction de mise à jour forcée (Écrase proprement l'ancien sans conflit Git)
+# Fonction de mise à jour forcée (écrase proprement l'ancien sans conflit Git)
 update_manager() {
     if [ -d "$INSTALL_DIR/.git" ]; then
         cd "$INSTALL_DIR"
@@ -22,7 +22,7 @@ update_manager() {
         sudo chmod +x "$INSTALL_DIR"/*.sh "$MODULES_DIR"/*.sh 2>/dev/null || true
         sudo cp -f "$INSTALL_DIR/ps5-manager.desktop" /usr/share/applications/ps5-manager.desktop 2>/dev/null || true
         sudo update-desktop-database /usr/share/applications/ 2>/dev/null || true
-        zenity --info --title="Mise à jour" --text="Le gestionnaire a été mis à jour et forcé avec succès !" --width=350
+        zenity --info --title="Mise à jour" --text="Le gestionnaire a été mis à jour avec succès !" --width=350
     else
         sudo mkdir -p "$INSTALL_DIR"
         sudo git clone "$REPO_URL" "$INSTALL_DIR"
@@ -59,6 +59,9 @@ while true; do
 
     [ $? -ne 0 ] || [ -z "$CHOICE" ] && exit 0
 
+    # Transmission propre de l'environnement graphique pour éviter les erreurs Gdk-WARNING
+    RUN_MOD="sudo -u ${SUDO_USER:-root} env DISPLAY=$DISPLAY DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS bash"
+
     case $CHOICE in
         1)
             SUB=$(zenity --list --title="Gestion du Manager" --text="Choisissez une action :" --width=450 --height=250 \
@@ -72,17 +75,17 @@ while true; do
                 exit 0
             fi
             ;;
-        2) gnome-terminal --title="Configuration des Langues" -- bash "$MODULES_DIR/02-langues.sh" ;;
-        3) gnome-terminal --title="Gestion des Dépôts" -- bash "$MODULES_DIR/03-depots.sh" ;;
-        4) gnome-terminal --title="Gestion des Utilisateurs" -- bash "$MODULES_DIR/04-utilisateurs.sh" ;;
-        5) gnome-terminal --title="Mises à jour Fedora" -- bash "$MODULES_DIR/05-maj-systeme.sh" ;;
-        6) gnome-terminal --title="Maintenance Système" -- bash "$MODULES_DIR/06-maintenance.sh" ;;
-        7) gnome-terminal --title="Alimentation PS5" -- bash "$MODULES_DIR/07-alimentation.sh" ;;
-        8) gnome-terminal --title="PS5 Fan Manager" -- bash "$MODULES_DIR/08-fan-manager.sh" ;;
-        9) gnome-terminal --title="PS5 Hardware Control" -- bash "$MODULES_DIR/09-hw-control.sh" ;;
-        10) gnome-terminal --title="Mesa & Vulkan" -- bash "$MODULES_DIR/10-mesa-vulkan.sh" ;;
-        11) gnome-terminal --title="Kernel PS5" -- bash "$MODULES_DIR/11-kernel.sh" ;;
-        12) gnome-terminal --title="Logithèque PS5" -- bash "$MODULES_DIR/12-logiciels.sh" ;;
-        13) gnome-terminal --title="Software Presets" -- bash "$MODULES_DIR/13-presets.sh" ;;
+        2) $RUN_MOD "$MODULES_DIR/02-langues.sh" ;;
+        3) $RUN_MOD "$MODULES_DIR/03-depots.sh" ;;
+        4) $RUN_MOD "$MODULES_DIR/04-utilisateurs.sh" ;;
+        5) $RUN_MOD "$MODULES_DIR/05-maj-systeme.sh" ;;
+        6) $RUN_MOD "$MODULES_DIR/06-maintenance.sh" ;;
+        7) $RUN_MOD "$MODULES_DIR/07-alimentation.sh" ;;
+        8) $RUN_MOD "$MODULES_DIR/08-fan-manager.sh" ;;
+        9) $RUN_MOD "$MODULES_DIR/09-hw-control.sh" ;;
+        10) $RUN_MOD "$MODULES_DIR/10-mesa-vulkan.sh" ;;
+        11) $RUN_MOD "$MODULES_DIR/11-kernel.sh" ;;
+        12) $RUN_MOD "$MODULES_DIR/12-logiciels.sh" ;;
+        13) $RUN_MOD "$MODULES_DIR/13-presets.sh" ;;
     esac
 done
