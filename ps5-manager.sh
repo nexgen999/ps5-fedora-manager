@@ -58,7 +58,7 @@ while true; do
         "4"  "Gestion des utilisateurs"     "Voir, éditer, ajouter/supprimer des comptes et configurer le root" \
         "5"  "Mises à jour Fedora"          "Mettre à jour applications, système, langpacks et dépôts" \
         "6"  "Maintenance & Nettoyage"      "Nettoyage des fichiers temporaires, caches DNF et logs" \
-        "7"  "Management de l'alimentation" "Activer ou désactiver la mise en veille écran ou système" \
+        "7"  "Management de l'alimentation" "Activer ou désactiver la veille écran ou système" \
         "8"  "PS5 Fan Manager"              "Status, Fan on/off, Boost on/off, service et mise à jour" \
         "9"  "PS5 Hardware Control"         "Installation, mise à jour, désinstallation et check sysfs" \
         "10" "Mesa / Vulkan & RADV"         "Outils Vulkan, pilotes mesa et vérification RADV GPU AMD" \
@@ -106,7 +106,7 @@ while true; do
                         gnome-session-quit --logout --force
                     fi
                     ;;
-            endcase
+            esac
             ;;
         3)
             SUB=$(zenity --list --title="3. Gestion des dépôts" --text="Choisissez une option :" --width=550 --height=300 \
