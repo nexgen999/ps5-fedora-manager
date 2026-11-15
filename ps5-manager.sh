@@ -1,18 +1,11 @@
 #!/bin/bash
 # ==============================================================================
-# PS5 Fedora Manager - Script Principal (TUI)
-# Auteur : nexgen999
-# Description : Tableau de bord modulaire pour PS5 Linux
+# PS5 Fedora Manager - Script Principal (Interface Graphique Zenity)
 # ==============================================================================
 
-# Sécurité : Exécution en root obligatoire pour la gestion système
-if [ "$EUID" -ne 0 ]; then
-  if command -v whiptail &>/dev/null; then
-    whiptail --title "Erreur de privilèges" --msgbox "Ce gestionnaire doit être exécuté en tant que root (sudo ps5-manager)." 10 50
-  else
-    echo "Erreur : Ce gestionnaire doit être exécuté en tant que root."
-  fi
-  exit 1
+# Vérification des dépendances graphiques
+if ! command -v zenity &>/dev/null; then
+    dnf install -y zenity
 fi
 
 # Définition des chemins
@@ -20,76 +13,77 @@ INSTALL_DIR="/opt/ps5-manager"
 MODULES_DIR="$INSTALL_DIR/modules"
 REPO_URL="https://github.com/nexgen999/ps5-fedora-manager.git"
 
-# Fonction de mise à jour automatique du manager et des modules
+# Fonction de mise à jour automatique
 update_manager() {
-    if ! command -v git &>/dev/null; then
-        apt-get install -y git || dnf install -y git
-    fi
-
     if [ -d "$INSTALL_DIR/.git" ]; then
         cd "$INSTALL_DIR" && git pull origin main
-        whiptail --title "Mise à jour" --msgbox "Le gestionnaire et les modules ont été mis à jour avec succès !" 10 50
+        chmod +x "$INSTALL_DIR"/*.sh "$MODULES_DIR"/*.sh 2>/dev/null || true
+        cp -f "$INSTALL_DIR/ps5-manager.desktop" /usr/share/applications/ps5-manager.desktop 2>/dev/null || true
+        update-desktop-database /usr/share/applications/ 2>/dev/null || true
+        zenity --info --title="Mise à jour" --text="Le gestionnaire et les modules ont été mis à jour avec succès !" --width=350
     else
         mkdir -p "$INSTALL_DIR"
         git clone "$REPO_URL" "$INSTALL_DIR"
-        whiptail --title "Installation" --msgbox "Dépôt cloné avec succès dans $INSTALL_DIR !" 10 50
+        zenity --info --title="Installation" --text="Dépôt cloné avec succès dans $INSTALL_DIR !" --width=350
     fi
 }
 
-# Vérification initiale si le dossier des modules existe
-if [ ! -d "$MODULES_DIR" ]; then
-    update_manager
-fi
+# Infos système pour l'en-tête
+OS_VER=$(grep -E '^PRETTY_NAME=' /etc/os-release | cut -d'"' -f2 | sed 's/ (.*//')
+K_VER=$(uname -r | cut -d'-' -f1)
 
-# Boucle principale du Menu TUI
+# Boucle principale du Menu Graphique (Style Tableau Zenity)
 while true; do
-    CHOICE=$(whiptail --title "PS5 Fedora Manager (v1.0)" \
-    --menu "Sélectionnez une catégorie ou une action :" 22 76 13 \
-    "1"  "Mises à jour & Désinstallation du Manager" \
-    "2"  "Configuration des langues (Clavier + Système)" \
-    "3"  "Gestion des dépôts (RPM Fusion, Flatpak...)" \
-    "4"  "Gestion des utilisateurs & compte Root" \
-    "5"  "Mises à jour globales Fedora (Système & Apps)" \
-    "6"  "Maintenance & Nettoyage des caches" \
-    "7"  "Management de l'alimentation (Veille)" \
-    "8"  "PS5 Fan Manager (Ventilation & Boost)" \
-    "9"  "PS5 Hardware Control (GUI & Sysfs)" \
-    "10" "Mise à jour Mesa / Vulkan & RADV" \
-    "11" "Mise à jour du Kernel PS5" \
-    "12" "Logiciels recommandés (Steam, Heroic, Decky...)" \
-    "13" "Installation de Software Presets (Gaming, Dev...)" \
-    "0"  "Quitter" 3>&1 1>&2 2>&3)
+    CHOICE=$(zenity --list \
+        --title="PS5 Linux Universal Manager (nexgen999)" \
+        --text="<span size='x-large' weight='bold'>PS5 Linux Universal Manager (nexgen999)</span>\n\nSystème : $OS_VER | Noyau : $K_VER\nChoisissez une action :" \
+        --width=820 \
+        --height=520 \
+        --column="Option" --column="Action" --column="Description" \
+        "1"  "Mise à jour Manager"   "Vérifier les mises à jour GitHub ou désinstaller le manager" \
+        "2"  "Langue & Clavier"      "Configurer la langue du système, le clavier et la session" \
+        "3"  "Gestion des Dépôts"    "Gérer RPM Fusion, Flatpak (Flathub) et dépôts personnalisés" \
+        "4"  "Utilisateurs & Root"   "Ajouter, éditer ou supprimer des comptes et mots de passe" \
+        "5"  "Mises à jour Fedora"   "Mettre à jour le système DNF, Flatpak et les langpacks" \
+        "6"  "Maintenance & Clean"   "Nettoyer les caches DNF, journaux système et fichiers temp" \
+        "7"  "Alimentation (Veille)" "Activer ou désactiver la mise en veille écran et système" \
+        "8"  "PS5 Fan Manager"       "Contrôler la ventilation, le mode Boost et ps5_control" \
+        "9"  "PS5 Hardware Control"  "Installer ou gérer l'interface graphique matériel (GUI)" \
+        "10" "Mesa / Vulkan & RADV"  "Mettre à jour les pilotes graphiques AMD et vérifier RADV" \
+        "11" "Noyau PS5 (Kernel)"    "Télécharger et sélectionner le kernel Linux PS5 par défaut" \
+        "12" "Logithèque PS5"        "Installer/gérer Steam, Heroic, ProtonUp-Qt, Decky, Brave..." \
+        "13" "Software Presets"      "Déployer un pack complet : Gaming, Bureautique ou Dev")
 
-    EXIT_STATUS=$?
-    if [ $EXIT_STATUS != 0 ]; then
-        clear
+    # Si l'utilisateur clique sur Cancel ou ferme la fenêtre
+    if [ $? -ne 0 ] || [ -z "$CHOICE" ]; then
         exit 0
     fi
 
+    # Exécution de l'action choisie (dans un terminal propre si le sous-module utilise whiptail)
     case $CHOICE in
         1)
-            # Option 1 : Géré en interne ou via un sous-module
-            SUB=$(whiptail --title "Gestion du Manager" --menu "Choisissez une action :" 12 50 2 \
-            "1" "Vérifier et mettre à jour le Manager" \
-            "2" "Désinstaller le Manager de la machine" 3>&1 1>&2 2>&3)
+            SUB=$(zenity --list --title="Gestion du Manager" --text="Choisissez une action :" --width=450 --height=250 \
+                --column="ID" --column="Action" \
+                "1" "Vérifier et mettre à jour depuis GitHub" \
+                "2" "Désinstaller complètement le Manager")
             [ "$SUB" = "1" ] && update_manager
-            [ "$SUB" = "2" ] && { rm -rf "$INSTALL_DIR" /usr/local/bin/ps5-manager; whiptail --msgbox "Manager désinstallé." 8 40; exit 0; }
+            if [ "$SUB" = "2" ]; then
+                rm -rf "$INSTALL_DIR" /usr/local/bin/ps5-manager /usr/share/applications/ps5-manager.desktop /usr/share/pixmaps/ps5-manager.png
+                zenity --info --text="PS5 Fedora Manager a été désinstallé." --width=300
+                exit 0
+            fi
             ;;
-        2) [ -f "$MODULES_DIR/02-langues.sh" ] && bash "$MODULES_DIR/02-langues.sh" || whiptail --msgbox "Module introuvable !" 8 40 ;;
-        3) [ -f "$MODULES_DIR/03-depots.sh" ] && bash "$MODULES_DIR/03-depots.sh" || whiptail --msgbox "Module introuvable !" 8 40 ;;
-        4) [ -f "$MODULES_DIR/04-utilisateurs.sh" ] && bash "$MODULES_DIR/04-utilisateurs.sh" || whiptail --msgbox "Module introuvable !" 8 40 ;;
-        5) [ -f "$MODULES_DIR/05-maj-systeme.sh" ] && bash "$MODULES_DIR/05-maj-systeme.sh" || whiptail --msgbox "Module introuvable !" 8 40 ;;
-        6) [ -f "$MODULES_DIR/06-maintenance.sh" ] && bash "$MODULES_DIR/06-maintenance.sh" || whiptail --msgbox "Module introuvable !" 8 40 ;;
-        7) [ -f "$MODULES_DIR/07-alimentation.sh" ] && bash "$MODULES_DIR/07-alimentation.sh" || whiptail --msgbox "Module introuvable !" 8 40 ;;
-        8) [ -f "$MODULES_DIR/08-fan-manager.sh" ] && bash "$MODULES_DIR/08-fan-manager.sh" || whiptail --msgbox "Module introuvable !" 8 40 ;;
-        9) [ -f "$MODULES_DIR/09-hw-control.sh" ] && bash "$MODULES_DIR/09-hw-control.sh" || whiptail --msgbox "Module introuvable !" 8 40 ;;
-        10) [ -f "$MODULES_DIR/10-mesa-vulkan.sh" ] && bash "$MODULES_DIR/10-mesa-vulkan.sh" || whiptail --msgbox "Module introuvable !" 8 40 ;;
-        11) [ -f "$MODULES_DIR/11-kernel.sh" ] && bash "$MODULES_DIR/11-kernel.sh" || whiptail --msgbox "Module introuvable !" 8 40 ;;
-        12) [ -f "$MODULES_DIR/12-logiciels.sh" ] && bash "$MODULES_DIR/12-logiciels.sh" || whiptail --msgbox "Module introuvable !" 8 40 ;;
-        13) [ -f "$MODULES_DIR/13-presets.sh" ] && bash "$MODULES_DIR/13-presets.sh" || whiptail --msgbox "Module introuvable !" 8 40 ;;
-        0)
-            clear
-            exit 0
-            ;;
+        2) gnome-terminal --title="Configuration des Langues" -- bash "$MODULES_DIR/02-langues.sh" ;;
+        3) gnome-terminal --title="Gestion des Dépôts" -- bash "$MODULES_DIR/03-depots.sh" ;;
+        4) gnome-terminal --title="Gestion des Utilisateurs" -- bash "$MODULES_DIR/04-utilisateurs.sh" ;;
+        5) gnome-terminal --title="Mises à jour Fedora" -- bash "$MODULES_DIR/05-maj-systeme.sh" ;;
+        6) gnome-terminal --title="Maintenance Système" -- bash "$MODULES_DIR/06-maintenance.sh" ;;
+        7) gnome-terminal --title="Alimentation PS5" -- bash "$MODULES_DIR/07-alimentation.sh" ;;
+        8) gnome-terminal --title="PS5 Fan Manager" -- bash "$MODULES_DIR/08-fan-manager.sh" ;;
+        9) gnome-terminal --title="PS5 Hardware Control" -- bash "$MODULES_DIR/09-hw-control.sh" ;;
+        10) gnome-terminal --title="Mesa & Vulkan" -- bash "$MODULES_DIR/10-mesa-vulkan.sh" ;;
+        11) gnome-terminal --title="Kernel PS5" -- bash "$MODULES_DIR/11-kernel.sh" ;;
+        12) gnome-terminal --title="Logithèque PS5" -- bash "$MODULES_DIR/12-logiciels.sh" ;;
+        13) gnome-terminal --title="Software Presets" -- bash "$MODULES_DIR/13-presets.sh" ;;
     esac
 done
