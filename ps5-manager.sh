@@ -8,10 +8,18 @@ if ! command -v zenity &>/dev/null; then
     sudo dnf install -y zenity
 fi
 
-# Définition des chemins
+# Définition des chemins et de l'utilisateur réel pour le bus graphique
 INSTALL_DIR="/opt/ps5-manager"
 MODULES_DIR="$INSTALL_DIR/modules"
 REPO_URL="https://github.com/nexgen999/ps5-fedora-manager.git"
+
+REAL_USER="${SUDO_USER:-$(logname 2>/dev/null || echo 'ps5')}"
+USER_UID=$(id -u "$REAL_USER" 2>/dev/null || echo "1000")
+
+# Forcer les variables d'environnement graphique et D-Bus
+export DISPLAY="${DISPLAY:-:0}"
+export XDG_RUNTIME_DIR="/run/user/$USER_UID"
+export DBUS_SESSION_BUS_ADDRESS="${DBUS_SESSION_BUS_ADDRESS:-unix:path=/run/user/$USER_UID/bus}"
 
 # Fonction de mise à jour forcée (écrase proprement l'ancien sans conflit Git)
 update_manager() {
@@ -59,8 +67,8 @@ while true; do
 
     [ $? -ne 0 ] || [ -z "$CHOICE" ] && exit 0
 
-    # Transmission propre de l'environnement graphique pour éviter les erreurs Gdk-WARNING
-    RUN_MOD="sudo -u ${SUDO_USER:-root} env DISPLAY=$DISPLAY DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS bash"
+    # Transmission propre et sécurisée de l'environnement graphique aux sous-modules
+    RUN_MOD="sudo -u $REAL_USER env DISPLAY=$DISPLAY XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS bash"
 
     case $CHOICE in
         1)
