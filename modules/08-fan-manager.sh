@@ -1,87 +1,57 @@
 #!/bin/bash
 # ==============================================================================
-# Module 08 : PS5 Fan Manager & ps5-linux-tools
+# Module 08 : PS5 Fan Manager & ps5-linux-tools (Version Zenity)
 # ==============================================================================
 
 PS5_CTL="/usr/local/sbin/ps5_control"
 SERVICE_NAME="ps5-performance.service"
 
 while true; do
-    ACTION=$(whiptail --title "PS5 Fan Manager & Performance" --menu "Contrôle du refroidissement et du mode Boost PS5 :" 20 68 8 \
-    "1" "Voir le statut (Service + Capteurs hwmon)" \
-    "2" "Fan ON (Activer la ventilation)" \
-    "3" "Fan OFF (Désactiver la ventilation)" \
-    "4" "Boost ON (Activer le mode Boost)" \
-    "5" "Boost OFF (Désactiver le mode Boost)" \
-    "6" "Voir l'état détaillé de $SERVICE_NAME" \
-    "7" "Redémarrer / Réactiver $SERVICE_NAME" \
-    "8" "Mettre à jour ps5_control depuis ps5-linux-tools" \
-    "0" "Retour au menu principal" 3>&1 1>&2 2>&3)
+    ACTION=$(zenity --list \
+        --title="PS5 Fan Manager & Performance" \
+        --text="Contrôle du refroidissement et du mode Boost PS5 :" \
+        --width=650 --height=400 \
+        --column="ID" --column="Action" \
+        "1" "Voir le statut (Service + Capteurs hwmon)" \
+        "2" "Fan ON (Activer la ventilation)" \
+        "3" "Fan OFF (Désactiver la ventilation)" \
+        "4" "Boost ON (Activer le mode Boost)" \
+        "5" "Boost OFF (Désactiver le mode Boost)" \
+        "6" "Voir l'état détaillé du service" \
+        "7" "Redémarrer / Réactiver le service" \
+        "8" "Mettre à jour ps5_control depuis GitHub" \
+        "0" "Retour au menu principal")
 
-    [ $? -ne 0 ] || [ "$ACTION" = "0" ] && break
+    [ $? -ne 0 ] || [ "$ACTION" = "0" ] || [ -z "$ACTION" ] && break
 
     case $ACTION in
         1)
             SVC_STATUS=$(systemctl is-active "$SERVICE_NAME" 2>/dev/null || echo "inactif")
-            SVC_ENABLED=$(systemctl is-enabled "$SERVICE_NAME" 2>/dev/null || echo "désactivé")
-            TEMPS=$(sensors 2>/dev/null || grep -H . /sys/class/thermal/thermal_zone*/temp 2>/dev/null || echo "Capteurs non lus.")
-            whiptail --title "Statut PS5 Fan & Températures" --msgbox "Service ($SERVICE_NAME) : $SVC_STATUS ($SVC_ENABLED)\nBinaire ps5_control : $([ -x "$PS5_CTL" ] && echo "Présent" || echo "Manquant")\n\n--- Capteurs ---\n$TEMPS" 20 72
+            TEMPS=$(sensors 2>/dev/null || echo "Capteurs non disponibles.")
+            zenity --info --title="Statut PS5" --text="Service : $SVC_STATUS\n\n--- Capteurs ---\n$TEMPS" --width=500 --height=300
             ;;
-        2)
-            if [ -x "$PS5_CTL" ]; then
-                "$PS5_CTL" --fan on
-                whiptail --title "Ventilation" --msgbox "Commande envoyée : Fan ON." 8 45
-            else
-                whiptail --title "Erreur" --msgbox "Binaire $PS5_CTL introuvable." 8 45
-            fi
-            ;;
-        3)
-            if [ -x "$PS5_CTL" ]; then
-                "$PS5_CTL" --fan off
-                whiptail --title "Ventilation" --msgbox "Commande envoyée : Fan OFF." 8 45
-            else
-                whiptail --title "Erreur" --msgbox "Binaire $PS5_CTL introuvable." 8 45
-            fi
-            ;;
-        4)
-            if [ -x "$PS5_CTL" ]; then
-                "$PS5_CTL" --boost on
-                whiptail --title "Mode Boost" --msgbox "Commande envoyée : Boost ON." 8 45
-            else
-                whiptail --title "Erreur" --msgbox "Binaire $PS5_CTL introuvable." 8 45
-            fi
-            ;;
-        5)
-            if [ -x "$PS5_CTL" ]; then
-                "$PS5_CTL" --boost off
-                whiptail --title "Mode Boost" --msgbox "Commande envoyée : Boost OFF." 8 45
-            else
-                whiptail --title "Erreur" --msgbox "Binaire $PS5_CTL introuvable." 8 45
-            fi
-            ;;
+        2) [ -x "$PS5_CTL" ] && "$PS5_CTL" --fan on && zenity --info --text="Ventilation activée (Fan ON)." --width=300 ;;
+        3) [ -x "$PS5_CTL" ] && "$PS5_CTL" --fan off && zenity --info --text="Ventilation désactivée (Fan OFF)." --width=300 ;;
+        4) [ -x "$PS5_CTL" ] && "$PS5_CTL" --boost on && zenity --info --text="Mode Boost activé." --width=300 ;;
+        5) [ -x "$PS5_CTL" ] && "$PS5_CTL" --boost off && zenity --info --text="Mode Boost désactivé." --width=300 ;;
         6)
             FULL_STATUS=$(systemctl status "$SERVICE_NAME" --no-pager 2>&1)
-            whiptail --title "État de $SERVICE_NAME" --msgbox "$FULL_STATUS" 20 76
+            zenity --text-info --title="État du Service" --filename=<(echo "$FULL_STATUS") --width=600 --height=400
             ;;
         7)
-            systemctl enable "$SERVICE_NAME" 2>/dev/null || true
-            systemctl restart "$SERVICE_NAME"
-            whiptail --title "Service Redémarré" --msgbox "Le service $SERVICE_NAME a été redémarré (Fan ON + Boost ON réappliqués)." 9 60
+            sudo systemctl enable "$SERVICE_NAME" 2>/dev/null || true
+            sudo systemctl restart "$SERVICE_NAME"
+            zenity --info --text="Service redémarré avec succès." --width=300
             ;;
         8)
             TMP_TOOLS="/tmp/ps5-linux-tools"
             rm -rf "$TMP_TOOLS"
-            if git clone --depth 1 https://github.com/ps5-linux/ps5-linux-tools.git "$TMP_TOOLS"; then
-                if make -C "$TMP_TOOLS" && [ -f "$TMP_TOOLS/ps5_control" ]; then
-                    install -m 0755 "$TMP_TOOLS/ps5_control" "$PS5_CTL"
-                    rm -rf "$TMP_TOOLS"
-                    whiptail --title "Mise à jour réussie" --msgbox "ps5_control a été recompilé et installé dans $PS5_CTL !" 9 60
-                else
-                    rm -rf "$TMP_TOOLS"
-                    whiptail --title "Erreur de compilation" --msgbox "La compilation (make) a échoué. Vérifiez que make et gcc sont installés." 9 60
-                fi
+            if git clone --depth 1 https://github.com/ps5-linux/ps5-linux-tools.git "$TMP_TOOLS" && make -C "$TMP_TOOLS"; then
+                sudo install -m 0755 "$TMP_TOOLS/ps5_control" "$PS5_CTL"
+                rm -rf "$TMP_TOOLS"
+                zenity --info --text="ps5_control mis à jour avec succès !" --width=300
             else
-                whiptail --title "Erreur réseau" --msgbox "Impossible de cloner le dépôt ps5-linux-tools." 8 55
+                zenity --error --text="Échec de la compilation de ps5_control." --width=300
             fi
             ;;
     esac
