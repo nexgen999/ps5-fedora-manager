@@ -1,3 +1,4 @@
+sudo tee /usr/share/applications/ps5-manager.desktop << 'EOF'
 [Desktop Entry]
 Name=PS5 Fedora Manager
 Comment=Gestionnaire système, matériel et logiciels pour PS5 Linux
@@ -7,3 +8,4 @@ Terminal=false
 Type=Application
 Categories=System;Settings;
 Keywords=PS5;Fedora;Manager;Fan;Kernel;
+EOF
