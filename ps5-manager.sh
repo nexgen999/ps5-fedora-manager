@@ -21,21 +21,43 @@ export DISPLAY="${DISPLAY:-:0}"
 export XDG_RUNTIME_DIR="/run/user/$USER_UID"
 export DBUS_SESSION_BUS_ADDRESS="${DBUS_SESSION_BUS_ADDRESS:-unix:path=/run/user/$USER_UID/bus}"
 
-# Fonction de mise à jour forcée (écrase proprement l'ancien sans conflit Git)
+# Fonction de mise à jour robuste avec attribution automatique des droits d'exécution
 update_manager() {
     if [ -d "$INSTALL_DIR/.git" ]; then
         cd "$INSTALL_DIR"
         sudo git fetch --all
         sudo git reset --hard origin/main
+        
+        # Attribution automatique et systématique des droits d'exécution
         sudo chmod +x "$INSTALL_DIR"/*.sh "$MODULES_DIR"/*.sh 2>/dev/null || true
-        sudo cp -f "$INSTALL_DIR/ps5-manager.desktop" /usr/share/applications/ps5-manager.desktop 2>/dev/null || true
+        sudo chmod +x "$INSTALL_DIR/ps5-manager.sh" 2>/dev/null || true
+        
+        # Synchronisation et réplication propre du binaire global
+        sudo cp -f "$INSTALL_DIR/ps5-manager.sh" /usr/local/bin/ps5-manager
+        sudo chmod +x /usr/local/bin/ps5-manager
+        
+        # Mise à jour du raccourci bureau et de la base GNOME
+        if [ -f "$INSTALL_DIR/ps5-manager.desktop" ]; then
+            sudo cp -f "$INSTALL_DIR/ps5-manager.desktop" /usr/share/applications/ps5-manager.desktop
+            sudo chmod 644 /usr/share/applications/ps5-manager.desktop
+        fi
+        
+        if [ -f "$INSTALL_DIR/icon.png" ]; then
+            sudo cp -f "$INSTALL_DIR/icon.png" /usr/share/pixmaps/ps5-manager.png
+        fi
+        
         sudo update-desktop-database /usr/share/applications/ 2>/dev/null || true
-        zenity --info --title="Mise à jour" --text="Le gestionnaire a été mis à jour avec succès !" --width=350
+        zenity --info --title="Mise à jour" --text="Le gestionnaire a été mis à jour et les droits ont été configurés avec succès !" --width=380
     else
         sudo mkdir -p "$INSTALL_DIR"
         sudo git clone "$REPO_URL" "$INSTALL_DIR"
+        
+        # Droits pour un premier clonage
         sudo chmod +x "$INSTALL_DIR"/*.sh "$MODULES_DIR"/*.sh 2>/dev/null || true
-        zenity --info --title="Installation" --text="Dépôt cloné avec succès !" --width=350
+        sudo cp -f "$INSTALL_DIR/ps5-manager.sh" /usr/local/bin/ps5-manager
+        sudo chmod +x /usr/local/bin/ps5-manager
+        
+        zenity --info --title="Installation" --text="Dépôt cloné et configuré avec succès !" --width=350
     fi
 }
 
