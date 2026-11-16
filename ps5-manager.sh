@@ -525,6 +525,29 @@ EN_FMT["Supprimer le compte %s et son dossier personnel ?"]="Delete account %s a
 EN_FMT["Compte %s supprimé."]="Account %s deleted."
 EN_FMT["Aucun langpack trouvé pour %s."]="No language pack found for %s."
 EN_FMT["Quelle action pour %s ?"]="Which action for %s?"
+# ==== Journal / logs ====
+EN_TR["14. Journal / Logs"]="14. Logs"
+EN_TR["Journal / Logs"]="Logs"
+EN_TR["Voir en direct ce que fait le gestionnaire (fenêtre de log, historique, effacement)"]="Watch live what the manager is doing (log window, history, clearing)"
+EN_TR["Ouvrir la fenêtre de log en direct"]="Open the live log window"
+EN_TR["Voir le journal de cette session"]="View this session's log"
+EN_TR["Voir un ancien journal"]="View an older log"
+EN_TR["Activer / désactiver la fenêtre automatique"]="Enable / disable the automatic log window"
+EN_TR["Effacer les journaux"]="Clear the logs"
+EN_TR["Journal"]="Log"
+EN_TR["Journaux"]="Logs"
+EN_TR["Journal de la session"]="Session log"
+EN_TR["Ancien journal"]="Older log"
+EN_TR["Choisissez un journal :"]="Choose a log:"
+EN_TR["Fichier"]="File"
+EN_TR["Aucun journal enregistré pour le moment."]="No log recorded yet."
+EN_TR["Aucun terminal graphique détecté (gnome-terminal, kgx, xterm…).\nLe journal est affiché ici à la place."]="No graphical terminal found (gnome-terminal, kgx, xterm…).\nThe log is shown here instead."
+EN_TR["Fenêtre de log automatique : activée."]="Automatic log window: enabled."
+EN_TR["Fenêtre de log automatique : désactivée."]="Automatic log window: disabled."
+EN_TR["Supprimer tous les journaux ?"]="Delete all logs?"
+EN_TR["Journaux effacés."]="Logs cleared."
+EN_FMT["Ce que fait réellement le gestionnaire, en direct.\nJournal de cette session : %s"]="What the manager is actually doing, live.\nThis session log: %s"
+
 EN_TR["Aucun message."]="No message."
 EN_TR["Decky est installé.\\nUtilisez « Mettre à jour » pour passer à la dernière version."]="Decky is installed.\\nUse « Update » to get the latest version."
 EN_TR["Decky n est pas installé."]="Decky is not installed."
@@ -547,25 +570,179 @@ error()    { Z --error   --title="$1" --text="$2" --width="${3:-460}"; }
 confirm()  { Z --question --title="$1" --text="$2" --width="${3:-440}"; }
 ask()      { Z --entry   --title="$1" --text="$2"; }
 ask_pass() { Z --password --title="$1" --text="$2"; }
-show_text(){ Z --text-info --title="$1" --width="${3:-660}" --height="${4:-440}" <<< "$2"; }
+show_text(){
+    # Les commandes tournent dans un pty (journal vivant) : on retire les retours
+    # chariot et les codes couleur avant de les afficher dans la fenêtre.
+    local body
+    body="$(printf '%s' "$2" | command tr -d '\r' | command sed -e 's/\x1b\[[0-9;?]*[a-zA-Z]//g')"
+    Z --text-info --title="$1" --width="${3:-660}" --height="${4:-440}" <<< "$body"
+}
+
+# ------------------------------------------------------------------------------
+# Journal : un fichier par session + fenêtre de terminal qui le suit en direct
+# ------------------------------------------------------------------------------
+LOG_DIR="/var/log/ps5-manager"
+LOG_WINDOW_FILE="/etc/ps5-manager/log-window"
+SESSION_LOG=""
+LOG_WIN_OPEN=""
+
+log_line() {
+    [ -n "$SESSION_LOG" ] || return 0
+    printf '%s  %s\n' "$(date +%H:%M:%S)" "$*" >> "$SESSION_LOG" 2>/dev/null
+}
+
+log_setup() {
+    mkdir -p "$LOG_DIR" 2>/dev/null && chmod 0755 "$LOG_DIR" 2>/dev/null
+    # rotation : on garde 14 jours de journaux
+    find "$LOG_DIR" -maxdepth 1 -name 'session-*.log' -mtime +14 -delete 2>/dev/null
+    SESSION_LOG="$LOG_DIR/session-$(date +%Y%m%d-%H%M%S)-$$.log"
+    if ! : > "$SESSION_LOG" 2>/dev/null; then
+        SESSION_LOG="$(mktemp)"
+    fi
+    chmod 0644 "$SESSION_LOG" 2>/dev/null
+    ln -sfn "$SESSION_LOG" "$LOG_DIR/latest.log" 2>/dev/null
+    log_line "════ PS5 Manager — $(date '+%F %T') — utilisateur : $REAL_USER — PID $$"
+    log_line "système : $(uname -srm)"
+}
+
+log_window_enabled() {
+    [ "$(head -n1 "$LOG_WINDOW_FILE" 2>/dev/null)" != "off" ]
+}
+
+log_window_toggle() {
+    mkdir -p "$(dirname "$LOG_WINDOW_FILE")" 2>/dev/null
+    if log_window_enabled; then
+        echo "off" > "$LOG_WINDOW_FILE" 2>/dev/null
+    else
+        echo "on" > "$LOG_WINDOW_FILE" 2>/dev/null
+    fi
+}
+
+# Ouvre une vraie fenêtre de terminal (celle de l'utilisateur, pas de root) qui
+# suit le journal avec tail -f : on y voit dnf, flatpak, git, curl défiler.
+open_log_window() {
+    local logf="${1:-$SESSION_LOG}" term
+    [ -n "$logf" ] && [ -r "$logf" ] || return 1
+    [ -n "$LOG_WIN_OPEN" ] && return 0
+    local -a cmd=()
+    for term in ptyxis kgx gnome-terminal konsole xfce4-terminal mate-terminal tilix xterm; do
+        command -v "$term" >/dev/null 2>&1 || continue
+        case "$term" in
+            ptyxis|kgx|gnome-terminal)            cmd=("$term" -- tail -n +1 -f "$logf") ;;
+            konsole|xfce4-terminal|mate-terminal) cmd=("$term" -e tail -n +1 -f "$logf") ;;
+            tilix)                                cmd=("$term" -e "tail -n +1 -f $logf") ;;
+            xterm)                                cmd=("$term" -T "PS5 Manager - journal" \
+                                                       -geometry 110x30 -e tail -n +1 -f "$logf") ;;
+        esac
+        if run_as_user "${cmd[@]}" >/dev/null 2>&1; then
+            LOG_WIN_OPEN="$term"
+            return 0
+        fi
+    done
+    return 1
+}
+
+# Menu 14
+log_menu() {
+    local c f logf body
+    local -a files=()
+    log_setup_once
+    c="$(Z --list --title="$(tr '14. Journal / Logs')" \
+        --text="$(trf 'Ce que fait réellement le gestionnaire, en direct.\nJournal de cette session : %s' "${SESSION_LOG:-—}")" \
+        --width=680 --height=380 --column="ID" --column="$(tr 'Action')" \
+        "1" "$(tr 'Ouvrir la fenêtre de log en direct')" \
+        "2" "$(tr 'Voir le journal de cette session')" \
+        "3" "$(tr 'Voir un ancien journal')" \
+        "4" "$(tr 'Activer / désactiver la fenêtre automatique')" \
+        "5" "$(tr 'Effacer les journaux')")"
+    [ -n "$c" ] || return 0
+    case "$c" in
+        1)
+            if ! open_log_window; then
+                warn "$(tr 'Journal')" \
+                     "$(tr 'Aucun terminal graphique détecté (gnome-terminal, kgx, xterm…).\nLe journal est affiché ici à la place.')"
+                show_text "$(tr 'Journal de la session')" \
+                    "$(tail -n 800 "$SESSION_LOG" 2>/dev/null)" 900 620
+            fi
+            ;;
+        2)
+            body="$(tail -n 1200 "$SESSION_LOG" 2>/dev/null)"
+            [ -n "$body" ] || body="$(tr 'Aucun journal enregistré pour le moment.')"
+            show_text "$(tr 'Journal de la session')" "$body" 940 640
+            ;;
+        3)
+            while IFS= read -r f; do files+=("$f"); done < <(
+                find "$LOG_DIR" -maxdepth 1 -name 'session-*.log' -printf '%T@ %p\n' 2>/dev/null |
+                    sort -rn | head -20 | cut -d' ' -f2-)
+            if [ "${#files[@]}" -eq 0 ]; then
+                info "$(tr 'Journal')" "$(tr 'Aucun journal enregistré pour le moment.')"
+                return 0
+            fi
+            logf="$(Z --list --title="$(tr 'Ancien journal')" --text="$(tr 'Choisissez un journal :')" \
+                --width=760 --height=420 --column="$(tr 'Fichier')" "${files[@]}")"
+            [ -n "$logf" ] || return 0
+            show_text "$logf" "$(tail -n 1200 "$logf" 2>/dev/null)" 940 640
+            ;;
+        4)
+            log_window_toggle
+            if log_window_enabled; then
+                info "$(tr 'Journal')" "$(tr 'Fenêtre de log automatique : activée.')"
+            else
+                info "$(tr 'Journal')" "$(tr 'Fenêtre de log automatique : désactivée.')"
+            fi
+            ;;
+        5)
+            if confirm "$(tr 'Journaux')" "$(tr 'Supprimer tous les journaux ?')"; then
+                rm -f "$LOG_DIR"/session-*.log "$LOG_DIR"/latest.log 2>/dev/null
+                log_line "journaux effacés"
+                ln -sfn "$SESSION_LOG" "$LOG_DIR/latest.log" 2>/dev/null
+                info "$(tr 'Journal')" "$(tr 'Journaux effacés.')"
+            fi
+            ;;
+    esac
+}
+
+log_setup_once() {
+    [ -n "$SESSION_LOG" ] || log_setup
+}
 
 LAST_LOG=""
 # run_with_progress <titre> <texte> <commande...>
+# La sortie part dans le journal de session (donc dans la fenêtre de log) et un
+# terminal (pty) est simulé quand c'est possible, pour que dnf affiche sa vraie
+# progression au lieu d'un simple sablier.
+PS5_PTY=""
+command -v script >/dev/null 2>&1 && script -q -e -c true /dev/null >/dev/null 2>&1 && PS5_PTY=1
+
 run_with_progress() {
-    local title="$1"
+    local title="$1" text="$2"
     shift 2
-    local log pid
-    log="$(mktemp)"
+    local log pid label rc cmdline
+    log_setup_once
+    if [ -n "$SESSION_LOG" ] && [ -w "$SESSION_LOG" ]; then
+        log="$SESSION_LOG"
+    else
+        log="$(mktemp)"
+    fi
     LAST_LOG="$log"
-    "$@" >"$log" 2>&1 &
+    log_line "──── $title : $text"
+    log_line "commande : $*"
+    log_window_enabled && open_log_window "$log" >/dev/null 2>&1
+    if [ -n "$PS5_PTY" ]; then
+        cmdline="$(printf '%q ' "$@")"
+        script -q -e -c "$cmdline" /dev/null >>"$log" 2>&1 &
+    else
+        "$@" >>"$log" 2>&1 &
+    fi
     pid=$!
-    local label
     label="$(tr "Traitement en cours…")"
     ( while kill -0 "$pid" 2>/dev/null; do printf '# %s\n' "$label"; sleep 1; done ) |
-        Z --progress --pulse --no-cancel --auto-close --width=460 \
-          --title="$title" --text="Traitement en cours…" >/dev/null 2>&1
+        Z --progress --pulse --no-cancel --auto-close --width=500 \
+          --title="$title" --text="$text" >/dev/null 2>&1
     wait "$pid"
-    return $?
+    rc=$?
+    log_line "──── fin : $title (code $rc)"
+    return $rc
 }
 
 show_log() {
@@ -1513,6 +1690,9 @@ update_manager() {
 OS_VER="$(. /etc/os-release 2>/dev/null && printf '%s' "${PRETTY_NAME% (*}")"
 K_VER="$(uname -r)"
 
+# Journal de la session (créé au démarrage, avant toute action)
+log_setup
+
 # ------------------------------------------------------------------------------
 # Boucle principale
 # ------------------------------------------------------------------------------
@@ -1534,7 +1714,8 @@ while true; do
         "10" "Mesa / Vulkan & RADV"         "Outils Vulkan, mesa, résumé Vulkan complet, vérification RADV" \
         "11" "Mise à jour Kernel"           "Installer le dernier kernel PS5 (RPM) et choisir le kernel par défaut" \
         "12" "Logithèque / Logiciels"       "Steam, Heroic, ProtonUp, Decky, Etcher, Opera, Brave, Bazaar..." \
-        "13" "Langue / Language"            "Choisir la langue de l'interface : Français ou English")" ; then
+        "13" "Langue / Language"            "Choisir la langue de l'interface : Français ou English" \
+        "14" "Journal / Logs"               "Voir en direct ce que fait le gestionnaire (fenêtre de log, historique, effacement)")" ; then
         exit 0
     fi
     [ -n "$CHOICE" ] || exit 0
@@ -2013,6 +2194,9 @@ while true; do
                     info "Langue / Language" "Langue de l'interface : Français"
                 fi
             fi
+            ;;
+        14)
+            log_menu
             ;;
     esac
 done
