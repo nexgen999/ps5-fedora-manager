@@ -39,7 +39,10 @@ BRAVE_KEY="https://brave-browser-rpm-release.s3.brave.com/brave-core.asc"
 # ------------------------------------------------------------------------------
 # Utilisateur réel + environnement graphique
 # ------------------------------------------------------------------------------
-if [ "$(id -u)" -eq 0 ]; then
+if [ -n "${PS5_MANAGER_USER:-}" ]; then
+    # Relancé via pkexec : on garde l'utilisateur qui a cliqué sur l'icône.
+    REAL_USER="$PS5_MANAGER_USER"
+elif [ "$(id -u)" -eq 0 ]; then
     if [ -n "${SUDO_USER:-}" ] && [ "$SUDO_USER" != "root" ]; then
         REAL_USER="$SUDO_USER"
     else
@@ -62,6 +65,33 @@ export DISPLAY="${DISPLAY:-:0}"
 if [ -d "/run/user/$REAL_UID" ]; then
     export XDG_RUNTIME_DIR="/run/user/$REAL_UID"
     export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$REAL_UID/bus"
+fi
+
+# ------------------------------------------------------------------------------
+# Droits root
+# ------------------------------------------------------------------------------
+# Tout ce que fait le gestionnaire (dnf, git dans /opt, systemctl, /boot/efi,
+# chpasswd...) exige root. Lancé depuis l'icône du bureau, il n'y a pas de
+# terminal : sudo ne peut donc pas demander le mot de passe. On relance le
+# script via pkexec (fenêtre polkit), avec sudo en secours si pkexec manque.
+if [ "$(id -u)" -ne 0 ] && [ -z "${PS5_MANAGER_ELEVATED:-}" ]; then
+    SELF="$(readlink -f "$0" 2>/dev/null || echo "$0")"
+    if command -v pkexec >/dev/null 2>&1; then
+        pkexec env PS5_MANAGER_ELEVATED=1 PS5_MANAGER_USER="$REAL_USER" \
+            DISPLAY="$DISPLAY" XAUTHORITY="${XAUTHORITY:-$REAL_HOME/.Xauthority}" \
+            "$SELF" "$@"
+        rc=$?
+        # 127 = pkexec absent/inutilisable : on tente sudo. Sinon (0 = ok,
+        # 126 = annulé) on s'arrête, le travail a été fait ou refusé.
+        [ "$rc" -ne 127 ] && exit "$rc"
+    fi
+    if command -v sudo >/dev/null 2>&1; then
+        sudo -E env PS5_MANAGER_ELEVATED=1 PS5_MANAGER_USER="$REAL_USER" "$SELF" "$@"
+        exit $?
+    fi
+    echo "Ce gestionnaire doit être lancé en root (pkexec ou sudo)." >&2
+    echo "This manager must run as root (pkexec or sudo)." >&2
+    exit 1
 fi
 
 # ------------------------------------------------------------------------------
