@@ -15,7 +15,7 @@
 #   10 mesa / vulkan / RADV
 #   11 kernel PS5 (RPM de ps5-linux-patches + kernel par défaut)
 #   12 logithèque (installer / désinstaller / mettre à jour chaque logiciel)
-#   13 presets (gaming, bureautique, développeur)
+#   13 langue de l interface (français / anglais)
 # ==============================================================================
 
 set -o pipefail
@@ -39,7 +39,10 @@ BRAVE_KEY="https://brave-browser-rpm-release.s3.brave.com/brave-core.asc"
 # ------------------------------------------------------------------------------
 # Utilisateur réel + environnement graphique
 # ------------------------------------------------------------------------------
-if [ "$(id -u)" -eq 0 ]; then
+if [ -n "${PS5_MANAGER_USER:-}" ]; then
+    # Relancé via pkexec : on garde l'utilisateur qui a cliqué sur l'icône.
+    REAL_USER="$PS5_MANAGER_USER"
+elif [ "$(id -u)" -eq 0 ]; then
     if [ -n "${SUDO_USER:-}" ] && [ "$SUDO_USER" != "root" ]; then
         REAL_USER="$SUDO_USER"
     else
@@ -65,49 +68,731 @@ if [ -d "/run/user/$REAL_UID" ]; then
 fi
 
 # ------------------------------------------------------------------------------
-# Zenity : dépendance obligatoire
+# Droits root
 # ------------------------------------------------------------------------------
-if ! command -v zenity >/dev/null 2>&1; then
-    dnf install -y zenity || { echo "zenity est requis." >&2; exit 1; }
-fi
-if ! command -v zenity >/dev/null 2>&1; then
-    echo "zenity est introuvable, le gestionnaire ne peut pas démarrer." >&2
+# Tout ce que fait le gestionnaire (dnf, git dans /opt, systemctl, /boot/efi,
+# chpasswd...) exige root. Lancé depuis l'icône du bureau, il n'y a pas de
+# terminal : sudo ne peut donc pas demander le mot de passe. On relance le
+# script via pkexec (fenêtre polkit), avec sudo en secours si pkexec manque.
+if [ "$(id -u)" -ne 0 ] && [ -z "${PS5_MANAGER_ELEVATED:-}" ]; then
+    SELF="$(readlink -f "$0" 2>/dev/null || echo "$0")"
+    if command -v pkexec >/dev/null 2>&1; then
+        pkexec env PS5_MANAGER_ELEVATED=1 PS5_MANAGER_USER="$REAL_USER" \
+            DISPLAY="$DISPLAY" XAUTHORITY="${XAUTHORITY:-$REAL_HOME/.Xauthority}" \
+            "$SELF" "$@"
+        rc=$?
+        # 127 = pkexec absent/inutilisable : on tente sudo. Sinon (0 = ok,
+        # 126 = annulé) on s'arrête, le travail a été fait ou refusé.
+        [ "$rc" -ne 127 ] && exit "$rc"
+    fi
+    if command -v sudo >/dev/null 2>&1; then
+        sudo -E env PS5_MANAGER_ELEVATED=1 PS5_MANAGER_USER="$REAL_USER" "$SELF" "$@"
+        exit $?
+    fi
+    echo "Ce gestionnaire doit être lancé en root (pkexec ou sudo)." >&2
+    echo "This manager must run as root (pkexec or sudo)." >&2
     exit 1
 fi
 
 # ------------------------------------------------------------------------------
+# Zenity : dépendance obligatoire
+# ------------------------------------------------------------------------------
+# En mode --cli (interface GTK), zenity n'est pas utilisé : aucune fenêtre.
+if [ "${1:-}" != "--cli" ]; then
+    if ! command -v zenity >/dev/null 2>&1; then
+        dnf install -y zenity || { echo "zenity est requis." >&2; exit 1; }
+    fi
+    if ! command -v zenity >/dev/null 2>&1; then
+        echo "zenity est introuvable, le gestionnaire ne peut pas démarrer." >&2
+        exit 1
+    fi
+fi
+
+# ------------------------------------------------------------------------------
+# Langue de l'interface (fr / en)
+# ------------------------------------------------------------------------------
+LANG_FILE="/etc/ps5-manager/language"
+UI_LANG="fr"
+
+declare -A EN_TR EN_FMT
+
+load_ui_lang() {
+    local l
+    [ -r "$LANG_FILE" ] || return 0
+    l="$(head -n1 "$LANG_FILE" 2>/dev/null)"
+    case "$l" in fr|en) UI_LANG="$l" ;; esac
+}
+
+save_ui_lang() {
+    UI_LANG="$1"
+    sudo mkdir -p "$(dirname "$LANG_FILE")" 2>/dev/null
+    printf '%s\n' "$UI_LANG" | sudo tee "$LANG_FILE" >/dev/null 2>&1 ||
+        printf '%s\n' "$UI_LANG" > "$LANG_FILE" 2>/dev/null || true
+}
+
+# Traduit une chaîne exacte (dictionnaire FR -> EN). Inconnue : inchangée.
+# %b permet d'afficher les \n des textes multilignes.
+tr() {
+    local s="$1"
+    if [ "$UI_LANG" = "en" ] && [ -n "${EN_TR[$s]:-}" ]; then
+        s="${EN_TR[$s]}"
+    fi
+    printf '%b' "$s"
+}
+
+# Traduit une chaîne de format utilisée avec printf.
+trf() {
+    local f="$1"
+    shift
+    if [ "$UI_LANG" = "en" ] && [ -n "${EN_FMT[$f]:-}" ]; then
+        f="${EN_FMT[$f]}"
+    fi
+    if [ $# -gt 0 ]; then
+        printf "$f" "$@"
+    else
+        printf '%s' "$f"
+    fi
+}
+
+# zenity qui traduit automatiquement titres, textes, colonnes et libellés.
+Z() {
+    if [ "$UI_LANG" != "en" ]; then
+        zenity "$@"
+        return $?
+    fi
+    local -a a=()
+    local x k v
+    for x in "$@"; do
+        case "$x" in
+            --title=*|--text=*|--column=*|--ok-label=*)
+                k="${x%%=*}"
+                v="${x#*=}"
+                a+=("${k}=$(tr "$v")")
+                ;;
+            *) a+=("$(tr "$x")") ;;
+        esac
+    done
+    zenity "${a[@]}"
+}
+
+choose_language() {
+    local pick
+    pick="$(Z --list --title="Langue / Language" \
+        --text="$(printf 'Choisissez la langue de l interface.\nChoose the interface language.') " \
+        --width=480 --height=230 --column="Langue / Language" \
+        "Français" "English")"
+    case "$pick" in
+        "Français") save_ui_lang fr ;;
+        "English") save_ui_lang en ;;
+        *) return 1 ;;
+    esac
+}
+
+load_ui_lang
+
+# ==== TABLE DE TRADUCTION FR -> EN ====
+# Libellés et titres communs
+EN_TR["Choisissez une option :"]="Choose an option:"
+EN_TR["Choisissez un logiciel :"]="Choose software:"
+EN_TR["Action"]="Action"
+EN_TR["Description"]="Description"
+EN_TR["Version"]="Version"
+EN_TR["Statut"]="Status"
+EN_TR["Logiciel"]="Software"
+EN_TR["Format"]="Format"
+EN_TR["Layout"]="Layout"
+EN_TR["Langue installée"]="Installed language"
+EN_TR["Langue système"]="System language"
+EN_TR["Clavier"]="Keyboard"
+EN_TR["Choisissez la disposition du clavier :"]="Choose the keyboard layout:"
+EN_TR["Que voulez-vous supprimer ?"]="What do you want to remove?"
+EN_TR["Quel format d'installation ?"]="Which installation format?"
+EN_TR["Traitement en cours…"]="Working…"
+EN_TR["Détail de l'erreur"]="Error details"
+EN_TR["Dépendances"]="Dependencies"
+EN_TR["Dépôts"]="Repositories"
+EN_TR["Kernels"]="Kernels"
+EN_TR["Système"]="System"
+EN_TR["Maintenance"]="Maintenance"
+EN_TR["Utilisateur"]="User"
+EN_TR["Mot de passe"]="Password"
+EN_TR["Mise à jour"]="Update"
+EN_TR["Mises à jour"]="Updates"
+EN_TR["Installation"]="Installation"
+EN_TR["Désinstallation"]="Uninstallation"
+EN_TR["Installer"]="Install"
+EN_TR["Désinstaller"]="Uninstall"
+EN_TR["Mettre à jour"]="Update"
+EN_TR["Vérifier les mises à jour"]="Check for updates"
+EN_TR["Langue / Language"]="Language / Langue"
+EN_TR["Français"]="Français"
+EN_TR["English"]="English"
+EN_TR["Root"]="Root"
+EN_TR["Flatpak"]="Flatpak"
+EN_TR["RPM Fusion"]="RPM Fusion"
+EN_TR["Langue"]="Language"
+EN_TR["Langue du compte"]="Account language"
+EN_TR["Configuration"]="Configuration"
+EN_TR["Alimentation"]="Power"
+EN_TR["Ventilateur"]="Fan"
+EN_TR["Boost"]="Boost"
+EN_TR["Kernel"]="Kernel"
+EN_TR["Kernel PS5"]="PS5 kernel"
+EN_TR["Kernel par défaut"]="Default kernel"
+EN_TR["Kernel à démarrer"]="Kernel to boot"
+EN_TR["RADV"]="RADV"
+EN_TR["Vulkan"]="Vulkan"
+EN_TR["Mesa / Vulkan"]="Mesa / Vulkan"
+EN_TR["Etcher"]="Etcher"
+EN_TR["Opera"]="Opera"
+EN_TR["Brave"]="Brave"
+EN_TR["Steam"]="Steam"
+EN_TR["PS5 Hardware Control"]="PS5 Hardware Control"
+EN_TR["PS5 Fan Manager"]="PS5 Fan Manager"
+# Menu principal
+EN_TR["Mise à jour / Désinstallation"]="Update / Uninstall"
+EN_TR["Mettre à jour le manager depuis GitHub (+ dépendances) ou le désinstaller"]="Update the manager from GitHub (and its dependencies), or uninstall it"
+EN_TR["Configuration des langues"]="Language configuration"
+EN_TR["Langpacks installés, installer une langue, configurer langue + clavier + session"]="Installed language packs, install a language, configure language + keyboard + session"
+EN_TR["Gestion des dépôts"]="Repository management"
+EN_TR["Voir, installer (RPM/Flatpak), supprimer, mettre à jour ou ajouter un dépôt"]="View, install (RPM/Flatpak), remove, update or add a repository"
+EN_TR["Gestion des utilisateurs"]="User management"
+EN_TR["Voir, éditer (mot de passe + langue), ajouter/supprimer un compte, root"]="View, edit (password + language), add/remove an account, root"
+EN_TR["Mises à jour Fedora"]="Fedora updates"
+EN_TR["Applications, système, langpacks, métadonnées des dépôts"]="Applications, system, language packs, repository metadata"
+EN_TR["Maintenance & Nettoyage"]="Maintenance & cleanup"
+EN_TR["Cache DNF, orphelins, journaux, fichiers temporaires, Flatpak, kernels"]="DNF cache, orphans, logs, temporary files, Flatpak, kernels"
+EN_TR["Management de l'alimentation"]="Power management"
+EN_TR["Veille complète, système ou écran : activation / désactivation"]="Full, system or screen sleep: enable / disable"
+EN_TR["Status, fan on/off, boost on/off, service, restart, mise à jour"]="Status, fan on/off, boost on/off, service, restart, update"
+EN_TR["Matériel sysfs, installer, vérifier les mises à jour, désinstaller"]="sysfs hardware, install, check for updates, uninstall"
+EN_TR["Mesa / Vulkan & RADV"]="Mesa / Vulkan & RADV"
+EN_TR["Outils Vulkan, mesa, résumé Vulkan complet, vérification RADV"]="Vulkan tools, mesa, full Vulkan summary, RADV check"
+EN_TR["Mise à jour Kernel"]="Kernel update"
+EN_TR["Installer le dernier kernel PS5 (RPM) et choisir le kernel par défaut"]="Install the latest PS5 kernel (RPM) and choose the boot kernel"
+EN_TR["Logithèque / Logiciels"]="Software library"
+EN_TR["Steam, Heroic, ProtonUp, Decky, Etcher, Opera, Brave, Bazaar..."]="Steam, Heroic, ProtonUp, Decky, Etcher, Opera, Brave, Bazaar..."
+EN_TR["Choisir la langue de l'interface : Français ou English"]="Choose the interface language: French or English"
+# Menu 1
+EN_TR["1. Mise à jour / Désinstallation"]="1. Update / Uninstall"
+EN_TR["Mettre à jour le manager + ses dépendances"]="Update the manager and its dependencies"
+EN_TR["Désinstaller complètement le manager"]="Completely uninstall the manager"
+EN_TR["Supprimer le gestionnaire et ses fichiers ?"]="Remove the manager and its files?"
+EN_TR["PS5 Fedora Manager a été désinstallé."]="PS5 Fedora Manager has been uninstalled."
+EN_TR["Le gestionnaire a été mis à jour (script + dépendances)."]="The manager has been updated (script + dependencies)."
+EN_TR["Installation terminée."]="Installation complete."
+EN_TR["Échec du clonage"]="Clone failed"
+EN_TR["Échec de la mise à jour"]="Update failed"
+# Menu 2
+EN_TR["2. Configuration des langues"]="2. Language configuration"
+EN_TR["Voir les langpacks installés (système + clavier)"]="Show installed language packs (system + keyboard)"
+EN_TR["Installer une langue"]="Install a language"
+EN_TR["Configuration intégrale (langue + clavier + compte) et relance session"]="Full configuration (language + keyboard + account) and restart the session"
+EN_TR["Langpacks installés"]="Installed language packs"
+EN_TR["Code de langue (ex: fr_FR.UTF-8, es_ES.UTF-8) :"]="Language code (e.g. fr_FR.UTF-8, es_ES.UTF-8):"
+# Menu 3
+EN_TR["3. Gestion des dépôts"]="3. Repository management"
+EN_TR["Voir tous les dépôts (RPM + Flatpak système et utilisateur)"]="List all repositories (RPM + Flatpak system and user)"
+EN_TR["Installer les dépôts RPM (RPM Fusion free + nonfree)"]="Install the RPM repositories (RPM Fusion free + nonfree)"
+EN_TR["Installer le dépôt Flatpak (Flathub)"]="Install the Flatpak repository (Flathub)"
+EN_TR["Désinstaller / supprimer un dépôt"]="Uninstall / remove a repository"
+EN_TR["Mise à jour des dépôts & nettoyage du cache"]="Update repositories & clean the cache"
+EN_TR["Ajouter un dépôt personnalisé (URL .repo)"]="Add a custom repository (.repo URL)"
+EN_TR["Dépôts système (RPM + Flatpak)"]="System repositories (RPM + Flatpak)"
+EN_TR["Supprimer un dépôt"]="Remove a repository"
+EN_TR["Désactiver un dépôt DNF (sans le supprimer)"]="Disable a DNF repository (without removing it)"
+EN_TR["Supprimer un dépôt DNF (fichier .repo)"]="Remove a DNF repository (.repo file)"
+EN_TR["Supprimer un dépôt Flatpak"]="Remove a Flatpak repository"
+EN_TR["Désactiver un dépôt"]="Disable a repository"
+EN_TR["ID du dépôt (ex: rpmfusion-nonfree) :"]="Repository ID (e.g. rpmfusion-nonfree):"
+EN_TR["ID du dépôt (ex: brave-browser) :"]="Repository ID (e.g. brave-browser):"
+EN_TR["Nom du dépôt (ex: flathub) :"]="Repository name (e.g. flathub):"
+EN_TR["Dépôt"]="Repository"
+EN_TR["Ajouter un dépôt"]="Add a repository"
+EN_TR["URL du fichier .repo :"]="URL of the .repo file:"
+EN_TR["Dépôt ajouté."]="Repository added."
+EN_TR["Installation de RPM Fusion free + nonfree…"]="Installing RPM Fusion free + nonfree…"
+EN_TR["RPM Fusion free + nonfree installés."]="RPM Fusion free + nonfree installed."
+EN_TR["Dépôt Flathub installé (portée système)."]="Flathub repository installed (system-wide)."
+EN_TR["L'ajout de Flathub a échoué."]="Adding Flathub failed."
+EN_TR["Cache nettoyé, dépôts et métadonnées rafraîchis."]="Cache cleaned, repositories and metadata refreshed."
+EN_TR["Mise à jour des métadonnées Flatpak…"]="Updating Flatpak metadata…"
+EN_TR["Formats Flatpak"]="Flatpak formats"
+# Menu 4
+EN_TR["4. Gestion des utilisateurs"]="4. User management"
+EN_TR["Voir la liste des utilisateurs"]="List users"
+EN_TR["Ajouter un utilisateur"]="Add a user"
+EN_TR["Nom du nouveau compte :"]="New account name:"
+EN_TR["Supprimer un compte utilisateur"]="Delete a user account"
+EN_TR["Nom du compte à supprimer :"]="Account name to delete:"
+EN_TR["Root : état du compte et changement de mot de passe"]="Root: account status and password change"
+EN_TR["Compte root"]="Root account"
+EN_TR["Nouveau mot de passe pour root :"]="New password for root:"
+EN_TR["Mot de passe root"]="Root password"
+EN_TR["Mot de passe root modifié."]="Root password changed."
+EN_TR["La modification a échoué."]="The change failed."
+EN_TR["La modification a échoué (mot de passe contenant « : » ?)."]="The change failed (password containing a colon?)."
+EN_TR["Impossible d'appliquer la langue."]="Could not apply the language."
+EN_TR["La suppression a échoué (session ouverte ?)."]="Deletion failed (session still open?)."
+EN_TR["Utilisateurs du système"]="System users"
+# Menu 5
+EN_TR["5. Mises à jour Fedora"]="5. Fedora updates"
+EN_TR["Mettre à jour les applications (DNF & Flatpak)"]="Update applications (DNF & Flatpak)"
+EN_TR["Mettre à jour le système complet"]="Update the whole system"
+EN_TR["Mettre à jour les langpacks"]="Update language packs"
+EN_TR["Mettre à jour les métadonnées des dépôts"]="Update repository metadata"
+EN_TR["Applications mises à jour."]="Applications updated."
+EN_TR["Système mis à jour."]="System updated."
+EN_TR["Langpacks à jour."]="Language packs updated."
+EN_TR["Mise à jour DNF…"]="DNF update…"
+EN_TR["Mise à jour Flatpak…"]="Flatpak update…"
+EN_TR["Mise à jour complète…"]="Full update…"
+EN_TR["Mise à jour des langpacks…"]="Updating language packs…"
+EN_TR["Échec de la mise à jour DNF"]="DNF update failed"
+EN_TR["Échec de la mise à jour des langpacks"]="Language pack update failed"
+# Menu 6
+EN_TR["6. Maintenance & Nettoyage"]="6. Maintenance & cleanup"
+EN_TR["Nettoyage complet (cache, journaux, temporaires, Flatpak inutilisé)"]="Full cleanup (cache, logs, temporary files, unused Flatpak)"
+EN_TR["Nettoyer uniquement le cache DNF"]="Clean the DNF cache only"
+EN_TR["Supprimer les paquets orphelins (autoremove)"]="Remove orphaned packages (autoremove)"
+EN_TR["Réduire les journaux systemd"]="Shrink the systemd journal"
+EN_TR["Nettoyer /tmp et /var/tmp"]="Clean /tmp and /var/tmp"
+EN_TR["Nettoyer les caches de l'utilisateur (vignettes)"]="Clean user caches (thumbnails)"
+EN_TR["Supprimer les anciens kernels (garder 2)"]="Remove old kernels (keep 2)"
+EN_TR["Voir l'espace disque utilisé"]="Show disk usage"
+EN_TR["Espace disque"]="Disk space"
+EN_TR["Caches DNF, journaux de plus de 7 jours, fichiers temporaires, vignettes et runtimes Flatpak inutilisés nettoyés."]="DNF caches, logs older than 7 days, temporary files, thumbnails and unused Flatpak runtimes cleaned."
+EN_TR["Vignettes de l'utilisateur nettoyées."]="User thumbnails cleaned."
+EN_TR["/tmp et /var/tmp nettoyés."]="/tmp and /var/tmp cleaned."
+EN_TR["Journaux réduits à 7 jours."]="Journal reduced to 7 days."
+EN_TR["Paquets orphelins supprimés."]="Orphaned packages removed."
+EN_TR["Cache DNF nettoyé et recréé."]="DNF cache cleaned and rebuilt."
+EN_TR["Nettoyage complet…"]="Full cleanup…"
+EN_TR["Nettoyage du cache DNF…"]="Cleaning the DNF cache…"
+EN_TR["Suppression des orphelins…"]="Removing orphans…"
+EN_TR["Réduction des journaux…"]="Shrinking logs…"
+EN_TR["Nettoyage des temporaires…"]="Cleaning temporary files…"
+EN_TR["Suppression des anciens kernels…"]="Removing old kernels…"
+EN_TR["Échec du nettoyage"]="Cleanup failed"
+EN_TR["Échec de autoremove"]="autoremove failed"
+EN_TR["Échec de journalctl"]="journalctl failed"
+EN_TR["Échec de la suppression"]="Removal failed"
+EN_TR["Anciens kernels supprimés (2 conservés)."]="Old kernels removed (2 kept)."
+EN_TR["Aucun paquet kernel trouvé."]="No kernel package found."
+EN_TR["package-cleanup est indisponible (paquet dnf-utils absent sur cette version).\nAucune suppression effectuée."]="package-cleanup is unavailable (dnf-utils missing on this release).\nNothing was removed."
+# Menu 7
+EN_TR["7. Management de l'alimentation"]="7. Power management"
+EN_TR["Activer la veille complète (système + écran)"]="Enable full sleep (system + screen)"
+EN_TR["Désactiver la veille complète"]="Disable full sleep (system + screen)"
+EN_TR["Activer la veille système (suspend/hibernate)"]="Enable system sleep (suspend/hibernate)"
+EN_TR["Désactiver la veille système"]="Disable system sleep"
+EN_TR["Activer la mise en veille de l'écran (5 min)"]="Enable screen blanking (5 min)"
+EN_TR["Désactiver la mise en veille de l'écran"]="Disable screen blanking"
+EN_TR["Veille complète activée (système + écran après 5 min)."]="Full sleep enabled (system + screen after 5 min)."
+EN_TR["Veille complète désactivée (système + écran)."]="Full sleep disabled (system + screen)."
+EN_TR["Échec : la veille complète n a pas pu être activée."]="Failed: full sleep could not be enabled."
+EN_TR["Échec : la veille complète n a pas pu être désactivée."]="Failed: full sleep could not be disabled."
+EN_TR["Veille système activée."]="System sleep enabled."
+EN_TR["Veille système désactivée."]="System sleep disabled."
+EN_TR["Veille écran activée (5 min)."]="Screen blanking enabled (5 min)."
+EN_TR["Veille écran désactivée."]="Screen blanking disabled."
+EN_TR["Impossible de démasquer les cibles de veille."]="Could not unmask the sleep targets."
+EN_TR["Impossible de masquer les cibles de veille."]="Could not mask the sleep targets."
+EN_TR["gsettings a échoué (session GNOME absente ?)."]="gsettings failed (no GNOME session?)."
+# Menu 8
+EN_TR["8. PS5 Fan Manager"]="8. PS5 Fan Manager"
+EN_TR["Voir le status (services + ps5_control)"]="Show status (services + ps5_control)"
+EN_TR["Fan on (activer au démarrage)"]="Fan on (enable at boot)"
+EN_TR["Fan off"]="Fan off"
+EN_TR["Boost on"]="Boost on"
+EN_TR["Boost off"]="Boost off"
+EN_TR["Voir l'état des services fan / boost"]="Show fan / boost service status"
+EN_TR["Relancer le service"]="Restart the service"
+EN_TR["Installer / mettre à jour ps5-linux-tools"]="Install / update ps5-linux-tools"
+EN_TR["Status ventilateur"]="Fan status"
+EN_TR["Services Fan / Boost"]="Fan / Boost services"
+EN_TR["ps5fan.service activé et démarré."]="ps5fan.service enabled and started."
+EN_TR["ps5fan.service arrêté et désactivé."]="ps5fan.service stopped and disabled."
+EN_TR["ps5fan.service relancé."]="ps5fan.service restarted."
+EN_TR["ps5boost.service activé et démarré."]="ps5boost.service enabled and started."
+EN_TR["ps5boost.service arrêté et désactivé."]="ps5boost.service stopped and disabled."
+EN_TR["Impossible d'activer ps5fan.service (ps5-linux-tools installé ?)."]="Could not enable ps5fan.service (is ps5-linux-tools installed?)."
+EN_TR["Impossible de désactiver ps5fan.service."]="Could not disable ps5fan.service."
+EN_TR["Impossible d'activer ps5boost.service."]="Could not enable ps5boost.service."
+EN_TR["Impossible de désactiver ps5boost.service."]="Could not disable ps5boost.service."
+EN_TR["Impossible de relancer ps5fan.service."]="Could not restart ps5fan.service."
+EN_TR["Récupération du dépôt…"]="Fetching the repository…"
+EN_TR["Compilation et installation…"]="Building and installing…"
+EN_TR["Échec de install.sh"]="install.sh failed"
+EN_TR["Fan et boost installés / mis à jour.\nServices : ps5fan.service et ps5boost.service."]="Fan and boost installed / updated.\nServices: ps5fan.service and ps5boost.service."
+# Menu 9
+EN_TR["9. PS5 Hardware Control"]="9. PS5 Hardware Control"
+EN_TR["Vérifier la présence du matériel (/sys/class/hwmon et noeuds PS5)"]="Check hardware presence (/sys/class/hwmon and PS5 nodes)"
+EN_TR["Installer PS5 Hardware Control"]="Install PS5 Hardware Control"
+EN_TR["Mettre à jour PS5 Hardware Control"]="Update PS5 Hardware Control"
+EN_TR["Désinstaller PS5 Hardware Control"]="Uninstall PS5 Hardware Control"
+EN_TR["Non installé.\nUtilisez l'option Installer."]="Not installed.\nUse the Install option."
+EN_TR["Impossible de lire la version disponible sur GitHub."]="Could not read the version available on GitHub."
+EN_TR["Matériel PS5"]="PS5 hardware"
+EN_TR["L'installateur a échoué.\nLancez-le dans un terminal pour voir le détail."]="The installer failed.\nRun it in a terminal to see the details."
+EN_TR["La désinstallation a échoué."]="Uninstall failed."
+EN_TR["Installation / mise à jour terminée.\nLancez « ps5-hwcon-gui » (mot de passe demandé)."]="Installation / update complete.\nRun « ps5-hwcon-gui » (password required)."
+EN_TR["Désinstallé (vos réglages dans /var/lib/ps5-hwcon sont conservés)."]="Uninstalled (your settings in /var/lib/ps5-hwcon are kept)."
+# Menu 10
+EN_TR["10. Mesa / Vulkan & RADV"]="10. Mesa / Vulkan & RADV"
+EN_TR["Installer les outils Vulkan & Mesa demos"]="Install Vulkan tools & Mesa demos"
+EN_TR["Vérifier la prise en charge RADV (GPU AMD PS5)"]="Check RADV support (PS5 AMD GPU)"
+EN_TR["Afficher le résumé Vulkan complet"]="Show the full Vulkan summary"
+EN_TR["vulkaninfo est absent : utilisez d'abord l'option 1."]="vulkaninfo is missing: use option 1 first."
+EN_TR["Mesa et Vulkan mis à jour."]="Mesa and Vulkan updated."
+EN_TR["vulkan-tools et mesa-demos installés."]="vulkan-tools and mesa-demos installed."
+EN_TR["Vérification RADV"]="RADV check"
+EN_TR["Résumé Vulkan"]="Vulkan summary"
+# Menu 11
+EN_TR["11. Mise à jour Kernel PS5"]="11. PS5 kernel update"
+EN_TR["Installer le dernier kernel PS5 (RPM de ps5-linux-patches)"]="Install the latest PS5 kernel (ps5-linux-patches RPM)"
+EN_TR["Choisir le kernel à démarrer (copie sur /boot/efi)"]="Choose the boot kernel (copied to /boot/efi)"
+EN_TR["Ce kernel n'est publié que pour x86_64."]="This kernel is published for x86_64 only."
+EN_TR["Impossible de contacter GitHub pour trouver la dernière release."]="Could not reach GitHub to find the latest release."
+EN_TR["Échec du téléchargement du kernel"]="Kernel download failed"
+EN_TR["Échec de l'installation du kernel"]="Kernel installation failed"
+EN_TR["Aucun kernel trouvé dans /boot."]="No kernel found in /boot."
+EN_TR["La copie vers /boot/efi a échoué (ESP en lecture seule ou plein ?)."]="Copy to /boot/efi failed (ESP read-only or full?)."
+EN_TR["installé"]="installed"
+EN_TR["démarré "]="running "
+EN_TR["sur /boot/efi "]="on /boot/efi "
+# Menu 12
+EN_TR["12. Logithèque PS5"]="12. PS5 software library"
+EN_TR["RPM (dépôt officiel)"]="RPM (official repository)"
+EN_TR["Flatpak (Flathub)"]="Flatpak (Flathub)"
+EN_TR["Vérification impossible (dépôt indisponible ?)."]="Check impossible (repository unavailable?)."
+EN_TR["Ajout du dépôt impossible.\n%s"]="Could not add the repository.\n%s"
+
+# ==== CHAÎNES DE FORMAT (utilisées avec trf) ====
+EN_FMT["Supprimer ces fichiers ?\n\n%s"]="Remove these files?\n\n%s"
+EN_FMT["Kernels installés :\n\n%s\n\nSupprimer les anciens en gardant les 2 plus récents ?"]="Installed kernels:\n\n%s\n\nRemove old kernels, keeping the 2 most recent?"
+EN_FMT["À jour.\n\nVersion installée : %s\nVersion GitHub   : %s"]="Up to date.\n\nInstalled version: %s\nGitHub version:    %s"
+EN_FMT["Mise à jour disponible.\n\nVersion installée : %s\nVersion GitHub   : %s\n\nUtilisez l option Mettre à jour."]="Update available.\n\nInstalled version: %s\nGitHub version:    %s\n\nUse the Update option."
+EN_FMT["Le paquet est introuvable (HTTP %s).\n\n%s"]="Package not found (HTTP %s).\n\n%s"
+EN_FMT["Installer le kernel PS5 %s ?\n\nPaquet : linux-ps5-%s-1.x86_64.rpm\n\n- modules dans /usr/lib/modules/%s\n- dracut génère /boot/initrd.img-%s\n- le noyau est copié dans /boot/efi par le paquet, et c est lui qui démarre\n\nUn redémarrage sera nécessaire."]="Install PS5 kernel %s?\n\nPackage: linux-ps5-%s-1.x86_64.rpm\n\n- modules in /usr/lib/modules/%s\n- dracut generates /boot/initrd.img-%s\n- the package copies the kernel to /boot/efi, which is what boots\n\nA reboot will be required."
+EN_FMT["Kernel %s installé\n\n"]="Kernel %s installed\n\n"
+EN_FMT["  /boot/initrd.img-%s ..... ABSENT (dracut a échoué)\n\n"]="  /boot/initrd.img-%s ..... MISSING (dracut failed)\n\n"
+EN_FMT["  /boot/efi/bzImage ....... ABSENT (ESP non monté ?)\n"]="  /boot/efi/bzImage ....... MISSING (ESP not mounted?)\n"
+EN_FMT["\nRPM conservé : %s\n"]="\nRPM kept: %s\n"
+EN_FMT["\nKernel actuellement démarré : %s"]="\nCurrently running kernel: %s"
+EN_FMT["Kernel démarré : %s\nKernel sur /boot/efi : %s\n\nChoisissez le kernel à placer sur /boot/efi (celui qui démarre) :"]="Running kernel: %s\nKernel on /boot/efi: %s\n\nChoose the kernel to place on /boot/efi (the one that boots):"
+EN_FMT["Copier le kernel %s sur /boot/efi ?\n\n/boot/vmlinuz-%s      -> /boot/efi/bzImage\n/boot/initrd.img-%s   -> /boot/efi/initrd.img\n\nLes fichiers actuels seront sauvegardés en .bak.\nUn redémarrage sera nécessaire."]="Copy kernel %s to /boot/efi?\n\n/boot/vmlinuz-%s      -> /boot/efi/bzImage\n/boot/initrd.img-%s   -> /boot/efi/initrd.img\n\nCurrent files will be saved as .bak.\nA reboot will be required."
+EN_FMT["Kernel %s copié sur /boot/efi.\n\nSauvegarde de l ancien : /boot/efi/bzImage.bak\n\nRedémarrez pour l utiliser."]="Kernel %s copied to /boot/efi.\n\nBackup of the previous one: /boot/efi/bzImage.bak\n\nReboot to use it."
+EN_FMT["Ajout du dépôt impossible.\n\n%s"]="Could not add the repository.\n\n%s"
+EN_FMT["Mise à jour disponible.\n\nInstallé : %s\nGitHub   : %s"]="Update available.\n\nInstalled: %s\nGitHub:    %s"
+EN_FMT["<span size=\"x-large\" weight=\"bold\">PS5 Linux Universal Manager</span>\n\nSystème : %s | Noyau : %s\nChoisissez une action :"]="<span size=\"x-large\" weight=\"bold\">PS5 Linux Universal Manager</span>\n\nSystem: %s | Kernel: %s\nChoose an action:"
+EN_FMT["Langue : %s\nClavier : %s\n\nLa session va se fermer pour appliquer les changements.\nContinuer ?"]="Language: %s\nKeyboard: %s\n\nThe session will close to apply the changes.\nContinue?"
+EN_FMT["Échec.\n\n%s"]="Failed.\n\n%s"
+EN_FMT["État du compte root :\n\n%s\n\nUn mot de passe n est jamais affichable (il est stocké haché).\nVoulez-vous définir un nouveau mot de passe root ?"]="Root account status:\n\n%s\n\nA password can never be displayed (it is stored hashed).\nDo you want to set a new root password?"
+# Compléments
+EN_FMT["%s supprimé."]="%s removed."
+EN_FMT["%s n est pas installé."]="%s is not installed."
+EN_FMT["%s est à jour."]="%s is up to date."
+EN_FMT["Une mise à jour de %s est disponible."]="An update for %s is available."
+EN_FMT["%s est déjà installé."]="%s is already installed."
+EN_FMT["%s installé."]="%s installed."
+EN_FMT["%s mis à jour."]="%s updated."
+EN_FMT["%s est déjà installé (%s)."]="%s is already installed (%s)."
+EN_FMT["%s installé via RPM."]="%s installed via RPM."
+EN_FMT["%s installé via Flatpak."]="%s installed via Flatpak."
+EN_FMT["%s mis à jour (RPM)."]="%s updated (RPM)."
+EN_FMT["%s mis à jour (Flatpak)."]="%s updated (Flatpak)."
+EN_FMT["%s est à jour (RPM)."]="%s is up to date (RPM)."
+EN_FMT["%s est à jour (Flatpak)."]="%s is up to date (Flatpak)."
+EN_FMT["Une mise à jour de %s est disponible (RPM)."]="An update for %s is available (RPM)."
+EN_FMT["Une mise à jour de %s est disponible (Flatpak)."]="An update for %s is available (Flatpak)."
+EN_FMT["Logiciel inconnu : %s"]="Unknown software: %s"
+EN_FMT["Dépôt %s désactivé."]="Repository %s disabled."
+EN_FMT["Dépôt %s supprimé."]="Repository %s removed."
+EN_FMT["Aucun fichier .repo ne définit %s dans /etc/yum.repos.d."]="No .repo file defines %s in /etc/yum.repos.d."
+EN_FMT["Suppression de %s impossible."]="Could not remove %s."
+EN_FMT["Supprimer le dépôt Flatpak %s ?"]="Remove the Flatpak repository %s?"
+EN_FMT["Le RPM téléchargé est vide : %s"]="The downloaded RPM is empty: %s"
+EN_FMT["Le fichier /boot/vmlinuz-%s est absent."]="The file /boot/vmlinuz-%s is missing."
+EN_FMT["Le fichier /boot/initrd.img-%s est absent : ce kernel ne peut pas démarrer."]="The file /boot/initrd.img-%s is missing: this kernel cannot boot."
+EN_FMT["Éditer mon compte (%s) : mot de passe et langue"]="Edit my account (%s): password and language"
+EN_FMT["Nouveau mot de passe pour %s (vide = inchangé) :"]="New password for %s (empty = unchanged):"
+EN_FMT["Mot de passe de %s mis à jour."]="Password for %s updated."
+EN_FMT["Langue du compte %s"]="Language for account %s"
+EN_FMT["Langue %s appliquée à %s.\nDéconnectez-vous pour l appliquer."]="Language %s applied to %s.\nLog out to apply it."
+EN_FMT["Mot de passe pour %s :"]="Password for %s:"
+EN_FMT["Compte %s créé."]="Account %s created."
+EN_FMT["La création de %s a échoué."]="Creating %s failed."
+EN_FMT["Suppression de %s refusée (compte root ou compte courant)."]="Refusing to delete %s (root or current account)."
+EN_FMT["Supprimer le compte %s et son dossier personnel ?"]="Delete account %s and its home directory?"
+EN_FMT["Compte %s supprimé."]="Account %s deleted."
+EN_FMT["Aucun langpack trouvé pour %s."]="No language pack found for %s."
+EN_FMT["Quelle action pour %s ?"]="Which action for %s?"
+# ==== Journal / logs ====
+EN_TR["14. Journal / Logs"]="14. Logs"
+EN_TR["Journal / Logs"]="Logs"
+EN_TR["Voir en direct ce que fait le gestionnaire (fenêtre de log, historique, effacement)"]="Watch live what the manager is doing (log window, history, clearing)"
+EN_TR["Ouvrir la fenêtre de log en direct"]="Open the live log window"
+EN_TR["Voir le journal de cette session"]="View this session's log"
+EN_TR["Voir un ancien journal"]="View an older log"
+EN_TR["Activer / désactiver la fenêtre automatique"]="Enable / disable the automatic log window"
+EN_TR["Effacer les journaux"]="Clear the logs"
+EN_TR["Journal"]="Log"
+EN_TR["Journaux"]="Logs"
+EN_TR["Journal de la session"]="Session log"
+EN_TR["Ancien journal"]="Older log"
+EN_TR["Choisissez un journal :"]="Choose a log:"
+EN_TR["Fichier"]="File"
+EN_TR["Aucun journal enregistré pour le moment."]="No log recorded yet."
+EN_TR["Aucun terminal graphique détecté (gnome-terminal, kgx, xterm…).\nLe journal est affiché ici à la place."]="No graphical terminal found (gnome-terminal, kgx, xterm…).\nThe log is shown here instead."
+EN_TR["Fenêtre de log automatique : activée."]="Automatic log window: enabled."
+EN_TR["Fenêtre de log automatique : désactivée."]="Automatic log window: disabled."
+EN_TR["Supprimer tous les journaux ?"]="Delete all logs?"
+EN_TR["Journaux effacés."]="Logs cleared."
+EN_TR["Ouvrir la nouvelle interface GTK (aperçu)"]="Open the new GTK interface (preview)"
+EN_TR["Interface GTK"]="GTK interface"
+EN_TR["ps5-manager-gui.py est introuvable (mettez le manager à jour)."]="ps5-manager-gui.py not found (update the manager)."
+EN_TR["GTK4/libadwaita est absent : sudo dnf install python3-gobject gtk4 libadwaita"]="GTK4/libadwaita is missing: sudo dnf install python3-gobject gtk4 libadwaita"
+EN_TR["L interface GTK s ouvre (aperçu). Journal : /tmp/ps5-manager-gui.log"]="The GTK interface is opening (preview). Log: /tmp/ps5-manager-gui.log"
+
+EN_FMT["Ce que fait réellement le gestionnaire, en direct.\nJournal de cette session : %s"]="What the manager is actually doing, live.\nThis session log: %s"
+
+EN_TR["Aucun message."]="No message."
+EN_TR["Decky est installé.\\nUtilisez « Mettre à jour » pour passer à la dernière version."]="Decky is installed.\\nUse « Update » to get the latest version."
+EN_TR["Decky n est pas installé."]="Decky is not installed."
+EN_TR["Etcher est à jour."]="Etcher is up to date."
+EN_TR["Etcher installé / mis à jour depuis le RPM GitHub."]="Etcher installed / updated from the GitHub RPM."
+EN_TR["Etcher n est pas installé."]="Etcher is not installed."
+EN_TR["Impossible de trouver le RPM sur les releases GitHub."]="Could not find the RPM on the GitHub releases."
+EN_TR["Langue de l'interface : Français"]="Interface language: French"
+EN_TR["Mettre à jour les paquets Mesa & Vulkan"]="Update the Mesa & Vulkan packages"
+EN_TR["Supprimer un utilisateur"]="Delete a user"
+
+
+
+# ------------------------------------------------------------------------------
 # Interface
 # ------------------------------------------------------------------------------
-info()     { zenity --info    --title="$1" --text="$2" --width="${3:-440}"; }
-warn()     { zenity --warning --title="$1" --text="$2" --width="${3:-440}"; }
-error()    { zenity --error   --title="$1" --text="$2" --width="${3:-460}"; }
-confirm()  { zenity --question --title="$1" --text="$2" --width="${3:-440}"; }
-ask()      { zenity --entry   --title="$1" --text="$2"; }
-ask_pass() { zenity --password --title="$1" --text="$2"; }
-show_text(){ zenity --text-info --title="$1" --width="${3:-660}" --height="${4:-440}" <<< "$2"; }
+info()     { Z --info    --title="$1" --text="$2" --width="${3:-440}"; }
+warn()     { Z --warning --title="$1" --text="$2" --width="${3:-440}"; }
+error()    { Z --error   --title="$1" --text="$2" --width="${3:-460}"; }
+confirm()  { Z --question --title="$1" --text="$2" --width="${3:-440}"; }
+ask()      { Z --entry   --title="$1" --text="$2"; }
+ask_pass() { Z --password --title="$1" --text="$2"; }
+show_text(){
+    # Les commandes tournent dans un pty (journal vivant) : on retire les retours
+    # chariot et les codes couleur avant de les afficher dans la fenêtre.
+    local body
+    body="$(printf '%s' "$2" | command tr -d '\r' | command sed -e 's/\x1b\[[0-9;?]*[a-zA-Z]//g')"
+    Z --text-info --title="$1" --width="${3:-660}" --height="${4:-440}" <<< "$body"
+}
+
+# ------------------------------------------------------------------------------
+# Journal : un fichier par session + fenêtre de terminal qui le suit en direct
+# ------------------------------------------------------------------------------
+LOG_DIR="/var/log/ps5-manager"
+LOG_WINDOW_FILE="/etc/ps5-manager/log-window"
+SESSION_LOG=""
+LOG_WIN_OPEN=""
+
+log_line() {
+    [ -n "$SESSION_LOG" ] || return 0
+    printf '%s  %s\n' "$(date +%H:%M:%S)" "$*" >> "$SESSION_LOG" 2>/dev/null
+}
+
+log_setup() {
+    local dir="$LOG_DIR"
+    mkdir -p "$dir" 2>/dev/null
+    if [ ! -d "$dir" ] || [ ! -w "$dir" ]; then
+        # pas les droits sur /var/log (lancement non-root) : on bascule sur /tmp
+        dir="${TMPDIR:-/tmp}/ps5-manager-logs"
+        mkdir -p "$dir" 2>/dev/null
+    fi
+    LOG_DIR="$dir"
+    # rotation : on garde 14 jours de journaux
+    find "$dir" -maxdepth 1 -name 'session-*.log' -mtime +14 -delete 2>/dev/null
+    SESSION_LOG="$dir/session-$(date +%Y%m%d-%H%M%S)-$$.log"
+    if ! { : > "$SESSION_LOG"; } 2>/dev/null; then
+        SESSION_LOG="$(mktemp)"
+    fi
+    chmod 0644 "$SESSION_LOG" 2>/dev/null
+    { ln -sfn "$SESSION_LOG" "$dir/latest.log"; } 2>/dev/null
+    log_line "════ PS5 Manager — $(date '+%F %T') — utilisateur : $REAL_USER — PID $$"
+    log_line "système : $(uname -srm)"
+}
+
+log_window_enabled() {
+    [ "$(head -n1 "$LOG_WINDOW_FILE" 2>/dev/null)" != "off" ]
+}
+
+log_window_toggle() {
+    mkdir -p "$(dirname "$LOG_WINDOW_FILE")" 2>/dev/null
+    if log_window_enabled; then
+        echo "off" > "$LOG_WINDOW_FILE" 2>/dev/null
+    else
+        echo "on" > "$LOG_WINDOW_FILE" 2>/dev/null
+    fi
+}
+
+# Ouvre une vraie fenêtre de terminal (celle de l'utilisateur, pas de root) qui
+# suit le journal avec tail -f : on y voit dnf, flatpak, git, curl défiler.
+open_log_window() {
+    local logf="${1:-$SESSION_LOG}" term
+    [ -n "$logf" ] && [ -r "$logf" ] || return 1
+    [ -n "$LOG_WIN_OPEN" ] && return 0
+    local -a cmd=()
+    for term in ptyxis kgx gnome-terminal konsole xfce4-terminal mate-terminal tilix xterm; do
+        command -v "$term" >/dev/null 2>&1 || continue
+        case "$term" in
+            ptyxis|kgx|gnome-terminal)            cmd=("$term" -- tail -n +1 -f "$logf") ;;
+            konsole|xfce4-terminal|mate-terminal) cmd=("$term" -e tail -n +1 -f "$logf") ;;
+            tilix)                                cmd=("$term" -e "tail -n +1 -f $logf") ;;
+            xterm)                                cmd=("$term" -T "PS5 Manager - journal" \
+                                                       -geometry 110x30 -e tail -n +1 -f "$logf") ;;
+        esac
+        if run_as_user "${cmd[@]}" >/dev/null 2>&1; then
+            LOG_WIN_OPEN="$term"
+            return 0
+        fi
+    done
+    return 1
+}
+
+# Ouvre la nouvelle interface GTK (aperçu), qui réutilise ce script en --cli.
+launch_gui() {
+    local gui="" c
+    for c in /usr/local/bin/ps5-manager-gui "$INSTALL_DIR/ps5-manager-gui.py" \
+             "$(dirname "$(readlink -f "$0")")/ps5-manager-gui.py"; do
+        [ -f "$c" ] && { gui="$c"; break; }
+    done
+    if [ -z "$gui" ]; then
+        error "$(tr 'Interface GTK')" \
+            "$(tr 'ps5-manager-gui.py est introuvable (mettez le manager à jour).')"
+        return 1
+    fi
+    if ! python3 -c 'import gi; gi.require_version("Gtk","4.0"); gi.require_version("Adw","1")' \
+            >/dev/null 2>&1; then
+        error "$(tr 'Interface GTK')" \
+            "$(tr 'GTK4/libadwaita est absent : sudo dnf install python3-gobject gtk4 libadwaita')"
+        return 1
+    fi
+    PS5_MANAGER_ELEVATED=1 nohup python3 "$gui" >/tmp/ps5-manager-gui.log 2>&1 &
+    info "$(tr 'Interface GTK')" \
+        "$(tr 'L interface GTK s ouvre (aperçu). Journal : /tmp/ps5-manager-gui.log')"
+}
+
+# Menu 14
+log_menu() {
+    local c f logf body
+    local -a files=()
+    log_setup_once
+    c="$(Z --list --title="$(tr '14. Journal / Logs')" \
+        --text="$(trf 'Ce que fait réellement le gestionnaire, en direct.\nJournal de cette session : %s' "${SESSION_LOG:-—}")" \
+        --width=680 --height=380 --column="ID" --column="$(tr 'Action')" \
+        "1" "$(tr 'Ouvrir la fenêtre de log en direct')" \
+        "2" "$(tr 'Voir le journal de cette session')" \
+        "3" "$(tr 'Voir un ancien journal')" \
+        "4" "$(tr 'Activer / désactiver la fenêtre automatique')" \
+        "5" "$(tr 'Effacer les journaux')" \
+        "6" "$(tr 'Ouvrir la nouvelle interface GTK (aperçu)')")"
+    [ -n "$c" ] || return 0
+    case "$c" in
+        1)
+            if ! open_log_window; then
+                warn "$(tr 'Journal')" \
+                     "$(tr 'Aucun terminal graphique détecté (gnome-terminal, kgx, xterm…).\nLe journal est affiché ici à la place.')"
+                show_text "$(tr 'Journal de la session')" \
+                    "$(tail -n 800 "$SESSION_LOG" 2>/dev/null)" 900 620
+            fi
+            ;;
+        2)
+            body="$(tail -n 1200 "$SESSION_LOG" 2>/dev/null)"
+            [ -n "$body" ] || body="$(tr 'Aucun journal enregistré pour le moment.')"
+            show_text "$(tr 'Journal de la session')" "$body" 940 640
+            ;;
+        3)
+            while IFS= read -r f; do files+=("$f"); done < <(
+                find "$LOG_DIR" -maxdepth 1 -name 'session-*.log' -printf '%T@ %p\n' 2>/dev/null |
+                    sort -rn | head -20 | cut -d' ' -f2-)
+            if [ "${#files[@]}" -eq 0 ]; then
+                info "$(tr 'Journal')" "$(tr 'Aucun journal enregistré pour le moment.')"
+                return 0
+            fi
+            logf="$(Z --list --title="$(tr 'Ancien journal')" --text="$(tr 'Choisissez un journal :')" \
+                --width=760 --height=420 --column="$(tr 'Fichier')" "${files[@]}")"
+            [ -n "$logf" ] || return 0
+            show_text "$logf" "$(tail -n 1200 "$logf" 2>/dev/null)" 940 640
+            ;;
+        4)
+            log_window_toggle
+            if log_window_enabled; then
+                info "$(tr 'Journal')" "$(tr 'Fenêtre de log automatique : activée.')"
+            else
+                info "$(tr 'Journal')" "$(tr 'Fenêtre de log automatique : désactivée.')"
+            fi
+            ;;
+        6)
+            launch_gui
+            ;;
+        5)
+            if confirm "$(tr 'Journaux')" "$(tr 'Supprimer tous les journaux ?')"; then
+                rm -f "$LOG_DIR"/session-*.log "$LOG_DIR"/latest.log 2>/dev/null
+                log_line "journaux effacés"
+                ln -sfn "$SESSION_LOG" "$LOG_DIR/latest.log" 2>/dev/null
+                info "$(tr 'Journal')" "$(tr 'Journaux effacés.')"
+            fi
+            ;;
+    esac
+}
+
+log_setup_once() {
+    [ -n "$SESSION_LOG" ] || log_setup
+}
 
 LAST_LOG=""
 # run_with_progress <titre> <texte> <commande...>
+# La sortie part dans le journal de session (donc dans la fenêtre de log) et un
+# terminal (pty) est simulé quand c'est possible, pour que dnf affiche sa vraie
+# progression au lieu d'un simple sablier.
+PS5_PTY=""
+command -v script >/dev/null 2>&1 && script -q -e -c true /dev/null >/dev/null 2>&1 && PS5_PTY=1
+
 run_with_progress() {
     local title="$1" text="$2"
     shift 2
-    local log pid
-    log="$(mktemp)"
+    local log pid label rc cmdline
+    log_setup_once
+    if [ -n "$SESSION_LOG" ] && [ -w "$SESSION_LOG" ]; then
+        log="$SESSION_LOG"
+    else
+        log="$(mktemp)"
+    fi
     LAST_LOG="$log"
-    "$@" >"$log" 2>&1 &
+    log_line "──── $title : $text"
+    log_line "commande : $*"
+    log_window_enabled && open_log_window "$log" >/dev/null 2>&1
+    if [ -n "$PS5_PTY" ]; then
+        cmdline="$(printf '%q ' "$@")"
+        script -q -e -c "$cmdline" /dev/null >>"$log" 2>&1 &
+    else
+        "$@" >>"$log" 2>&1 &
+    fi
     pid=$!
-    ( while kill -0 "$pid" 2>/dev/null; do printf '# %s\n' "$text"; sleep 1; done ) |
-        zenity --progress --pulse --no-cancel --auto-close --width=460 \
-               --title="$title" --text="$text" >/dev/null 2>&1
+    label="$(tr "Traitement en cours…")"
+    ( while kill -0 "$pid" 2>/dev/null; do printf '# %s\n' "$label"; sleep 1; done ) |
+        Z --progress --pulse --no-cancel --auto-close --width=500 \
+          --title="$title" --text="$text" >/dev/null 2>&1
     wait "$pid"
-    return $?
+    rc=$?
+    log_line "──── fin : $title (code $rc)"
+    return $rc
 }
 
 show_log() {
     local tail_txt title="Détail de l'erreur"
     [ -n "${1:-}" ] && title="$1"
     tail_txt="$(tail -n 60 "$LAST_LOG" 2>/dev/null)"
-    show_text "$title" "${tail_txt:-Aucun message.}" 720 480
+    show_text "$title" "${tail_txt:-$(tr 'Aucun message.')}" 720 480
 }
 
 # Exécute une commande en tant que vrai utilisateur (gsettings, flatpak user,
@@ -261,7 +946,7 @@ pick_locale() {
     local title="$1" locales=()
     mapfile -t locales < <(installed_locales)
     [ "${#locales[@]}" -gt 0 ] || locales=(fr_FR.UTF-8 en_US.UTF-8)
-    zenity --list --title="$title" --width=480 --height=400 \
+    Z --list --title="$title" --width=480 --height=400 \
         --column="Langue installée" "${locales[@]}"
 }
 
@@ -302,7 +987,7 @@ list_repos() {
 
 remove_repo_menu() {
     local sub
-    sub="$(zenity --list --title="Supprimer un dépôt" --text="Que voulez-vous supprimer ?" \
+    sub="$(Z --list --title="Supprimer un dépôt" --text="Que voulez-vous supprimer ?" \
         --width=520 --height=270 --column="ID" --column="Action" \
         "1" "Désactiver un dépôt DNF (sans le supprimer)" \
         "2" "Supprimer un dépôt DNF (fichier .repo)" \
@@ -313,7 +998,7 @@ remove_repo_menu() {
             id="$(ask "Désactiver un dépôt" "ID du dépôt (ex: rpmfusion-nonfree) :")"
             [ -n "$id" ] || return 0
             if out="$(dnf_disable_repo "$id" 2>&1)"; then
-                info "Dépôt" "Dépôt $id désactivé."
+                info "Dépôt" "$(trf 'Dépôt %s désactivé.' "$id")"
             else
                 error "Dépôt" "$(printf 'Échec.\n\n%s' "$out")"
             fi
@@ -324,26 +1009,26 @@ remove_repo_menu() {
             [ -n "$id" ] || return 0
             files="$(repo_files_for_id "$id")"
             if [ -z "$files" ]; then
-                error "Dépôt" "Aucun fichier .repo ne définit $id dans /etc/yum.repos.d."
+                error "Dépôt" "$(trf 'Aucun fichier .repo ne définit %s dans /etc/yum.repos.d.' "$id")"
                 return 1
             fi
-            if confirm "Supprimer un dépôt" "$(printf 'Supprimer ces fichiers ?\n\n%s' "$files")"; then
+            if confirm "Supprimer un dépôt" "$(trf 'Supprimer ces fichiers ?\n\n%s' "$files")"; then
                 # shellcheck disable=SC2086
-                sudo rm -f $files && info "Dépôt" "Dépôt $id supprimé."
+                sudo rm -f $files && info "Dépôt" "$(trf 'Dépôt %s supprimé.' "$id")"
             fi
             ;;
         3)
             local name
             name="$(ask "Supprimer un dépôt Flatpak" "Nom du dépôt (ex: flathub) :")"
             [ -n "$name" ] || return 0
-            if confirm "Dépôt Flatpak" "Supprimer le dépôt Flatpak $name ?"; then
+            if confirm "Dépôt Flatpak" "$(trf 'Supprimer le dépôt Flatpak %s ?' "$name")"; then
                 sudo flatpak remote-delete --system "$name" 2>/dev/null ||
                     sudo flatpak remote-delete --user "$name" 2>/dev/null ||
                     {
-                        error "Dépôt Flatpak" "Suppression de $name impossible."
+                        error "Dépôt Flatpak" "$(trf 'Suppression de %s impossible.' "$name")"
                         return 1
                     }
-                info "Dépôt Flatpak" "Dépôt $name supprimé."
+                info "Dépôt Flatpak" "$(trf 'Dépôt %s supprimé.' "$name")"
             fi
             ;;
     esac
@@ -388,7 +1073,7 @@ maintenance_old_kernels() {
         info "Kernels" "Aucun paquet kernel trouvé."
         return 0
     fi
-    if ! confirm "Anciens kernels" "$(printf 'Kernels installés :\n\n%s\n\nSupprimer les anciens en gardant les 2 plus récents ?' "$out")" 560; then
+    if ! confirm "Anciens kernels" "$(trf 'Kernels installés :\n\n%s\n\nSupprimer les anciens en gardant les 2 plus récents ?' "$out")" 560; then
         return 0
     fi
     if ! command -v package-cleanup >/dev/null 2>&1; then
@@ -407,19 +1092,31 @@ maintenance_old_kernels() {
 }
 
 # ------------------------------------------------------------------------------
-# Menu 7 : alimentation
+# Menu 7 : alimentation (6 opérations : système, écran, complète)
 # ------------------------------------------------------------------------------
-suspend_on() {
-    sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target
-}
-suspend_off() {
+# gsettings doit tourner en tant qu'utilisateur : en root il écrit dans la
+# base dconf de root et rien ne change pour la session.
+pw_system_off() {
     sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
 }
-screen_on() {
+pw_system_on() {
+    sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target
+}
+pw_screen_off() {
+    run_as_user gsettings set org.gnome.desktop.session idle-delay 0
+}
+pw_screen_on() {
     run_as_user gsettings set org.gnome.desktop.session idle-delay 300
 }
-screen_off() {
-    run_as_user gsettings set org.gnome.desktop.session idle-delay 0
+pw_full_off() {
+    sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target &&
+        run_as_user gsettings set org.gnome.desktop.session idle-delay 0 &&
+        run_as_user gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing'
+}
+pw_full_on() {
+    sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target &&
+        run_as_user gsettings set org.gnome.desktop.session idle-delay 300 &&
+        run_as_user gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'suspend'
 }
 
 # ------------------------------------------------------------------------------
@@ -481,9 +1178,9 @@ hwcon_check_update() {
         return 1
     fi
     if [ "$installed" = "$latest" ]; then
-        info "PS5 Hardware Control" "$(printf 'À jour.\n\nVersion installée : %s\nVersion GitHub   : %s' "$installed" "$latest")"
+        info "PS5 Hardware Control" "$(trf 'À jour.\n\nVersion installée : %s\nVersion GitHub   : %s' "$installed" "$latest")"
     else
-        info "PS5 Hardware Control" "$(printf 'Mise à jour disponible.\n\nVersion installée : %s\nVersion GitHub   : %s\n\nUtilisez l option Mettre à jour.' "$installed" "$latest")"
+        info "PS5 Hardware Control" "$(trf 'Mise à jour disponible.\n\nVersion installée : %s\nVersion GitHub   : %s\n\nUtilisez l option Mettre à jour.' "$installed" "$latest")"
     fi
 }
 
@@ -564,11 +1261,11 @@ kernel_install_latest() {
 
     code="$(curl -sIL -o /dev/null -w '%{http_code}' "$rpm_url" 2>/dev/null)"
     if [ "$code" != "200" ]; then
-        error "Kernel PS5" "$(printf "Le paquet est introuvable (HTTP %s).\n\n%s" "${code:-?}" "$rpm_url")"
+        error "Kernel PS5" "$(trf 'Le paquet est introuvable (HTTP %s).\n\n%s' "${code:-?}" "$rpm_url")"
         return 1
     fi
 
-    if ! confirm "Kernel PS5 $ver" "$(printf 'Installer le kernel PS5 %s ?\n\nPaquet : linux-ps5-%s-1.x86_64.rpm\n\n- modules dans /usr/lib/modules/%s\n- dracut génère /boot/initrd.img-%s\n- le noyau est copié dans /boot/efi par le paquet, et c est lui qui démarre\n\nUn redémarrage sera nécessaire.' "$ver" "$ver" "$ver" "$ver")" 540; then
+    if ! confirm "Kernel PS5 $ver" "$(trf 'Installer le kernel PS5 %s ?\n\nPaquet : linux-ps5-%s-1.x86_64.rpm\n\n- modules dans /usr/lib/modules/%s\n- dracut génère /boot/initrd.img-%s\n- le noyau est copié dans /boot/efi par le paquet, et c est lui qui démarre\n\nUn redémarrage sera nécessaire.' "$ver" "$ver" "$ver" "$ver")" 540; then
         return 0
     fi
 
@@ -584,7 +1281,7 @@ kernel_install_latest() {
         return 1
     fi
     if [ ! -s "$local_rpm" ]; then
-        error "Kernel PS5" "Le RPM téléchargé est vide : $local_rpm"
+        error "Kernel PS5" "$(trf 'Le RPM téléchargé est vide : %s' "$local_rpm")"
         return 1
     fi
 
@@ -595,7 +1292,7 @@ kernel_install_latest() {
         return 1
     fi
 
-    report="$(printf 'Kernel %s installé\n\n' "$ver")"
+    report="$(trf 'Kernel %s installé\n\n' "$ver")"
     if [ -f "/boot/vmlinuz-$ver" ]; then
         report+="$(printf '  /boot/vmlinuz-%s ......... OK\n' "$ver")"
     else
@@ -609,22 +1306,22 @@ kernel_install_latest() {
     if [ -f "/boot/initrd.img-$ver" ]; then
         report+="$(printf '  /boot/initrd.img-%s ..... OK\n\n' "$ver")"
     else
-        report+="$(printf '  /boot/initrd.img-%s ..... ABSENT (dracut a échoué)\n\n' "$ver")"
+        report+="$(trf '  /boot/initrd.img-%s ..... ABSENT (dracut a échoué)\n\n' "$ver")"
     fi
     if [ -f /boot/efi/bzImage ]; then
         report+="$(printf '  /boot/efi/bzImage ....... %s\n' "$(esp_kernel_version || echo présent)")"
         report+="$(printf '  /boot/efi/initrd.img .... %s\n' "$([ -s /boot/efi/initrd.img ] && echo présent || echo ABSENT)")"
     else
-        report+="$(printf '  /boot/efi/bzImage ....... ABSENT (ESP non monté ?)\n')"
+        report+="$(trf '  /boot/efi/bzImage ....... ABSENT (ESP non monté ?)\n')"
     fi
-    report+="$(printf '\nRPM conservé : %s\n' "$local_rpm")"
-    report+="$(printf '\nKernel actuellement démarré : %s' "$(uname -r)")"
+            report+="$(trf '\nRPM conservé : %s\n' "$local_rpm")"
+    report+="$(trf '\nKernel actuellement démarré : %s' "$(uname -r)")"
 
     info "Kernel PS5 $ver" "$report" 640
 }
 
 kernel_select_default() {
-    local f k cur esp entry args=() kernels=()
+    local f k cur esp entry args=() kernels=() want="${1:-}"
     for f in /boot/vmlinuz-*; do
         [ -e "$f" ] || continue
         k="${f##*/vmlinuz-}"
@@ -648,25 +1345,29 @@ kernel_select_default() {
         args+=("$k" "$st")
     done
 
-    entry="$(zenity --list --title="Kernel à démarrer" \
-        --text="$(printf 'Kernel démarré : %s\nKernel sur /boot/efi : %s\n\nChoisissez le kernel à placer sur /boot/efi (celui qui démarre) :' "$cur" "${esp:-inconnu}")" \
+    if [ -n "$want" ]; then
+        entry="$want"
+    else
+    entry="$(Z --list --title="Kernel à démarrer" \
+        --text="$(trf 'Kernel démarré : %s\nKernel sur /boot/efi : %s\n\nChoisissez le kernel à placer sur /boot/efi (celui qui démarre) :' "$cur" "${esp:-inconnu}")" \
         --width=620 --height=420 \
         --column="Version" --column="Statut" "${args[@]}")"
+    fi
     [ -n "$entry" ] || return 0
 
     if [ ! -f "/boot/vmlinuz-$entry" ]; then
-        error "Kernel" "Le fichier /boot/vmlinuz-$entry est absent."
+        error "Kernel" "$(trf 'Le fichier /boot/vmlinuz-%s est absent.' "$entry")"
         return 1
     fi
     if [ ! -f "/boot/initrd.img-$entry" ]; then
-        error "Kernel" "Le fichier /boot/initrd.img-$entry est absent : ce kernel ne peut pas démarrer."
+        error "Kernel" "$(trf 'Le fichier /boot/initrd.img-%s est absent : ce kernel ne peut pas démarrer.' "$entry")"
         return 1
     fi
     if ! esp_ready; then
         error "Kernel" "L'ESP /boot/efi n'est pas accessible (partition non montée ?).\nImpossible d'y copier le kernel."
         return 1
     fi
-    if ! confirm "Kernel à démarrer" "$(printf 'Copier le kernel %s sur /boot/efi ?\n\n/boot/vmlinuz-%s      -> /boot/efi/bzImage\n/boot/initrd.img-%s   -> /boot/efi/initrd.img\n\nLes fichiers actuels seront sauvegardés en .bak.\nUn redémarrage sera nécessaire.' "$entry" "$entry" "$entry")" 560; then
+    if ! confirm "Kernel à démarrer" "$(trf 'Copier le kernel %s sur /boot/efi ?\n\n/boot/vmlinuz-%s      -> /boot/efi/bzImage\n/boot/initrd.img-%s   -> /boot/efi/initrd.img\n\nLes fichiers actuels seront sauvegardés en .bak.\nUn redémarrage sera nécessaire.' "$entry" "$entry" "$entry")" 560; then
         return 0
     fi
 
@@ -675,7 +1376,7 @@ kernel_select_default() {
     if sudo cp -f "/boot/vmlinuz-$entry" /boot/efi/bzImage &&
        sudo cp -f "/boot/initrd.img-$entry" /boot/efi/initrd.img &&
        sync; then
-        info "Kernel à démarrer" "$(printf 'Kernel %s copié sur /boot/efi.\n\nSauvegarde de l ancien : /boot/efi/bzImage.bak\n\nRedémarrez pour l utiliser.' "$entry")" 560
+        info "Kernel à démarrer" "$(trf 'Kernel %s copié sur /boot/efi.\n\nSauvegarde de l ancien : /boot/efi/bzImage.bak\n\nRedémarrez pour l utiliser.' "$entry")" 560
     else
         error "Kernel" "La copie vers /boot/efi a échoué (ESP en lecture seule ou plein ?)."
         return 1
@@ -700,7 +1401,7 @@ opera_repo_add() {
 brave_repo_add() {
     local out
     if ! out="$(dnf_add_repo "$BRAVE_REPO" 2>&1)"; then
-        error "Brave" "$(printf 'Ajout du dépôt impossible.\n\n%s' "$out")"
+        error "Brave" "$(trf 'Ajout du dépôt impossible.\n\n%s' "$out")"
         return 1
     fi
     sudo rpm --import "$BRAVE_KEY" >/dev/null 2>&1 || true
@@ -749,7 +1450,7 @@ software_action() {
             kind="flatpak"; fp_id="com.mattjakeman.ExtensionManager"
             ;;
         *)
-            error "Logithèque" "Logiciel inconnu : $sw"
+            error "Logithèque" "$(trf 'Logiciel inconnu : %s' "$sw")"
             return 1
             ;;
     esac
@@ -767,16 +1468,16 @@ software_action() {
                     ;;
                 remove|uninstall)
                     if remove_pkgs "$sw" "$rpm_name"; then
-                        info "$sw" "$sw supprimé."
+                        info "$sw" "$(trf '%s supprimé.' "$sw")"
                     fi
                     ;;
                 check)
                     if ! rpm -q "$rpm_name" >/dev/null 2>&1; then
-                        info "$sw" "$sw n est pas installé."
+                        info "$sw" "$(trf '%s n est pas installé.' "$sw")"
                     else
                         case "$(rpm_update_state "$rpm_name")" in
-                            uptodate) info "$sw" "$sw est à jour." ;;
-                            update) info "$sw" "Une mise à jour de $sw est disponible." ;;
+                            uptodate) info "$sw" "$(trf '%s est à jour.' "$sw")" ;;
+                            update) info "$sw" "$(trf 'Une mise à jour de %s est disponible.' "$sw")" ;;
                             *) info "$sw" "Vérification impossible (dépôt indisponible ?)." ;;
                         esac
                     fi
@@ -787,35 +1488,35 @@ software_action() {
             case "$action" in
                 install)
                     if flatpak_present "$fp_id"; then
-                        info "$sw" "$sw est déjà installé."
+                        info "$sw" "$(trf '%s est déjà installé.' "$sw")"
                     elif flatpak_install "$fp_id"; then
-                        info "$sw" "$sw installé."
+                        info "$sw" "$(trf '%s installé.' "$sw")"
                     fi
                     ;;
                 update)
                     if ! flatpak_present "$fp_id"; then
-                        info "$sw" "$sw n est pas installé."
+                        info "$sw" "$(trf '%s n est pas installé.' "$sw")"
                     elif run_with_progress "$sw" "Mise à jour de $sw…" \
                          sudo flatpak update --system --noninteractive "$fp_id"; then
-                        info "$sw" "$sw mis à jour."
+                        info "$sw" "$(trf '%s mis à jour.' "$sw")"
                     else
                         show_log "Échec de la mise à jour"
                     fi
                     ;;
                 remove|uninstall)
                     if ! flatpak_present "$fp_id"; then
-                        info "$sw" "$sw n est pas installé."
+                        info "$sw" "$(trf '%s n est pas installé.' "$sw")"
                     elif flatpak_remove "$fp_id"; then
-                        info "$sw" "$sw supprimé."
+                        info "$sw" "$(trf '%s supprimé.' "$sw")"
                     fi
                     ;;
                 check)
                     if ! flatpak_present "$fp_id"; then
-                        info "$sw" "$sw n est pas installé."
+                        info "$sw" "$(trf '%s n est pas installé.' "$sw")"
                     elif flatpak_have_update "$fp_id"; then
-                        info "$sw" "Une mise à jour de $sw est disponible."
+                        info "$sw" "$(trf 'Une mise à jour de %s est disponible.' "$sw")"
                     else
-                        info "$sw" "$sw est à jour."
+                        info "$sw" "$(trf '%s est à jour.' "$sw")"
                     fi
                     ;;
             esac
@@ -877,7 +1578,7 @@ software_action() {
                     if [ -z "$inst" ]; then
                         info "Etcher" "Etcher n est pas installé."
                     elif [ -n "$latest" ] && [ "$inst" != "$latest" ]; then
-                        info "Etcher" "$(printf 'Mise à jour disponible.\n\nInstallé : %s\nGitHub   : %s' "$inst" "$latest")"
+                        info "Etcher" "$(trf 'Mise à jour disponible.\n\nInstallé : %s\nGitHub   : %s' "$inst" "$latest")"
                     else
                         info "Etcher" "Etcher est à jour."
                     fi
@@ -889,25 +1590,30 @@ software_action() {
             case "$action" in
                 install)
                     if [ "$fmt" != "none" ]; then
-                        info "$sw" "$sw est déjà installé ($fmt)."
+                        info "$sw" "$(trf '%s est déjà installé (%s).' "$sw" "$fmt")"
                         return 0
                     fi
                     local how
-                    how="$(zenity --list --title="$sw" --text="Quel format d'installation ?" \
-                        --width=430 --height=230 --column="Format" \
-                        "RPM (dépôt officiel)" "Flatpak (Flathub)")"
+                    if [ -n "${CLI_HOW:-}" ]; then
+                        how="$CLI_HOW"
+                    else
+                    how="$(Z --list --title="$sw" --text="Quel format d'installation ?" \
+                        --width=460 --height=250 --column="ID" --column="Format" \
+                        "1" "RPM (dépôt officiel)" \
+                        "2" "Flatpak (Flathub)")"
+                    fi
                     [ -n "$how" ] || return 0
-                    if [ "$how" = "RPM (dépôt officiel)" ]; then
+                    if [ "$how" = "1" ]; then
                         if [ "$sw" = "Opera" ]; then
                             opera_repo_add
                         else
                             brave_repo_add || return 1
                         fi
                         if install_pkgs "$sw" "$rpm_name"; then
-                            info "$sw" "$sw installé via RPM."
+                            info "$sw" "$(trf '%s installé via RPM.' "$sw")"
                         fi
                     elif flatpak_install "$fp_id"; then
-                        info "$sw" "$sw installé via Flatpak."
+                        info "$sw" "$(trf '%s installé via Flatpak.' "$sw")"
                     fi
                     ;;
                 update)
@@ -915,7 +1621,7 @@ software_action() {
                         rpm)
                             if run_with_progress "$sw" "Mise à jour de $sw…" \
                                  sudo dnf upgrade -y "$rpm_name"; then
-                                info "$sw" "$sw mis à jour (RPM)."
+                                info "$sw" "$(trf '%s mis à jour (RPM).' "$sw")"
                             else
                                 show_log "Échec de la mise à jour"
                             fi
@@ -923,26 +1629,26 @@ software_action() {
                         flatpak)
                             if run_with_progress "$sw" "Mise à jour de $sw…" \
                                  sudo flatpak update --system --noninteractive "$fp_id"; then
-                                info "$sw" "$sw mis à jour (Flatpak)."
+                                info "$sw" "$(trf '%s mis à jour (Flatpak).' "$sw")"
                             else
                                 show_log "Échec de la mise à jour"
                             fi
                             ;;
                         *)
-                            info "$sw" "$sw n est pas installé."
+                            info "$sw" "$(trf '%s n est pas installé.' "$sw")"
                             ;;
                     esac
                     ;;
                 remove|uninstall)
                     case "$fmt" in
                         rpm)
-                            remove_pkgs "$sw" "$rpm_name" && info "$sw" "$sw supprimé."
+                            remove_pkgs "$sw" "$rpm_name" && info "$sw" "$(trf '%s supprimé.' "$sw")"
                             ;;
                         flatpak)
-                            flatpak_remove "$fp_id" && info "$sw" "$sw supprimé."
+                            flatpak_remove "$fp_id" && info "$sw" "$(trf '%s supprimé.' "$sw")"
                             ;;
                         *)
-                            info "$sw" "$sw n est pas installé."
+                            info "$sw" "$(trf '%s n est pas installé.' "$sw")"
                             ;;
                     esac
                     ;;
@@ -950,20 +1656,20 @@ software_action() {
                     case "$fmt" in
                         rpm)
                             case "$(rpm_update_state "$rpm_name")" in
-                                uptodate) info "$sw" "$sw est à jour (RPM)." ;;
-                                update) info "$sw" "Une mise à jour de $sw est disponible (RPM)." ;;
+                                uptodate) info "$sw" "$(trf '%s est à jour (RPM).' "$sw")" ;;
+                                update) info "$sw" "$(trf 'Une mise à jour de %s est disponible (RPM).' "$sw")" ;;
                                 *) info "$sw" "Vérification impossible (dépôt indisponible ?)." ;;
                             esac
                             ;;
                         flatpak)
                             if flatpak_have_update "$fp_id"; then
-                                info "$sw" "Une mise à jour de $sw est disponible (Flatpak)."
+                                info "$sw" "$(trf 'Une mise à jour de %s est disponible (Flatpak).' "$sw")"
                             else
-                                info "$sw" "$sw est à jour (Flatpak)."
+                                info "$sw" "$(trf '%s est à jour (Flatpak).' "$sw")"
                             fi
                             ;;
                         *)
-                            info "$sw" "$sw n est pas installé."
+                            info "$sw" "$(trf '%s n est pas installé.' "$sw")"
                             ;;
                     esac
                     ;;
@@ -997,6 +1703,9 @@ install_files() {
         sudo install -m 0644 "$src/ps5-manager.desktop" /usr/share/applications/ps5-manager.desktop
     [ -f "$src/icon.png" ] &&
         sudo install -m 0644 "$src/icon.png" /usr/share/pixmaps/ps5-manager.png
+    if [ -f "$src/ps5-manager-gui.py" ]; then
+        sudo install -m 0755 "$src/ps5-manager-gui.py" /usr/local/bin/ps5-manager-gui || true
+    fi
     sudo update-desktop-database /usr/share/applications/ >/dev/null 2>&1 || true
 }
 
@@ -1035,13 +1744,121 @@ update_manager() {
 OS_VER="$(. /etc/os-release 2>/dev/null && printf '%s' "${PRETTY_NAME% (*}")"
 K_VER="$(uname -r)"
 
+# Journal de la session (créé au démarrage, avant toute action)
+log_setup
+
+# ------------------------------------------------------------------------------
+# Mode CLI — utilisé par l'interface GTK (ps5-manager-gui)
+# Tout ce qui passait par zenity écrit ici sur la sortie standard, pour que le
+# moteur reste unique : le bash fait le travail, GTK l'affiche.
+# ------------------------------------------------------------------------------
+cli_setup() {
+    Z()        { :; }
+    info()     { printf '• %s : %s\n' "$1" "$2"; }
+    warn()     { printf '! %s : %s\n' "$1" "$2" >&2; }
+    error()    { printf '✗ %s : %s\n' "$1" "$2" >&2; }
+    confirm()  { return 0; }
+    ask()      { return 0; }
+    ask_pass() { return 0; }
+    show_text(){ printf '%s\n' "$2"; }
+    choose_language() { return 1; }
+    run_with_progress() {
+        local t="$1"
+        shift 2
+        printf '▶ %s\n' "$t"
+        "$@"
+    }
+}
+
+# version<TAB>démarré<TAB>sur_esp<TAB>initrd_présent
+kernel_versions() {
+    local f k cur esp
+    cur="$(uname -r)"
+    esp="$(esp_kernel_version || true)"
+    for f in /boot/vmlinuz-*; do
+        [ -e "$f" ] || continue
+        k="${f##*/vmlinuz-}"
+        case "$k" in 0-rescue*) continue ;; esac
+        printf '%s\t%s\t%s\t%s\n' "$k" \
+            "$([ "$k" = "$cur" ] && echo 1 || echo 0)" \
+            "$([ -n "$esp" ] && [ "$k" = "$esp" ] && echo 1 || echo 0)" \
+            "$([ -f "/boot/initrd.img-$k" ] && echo 1 || echo 0)"
+    done | sort -Vr
+}
+
+cli_maint() {
+    case "${1:-}" in
+        cache)      run_with_progress "Maintenance" "Nettoyage du cache DNF…" sudo dnf clean all ;;
+        autoremove) run_with_progress "Maintenance" "Suppression des orphelins…" sudo dnf autoremove -y ;;
+        journal)    run_with_progress "Maintenance" "Réduction des journaux…" sudo journalctl --vacuum-time=7d ;;
+        tmp)        run_with_progress "Maintenance" "Nettoyage des temporaires…" \
+                        sudo bash -c 'rm -rf /tmp/* /var/tmp/* 2>/dev/null || true' ;;
+        thumbs)     run_as_user rm -rf "$REAL_HOME/.cache/thumbnails" ;;
+        kernels)    maintenance_old_kernels ;;
+        df)         df -hT -x tmpfs -x devtmpfs -x efivarfs ;;
+        *)          printf 'action maintenance inconnue : %s\n' "${1:-}" >&2; return 2 ;;
+    esac
+}
+
+cli_main() {
+    local cli_cmd="${1:-help}" out
+    cli_setup
+    [ $# -gt 0 ] && shift
+    case "$cli_cmd" in
+        log)
+            case "${1:-path}" in
+                path)  printf '%s\n' "${SESSION_LOG:-$LOG_DIR/latest.log}" ;;
+                list)  find "$LOG_DIR" -maxdepth 1 -name 'session-*.log' -printf '%f\t%T@\n' 2>/dev/null |
+                           sort -k2 -rn | cut -f1 | head -20 ;;
+                show)  [ -n "${2:-}" ] && tail -n 2000 "$2" ;;
+                clear) rm -f "$LOG_DIR"/session-*.log "$LOG_DIR"/latest.log 2>/dev/null
+                       printf 'journaux effacés\n' ;;
+                open)  open_log_window ;;
+                *)     printf 'commande log inconnue\n' >&2; return 2 ;;
+            esac
+            ;;
+        app)
+            CLI_HOW="${3:-1}"
+            software_action "${1:-}" "${2:-check}" ;;
+        maint)
+            cli_maint "${1:-}" ;;
+        kernel)
+            case "${1:-latest}" in
+                latest)
+                    if out="$(kernel_latest)"; then
+                        printf '%s\n' "$out"
+                    else
+                        printf 'impossible de joindre les releases GitHub\n' >&2
+                        return 1
+                    fi
+                    ;;
+                install) kernel_install_latest ;;
+                list)    kernel_versions ;;
+                select)  kernel_select_default "${2:-}" ;;
+                *)       printf 'commande kernel inconnue\n' >&2; return 2 ;;
+            esac
+            ;;
+        *)
+            printf 'usage : %s --cli <log|app|maint|kernel> …\n' "$0" >&2
+            return 2
+            ;;
+    esac
+}
+
+if [ "${1:-}" = "--cli" ]; then
+    shift
+    log_setup
+    cli_main "$@"
+    exit $?
+fi
+
 # ------------------------------------------------------------------------------
 # Boucle principale
 # ------------------------------------------------------------------------------
 while true; do
-    if ! CHOICE="$(zenity --list \
+    if ! CHOICE="$(Z --list \
         --title="PS5 Linux Universal Manager (nexgen999)" \
-        --text="$(printf '<span size="x-large" weight="bold">PS5 Linux Universal Manager</span>\n\nSystème : %s | Noyau : %s\nChoisissez une action :' "$OS_VER" "$K_VER")" \
+        --text="$(trf '<span size="x-large" weight="bold">PS5 Linux Universal Manager</span>\n\nSystème : %s | Noyau : %s\nChoisissez une action :' "$OS_VER" "$K_VER")" \
         --width=880 --height=640 \
         --column="Opt" --column="Action" --column="Description" \
         "1"  "Mise à jour / Désinstallation" "Mettre à jour le manager depuis GitHub (+ dépendances) ou le désinstaller" \
@@ -1056,14 +1873,15 @@ while true; do
         "10" "Mesa / Vulkan & RADV"         "Outils Vulkan, mesa, résumé Vulkan complet, vérification RADV" \
         "11" "Mise à jour Kernel"           "Installer le dernier kernel PS5 (RPM) et choisir le kernel par défaut" \
         "12" "Logithèque / Logiciels"       "Steam, Heroic, ProtonUp, Decky, Etcher, Opera, Brave, Bazaar..." \
-        "13" "Software Presets"             "Installation groupée : Gaming, Bureautique ou Développeur")"; then
+        "13" "Langue / Language"            "Choisir la langue de l'interface : Français ou English" \
+        "14" "Journal / Logs"               "Voir en direct ce que fait le gestionnaire (fenêtre de log, historique, effacement)")" ; then
         exit 0
     fi
     [ -n "$CHOICE" ] || exit 0
 
     case "$CHOICE" in
         1)
-            SUB="$(zenity --list --title="1. Mise à jour / Désinstallation" --text="Choisissez une option :" \
+            SUB="$(Z --list --title="1. Mise à jour / Désinstallation" --text="Choisissez une option :" \
                 --width=500 --height=250 --column="ID" --column="Action" \
                 "1" "Mettre à jour le manager + ses dépendances" \
                 "2" "Désinstaller complètement le manager")"
@@ -1081,7 +1899,7 @@ while true; do
             esac
             ;;
         2)
-            SUB="$(zenity --list --title="2. Configuration des langues" --text="Choisissez une option :" \
+            SUB="$(Z --list --title="2. Configuration des langues" --text="Choisissez une option :" \
                 --width=560 --height=290 --column="ID" --column="Action" \
                 "1" "Voir les langpacks installés (système + clavier)" \
                 "2" "Installer une langue" \
@@ -1101,7 +1919,7 @@ while true; do
                     elif sudo dnf install -y "langpacks-${LANG_CODE%%_*}" "glibc-langpack-${LANG_CODE%%_*}" >/dev/null 2>&1; then
                         info "Langue" "Installé : langpacks-${LANG_CODE%%_*} + glibc-langpack-${LANG_CODE%%_*}"
                     else
-                        error "Langue" "Aucun langpack trouvé pour $LANG_IN."
+                        error "Langue" "$(trf 'Aucun langpack trouvé pour %s.' "$LANG_IN")"
                     fi
                     ;;
                 3)
@@ -1110,19 +1928,19 @@ while true; do
                     KB_LIST=()
                     mapfile -t KB_LIST < <(keymap_layouts | head -n 60)
                     [ "${#KB_LIST[@]}" -gt 0 ] || KB_LIST=(fr us de es)
-                    SELECTED_KB="$(zenity --list --title="Clavier" \
+                    SELECTED_KB="$(Z --list --title="Clavier" \
                         --text="Choisissez la disposition du clavier :" --width=460 --height=340 \
                         --column="Layout" "${KB_LIST[@]}")"
                     [ -n "$SELECTED_KB" ] || SELECTED_KB="fr"
                     apply_language_all "$SELECTED_LANG" "$SELECTED_KB"
-                    if confirm "Configuration" "$(printf 'Langue : %s\nClavier : %s\n\nLa session va se fermer pour appliquer les changements.\nContinuer ?' "$SELECTED_LANG" "$SELECTED_KB")"; then
+                    if confirm "Configuration" "$(trf 'Langue : %s\nClavier : %s\n\nLa session va se fermer pour appliquer les changements.\nContinuer ?' "$SELECTED_LANG" "$SELECTED_KB")"; then
                         run_as_user gnome-session-quit --logout --force
                     fi
                     ;;
             esac
             ;;
         3)
-            SUB="$(zenity --list --title="3. Gestion des dépôts" --text="Choisissez une option :" \
+            SUB="$(Z --list --title="3. Gestion des dépôts" --text="Choisissez une option :" \
                 --width=580 --height=330 --column="ID" --column="Action" \
                 "1" "Voir tous les dépôts (RPM + Flatpak système et utilisateur)" \
                 "2" "Installer les dépôts RPM (RPM Fusion free + nonfree)" \
@@ -1155,17 +1973,17 @@ while true; do
                         if OUT="$(dnf_add_repo "$REPO_URL_ADD" 2>&1)"; then
                             info "Dépôt" "Dépôt ajouté."
                         else
-                            error "Dépôt" "$(printf 'Échec.\n\n%s' "$OUT")"
+                            error "Dépôt" "$(trf 'Échec.\n\n%s' "$OUT")"
                         fi
                     fi
                     ;;
             esac
             ;;
         4)
-            SUB="$(zenity --list --title="4. Gestion des utilisateurs" --text="Choisissez une option :" \
+            SUB="$(Z --list --title="4. Gestion des utilisateurs" --text="Choisissez une option :" \
                 --width=560 --height=310 --column="ID" --column="Action" \
                 "1" "Voir la liste des utilisateurs" \
-                "2" "Éditer mon compte ($REAL_USER) : mot de passe et langue" \
+                "2" "$(trf 'Éditer mon compte (%s) : mot de passe et langue' "$REAL_USER")" \
                 "3" "Ajouter un utilisateur" \
                 "4" "Supprimer un compte utilisateur" \
                 "5" "Root : état du compte et changement de mot de passe")"
@@ -1174,21 +1992,21 @@ while true; do
                     show_text "Utilisateurs du système" "$(awk -F: '$3>=1000 && $3<65534 {printf "%-20s uid=%-6s home=%-22s shell=%s\n", $1, $3, $6, $7}' /etc/passwd)"
                     ;;
                 2)
-                    NEW_PASS="$(ask_pass "Mot de passe" "Nouveau mot de passe pour $REAL_USER (vide = inchangé) :")"
+                    NEW_PASS="$(ask_pass "Mot de passe" "$(trf 'Nouveau mot de passe pour %s (vide = inchangé) :' "$REAL_USER")")"
                     if [ -n "$NEW_PASS" ]; then
                         if printf '%s:%s\n' "$REAL_USER" "$NEW_PASS" | sudo chpasswd; then
-                            info "Mot de passe" "Mot de passe de $REAL_USER mis à jour."
+                            info "Mot de passe" "$(trf 'Mot de passe de %s mis à jour.' "$REAL_USER")"
                         else
                             error "Mot de passe" "La modification a échoué (mot de passe contenant « : » ?)."
                         fi
                     fi
-                    USER_LANG="$(pick_locale "Langue du compte $REAL_USER")"
+                    USER_LANG="$(pick_locale "$(trf 'Langue du compte %s' "$REAL_USER")")"
                     if [ -n "$USER_LANG" ]; then
                         applied="0"
                         set_user_language "$REAL_USER" "$USER_LANG" && applied="1"
                         run_as_user gsettings set org.gnome.system.locale region "$USER_LANG" >/dev/null 2>&1 && applied="1"
                         if [ "$applied" = "1" ]; then
-                            info "Langue du compte" "Langue $USER_LANG appliquée à $REAL_USER.\nDéconnectez-vous pour l'appliquer."
+                            info "Langue du compte" "$(trf 'Langue %s appliquée à %s.\nDéconnectez-vous pour l appliquer.' "$USER_LANG" "$REAL_USER")"
                         else
                             error "Langue du compte" "Impossible d'appliquer la langue."
                         fi
@@ -1197,22 +2015,22 @@ while true; do
                 3)
                     NEW_USER="$(ask "Ajouter un utilisateur" "Nom du nouveau compte :")"
                     [ -n "$NEW_USER" ] || continue
-                    NEW_UPASS="$(ask_pass "Mot de passe" "Mot de passe pour $NEW_USER :")"
+                    NEW_UPASS="$(ask_pass "Mot de passe" "$(trf 'Mot de passe pour %s :' "$NEW_USER")")"
                     if sudo useradd -m -s /bin/bash "$NEW_USER" &&
                        printf '%s:%s\n' "$NEW_USER" "$NEW_UPASS" | sudo chpasswd; then
-                        info "Utilisateur" "Compte $NEW_USER créé."
+                        info "Utilisateur" "$(trf 'Compte %s créé.' "$NEW_USER")"
                     else
-                        error "Utilisateur" "La création de $NEW_USER a échoué."
+                        error "Utilisateur" "$(trf 'La création de %s a échoué.' "$NEW_USER")"
                     fi
                     ;;
                 4)
                     DEL_USER="$(ask "Supprimer un utilisateur" "Nom du compte à supprimer :")"
                     [ -n "$DEL_USER" ] || continue
                     if [ "$DEL_USER" = "root" ] || [ "$DEL_USER" = "$REAL_USER" ]; then
-                        error "Utilisateur" "Suppression de $DEL_USER refusée (compte root ou compte courant)."
-                    elif confirm "Supprimer $DEL_USER" "Supprimer le compte $DEL_USER et son dossier personnel ?"; then
+                        error "Utilisateur" "$(trf 'Suppression de %s refusée (compte root ou compte courant).' "$DEL_USER")"
+                    elif confirm "Supprimer $DEL_USER" "$(trf 'Supprimer le compte %s et son dossier personnel ?' "$DEL_USER")"; then
                         if sudo userdel -r "$DEL_USER"; then
-                            info "Utilisateur" "Compte $DEL_USER supprimé."
+                            info "Utilisateur" "$(trf 'Compte %s supprimé.' "$DEL_USER")"
                         else
                             error "Utilisateur" "La suppression a échoué (session ouverte ?)."
                         fi
@@ -1220,7 +2038,7 @@ while true; do
                     ;;
                 5)
                     ROOT_STATE="$(sudo passwd -S root 2>&1)"
-                    if confirm "Compte root" "$(printf 'État du compte root :\n\n%s\n\nUn mot de passe n est jamais affichable (il est stocké haché).\nVoulez-vous définir un nouveau mot de passe root ?' "$ROOT_STATE")" 520; then
+                    if confirm "Compte root" "$(trf 'État du compte root :\n\n%s\n\nUn mot de passe n est jamais affichable (il est stocké haché).\nVoulez-vous définir un nouveau mot de passe root ?' "$ROOT_STATE")" 520; then
                         ROOT_PASS="$(ask_pass "Mot de passe root" "Nouveau mot de passe pour root :")"
                         if [ -n "$ROOT_PASS" ]; then
                             if printf 'root:%s\n' "$ROOT_PASS" | sudo chpasswd; then
@@ -1234,7 +2052,7 @@ while true; do
             esac
             ;;
         5)
-            SUB="$(zenity --list --title="5. Mises à jour Fedora" --text="Choisissez une option :" \
+            SUB="$(Z --list --title="5. Mises à jour Fedora" --text="Choisissez une option :" \
                 --width=480 --height=280 --column="ID" --column="Action" \
                 "1" "Mettre à jour les applications (DNF & Flatpak)" \
                 "2" "Mettre à jour le système complet" \
@@ -1271,7 +2089,7 @@ while true; do
             esac
             ;;
         6)
-            SUB="$(zenity --list --title="6. Maintenance & Nettoyage" --text="Choisissez une option :" \
+            SUB="$(Z --list --title="6. Maintenance & Nettoyage" --text="Choisissez une option :" \
                 --width=580 --height=360 --column="ID" --column="Action" \
                 "1" "Nettoyage complet (cache, journaux, temporaires, Flatpak inutilisé)" \
                 "2" "Nettoyer uniquement le cache DNF" \
@@ -1325,7 +2143,7 @@ while true; do
             esac
             ;;
         7)
-            SUB="$(zenity --list --title="7. Management de l'alimentation" --text="Choisissez une option :" \
+            SUB="$(Z --list --title="7. Management de l'alimentation" --text="Choisissez une option :" \
                 --width=580 --height=310 --column="ID" --column="Action" \
                 "1" "Activer la veille complète (système + écran)" \
                 "2" "Désactiver la veille complète" \
@@ -1335,38 +2153,42 @@ while true; do
                 "6" "Désactiver la mise en veille de l'écran")"
             case "$SUB" in
                 1)
-                    suspend_on >/dev/null 2>&1
-                    screen_on >/dev/null 2>&1
-                    info "Alimentation" "Veille complète activée (système + écran après 5 min)."
+                    if pw_full_on; then
+                        info "Alimentation" "Veille complète activée (système + écran après 5 min)."
+                    else
+                        error "Alimentation" "Échec : la veille complète n a pas pu être activée."
+                    fi
                     ;;
                 2)
-                    suspend_off >/dev/null 2>&1
-                    screen_off >/dev/null 2>&1
-                    info "Alimentation" "Veille complète désactivée."
+                    if pw_full_off; then
+                        info "Alimentation" "Veille complète désactivée (système + écran)."
+                    else
+                        error "Alimentation" "Échec : la veille complète n a pas pu être désactivée."
+                    fi
                     ;;
                 3)
-                    if suspend_on; then
+                    if pw_system_on; then
                         info "Alimentation" "Veille système activée."
                     else
                         error "Alimentation" "Impossible de démasquer les cibles de veille."
                     fi
                     ;;
                 4)
-                    if suspend_off; then
+                    if pw_system_off; then
                         info "Alimentation" "Veille système désactivée."
                     else
                         error "Alimentation" "Impossible de masquer les cibles de veille."
                     fi
                     ;;
                 5)
-                    if screen_on; then
+                    if pw_screen_on; then
                         info "Alimentation" "Veille écran activée (5 min)."
                     else
                         error "Alimentation" "gsettings a échoué (session GNOME absente ?)."
                     fi
                     ;;
                 6)
-                    if screen_off; then
+                    if pw_screen_off; then
                         info "Alimentation" "Veille écran désactivée."
                     else
                         error "Alimentation" "gsettings a échoué (session GNOME absente ?)."
@@ -1375,7 +2197,7 @@ while true; do
             esac
             ;;
         8)
-            SUB="$(zenity --list --title="8. PS5 Fan Manager" --text="Choisissez une option :" \
+            SUB="$(Z --list --title="8. PS5 Fan Manager" --text="Choisissez une option :" \
                 --width=520 --height=380 --column="ID" --column="Action" \
                 "1" "Voir le status (services + ps5_control)" \
                 "2" "Fan on (activer au démarrage)" \
@@ -1431,7 +2253,7 @@ while true; do
             esac
             ;;
         9)
-            SUB="$(zenity --list --title="9. PS5 Hardware Control" --text="Choisissez une option :" \
+            SUB="$(Z --list --title="9. PS5 Hardware Control" --text="Choisissez une option :" \
                 --width=560 --height=320 --column="ID" --column="Action" \
                 "1" "Vérifier la présence du matériel (/sys/class/hwmon et noeuds PS5)" \
                 "2" "Installer PS5 Hardware Control" \
@@ -1447,7 +2269,7 @@ while true; do
             esac
             ;;
         10)
-            SUB="$(zenity --list --title="10. Mesa / Vulkan & RADV" --text="Choisissez une option :" \
+            SUB="$(Z --list --title="10. Mesa / Vulkan & RADV" --text="Choisissez une option :" \
                 --width=560 --height=290 --column="ID" --column="Action" \
                 "1" "Installer les outils Vulkan & Mesa demos" \
                 "2" "Mettre à jour les paquets Mesa & Vulkan" \
@@ -1486,7 +2308,7 @@ while true; do
             esac
             ;;
         11)
-            SUB="$(zenity --list --title="11. Mise à jour Kernel PS5" --text="Choisissez une option :" \
+            SUB="$(Z --list --title="11. Mise à jour Kernel PS5" --text="Choisissez une option :" \
                 --width=580 --height=250 --column="ID" --column="Action" \
                 "1" "Installer le dernier kernel PS5 (RPM de ps5-linux-patches)" \
                 "2" "Choisir le kernel à démarrer (copie sur /boot/efi)")"
@@ -1496,7 +2318,7 @@ while true; do
             esac
             ;;
         12)
-            SUB="$(zenity --list --title="12. Logithèque PS5" --text="Choisissez un logiciel :" \
+            SUB="$(Z --list --title="12. Logithèque PS5" --text="Choisissez un logiciel :" \
                 --width=560 --height=430 --column="Logiciel" \
                 "Steam" \
                 "Heroic Games Launcher" \
@@ -1508,57 +2330,32 @@ while true; do
                 "Bazaar" \
                 "GNOME Extension Manager")"
             [ -n "$SUB" ] || continue
-            ACT="$(zenity --list --title="$SUB" --text="Quelle action pour $SUB ?" \
-                --width=460 --height=280 --column="Action" \
-                "Installer" \
-                "Désinstaller" \
-                "Mettre à jour" \
-                "Vérifier les mises à jour")"
+            ACT="$(Z --list --title="$SUB" --text="$(trf 'Quelle action pour %s ?' "$SUB")" \
+                --width=500 --height=310 --column="ID" --column="Action" \
+                "1" "Installer" \
+                "2" "Désinstaller" \
+                "3" "Mettre à jour" \
+                "4" "Vérifier les mises à jour")"
             [ -n "$ACT" ] || continue
+            # On teste l'identifiant, pas le libellé : le libellé change avec la langue.
             case "$ACT" in
-                "Installer") software_action "$SUB" install ;;
-                "Désinstaller") software_action "$SUB" remove ;;
-                "Mettre à jour") software_action "$SUB" update ;;
-                "Vérifier les mises à jour") software_action "$SUB" check ;;
+                1) software_action "$SUB" install ;;
+                2) software_action "$SUB" remove ;;
+                3) software_action "$SUB" update ;;
+                4) software_action "$SUB" check ;;
             esac
             ;;
         13)
-            PRESET="$(zenity --list --title="13. Software Presets" --text="Choisissez un pack complet à déployer :" \
-                --width=500 --height=270 --column="Preset" --column="Description" \
-                "Gaming" "Steam, Heroic, ProtonUp-Qt, Decky Loader" \
-                "Bureautique" "Brave, Opera, Bazaar, Extension Manager" \
-                "Développeur" "Outils de build, git, python3-devel, curl, wget")"
-            case "$PRESET" in
-                "Gaming")
-                    rpm_ensure_rpmfusion || true
-                    install_pkgs "Preset Gaming" steam || true
-                    flatpak_install com.heroicgameslauncher.hgl net.davidotek.pupgui2 || true
-                    run_as_user bash -c "curl -fsSL '$DECKY_INSTALL' | bash" || true
-                    info "Preset Gaming" "Preset Gaming déployé (Steam, Heroic, ProtonUp-Qt, Decky)."
-                    ;;
-                "Bureautique")
-                    if ! flatpak_present com.brave.Browser; then
-                        flatpak_install com.brave.Browser || true
-                    fi
-                    if ! flatpak_present com.opera.Opera; then
-                        flatpak_install com.opera.Opera || true
-                    fi
-                    flatpak_install io.github.kolunmi.Bazaar com.mattjakeman.ExtensionManager &&
-                        info "Preset Bureautique" "Preset Bureautique déployé."
-                    ;;
-                "Développeur")
-                    # dnf5 a supprimé l'alias groupinstall.
-                    GRP=(dnf group install -y development-tools)
-                    [ "$DNF5" = 1 ] || GRP=(dnf groupinstall -y development-tools)
-                    if run_with_progress "Preset Développeur" "Installation du groupe de build…" \
-                         sudo "${GRP[@]}"; then
-                        sudo dnf install -y python3-devel git curl wget >/dev/null 2>&1 || true
-                        info "Preset Développeur" "Preset Développeur déployé."
-                    else
-                        show_log "Échec du preset Développeur"
-                    fi
-                    ;;
-            esac
+            if choose_language; then
+                if [ "$UI_LANG" = "en" ]; then
+                    info "Langue / Language" "Interface language: English"
+                else
+                    info "Langue / Language" "Langue de l'interface : Français"
+                fi
+            fi
+            ;;
+        14)
+            log_menu
             ;;
     esac
 done
