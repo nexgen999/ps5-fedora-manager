@@ -1611,6 +1611,8 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         header = Adw.HeaderBar()
         header.set_title_widget(Adw.WindowTitle(title=title))
 
+        if self.busy_spinner.get_parent() is not None:
+            self.busy_spinner.unparent()
         header.pack_end(self.busy_spinner)
         log_btn = Gtk.Button(icon_name="utilities-terminal-symbolic")
         log_btn.set_tooltip_text(T("logs_live"))

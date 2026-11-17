@@ -78,4 +78,6 @@ if command -v restorecon >/dev/null 2>&1; then
         /var/log/ps5-manager >/dev/null 2>&1 || true
 fi
 
-echo "PS5 Manager (GTK4 / Libadwaita) installé avec les droits et dépendances. Lancez : ps5-manager"
+VERSION="$(sed -n 's/^APP_VERSION = "\(.*\)"/\1/p' "$INSTALL_DIR/ps5_manager.py" | head -1)"
+echo "PS5 Manager ${VERSION:-?} (GTK4 / Libadwaita) installé avec les droits et dépendances. Lancez : ps5-manager"
+echo "Fichier installé : $(readlink -f /usr/local/bin/ps5-manager)"
