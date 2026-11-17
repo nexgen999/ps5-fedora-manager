@@ -1,13 +1,3 @@
-# ps5-fedora-manager
-ps5-fedora-manager
-
-
-sudo git -C /opt/ps5-manager fetch --all --prune && \
-sudo git -C /opt/ps5-manager reset --hard origin/main && \
-sudo install -m 0755 /opt/ps5-manager/ps5-manager.sh /usr/local/bin/ps5-manager
-
-------------------------------------------
-
 # PS5 Fedora Manager
 
 Gestionnaire système, matériel et logiciel conçu pour **Fedora Linux (Fedora 45 / GNOME)** sur **PlayStation 5**, doté d'une interface native **Python + PyGObject (GTK4 & Libadwaita)** harmonisée automatiquement avec la couleur d'accentuation et le mode clair/sombre de GNOME.
