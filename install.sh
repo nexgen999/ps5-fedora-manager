@@ -28,6 +28,11 @@ fi
 
 sudo install -o root -g root -m 0755 "$INSTALL_DIR/ps5_manager.py" /usr/local/bin/ps5-manager
 
+# Purge les restes de l'ancienne installation (interface bash/zenity et GUI PyGObject)
+sudo rm -f /usr/local/bin/ps5-manager-gui /usr/local/bin/ps5-manager-gui.py \
+    "$INSTALL_DIR/ps5-manager.sh" "$INSTALL_DIR/ps5-manager.sh.next" \
+    "$INSTALL_DIR/ps5-manager-gui.py"
+
 if [ -f "$SCRIPT_DIR/ps5-manager.desktop" ]; then
     sudo install -o root -g root -m 0644 "$SCRIPT_DIR/ps5-manager.desktop" /usr/share/applications/ps5-manager.desktop
     sudo update-desktop-database /usr/share/applications/ >/dev/null 2>&1 || true

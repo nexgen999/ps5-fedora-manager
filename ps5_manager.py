@@ -248,6 +248,36 @@ def apply_install_permissions() -> None:
             subprocess.run(["restorecon", "-RF", *targets], capture_output=True)
 
 
+# ------------------------------------------------------------------------------
+# Ancienne installation (interface bash/zenity et GUI PyGObject) : ses fichiers
+# sont purgés à l'installation, à la mise à jour et à la désinstallation.
+# ------------------------------------------------------------------------------
+LEGACY_PATHS = (
+    "/usr/local/bin/ps5-manager-gui",
+    "/usr/local/bin/ps5-manager-gui.py",
+    f"{INSTALL_DIR}/ps5-manager.sh",
+    f"{INSTALL_DIR}/ps5-manager.sh.next",
+    f"{INSTALL_DIR}/ps5-manager-gui.py",
+)
+
+
+def remove_legacy_install(emit: Optional[Callable[[str], None]] = None) -> list[str]:
+    """Supprime les restes de l'ancienne installation et renvoie les chemins retirés."""
+    removed: list[str] = []
+    for path in LEGACY_PATHS:
+        if not os.path.lexists(path):
+            continue
+        try:
+            os.remove(path)
+        except OSError:
+            continue
+        removed.append(path)
+    if emit is not None:
+        for path in removed:
+            emit(f"Ancien fichier supprimé : {path}")
+    return removed
+
+
 def elevate_if_needed() -> None:
     if os.geteuid() == 0 or os.environ.get("PS5_MANAGER_ELEVATED"):
         return
@@ -2206,6 +2236,7 @@ def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
                     if rc_inst != 0:
                         return False, T("failed") % rc_inst
 
+            remove_legacy_install(emit)
             apply_install_permissions()
             win.run_cmd_pty(["update-desktop-database", "/usr/share/applications/"], emit)
             emit("Droits (root:root, 0755/0644, Polkit GUI, SELinux) appliqués.")
@@ -2248,6 +2279,7 @@ def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
             shutil.rmtree(target, ignore_errors=True) if os.path.isdir(target) else (
                 os.remove(target) if os.path.exists(target) else None
             )
+        remove_legacy_install()
         win.toast(T("done"))
         GLib.timeout_add_seconds(1, lambda: win.close() or False)
 
