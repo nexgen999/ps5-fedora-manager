@@ -491,6 +491,7 @@ STRINGS = {
         # Sections
         "sec_logs": "Journal / Logs",
         "sec_library": "Logithèque",
+        "sec_aidev": "IA & Développeur",
         "sec_update": "Mise à jour du manager",
         "sec_lang": "Langues & clavier",
         "sec_repos": "Dépôts",
@@ -653,6 +654,16 @@ STRINGS = {
         "ui_lang_sub": "Changement immédiat et mémorisé dans /etc/ps5-manager/language",
         "fr_label": "Français",
         "en_label": "English",
+        # 15. IA & Développeur
+        "aidev_open_sub": "Ollama, Open WebUI (Podman), VSCodium et modèles IA locaux",
+        "aidev_stack": "Outils & Applications IA / Dev",
+        "aidev_stack_sub": "Installation, mise à jour et désinstallation des briques locales",
+        "aidev_services": "Contrôle des services IA",
+        "aidev_services_sub": "Démarrer, arrêter ou désactiver au démarrage pour libérer la RAM",
+        "aidev_models": "Modèles IA locaux (Ollama)",
+        "aidev_models_sub": "Télécharger, inspecter, décharger de la RAM ou supprimer les modèles",
+        "aidev_extras": "Diagnostic & Maintenance IA (PS5)",
+        "aidev_extras_sub": "Vérification RAM/GPU, nettoyage Podman et persistance",
     },
     "en": {
         "app_title": "PS5 Manager",
@@ -675,6 +686,7 @@ STRINGS = {
         # Sections
         "sec_logs": "Logs",
         "sec_library": "Software library",
+        "sec_aidev": "AI & Developer",
         "sec_update": "Manager update",
         "sec_lang": "Languages & keyboard",
         "sec_repos": "Repositories",
@@ -837,6 +849,16 @@ STRINGS = {
         "ui_lang_sub": "Applies immediately and saved to /etc/ps5-manager/language",
         "fr_label": "Français",
         "en_label": "English",
+        # 15. AI & Developer
+        "aidev_open_sub": "Ollama, Open WebUI (Podman), VSCodium and local AI models",
+        "aidev_stack": "AI & Developer Stack",
+        "aidev_stack_sub": "Install, update and uninstall local AI and coding tools",
+        "aidev_services": "AI Services Control",
+        "aidev_services_sub": "Start, stop or disable at boot to save RAM on PS5",
+        "aidev_models": "Local AI Models (Ollama)",
+        "aidev_models_sub": "Pull, inspect, unload from RAM or remove models",
+        "aidev_extras": "AI Diagnostics & Maintenance (PS5)",
+        "aidev_extras_sub": "RAM/GPU check, Podman cleanup and rootless linger",
     },
 }
 
@@ -1263,6 +1285,7 @@ SECTIONS = [
     # Groupe 1
     ("logs", "utilities-terminal-symbolic", "sec_logs", 1),
     ("library", "system-software-install-symbolic", "sec_library", 1),
+    ("aidev", "applications-development-symbolic", "sec_aidev", 1),
     # Groupe 2
     ("update", "software-update-available-symbolic", "sec_update", 2),
     ("lang", "preferences-desktop-locale-symbolic", "sec_lang", 2),
@@ -1843,6 +1866,17 @@ def build_page_library(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None
                 )
             )
         page.add(grp)
+
+    g_ai = Adw.PreferencesGroup(title=T("sec_aidev"), description=T("aidev_open_sub"))
+    g_ai.add(
+        win.row(
+            T("sec_aidev"),
+            T("aidev_open_sub"),
+            "applications-development-symbolic",
+            lambda *_: win._select_section("aidev"),
+        )
+    )
+    page.add(g_ai)
 
 
 def _push_software_actions(win: Ps5ManagerWindow, item: SoftwareItem) -> None:
@@ -3013,9 +3047,926 @@ def build_page_ui_lang(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None
     page.add(g_accent)
 
 
+# ------------------------------------------------------------------------------
+# Section IA & Développeur (Ollama + Open WebUI + VSCodium + Modèles)
+# ------------------------------------------------------------------------------
+AI_MODELS_CATALOG: list[tuple[str, str, str]] = [
+    ("qwen2.5-coder:3b", "Code léger · recommandé CPU / PS5 (~2 Go)", "Lightweight coding · recommended for CPU / PS5 (~2 GB)"),
+    ("qwen2.5-coder:7b", "Code avancé · GPU / 16 Go RAM (~4.7 Go)", "Advanced coding · GPU / 16 GB RAM (~4.7 GB)"),
+    ("gemma4:e2b", "Gemma 4 ultra-léger · rapide sur CPU", "Gemma 4 ultra-light · fast on CPU"),
+    ("gemma4:e4b", "Gemma 4 compact E4B · polyvalent", "Gemma 4 compact E4B · versatile"),
+    ("qwen3.5:4b", "Qwen 3.5 compact 4B · usage général", "Qwen 3.5 compact 4B · general purpose"),
+    ("nemotron-3.5-bolt:e4b", "Nemotron 3.5 Bolt E4B · réponses rapides", "Nemotron 3.5 Bolt E4B · fast responses"),
+    ("deepseek-r1:8b", "DeepSeek R1 8B · raisonnement avancé", "DeepSeek R1 8B · advanced reasoning"),
+    ("eriktonon/deepseek-v4.1-flash-1017:9b", "DeepSeek V4.1 Flash 9B · communautaire", "DeepSeek V4.1 Flash 9B · community"),
+    ("mimo-v2.6:9b", "MiMo V2.6 9B · raisonnement & code", "MiMo V2.6 9B · reasoning & coding"),
+    ("gemma4:12b", "Gemma 4 12B · modèle lourd (~8+ Go RAM)", "Gemma 4 12B · heavy model (~8+ GB RAM)"),
+]
+
+VSCODIUM_GPG = "https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/-/raw/master/pub.gpg"
+VSCODIUM_REPO_FILE = "/etc/yum.repos.d/vscodium.repo"
+VSCODIUM_REPO_CONTENT = (
+    "[gitlab.com_paulcarroty_vscodium_repo]\n"
+    "name=download.vscodium.com\n"
+    "baseurl=https://download.vscodium.com/rpms/\n"
+    "enabled=1\n"
+    "gpgcheck=1\n"
+    "repo_gpgcheck=1\n"
+    f"gpgkey={VSCODIUM_GPG}\n"
+    "metadata_expire=1h\n"
+)
+OPENWEBUI_IMAGE = "ghcr.io/open-webui/open-webui:main"
+OPENWEBUI_ICON_URL = "https://cdn.jsdelivr.net/gh/selfhst/icons/png/open-webui.png"
+OPENWEBUI_ICON_PATH = "/usr/share/pixmaps/open-webui.png"
+OPENWEBUI_DESKTOP_PATH = "/usr/share/applications/open-webui.desktop"
+OPENWEBUI_LAUNCHER_PATH = "/usr/local/bin/open-webui-launch"
+
+
+def _ollama_installed() -> bool:
+    return shutil.which("ollama") is not None
+
+
+def _ollama_version() -> str:
+    if not _ollama_installed():
+        return ""
+    res = subprocess.run(["ollama", "--version"], capture_output=True, text=True)
+    return res.stdout.strip() or res.stderr.strip()
+
+
+def _ollama_service_active() -> bool:
+    return subprocess.run(["systemctl", "is-active", "ollama"], capture_output=True).returncode == 0
+
+
+def _ollama_service_enabled() -> bool:
+    return subprocess.run(["systemctl", "is-enabled", "ollama"], capture_output=True).returncode == 0
+
+
+def _ollama_installed_models() -> dict[str, str]:
+    """Retourne {nom_modele: taille} via `ollama list`."""
+    if not _ollama_installed():
+        return {}
+    res = subprocess.run(["ollama", "list"], capture_output=True, text=True)
+    if res.returncode != 0:
+        return {}
+    models: dict[str, str] = {}
+    for line in res.stdout.splitlines()[1:]:
+        parts = line.split()
+        if len(parts) >= 4:
+            models[parts[0]] = f"{parts[2]} {parts[3]}"
+        elif parts:
+            models[parts[0]] = ""
+    return models
+
+
+def _ollama_running_models() -> set[str]:
+    if not _ollama_installed():
+        return set()
+    res = subprocess.run(["ollama", "ps"], capture_output=True, text=True)
+    if res.returncode != 0:
+        return set()
+    running: set[str] = set()
+    for line in res.stdout.splitlines()[1:]:
+        parts = line.split()
+        if parts:
+            running.add(parts[0])
+    return running
+
+
+def _podman_webui_state() -> str:
+    """Retourne 'running', 'exited'/'stopped', 'missing', ou 'no_podman'."""
+    if not shutil.which("podman"):
+        return "no_podman"
+    res = subprocess.run(
+        run_as_user_cmd(["podman", "inspect", "-f", "{{.State.Status}}", "open-webui"]),
+        capture_output=True, text=True,
+    )
+    if res.returncode == 0 and res.stdout.strip():
+        return res.stdout.strip().lower()
+    return "missing"
+
+
+def _vscodium_installed() -> bool:
+    return subprocess.run(["rpm", "-q", "codium"], capture_output=True).returncode == 0
+
+
+def _ensure_vscodium_repo(win: Ps5ManagerWindow, emit: Callable[[str], None]) -> bool:
+    rc = win.run_cmd_pty(["rpmkeys", "--import", VSCODIUM_GPG], emit)
+    if rc != 0:
+        return False
+    try:
+        with open(VSCODIUM_REPO_FILE, "w", encoding="utf-8") as fh:
+            fh.write(VSCODIUM_REPO_CONTENT)
+        os.chmod(VSCODIUM_REPO_FILE, 0o644)
+        os.chown(VSCODIUM_REPO_FILE, 0, 0)
+        return True
+    except OSError as exc:
+        emit(f"Erreur écriture {VSCODIUM_REPO_FILE} : {exc}")
+        return False
+
+
+def _ensure_ollama_ready(win: Ps5ManagerWindow, emit: Callable[[str], None]) -> bool:
+    if not _ollama_installed():
+        emit("Ollama non détecté — installation avec pciutils…")
+        if win.run_cmd_pty(["dnf", "install", "-y", "pciutils"], emit) != 0:
+            return False
+        if win.run_cmd_pty("curl -fsSL https://ollama.com/install.sh | sh", emit) != 0:
+            return False
+    if not _ollama_service_active():
+        win.run_cmd_pty(["systemctl", "start", "ollama"], emit)
+    return _ollama_installed()
+
+
+def _create_openwebui_container(win: Ps5ManagerWindow, emit: Callable[[str], None]) -> int:
+    return win.run_cmd_pty(
+        [
+            "podman", "run", "-d", "--network=host",
+            "-v", "open-webui:/app/backend/data",
+            "-e", "OLLAMA_BASE_URL=http://127.0.0.1:11434",
+            "--name", "open-webui",
+            "--restart", "always",
+            OPENWEBUI_IMAGE,
+        ],
+        emit,
+        as_user=True,
+    )
+
+
+def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
+    ollama_ok = _ollama_installed()
+    ollama_act = _ollama_service_active() if ollama_ok else False
+    ollama_boot = _ollama_service_enabled() if ollama_ok else False
+    webui_st = _podman_webui_state()
+    codium_ok = _vscodium_installed()
+    installed_models = _ollama_installed_models()
+
+    # 1) Outils & Applications IA / Dev
+    g_tools = Adw.PreferencesGroup(title=T("aidev_stack"), description=T("aidev_stack_sub"))
+
+    ollama_sub = (
+        f"{_ollama_version()} · {'actif' if ollama_act else 'arrêté'}"
+        if ollama_ok
+        else "pciutils + script officiel ollama.com"
+    )
+    g_tools.add(
+        win.row(
+            "Ollama (moteur IA local)",
+            ollama_sub,
+            "utilities-terminal-symbolic",
+            lambda *_: _push_ollama_actions(win),
+        )
+    )
+
+    webui_labels = {
+        "running": "Actif · http://127.0.0.1:8080",
+        "exited": "Installé (arrêté) · Podman",
+        "created": "Installé (arrêté) · Podman",
+        "paused": "En pause · Podman",
+        "missing": "Non installé · Podman ghcr.io/open-webui",
+        "no_podman": "Podman absent (sera installé automatiquement)",
+    }
+    g_tools.add(
+        win.row(
+            "Open WebUI (interface web IA)",
+            webui_labels.get(webui_st, webui_st),
+            "web-browser-symbolic",
+            lambda *_: _push_webui_actions(win),
+        )
+    )
+
+    g_tools.add(
+        win.row(
+            "VSCodium (éditeur de code libre)",
+            T("installed_rpm") if codium_ok else f"{T('not_installed')} · dépôt officiel RPM",
+            "applications-development-symbolic",
+            lambda *_: _push_vscodium_actions(win),
+        )
+    )
+    page.add(g_tools)
+
+    # 2) Contrôle des services IA
+    g_srv = Adw.PreferencesGroup(title=T("aidev_services"), description=T("aidev_services_sub"))
+
+    sw_ollama = Adw.SwitchRow(
+        title=GLib.markup_escape_text("Service Ollama (ollama.service)"),
+        subtitle=GLib.markup_escape_text(
+            "Démarrer / arrêter le serveur IA (port 11434)"
+            if UI_LANG == "fr"
+            else "Start / stop local AI server (port 11434)"
+        ),
+    )
+    sw_ollama.add_prefix(Gtk.Image.new_from_icon_name("system-run-symbolic"))
+    sw_ollama.set_active(ollama_act)
+    sw_ollama.set_sensitive(ollama_ok)
+
+    def _toggle_ollama(r, _p):
+        act = "start" if r.get_active() else "stop"
+        rc = subprocess.run(["systemctl", act, "ollama"]).returncode
+        win.toast(T("done") if rc == 0 else T("failed") % rc)
+        win._select_section("aidev")
+
+    sw_ollama.connect("notify::active", _toggle_ollama)
+    g_srv.add(sw_ollama)
+
+    sw_boot = Adw.SwitchRow(
+        title=GLib.markup_escape_text(
+            "Démarrage automatique Ollama au boot" if UI_LANG == "fr" else "Start Ollama automatically at boot"
+        ),
+        subtitle=GLib.markup_escape_text("systemctl enable / disable ollama"),
+    )
+    sw_boot.add_prefix(Gtk.Image.new_from_icon_name("preferences-system-time-symbolic"))
+    sw_boot.set_active(ollama_boot)
+    sw_boot.set_sensitive(ollama_ok)
+
+    def _toggle_ollama_boot(r, _p):
+        act = "enable" if r.get_active() else "disable"
+        rc = subprocess.run(["systemctl", act, "ollama"]).returncode
+        win.toast(T("done") if rc == 0 else T("failed") % rc)
+
+    sw_boot.connect("notify::active", _toggle_ollama_boot)
+    g_srv.add(sw_boot)
+
+    sw_webui = Adw.SwitchRow(
+        title=GLib.markup_escape_text("Conteneur Open WebUI (Podman)"),
+        subtitle=GLib.markup_escape_text("podman start / stop open-webui"),
+    )
+    sw_webui.add_prefix(Gtk.Image.new_from_icon_name("network-server-symbolic"))
+    sw_webui.set_active(webui_st == "running")
+    sw_webui.set_sensitive(webui_st not in ("missing", "no_podman"))
+
+    def _toggle_webui(r, _p):
+        act = "start" if r.get_active() else "stop"
+        rc = subprocess.run(run_as_user_cmd(["podman", act, "open-webui"])).returncode
+        win.toast(T("done") if rc == 0 else T("failed") % rc)
+        win._select_section("aidev")
+
+    sw_webui.connect("notify::active", _toggle_webui)
+    g_srv.add(sw_webui)
+
+    def _start_all():
+        def _task(emit):
+            rc1 = win.run_cmd_pty(["systemctl", "start", "ollama"], emit) if _ollama_installed() else 0
+            rc2 = (
+                win.run_cmd_pty(["podman", "start", "open-webui"], emit, as_user=True)
+                if _podman_webui_state() not in ("missing", "no_podman")
+                else 0
+            )
+            ok = rc1 == 0 and rc2 == 0
+            return ok, T("done") if ok else T("failed") % (rc1 or rc2)
+        win.run_task("Démarrer Ollama + Open WebUI", _task, lambda *_: win._select_section("aidev"))
+
+    def _stop_all():
+        def _task(emit):
+            if _podman_webui_state() == "running":
+                win.run_cmd_pty(["podman", "stop", "open-webui"], emit, as_user=True)
+            if _ollama_installed():
+                win.run_cmd_pty(["systemctl", "stop", "ollama"], emit)
+            return True, T("done")
+        win.run_task("Arrêter Ollama + Open WebUI", _task, lambda *_: win._select_section("aidev"))
+
+    g_srv.add(
+        win.row(
+            "Tout démarrer (Ollama + Open WebUI)" if UI_LANG == "fr" else "Start all (Ollama + Open WebUI)",
+            "systemctl start ollama && podman start open-webui",
+            "media-playback-start-symbolic",
+            lambda *_: _start_all(),
+        )
+    )
+    g_srv.add(
+        win.row(
+            "Tout arrêter (libérer la RAM)" if UI_LANG == "fr" else "Stop all (free RAM)",
+            "podman stop open-webui && systemctl stop ollama",
+            "media-playback-stop-symbolic",
+            lambda *_: _stop_all(),
+        )
+    )
+    g_srv.add(
+        win.row(
+            "Ouvrir Open WebUI dans le navigateur" if UI_LANG == "fr" else "Open Open WebUI in browser",
+            "http://127.0.0.1:8080",
+            "web-browser-symbolic",
+            lambda *_: (
+                subprocess.Popen(run_as_user_cmd(["xdg-open", "http://127.0.0.1:8080"]))
+                if webui_st == "running"
+                else win.show_info("Open WebUI", "Démarrez d'abord le conteneur Open WebUI.")
+            ),
+        )
+    )
+    page.add(g_srv)
+
+    # 3) Modèles IA locaux
+    g_mod = Adw.PreferencesGroup(title=T("aidev_models"), description=T("aidev_models_sub"))
+    g_mod.add(
+        win.row(
+            "Gérer les modèles IA (catalogue & installés)" if UI_LANG == "fr" else "Manage AI models (catalog & installed)",
+            f"{len(installed_models)} installé(s) · qwen2.5-coder, deepseek, gemma4, mimo, nemotron…",
+            "folder-download-symbolic",
+            lambda *_: _push_ai_models(win),
+        )
+    )
+    g_mod.add(
+        win.row(
+            "Voir les modèles installés (ollama list)" if UI_LANG == "fr" else "List installed models (ollama list)",
+            None,
+            "view-list-symbolic",
+            lambda *_: (
+                win.show_text_modal("ollama list", subprocess.run(["ollama", "list"], capture_output=True, text=True).stdout or "(aucun modèle)")
+                if _ollama_installed()
+                else win.show_info("Ollama", "Ollama n'est pas installé.")
+            ),
+        )
+    )
+    g_mod.add(
+        win.row(
+            "Modèles actifs en RAM (ollama ps)" if UI_LANG == "fr" else "Active models in RAM (ollama ps)",
+            "Affiche les modèles actuellement chargés en mémoire",
+            "utilities-system-monitor-symbolic",
+            lambda *_: (
+                win.show_text_modal("ollama ps", subprocess.run(["ollama", "ps"], capture_output=True, text=True).stdout or "(aucun modèle actif)")
+                if _ollama_installed()
+                else win.show_info("Ollama", "Ollama n'est pas installé.")
+            ),
+        )
+    )
+    page.add(g_mod)
+
+    # 4) Propositions utiles pour PS5 Linux
+    g_ext = Adw.PreferencesGroup(title=T("aidev_extras"), description=T("aidev_extras_sub"))
+
+    def _hw_ai_diag():
+        cmd = (
+            "echo '=== Mémoire RAM / Swap (PS5 unifiée 16 Go) ==='; free -h; "
+            "echo ''; echo '=== Processeur ==='; lscpu | grep -E 'Model name|CPU\\(s\\)|Thread'; "
+            "echo ''; echo '=== GPU / PCI (pciutils) ==='; lspci | grep -iE 'vga|display|amd' || true; "
+            "echo ''; echo '=== Espace disque modèles ==='; df -h / /var /usr/share/ollama 2>/dev/null || df -h /"
+        )
+        out = subprocess.run(["bash", "-c", cmd], capture_output=True, text=True).stdout
+        win.show_text_modal("Diagnostic matériel IA (PS5)", out)
+
+    g_ext.add(
+        win.row(
+            "Diagnostic RAM / GPU / Disque pour l'IA" if UI_LANG == "fr" else "AI RAM / GPU / Disk diagnostic",
+            "Vérifie la mémoire libre avant d'exécuter un modèle 7B / 9B / 12B",
+            "applications-system-symbolic",
+            lambda *_: _hw_ai_diag(),
+        )
+    )
+    g_ext.add(
+        win.row(
+            "Nettoyer les anciennes images Podman" if UI_LANG == "fr" else "Prune unused Podman images",
+            "podman image prune -f (libère l'espace après mise à jour Open WebUI)",
+            "edit-clear-all-symbolic",
+            lambda *_: win.run_task(
+                "Podman prune",
+                lambda e: (win.run_cmd_pty(["podman", "image", "prune", "-f"], e, as_user=True) == 0, T("done")),
+            ),
+        )
+    )
+    if REAL_USER != "root":
+        g_ext.add(
+            win.row(
+                f"Activer le maintien de session Podman ({REAL_USER})" if UI_LANG == "fr" else f"Enable Podman user linger ({REAL_USER})",
+                f"loginctl enable-linger {REAL_USER} · démarre Open WebUI sans terminal",
+                "user-available-symbolic",
+                lambda *_: win.run_task(
+                    "loginctl enable-linger",
+                    lambda e: (win.run_cmd_pty(["loginctl", "enable-linger", REAL_USER], e) == 0, T("done")),
+                ),
+            )
+        )
+    page.add(g_ext)
+
+
+def _install_openwebui_desktop_entry(win: Ps5ManagerWindow, emit: Callable[[str], None]) -> bool:
+    """Télécharge l'icône Open WebUI localement dans Fedora et crée le lanceur GNOME."""
+    rc_icon = win.run_cmd_pty(
+        ["curl", "-fL", "--retry", "3", "-o", OPENWEBUI_ICON_PATH, OPENWEBUI_ICON_URL],
+        emit,
+    )
+    if rc_icon == 0 and os.path.isfile(OPENWEBUI_ICON_PATH):
+        try:
+            os.chmod(OPENWEBUI_ICON_PATH, 0o644)
+            os.chown(OPENWEBUI_ICON_PATH, 0, 0)
+        except OSError:
+            pass
+    else:
+        emit("Avertissement : impossible de télécharger open-webui.png (icône générique utilisée).")
+
+    launcher_script = """#!/bin/sh
+if command -v podman >/dev/null 2>&1 && podman container exists open-webui 2>/dev/null; then
+    state=$(podman inspect -f '{{.State.Running}}' open-webui 2>/dev/null || echo false)
+    if [ "$state" != "true" ]; then
+        podman start open-webui >/dev/null 2>&1 || true
+        i=0
+        while [ "$i" -lt 15 ]; do
+            curl -fsS http://127.0.0.1:8080 >/dev/null 2>&1 && break
+            sleep 1
+            i=$((i + 1))
+        done
+    fi
+fi
+exec xdg-open "http://127.0.0.1:8080"
+"""
+    desktop_entry = f"""[Desktop Entry]
+Name=Open WebUI
+Comment=Interface web locale pour Ollama (IA)
+Exec={OPENWEBUI_LAUNCHER_PATH}
+Icon={OPENWEBUI_ICON_PATH if os.path.isfile(OPENWEBUI_ICON_PATH) else 'web-browser'}
+Terminal=false
+Type=Application
+Categories=Development;Utility;Network;
+Keywords=AI;IA;Ollama;OpenWebUI;LLM;Chat;
+StartupNotify=true
+"""
+    try:
+        with open(OPENWEBUI_LAUNCHER_PATH, "w", encoding="utf-8") as fh:
+            fh.write(launcher_script)
+        os.chmod(OPENWEBUI_LAUNCHER_PATH, 0o755)
+        os.chown(OPENWEBUI_LAUNCHER_PATH, 0, 0)
+
+        with open(OPENWEBUI_DESKTOP_PATH, "w", encoding="utf-8") as fh:
+            fh.write(desktop_entry)
+        os.chmod(OPENWEBUI_DESKTOP_PATH, 0o644)
+        os.chown(OPENWEBUI_DESKTOP_PATH, 0, 0)
+    except OSError as exc:
+        emit(f"Erreur création lanceur Open WebUI : {exc}")
+        return False
+
+    if shutil.which("restorecon"):
+        win.run_cmd_pty(
+            ["restorecon", "-RF", OPENWEBUI_ICON_PATH, OPENWEBUI_LAUNCHER_PATH, OPENWEBUI_DESKTOP_PATH],
+            emit,
+        )
+    win.run_cmd_pty(["update-desktop-database", "/usr/share/applications/"], emit)
+    emit(f"Raccourci installé : {OPENWEBUI_DESKTOP_PATH} (icône : {OPENWEBUI_ICON_PATH})")
+    return True
+
+
+def _remove_openwebui_desktop_entry(win: Ps5ManagerWindow, emit: Callable[[str], None]) -> None:
+    for path in (OPENWEBUI_DESKTOP_PATH, OPENWEBUI_ICON_PATH, OPENWEBUI_LAUNCHER_PATH):
+        if os.path.exists(path):
+            try:
+                os.remove(path)
+                emit(f"Supprimé : {path}")
+            except OSError:
+                pass
+    win.run_cmd_pty(["update-desktop-database", "/usr/share/applications/"], emit)
+
+
+def _push_ollama_actions(win: Ps5ManagerWindow) -> None:
+    installed = _ollama_installed()
+    sub = Adw.PreferencesPage()
+    grp = Adw.PreferencesGroup(
+        title="Ollama",
+        description=_ollama_version() if installed else "Non installé · pciutils + install.sh",
+    )
+
+    def _install_or_update(label: str):
+        def _task(emit):
+            if win.run_cmd_pty(["dnf", "install", "-y", "pciutils"], emit) != 0:
+                return False, T("failed") % 1
+            rc = win.run_cmd_pty("curl -fsSL https://ollama.com/install.sh | sh", emit)
+            return rc == 0, T("done") if rc == 0 else T("failed") % rc
+        win.run_task(label, _task, lambda *_: (win.nav.pop(), win._select_section("aidev")))
+
+    def _uninstall(purge_models: bool):
+        def _task(emit):
+            win.run_cmd_pty(["systemctl", "stop", "ollama"], emit)
+            win.run_cmd_pty(["systemctl", "disable", "ollama"], emit)
+            cmds = [
+                "rm -f /etc/systemd/system/ollama.service",
+                "systemctl daemon-reload",
+                "rm -f /usr/local/bin/ollama /usr/bin/ollama",
+                "rm -rf /usr/lib/ollama",
+            ]
+            if purge_models:
+                cmds.append("rm -rf /usr/share/ollama")
+            win.run_cmd_pty(["bash", "-c", " && ".join(cmds)], emit)
+            return True, T("done")
+        win.run_task("Désinstaller Ollama", _task, lambda *_: (win.nav.pop(), win._select_section("aidev")))
+
+    grp.add(
+        win.row(
+            T("install"),
+            "dnf install -y pciutils && curl -fsSL https://ollama.com/install.sh | sh",
+            "system-software-install-symbolic",
+            lambda *_: _install_or_update("Installer Ollama"),
+        )
+    )
+    grp.add(
+        win.row(
+            T("update"),
+            "Met à jour Ollama vers la dernière version officielle",
+            "software-update-available-symbolic",
+            lambda *_: _install_or_update("Mettre à jour Ollama"),
+        )
+    )
+    grp.add(
+        win.row(
+            T("remove"),
+            "Supprime le service et les binaires, conserve /usr/share/ollama",
+            "user-trash-symbolic",
+            lambda *_: (
+                win.show_confirm("Désinstaller Ollama", "Supprimer Ollama tout en conservant les modèles dans /usr/share/ollama ?", lambda: _uninstall(False))
+                if _ollama_installed()
+                else win.show_info("Ollama", T("not_installed"))
+            ),
+        )
+    )
+    if installed:
+        grp.add(
+            win.row(
+                "Désinstaller complètement (+ supprimer tous les modèles)",
+                "Supprime aussi /usr/share/ollama",
+                "edit-delete-symbolic",
+                lambda *_: win.show_confirm("Purger Ollama", "Supprimer définitivement Ollama ET tous les modèles téléchargés (/usr/share/ollama) ?", lambda: _uninstall(True)),
+            )
+        )
+    sub.add(grp)
+    tb = Adw.ToolbarView()
+    hb = Adw.HeaderBar()
+    hb.set_title_widget(Adw.WindowTitle(title="Ollama"))
+    tb.add_top_bar(hb)
+    tb.set_content(sub)
+    win.nav.push(Adw.NavigationPage(child=tb, title="Ollama"))
+
+
+def _push_webui_actions(win: Ps5ManagerWindow) -> None:
+    st = _podman_webui_state()
+    has_desktop = os.path.isfile(OPENWEBUI_DESKTOP_PATH) and os.path.isfile(OPENWEBUI_ICON_PATH)
+    sub = Adw.PreferencesPage()
+    grp = Adw.PreferencesGroup(
+        title="Open WebUI (Podman)",
+        description=f"État : {st} · Icône GNOME : {'installée' if has_desktop else 'absente'}",
+    )
+
+    def _install():
+        def _task(emit):
+            if not shutil.which("podman"):
+                if win.run_cmd_pty(["dnf", "install", "-y", "podman"], emit) != 0:
+                    return False, T("failed") % 1
+            if _podman_webui_state() in ("missing", "no_podman"):
+                rc = _create_openwebui_container(win, emit)
+                if rc != 0:
+                    return False, T("failed") % rc
+            _install_openwebui_desktop_entry(win, emit)
+            return True, T("done")
+        win.run_task("Installer Open WebUI", _task, lambda *_: (win.nav.pop(), win._select_section("aidev")))
+
+    def _update():
+        def _task(emit):
+            if not shutil.which("podman"):
+                if win.run_cmd_pty(["dnf", "install", "-y", "podman"], emit) != 0:
+                    return False, T("failed") % 1
+            if win.run_cmd_pty(["podman", "pull", OPENWEBUI_IMAGE], emit, as_user=True) != 0:
+                return False, T("failed") % 1
+            win.run_cmd_pty(["podman", "stop", "open-webui"], emit, as_user=True)
+            win.run_cmd_pty(["podman", "rm", "open-webui"], emit, as_user=True)
+            rc = _create_openwebui_container(win, emit)
+            if rc != 0:
+                return False, T("failed") % rc
+            _install_openwebui_desktop_entry(win, emit)
+            return True, T("done")
+        win.run_task("Mettre à jour Open WebUI", _task, lambda *_: (win.nav.pop(), win._select_section("aidev")))
+
+    def _install_icon_only():
+        def _task(emit):
+            ok = _install_openwebui_desktop_entry(win, emit)
+            return ok, T("done") if ok else T("failed") % 1
+        win.run_task("Icône Open WebUI", _task, lambda *_: (win.nav.pop(), _push_webui_actions(win)))
+
+    def _uninstall(purge_data: bool):
+        def _task(emit):
+            win.run_cmd_pty(["podman", "stop", "open-webui"], emit, as_user=True)
+            win.run_cmd_pty(["podman", "rm", "open-webui"], emit, as_user=True)
+            if purge_data:
+                win.run_cmd_pty(["podman", "volume", "rm", "open-webui"], emit, as_user=True)
+                win.run_cmd_pty(["podman", "rmi", OPENWEBUI_IMAGE], emit, as_user=True)
+            _remove_openwebui_desktop_entry(win, emit)
+            return True, T("done")
+        win.run_task("Désinstaller Open WebUI", _task, lambda *_: (win.nav.pop(), win._select_section("aidev")))
+
+    grp.add(
+        win.row(
+            T("install"),
+            "Podman + conteneur open-webui + icône locale dans le menu GNOME",
+            "system-software-install-symbolic",
+            lambda *_: _install(),
+        )
+    )
+    grp.add(
+        win.row(
+            T("update"),
+            "podman pull + recréation (données conservées) + icône GNOME",
+            "software-update-available-symbolic",
+            lambda *_: _update(),
+        )
+    )
+    grp.add(
+        win.row(
+            "Ouvrir dans le navigateur (http://127.0.0.1:8080)",
+            "Démarre open-webui si arrêté puis ouvre la page web",
+            "web-browser-symbolic",
+            lambda *_: subprocess.Popen(run_as_user_cmd([OPENWEBUI_LAUNCHER_PATH]))
+            if os.access(OPENWEBUI_LAUNCHER_PATH, os.X_OK)
+            else subprocess.Popen(run_as_user_cmd(["xdg-open", "http://127.0.0.1:8080"])),
+        )
+    )
+    grp.add(
+        win.row(
+            "Installer / mettre à jour l'icône GNOME (menu Applications)",
+            "Télécharge open-webui.png dans /usr/share/pixmaps/ et crée open-webui.desktop",
+            "image-x-generic-symbolic",
+            lambda *_: _install_icon_only(),
+        )
+    )
+    grp.add(
+        win.row(
+            T("remove"),
+            "Supprime conteneur + lanceur/icône GNOME (conserve les conversations)",
+            "user-trash-symbolic",
+            lambda *_: win.show_confirm(
+                "Désinstaller Open WebUI",
+                "Supprimer le conteneur open-webui et son icône du menu GNOME en conservant vos données ?",
+                lambda: _uninstall(False),
+            ),
+        )
+    )
+    if st not in ("missing", "no_podman"):
+        grp.add(
+            win.row(
+                "Désinstaller complètement (conteneur + volume + image + icône)",
+                "Supprime aussi le volume open-webui et l'image",
+                "edit-delete-symbolic",
+                lambda *_: win.show_confirm(
+                    "Purger Open WebUI",
+                    "Supprimer le conteneur, l'icône, l'image ET toutes les conversations (volume open-webui) ?",
+                    lambda: _uninstall(True),
+                ),
+            )
+        )
+    sub.add(grp)
+    tb = Adw.ToolbarView()
+    hb = Adw.HeaderBar()
+    hb.set_title_widget(Adw.WindowTitle(title="Open WebUI"))
+    tb.add_top_bar(hb)
+    tb.set_content(sub)
+    win.nav.push(Adw.NavigationPage(child=tb, title="Open WebUI"))
+
+
+def _push_vscodium_actions(win: Ps5ManagerWindow) -> None:
+    installed = _vscodium_installed()
+    sub = Adw.PreferencesPage()
+    grp = Adw.PreferencesGroup(
+        title="VSCodium",
+        description=T("installed_rpm") if installed else T("not_installed"),
+    )
+
+    def _install():
+        def _task(emit):
+            if not _ensure_vscodium_repo(win, emit):
+                return False, "Erreur configuration dépôt VSCodium"
+            rc = win.run_cmd_pty(["dnf", "install", "-y", "codium"], emit)
+            return rc == 0, T("done") if rc == 0 else T("failed") % rc
+        win.run_task("Installer VSCodium", _task, lambda *_: (win.nav.pop(), win._select_section("aidev")))
+
+    def _update():
+        def _task(emit):
+            if not _ensure_vscodium_repo(win, emit):
+                return False, "Erreur configuration dépôt VSCodium"
+            rc = win.run_cmd_pty(["dnf", "upgrade", "-y", "--refresh", "codium"], emit)
+            return rc == 0, T("done") if rc == 0 else T("failed") % rc
+        win.run_task("Mettre à jour VSCodium", _task, lambda *_: (win.nav.pop(), win._select_section("aidev")))
+
+    def _remove():
+        def _task(emit):
+            rc = win.run_cmd_pty(["dnf", "remove", "-y", "codium"], emit)
+            if rc == 0 and os.path.isfile(VSCODIUM_REPO_FILE):
+                try:
+                    os.remove(VSCODIUM_REPO_FILE)
+                except OSError:
+                    pass
+            return rc == 0, T("done") if rc == 0 else T("failed") % rc
+        win.run_task("Désinstaller VSCodium", _task, lambda *_: (win.nav.pop(), win._select_section("aidev")))
+
+    grp.add(win.row(T("install"), "Clé GPG + vscodium.repo + dnf install codium", "system-software-install-symbolic", lambda *_: _install()))
+    grp.add(win.row(T("update"), "dnf upgrade -y --refresh codium", "software-update-available-symbolic", lambda *_: _update()))
+    if installed:
+        grp.add(win.row("Lancer VSCodium", "Ouvre codium sous votre session utilisateur", "applications-development-symbolic", lambda *_: subprocess.Popen(run_as_user_cmd(["codium"]))))
+    grp.add(
+        win.row(
+            T("remove"),
+            "dnf remove -y codium + retrait dépôt",
+            "user-trash-symbolic",
+            lambda *_: (
+                win.show_confirm("Désinstaller VSCodium", "Supprimer VSCodium (codium) et son dépôt ?", _remove)
+                if _vscodium_installed()
+                else win.show_info("VSCodium", T("not_installed"))
+            ),
+        )
+    )
+
+    sub.add(grp)
+    tb = Adw.ToolbarView()
+    hb = Adw.HeaderBar()
+    hb.set_title_widget(Adw.WindowTitle(title="VSCodium"))
+    tb.add_top_bar(hb)
+    tb.set_content(sub)
+    win.nav.push(Adw.NavigationPage(child=tb, title="VSCodium"))
+
+
+def _push_ai_models(win: Ps5ManagerWindow) -> None:
+    installed = _ollama_installed_models()
+    running = _ollama_running_models()
+    sub = Adw.PreferencesPage()
+
+    # 1) Modèles déjà installés sur le système (incluant modèles personnalisés)
+    g_inst = Adw.PreferencesGroup(
+        title="Modèles installés sur le système" if UI_LANG == "fr" else "Installed models on system",
+        description=f"{len(installed)} modèle(s) · {len(running)} actif(s) en RAM",
+    )
+    if not _ollama_installed():
+        g_inst.add(Adw.ActionRow(title=GLib.markup_escape_text("Ollama n'est pas installé (sera installé au premier pull).")))
+    elif not installed:
+        g_inst.add(Adw.ActionRow(title=GLib.markup_escape_text("Aucun modèle installé pour le moment.")))
+    else:
+        for name, size in installed.items():
+            state = "Actif en RAM" if name in running else "Installé"
+            sub_lbl = f"{state} · {size}" if size else state
+            g_inst.add(
+                win.row(
+                    name,
+                    sub_lbl,
+                    "media-playback-start-symbolic" if name in running else "drive-harddisk-symbolic",
+                    lambda _r, m=name: _push_model_actions(win, m),
+                )
+            )
+    if running:
+        def _stop_all_models():
+            def _task(emit):
+                for m in list(_ollama_running_models()):
+                    win.run_cmd_pty(["ollama", "stop", m], emit)
+                return True, T("done")
+            win.run_task("Décharger tous les modèles", _task, lambda *_: (win.nav.pop(), _push_ai_models(win)))
+
+        g_inst.add(
+            win.row(
+                "Décharger tous les modèles de la RAM" if UI_LANG == "fr" else "Unload all models from RAM",
+                "ollama stop sur tous les modèles actifs",
+                "media-playback-stop-symbolic",
+                lambda *_: _stop_all_models(),
+            )
+        )
+    sub.add(g_inst)
+
+    # 2) Catalogue rapide des modèles demandés
+    g_cat = Adw.PreferencesGroup(
+        title="Catalogue des modèles recommandés" if UI_LANG == "fr" else "Recommended models catalog",
+        description="Cliquez sur un modèle pour le télécharger, mettre à jour, stopper ou supprimer",
+    )
+    for model_id, desc_fr, desc_en in AI_MODELS_CATALOG:
+        desc = desc_fr if UI_LANG == "fr" else desc_en
+        if model_id in running:
+            badge = "Actif en RAM"
+        elif model_id in installed:
+            badge = f"Installé ({installed[model_id]})" if installed[model_id] else "Installé"
+        else:
+            badge = "Non installé"
+        g_cat.add(
+            win.row(
+                model_id,
+                f"{desc} · {badge}",
+                "folder-download-symbolic",
+                lambda _r, m=model_id: _push_model_actions(win, m),
+            )
+        )
+
+    def _pull_custom():
+        win.show_prompt(
+            "Télécharger un modèle Ollama",
+            "Nom exact du modèle (ex : llama3.2:3b, mistral:7b) :",
+            "qwen2.5-coder:3b",
+            lambda name: _exec_model_pull(win, name.strip(), refresh_models=True) if name.strip() else None,
+        )
+
+    g_cat.add(
+        win.row(
+            "Télécharger un autre modèle (nom personnalisé)" if UI_LANG == "fr" else "Pull a custom model",
+            "ollama pull <nom_du_modele>",
+            "list-add-symbolic",
+            lambda *_: _pull_custom(),
+        )
+    )
+    sub.add(g_cat)
+
+    tb = Adw.ToolbarView()
+    hb = Adw.HeaderBar()
+    hb.set_title_widget(Adw.WindowTitle(title=T("aidev_models")))
+    tb.add_top_bar(hb)
+    tb.set_content(sub)
+    win.nav.push(Adw.NavigationPage(child=tb, title=T("aidev_models")))
+
+
+def _exec_model_pull(win: Ps5ManagerWindow, model_name: str, refresh_models: bool = False) -> None:
+    def _task(emit):
+        if not _ensure_ollama_ready(win, emit):
+            return False, "Échec préparation Ollama"
+        rc = win.run_cmd_pty(["ollama", "pull", model_name], emit)
+        return rc == 0, T("done") if rc == 0 else T("failed") % rc
+
+    def _after(*_):
+        if refresh_models:
+            win.nav.pop()
+            _push_ai_models(win)
+
+    win.run_task(f"ollama pull {model_name}", _task, _after)
+
+
+def _push_model_actions(win: Ps5ManagerWindow, model_name: str) -> None:
+    installed = _ollama_installed_models()
+    running = _ollama_running_models()
+    is_inst = model_name in installed
+    is_run = model_name in running
+    status = "Actif en RAM" if is_run else (f"Installé ({installed[model_name]})" if is_inst else "Non installé")
+
+    sub = Adw.PreferencesPage()
+    grp = Adw.PreferencesGroup(title=model_name, description=status)
+
+    grp.add(
+        win.row(
+            "Mettre à jour (ollama pull)" if is_inst else "Télécharger (ollama pull)",
+            f"ollama pull {model_name}",
+            "system-software-install-symbolic",
+            lambda *_: _exec_model_pull(win, model_name, refresh_models=False),
+        )
+    )
+
+    if is_inst:
+        grp.add(
+            win.row(
+                "Décharger de la RAM (ollama stop)",
+                f"ollama stop {model_name}",
+                "media-playback-stop-symbolic",
+                lambda *_: win.run_task(
+                    f"ollama stop {model_name}",
+                    lambda e: (win.run_cmd_pty(["ollama", "stop", model_name], e) == 0, T("done")),
+                ),
+            )
+        )
+        grp.add(
+            win.row(
+                "Afficher les détails du modèle (ollama show)",
+                "Architecture, quantification, paramètres et licence",
+                "dialog-information-symbolic",
+                lambda *_: win.show_text_modal(
+                    model_name,
+                    subprocess.run(["ollama", "show", model_name], capture_output=True, text=True).stdout or "(indisponible)",
+                ),
+            )
+        )
+
+        def _do_remove():
+            def _task(emit):
+                if not _ollama_service_active():
+                    win.run_cmd_pty(["systemctl", "start", "ollama"], emit)
+                # Toujours stopper le modèle avant de le supprimer s'il est en RAM
+                if model_name in _ollama_running_models():
+                    win.run_cmd_pty(["ollama", "stop", model_name], emit)
+                rc = win.run_cmd_pty(["ollama", "rm", model_name], emit)
+                return rc == 0, T("done") if rc == 0 else T("failed") % rc
+
+            def _after(*_):
+                win.nav.pop()
+                win.nav.pop()
+                _push_ai_models(win)
+
+            win.run_task(f"ollama rm {model_name}", _task, _after)
+
+        grp.add(
+            win.row(
+                "Supprimer le modèle (stop auto + ollama rm)",
+                f"Stoppe si actif puis exécute ollama rm {model_name}",
+                "user-trash-symbolic",
+                lambda *_: win.show_confirm(
+                    f"Supprimer {model_name}",
+                    f"Le modèle sera stoppé s'il est actif puis supprimé (ollama rm {model_name}).",
+                    _do_remove,
+                ),
+            )
+        )
+
+    sub.add(grp)
+    tb = Adw.ToolbarView()
+    hb = Adw.HeaderBar()
+    hb.set_title_widget(Adw.WindowTitle(title=model_name))
+    tb.add_top_bar(hb)
+    tb.set_content(sub)
+    win.nav.push(Adw.NavigationPage(child=tb, title=model_name))
+
+
 PAGE_BUILDERS = {
     "logs": build_page_logs,
     "library": build_page_library,
+    "aidev": build_page_aidev,
     "update": build_page_update,
     "lang": build_page_lang,
     "repos": build_page_repos,
