@@ -40,6 +40,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Manager"
+APP_VERSION = "2.1.0"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1830,11 +1831,13 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
     def _show_sysinfo(self) -> None:
         os_name, k_ver = get_os_summary()
         body = (
+            f"Version : {APP_VERSION}\n"
             f"OS : {os_name}\n"
             f"Kernel : {k_ver}\n"
             f"User : {REAL_USER} (uid={REAL_UID})\n"
             f"GNOME Accent : {self.theme_sync.current_accent}\n"
             f"DNF5 : {'yes' if IS_DNF5 else 'no'}\n"
+            f"Fichier : {os.path.abspath(sys.argv[0])}\n"
             f"Session log : {self.logger.path}"
         )
         self.show_info(T("system_info"), body)
@@ -1844,7 +1847,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
             about = Adw.AboutDialog(
                 application_name=APP_NAME,
                 application_icon="applications-system-symbolic",
-                version="2.0.0 (GTK4 / Libadwaita)",
+                version=f"{APP_VERSION} (GTK4 / Libadwaita)",
                 developer_name="nexgen999",
                 website="https://github.com/nexgen999/ps5-fedora-manager",
                 comments="Gestionnaire système, matériel et logiciels pour Fedora sur PS5.",
