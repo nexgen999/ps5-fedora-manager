@@ -446,6 +446,22 @@ class SystemThemeSync:
             color: #ff7b63;
             font-weight: 600;
         }}
+
+        list.navigation-sidebar row.ps5-sidebar-sep,
+        list.navigation-sidebar row.ps5-sidebar-sep:hover,
+        list.navigation-sidebar row.ps5-sidebar-sep:active,
+        list.navigation-sidebar row.ps5-sidebar-sep:selected {{
+            min-height: 0px;
+            padding: 6px 12px;
+            margin: 2px 6px;
+            background: transparent;
+            box-shadow: none;
+        }}
+
+        list.navigation-sidebar row.ps5-sidebar-sep separator {{
+            min-height: 1px;
+            background-color: alpha(currentColor, 0.14);
+        }}
         """
         self.css_provider.load_from_data(css.encode("utf-8"))
 
@@ -1346,21 +1362,25 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         prev_group = 1
         for sec_id, icon, label_key, grp in SECTIONS:
             if grp != prev_group:
-                sep_row = Gtk.ListBoxRow(selectable=False, activatable=False)
-                sep_row.set_child(
-                    Gtk.Separator(
-                        orientation=Gtk.Orientation.HORIZONTAL,
-                        margin_top=6,
-                        margin_bottom=6,
-                        margin_start=12,
-                        margin_end=12,
-                    )
+                sep = Gtk.Separator(
+                    orientation=Gtk.Orientation.HORIZONTAL,
+                    valign=Gtk.Align.CENTER,
+                    vexpand=False,
                 )
+                sep.set_size_request(-1, 1)
+                sep_row = Gtk.ListBoxRow(
+                    selectable=False, activatable=False, focusable=False
+                )
+                sep_row.add_css_class("ps5-sidebar-sep")
+                sep_row.set_child(sep)
                 sep_row.is_separator = True  # type: ignore[attr-defined]
                 self.sidebar_list.append(sep_row)
                 prev_group = grp
 
-            row = Adw.ActionRow(title=T(label_key), activatable=True)
+            row = Adw.ActionRow(
+                title=GLib.markup_escape_text(T(label_key)),
+                activatable=True,
+            )
             row.add_prefix(Gtk.Image.new_from_icon_name(icon))
             row.sec_id = sec_id  # type: ignore[attr-defined]
             row.label_key = label_key  # type: ignore[attr-defined]
@@ -1393,7 +1413,8 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         if getattr(row, "is_separator", False):
             return False
         sec_id = getattr(row, "sec_id", "")
-        title = getattr(row, "get_title", lambda: "")().lower()
+        label_key = getattr(row, "label_key", "")
+        title = (T(label_key) if label_key else getattr(row, "get_title", lambda: "")()).lower()
         return q in title or q in sec_id
 
     def _on_search_changed(self, _entry: Gtk.SearchEntry) -> None:
@@ -1422,7 +1443,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
 
     def rebuild_ui_for_language(self) -> None:
         for sec_id, row in self.sidebar_rows.items():
-            row.set_title(T(row.label_key))  # type: ignore[attr-defined]
+            row.set_title(GLib.markup_escape_text(T(row.label_key)))  # type: ignore[attr-defined]
         self.search_entry.set_placeholder_text(T("search_placeholder"))
         self._select_section(self.active_section)
 
@@ -1727,7 +1748,8 @@ def build_page_logs(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
     g2 = Adw.PreferencesGroup(title=T("logs_group_opts"))
     sw = Adw.SwitchRow(
-        title=T("logs_auto"), subtitle=T("logs_auto_sub")
+        title=GLib.markup_escape_text(T("logs_auto")),
+        subtitle=GLib.markup_escape_text(T("logs_auto_sub")),
     )
     sw.add_prefix(Gtk.Image.new_from_icon_name("view-refresh-symbolic"))
     sw.set_active(log_window_enabled())
@@ -1756,7 +1778,7 @@ def _push_old_logs(win: Ps5ManagerWindow) -> None:
     grp = Adw.PreferencesGroup(title=T("logs_old"))
     files = win.logger.list_logs()
     if not files:
-        grp.add(Adw.ActionRow(title=T("logs_none")))
+        grp.add(Adw.ActionRow(title=GLib.markup_escape_text(T("logs_none"))))
     for path in files:
         name = os.path.basename(path)
         size_kb = max(1, os.path.getsize(path) // 1024) if os.path.exists(path) else 0
@@ -2157,8 +2179,8 @@ def _push_full_lang_config(win: Ps5ManagerWindow) -> None:
     sub = Adw.PreferencesPage()
     grp = Adw.PreferencesGroup(title=T("lang_full"))
 
-    loc_row = Adw.ComboRow(title=T("lang_pick_locale"), model=Gtk.StringList.new(sorted(set(locales))[:80]))
-    kb_row = Adw.ComboRow(title=T("lang_pick_kb"), model=Gtk.StringList.new(sorted(set(keymaps))[:80]))
+    loc_row = Adw.ComboRow(title=GLib.markup_escape_text(T("lang_pick_locale")), model=Gtk.StringList.new(sorted(set(locales))[:80]))
+    kb_row = Adw.ComboRow(title=GLib.markup_escape_text(T("lang_pick_kb")), model=Gtk.StringList.new(sorted(set(keymaps))[:80]))
     grp.add(loc_row)
     grp.add(kb_row)
 
@@ -2589,7 +2611,7 @@ def build_page_power(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     ).stdout.strip()
     scr_sleep_enabled = not idle_val.endswith(" 0") and idle_val != "uint32 0"
 
-    sw_sys = Adw.SwitchRow(title=T("pwr_sys"), subtitle=T("pwr_sys_sub"))
+    sw_sys = Adw.SwitchRow(title=GLib.markup_escape_text(T("pwr_sys")), subtitle=GLib.markup_escape_text(T("pwr_sys_sub")))
     sw_sys.add_prefix(Gtk.Image.new_from_icon_name("preferences-system-power-symbolic"))
     sw_sys.set_active(sys_sleep_enabled)
 
@@ -2601,7 +2623,7 @@ def build_page_power(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     sw_sys.connect("notify::active", _on_sys_toggle)
     grp.add(sw_sys)
 
-    sw_scr = Adw.SwitchRow(title=T("pwr_scr"), subtitle=T("pwr_scr_sub"))
+    sw_scr = Adw.SwitchRow(title=GLib.markup_escape_text(T("pwr_scr")), subtitle=GLib.markup_escape_text(T("pwr_scr_sub")))
     sw_scr.add_prefix(Gtk.Image.new_from_icon_name("video-display-symbolic"))
     sw_scr.set_active(scr_sleep_enabled)
 
@@ -2634,7 +2656,7 @@ def build_page_fan(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     def _svc_active(name: str) -> bool:
         return subprocess.run(["systemctl", "is-active", name], capture_output=True).returncode == 0
 
-    sw_fan = Adw.SwitchRow(title=T("fan_svc"), subtitle=T("fan_svc_sub"))
+    sw_fan = Adw.SwitchRow(title=GLib.markup_escape_text(T("fan_svc")), subtitle=GLib.markup_escape_text(T("fan_svc_sub")))
     sw_fan.add_prefix(Gtk.Image.new_from_icon_name("weather-windy-symbolic"))
     sw_fan.set_active(_svc_active("ps5fan.service"))
     sw_fan.connect(
@@ -2646,7 +2668,7 @@ def build_page_fan(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     )
     grp.add(sw_fan)
 
-    sw_boost = Adw.SwitchRow(title=T("fan_boost"), subtitle=T("fan_boost_sub"))
+    sw_boost = Adw.SwitchRow(title=GLib.markup_escape_text(T("fan_boost")), subtitle=GLib.markup_escape_text(T("fan_boost_sub")))
     sw_boost.add_prefix(Gtk.Image.new_from_icon_name("power-profile-performance-symbolic"))
     sw_boost.set_active(_svc_active("ps5boost.service"))
     sw_boost.connect(
