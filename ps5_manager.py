@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import datetime
 import glob
+import json
 import os
 import pty
 import pwd
@@ -77,13 +78,23 @@ def detect_real_user() -> tuple[str, int, str]:
     if not user:
         if os.geteuid() == 0:
             sudo_user = os.environ.get("SUDO_USER", "").strip()
+            pkexec_uid = os.environ.get("PKEXEC_UID", "").strip()
             if sudo_user and sudo_user != "root":
                 user = sudo_user
-            else:
+            elif pkexec_uid.isdigit() and int(pkexec_uid) != 0:
                 try:
-                    user = os.getlogin()
+                    user = pwd.getpwuid(int(pkexec_uid)).pw_name
+                except KeyError:
+                    user = ""
+            if not user:
+                try:
+                    login = os.getlogin()
+                    if login and login != "root":
+                        user = login
                 except OSError:
-                    user = "root"
+                    pass
+            if not user:
+                user = "root"
         else:
             try:
                 user = pwd.getpwuid(os.getuid()).pw_name
@@ -100,16 +111,30 @@ def detect_real_user() -> tuple[str, int, str]:
 
 REAL_USER, REAL_UID, REAL_HOME = detect_real_user()
 
-if "DISPLAY" not in os.environ:
+# pkexec restreint PATH à /usr/sbin:/usr/bin:/sbin:/bin : restaurer /usr/local/bin (ex: ollama)
+_base_paths = ["/usr/local/sbin", "/usr/local/bin", "/usr/sbin", "/usr/bin", "/sbin", "/bin"]
+if REAL_HOME and REAL_HOME != "/root":
+    _base_paths.append(os.path.join(REAL_HOME, ".local", "bin"))
+_cur_paths = [p for p in os.environ.get("PATH", "").split(":") if p]
+for _p in _cur_paths:
+    if _p not in _base_paths:
+        _base_paths.append(_p)
+os.environ["PATH"] = ":".join(_base_paths)
+
+if not os.environ.get("DISPLAY"):
     os.environ["DISPLAY"] = ":0"
-if os.path.isfile(os.path.join(REAL_HOME, ".Xauthority")) and "XAUTHORITY" not in os.environ:
+if os.path.isfile(os.path.join(REAL_HOME, ".Xauthority")) and not os.environ.get("XAUTHORITY"):
     os.environ["XAUTHORITY"] = os.path.join(REAL_HOME, ".Xauthority")
 runtime_dir = f"/run/user/{REAL_UID}"
 if os.path.isdir(runtime_dir):
-    os.environ.setdefault("XDG_RUNTIME_DIR", runtime_dir)
+    cur_xdg = os.environ.get("XDG_RUNTIME_DIR", "").strip()
+    if not cur_xdg or (REAL_UID != 0 and cur_xdg == "/run/user/0"):
+        os.environ["XDG_RUNTIME_DIR"] = runtime_dir
     bus_path = os.path.join(runtime_dir, "bus")
-    if os.path.exists(bus_path):
-        os.environ.setdefault("DBUS_SESSION_BUS_ADDRESS", f"unix:path={bus_path}")
+    if os.path.exists(bus_path) and not os.environ.get("DBUS_SESSION_BUS_ADDRESS", "").strip():
+        os.environ["DBUS_SESSION_BUS_ADDRESS"] = f"unix:path={bus_path}"
+if os.environ.get("DBUS_SESSION_BUS_ADDRESS", "") == "":
+    os.environ.pop("DBUS_SESSION_BUS_ADDRESS", None)
 
 
 POLKIT_POLICY_PATH = "/usr/share/polkit-1/actions/io.github.nexgen999.ps5-manager.policy"
@@ -224,14 +249,19 @@ def elevate_if_needed() -> None:
     env_args = [
         "PS5_MANAGER_ELEVATED=1",
         f"PS5_MANAGER_USER={REAL_USER}",
+        f"PATH={os.environ.get('PATH', '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin')}",
         f"DISPLAY={os.environ.get('DISPLAY', ':0')}",
-        f"WAYLAND_DISPLAY={os.environ.get('WAYLAND_DISPLAY', '')}",
-        f"XAUTHORITY={os.environ.get('XAUTHORITY', os.path.join(REAL_HOME, '.Xauthority'))}",
-        f"XDG_RUNTIME_DIR={os.environ.get('XDG_RUNTIME_DIR', runtime_dir)}",
-        f"DBUS_SESSION_BUS_ADDRESS={os.environ.get('DBUS_SESSION_BUS_ADDRESS', '')}",
         # Xwayland prioritaire en root, Wayland en secours
         "GDK_BACKEND=x11,wayland",
     ]
+    for _k, _v in (
+        ("WAYLAND_DISPLAY", os.environ.get("WAYLAND_DISPLAY", "")),
+        ("XAUTHORITY", os.environ.get("XAUTHORITY", os.path.join(REAL_HOME, ".Xauthority"))),
+        ("XDG_RUNTIME_DIR", os.environ.get("XDG_RUNTIME_DIR", runtime_dir if os.path.isdir(runtime_dir) else "")),
+        ("DBUS_SESSION_BUS_ADDRESS", os.environ.get("DBUS_SESSION_BUS_ADDRESS", "")),
+    ):
+        if _v:
+            env_args.append(f"{_k}={_v}")
     pkexec = shutil.which("pkexec")
     if pkexec:
         try:
@@ -291,27 +321,51 @@ if hasattr(Adw, "AccentColor"):
 def user_env() -> dict[str, str]:
     env = dict(os.environ)
     env["DISPLAY"] = os.environ.get("DISPLAY", ":0")
+    if REAL_USER != "root":
+        env["HOME"] = REAL_HOME
+        env["USER"] = REAL_USER
+        env["LOGNAME"] = REAL_USER
     if os.path.isdir(runtime_dir):
         env["XDG_RUNTIME_DIR"] = runtime_dir
         bus_path = os.path.join(runtime_dir, "bus")
         if os.path.exists(bus_path):
             env["DBUS_SESSION_BUS_ADDRESS"] = f"unix:path={bus_path}"
-    env["PATH"] = "/usr/local/bin:/usr/bin:/bin"
+        else:
+            env.pop("DBUS_SESSION_BUS_ADDRESS", None)
+    else:
+        env.pop("DBUS_SESSION_BUS_ADDRESS", None)
+    user_paths = ["/usr/local/bin", "/usr/bin", "/bin"]
+    if REAL_HOME and REAL_HOME != "/root":
+        user_paths.insert(0, os.path.join(REAL_HOME, ".local", "bin"))
+    env["PATH"] = ":".join(user_paths)
     return env
 
 
 def run_as_user_cmd(cmd: list[str]) -> list[str]:
     if os.geteuid() == 0 and REAL_USER != "root":
+        user_paths = ["/usr/local/bin", "/usr/bin", "/bin"]
+        if REAL_HOME and REAL_HOME != "/root":
+            user_paths.insert(0, os.path.join(REAL_HOME, ".local", "bin"))
+        env_kv = [
+            f"HOME={REAL_HOME}",
+            f"USER={REAL_USER}",
+            f"LOGNAME={REAL_USER}",
+            f"DISPLAY={os.environ.get('DISPLAY', ':0')}",
+            f"PATH={':'.join(user_paths)}",
+        ]
+        if os.path.isdir(runtime_dir):
+            env_kv.append(f"XDG_RUNTIME_DIR={runtime_dir}")
+            bus_path = os.path.join(runtime_dir, "bus")
+            if os.path.exists(bus_path):
+                env_kv.append(f"DBUS_SESSION_BUS_ADDRESS=unix:path={bus_path}")
         return [
             "sudo",
+            "-n",
             "-u",
             REAL_USER,
             "-H",
             "env",
-            f"DISPLAY={os.environ.get('DISPLAY', ':0')}",
-            f"XDG_RUNTIME_DIR={os.environ.get('XDG_RUNTIME_DIR', runtime_dir)}",
-            f"DBUS_SESSION_BUS_ADDRESS={os.environ.get('DBUS_SESSION_BUS_ADDRESS', '')}",
-            "PATH=/usr/local/bin:/usr/bin:/bin",
+            *env_kv,
             *cmd,
         ]
     return cmd
@@ -1660,7 +1714,10 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
             else:
                 full_cmd = run_as_user_cmd(cmd)
         else:
-            full_cmd = cmd  # type: ignore[assignment]
+            if isinstance(cmd, str) and not shell:
+                full_cmd = ["bash", "-c", cmd]
+            else:
+                full_cmd = cmd  # type: ignore[assignment]
 
         self.logger.write_line(f"commande : {full_cmd}")
         master_fd, slave_fd = pty.openpty()
@@ -3082,46 +3139,187 @@ OPENWEBUI_DESKTOP_PATH = "/usr/share/applications/open-webui.desktop"
 OPENWEBUI_LAUNCHER_PATH = "/usr/local/bin/open-webui-launch"
 
 
+def _ollama_bin() -> Optional[str]:
+    found = shutil.which("ollama")
+    if found and os.access(found, os.X_OK):
+        return found
+    candidates = [
+        "/usr/local/bin/ollama",
+        "/usr/bin/ollama",
+        "/bin/ollama",
+        "/opt/ollama/bin/ollama",
+    ]
+    if REAL_HOME and REAL_HOME != "/root":
+        candidates.extend([
+            os.path.join(REAL_HOME, ".local", "bin", "ollama"),
+            os.path.join(REAL_HOME, "bin", "ollama"),
+        ])
+    for cand in candidates:
+        if os.path.isfile(cand) and os.access(cand, os.X_OK):
+            return cand
+    return None
+
+
 def _ollama_installed() -> bool:
-    return shutil.which("ollama") is not None
+    return _ollama_bin() is not None
+
+
+def _ollama_service_exists() -> bool:
+    for unit_path in (
+        "/etc/systemd/system/ollama.service",
+        "/usr/lib/systemd/system/ollama.service",
+        "/lib/systemd/system/ollama.service",
+    ):
+        if os.path.isfile(unit_path):
+            return True
+    res = subprocess.run(
+        ["systemctl", "list-unit-files", "ollama.service"],
+        capture_output=True, text=True,
+    )
+    return "ollama.service" in (res.stdout or "")
 
 
 def _ollama_version() -> str:
-    if not _ollama_installed():
+    bin_path = _ollama_bin()
+    if not bin_path:
         return ""
-    res = subprocess.run(["ollama", "--version"], capture_output=True, text=True)
-    return res.stdout.strip() or res.stderr.strip()
+    res = subprocess.run([bin_path, "--version"], capture_output=True, text=True)
+    out = res.stdout.strip() or res.stderr.strip()
+    if "version is" in out:
+        return out.splitlines()[-1].strip()
+    return out.splitlines()[0].strip() if out else ""
+
+
+def _ollama_api_reachable(timeout: float = 0.6) -> bool:
+    try:
+        with urllib.request.urlopen("http://127.0.0.1:11434/api/version", timeout=timeout) as resp:
+            return resp.status == 200
+    except Exception:
+        return False
 
 
 def _ollama_service_active() -> bool:
-    return subprocess.run(["systemctl", "is-active", "ollama"], capture_output=True).returncode == 0
+    if subprocess.run(["systemctl", "is-active", "--quiet", "ollama"], capture_output=True).returncode == 0:
+        return True
+    return _ollama_api_reachable()
 
 
 def _ollama_service_enabled() -> bool:
-    return subprocess.run(["systemctl", "is-enabled", "ollama"], capture_output=True).returncode == 0
+    return subprocess.run(["systemctl", "is-enabled", "--quiet", "ollama"], capture_output=True).returncode == 0
+
+
+def _format_bytes_human(num_bytes: int) -> str:
+    if num_bytes <= 0:
+        return ""
+    gb = num_bytes / (1000 ** 3)
+    if gb >= 1.0:
+        return f"{gb:.1f} GB"
+    mb = num_bytes / (1000 ** 2)
+    return f"{mb:.0f} MB"
+
+
+def _ollama_model_dirs() -> list[str]:
+    dirs: list[str] = []
+    env_dir = os.environ.get("OLLAMA_MODELS", "").strip()
+    if env_dir:
+        dirs.append(env_dir)
+    for unit_glob in (
+        "/etc/systemd/system/ollama.service",
+        "/etc/systemd/system/ollama.service.d/*.conf",
+    ):
+        for p in glob.glob(unit_glob):
+            try:
+                with open(p, encoding="utf-8", errors="replace") as fh:
+                    for line in fh:
+                        m = re.search(r"OLLAMA_MODELS=[\"']?([^\"'\s]+)", line)
+                        if m:
+                            dirs.append(m.group(1))
+            except OSError:
+                pass
+    dirs.extend([
+        "/usr/share/ollama/.ollama/models",
+        "/var/lib/ollama/.ollama/models",
+        "/var/lib/ollama/models",
+        os.path.join(REAL_HOME, ".ollama", "models"),
+        "/root/.ollama/models",
+    ])
+    unique: list[str] = []
+    for d in dirs:
+        if d and d not in unique and os.path.isdir(d):
+            unique.append(d)
+    return unique
+
+
+def _scan_ollama_manifests_on_disk() -> dict[str, str]:
+    """Scanne les manifests locaux d'Ollama même lorsque ollama.service est arrêté."""
+    models: dict[str, str] = {}
+    for base_dir in _ollama_model_dirs():
+        manifests_root = os.path.join(base_dir, "manifests")
+        if not os.path.isdir(manifests_root):
+            continue
+        for root_dir, _dirs, files in os.walk(manifests_root):
+            for fname in files:
+                fpath = os.path.join(root_dir, fname)
+                rel = os.path.relpath(fpath, manifests_root)
+                parts = rel.split(os.sep)
+                if len(parts) < 4:
+                    continue
+                registry, namespace, model = parts[0], parts[1], "/".join(parts[2:-1])
+                tag = parts[-1]
+                if registry == "registry.ollama.ai" and namespace == "library":
+                    model_name = f"{model}:{tag}"
+                elif registry == "registry.ollama.ai":
+                    model_name = f"{namespace}/{model}:{tag}"
+                else:
+                    model_name = f"{registry}/{namespace}/{model}:{tag}"
+                size_bytes = 0
+                try:
+                    with open(fpath, encoding="utf-8") as fh:
+                        data = json.load(fh)
+                    cfg = data.get("config") or {}
+                    if isinstance(cfg, dict):
+                        size_bytes += int(cfg.get("size") or 0)
+                    for layer in data.get("layers") or []:
+                        if isinstance(layer, dict):
+                            size_bytes += int(layer.get("size") or 0)
+                except (OSError, ValueError, TypeError):
+                    pass
+                models.setdefault(model_name, _format_bytes_human(size_bytes))
+    return models
 
 
 def _ollama_installed_models() -> dict[str, str]:
-    """Retourne {nom_modele: taille} via `ollama list`."""
-    if not _ollama_installed():
-        return {}
-    res = subprocess.run(["ollama", "list"], capture_output=True, text=True)
-    if res.returncode != 0:
-        return {}
+    """Retourne {nom_modele: taille} via `ollama list` et repli disque si le daemon est arrêté."""
     models: dict[str, str] = {}
-    for line in res.stdout.splitlines()[1:]:
-        parts = line.split()
-        if len(parts) >= 4:
-            models[parts[0]] = f"{parts[2]} {parts[3]}"
-        elif parts:
-            models[parts[0]] = ""
+    bin_path = _ollama_bin()
+    if bin_path:
+        env = dict(os.environ)
+        env.setdefault("OLLAMA_HOST", "127.0.0.1:11434")
+        try:
+            res = subprocess.run([bin_path, "list"], capture_output=True, text=True, env=env, timeout=3)
+            if res.returncode == 0 and res.stdout:
+                for line in res.stdout.splitlines()[1:]:
+                    parts = line.split()
+                    if len(parts) >= 4:
+                        models[parts[0]] = f"{parts[2]} {parts[3]}"
+                    elif parts:
+                        models[parts[0]] = ""
+        except (OSError, subprocess.SubprocessError):
+            pass
+    for name, sz in _scan_ollama_manifests_on_disk().items():
+        if name not in models:
+            models[name] = sz
     return models
 
 
 def _ollama_running_models() -> set[str]:
-    if not _ollama_installed():
+    bin_path = _ollama_bin()
+    if not bin_path:
         return set()
-    res = subprocess.run(["ollama", "ps"], capture_output=True, text=True)
+    try:
+        res = subprocess.run([bin_path, "ps"], capture_output=True, text=True, timeout=3)
+    except (OSError, subprocess.SubprocessError):
+        return set()
     if res.returncode != 0:
         return set()
     running: set[str] = set()
@@ -3132,17 +3330,46 @@ def _ollama_running_models() -> set[str]:
     return running
 
 
+def _podman_bin() -> Optional[str]:
+    found = shutil.which("podman")
+    if found and os.access(found, os.X_OK):
+        return found
+    for cand in ("/usr/bin/podman", "/usr/local/bin/podman"):
+        if os.path.isfile(cand) and os.access(cand, os.X_OK):
+            return cand
+    return None
+
+
+def _podman_webui_context() -> tuple[str, str]:
+    """Retourne (état, propriétaire 'user'|'root')."""
+    podman = _podman_bin()
+    if not podman:
+        return "no_podman", "user"
+    try:
+        res_user = subprocess.run(
+            run_as_user_cmd([podman, "inspect", "-f", "{{.State.Status}}", "open-webui"]),
+            capture_output=True, text=True, env=user_env(), timeout=5,
+        )
+        if res_user.returncode == 0 and res_user.stdout.strip():
+            return res_user.stdout.strip().lower(), "user"
+    except (OSError, subprocess.SubprocessError):
+        pass
+    if REAL_USER != "root":
+        try:
+            res_root = subprocess.run(
+                [podman, "inspect", "-f", "{{.State.Status}}", "open-webui"],
+                capture_output=True, text=True, timeout=5,
+            )
+            if res_root.returncode == 0 and res_root.stdout.strip():
+                return res_root.stdout.strip().lower(), "root"
+        except (OSError, subprocess.SubprocessError):
+            pass
+    return "missing", "user"
+
+
 def _podman_webui_state() -> str:
     """Retourne 'running', 'exited'/'stopped', 'missing', ou 'no_podman'."""
-    if not shutil.which("podman"):
-        return "no_podman"
-    res = subprocess.run(
-        run_as_user_cmd(["podman", "inspect", "-f", "{{.State.Status}}", "open-webui"]),
-        capture_output=True, text=True,
-    )
-    if res.returncode == 0 and res.stdout.strip():
-        return res.stdout.strip().lower()
-    return "missing"
+    return _podman_webui_context()[0]
 
 
 def _vscodium_installed() -> bool:
@@ -3171,15 +3398,16 @@ def _ensure_ollama_ready(win: Ps5ManagerWindow, emit: Callable[[str], None]) -> 
             return False
         if win.run_cmd_pty("curl -fsSL https://ollama.com/install.sh | sh", emit) != 0:
             return False
-    if not _ollama_service_active():
+    if not _ollama_service_active() and _ollama_service_exists():
         win.run_cmd_pty(["systemctl", "start", "ollama"], emit)
     return _ollama_installed()
 
 
-def _create_openwebui_container(win: Ps5ManagerWindow, emit: Callable[[str], None]) -> int:
+def _create_openwebui_container(win: Ps5ManagerWindow, emit: Callable[[str], None], owner: str = "user") -> int:
+    podman = _podman_bin() or "podman"
     return win.run_cmd_pty(
         [
-            "podman", "run", "-d", "--network=host",
+            podman, "run", "-d", "--network=host",
             "-v", "open-webui:/app/backend/data",
             "-e", "OLLAMA_BASE_URL=http://127.0.0.1:11434",
             "--name", "open-webui",
@@ -3187,26 +3415,68 @@ def _create_openwebui_container(win: Ps5ManagerWindow, emit: Callable[[str], Non
             OPENWEBUI_IMAGE,
         ],
         emit,
-        as_user=True,
+        as_user=(owner == "user"),
     )
+
+
+def _run_quick_service_action(
+    win: Ps5ManagerWindow,
+    title: str,
+    fn: Callable[[], tuple[bool, str]],
+    on_done: Optional[Callable[[], None]] = None,
+) -> None:
+    if win.busy:
+        win.toast(T("busy"))
+        return
+    win.busy = True
+    win.busy_spinner.start()
+    win.logger.write_line(f"──── {title}")
+
+    def _worker() -> None:
+        ok = False
+        msg = ""
+        try:
+            ok, msg = fn()
+        except Exception as exc:
+            ok = False
+            msg = str(exc)
+        win.logger.write_line(f"──── fin : {title} ({'OK' if ok else 'ERR'}) {msg}")
+
+        def _finish() -> bool:
+            win.busy = False
+            win.busy_spinner.stop()
+            if ok:
+                win.toast(f"{title} — {T('done')}")
+            else:
+                win.show_info(title, msg or T("failed") % 1)
+            if on_done:
+                on_done()
+            return False
+
+        GLib.idle_add(_finish)
+
+    threading.Thread(target=_worker, daemon=True).start()
 
 
 def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     ollama_ok = _ollama_installed()
-    ollama_act = _ollama_service_active() if ollama_ok else False
-    ollama_boot = _ollama_service_enabled() if ollama_ok else False
-    webui_st = _podman_webui_state()
+    ollama_svc = _ollama_service_exists()
+    ollama_act = _ollama_service_active() if (ollama_ok or ollama_svc) else False
+    ollama_boot = _ollama_service_enabled() if ollama_svc else False
+    webui_st, webui_owner = _podman_webui_context()
     codium_ok = _vscodium_installed()
     installed_models = _ollama_installed_models()
 
     # 1) Outils & Applications IA / Dev
     g_tools = Adw.PreferencesGroup(title=T("aidev_stack"), description=T("aidev_stack_sub"))
 
-    ollama_sub = (
-        f"{_ollama_version()} · {'actif' if ollama_act else 'arrêté'}"
-        if ollama_ok
-        else "pciutils + script officiel ollama.com"
-    )
+    if ollama_ok:
+        ver_str = _ollama_version() or "Ollama"
+        ollama_sub = f"{ver_str} · {'actif' if ollama_act else 'arrêté'}"
+    elif ollama_svc:
+        ollama_sub = f"Service détecté · {'actif' if ollama_act else 'arrêté'}"
+    else:
+        ollama_sub = "pciutils + script officiel ollama.com"
     g_tools.add(
         win.row(
             "Ollama (moteur IA local)",
@@ -3216,11 +3486,13 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         )
     )
 
+    owner_tag = "Podman root" if webui_owner == "root" else "Podman"
     webui_labels = {
-        "running": "Actif · http://127.0.0.1:8080",
-        "exited": "Installé (arrêté) · Podman",
-        "created": "Installé (arrêté) · Podman",
-        "paused": "En pause · Podman",
+        "running": f"Actif ({owner_tag}) · http://127.0.0.1:8080",
+        "exited": f"Installé (arrêté) · {owner_tag}",
+        "stopped": f"Installé (arrêté) · {owner_tag}",
+        "created": f"Installé (arrêté) · {owner_tag}",
+        "paused": f"En pause · {owner_tag}",
         "missing": "Non installé · Podman ghcr.io/open-webui",
         "no_podman": "Podman absent (sera installé automatiquement)",
     }
@@ -3256,13 +3528,32 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     )
     sw_ollama.add_prefix(Gtk.Image.new_from_icon_name("system-run-symbolic"))
     sw_ollama.set_active(ollama_act)
-    sw_ollama.set_sensitive(ollama_ok)
+    sw_ollama.set_sensitive(ollama_ok or ollama_svc)
 
     def _toggle_ollama(r, _p):
         act = "start" if r.get_active() else "stop"
-        rc = subprocess.run(["systemctl", act, "ollama"]).returncode
-        win.toast(T("done") if rc == 0 else T("failed") % rc)
-        win._select_section("aidev")
+
+        def _do():
+            if not _ollama_service_exists():
+                return False, "L'unité systemd ollama.service est introuvable. Réinstallez ou mettez à jour Ollama."
+            res = subprocess.run(["systemctl", act, "ollama"], capture_output=True, text=True)
+            if res.returncode != 0:
+                err = (res.stderr or res.stdout or f"code {res.returncode}").strip()
+                return False, f"systemctl {act} ollama :\n{err}"
+            if act == "start":
+                import time
+                for _ in range(10):
+                    if _ollama_api_reachable(timeout=0.5):
+                        break
+                    time.sleep(0.4)
+            return True, T("done")
+
+        _run_quick_service_action(
+            win,
+            f"Ollama ({act})",
+            _do,
+            lambda: win._select_section("aidev"),
+        )
 
     sw_ollama.connect("notify::active", _toggle_ollama)
     g_srv.add(sw_ollama)
@@ -3275,12 +3566,23 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     )
     sw_boot.add_prefix(Gtk.Image.new_from_icon_name("preferences-system-time-symbolic"))
     sw_boot.set_active(ollama_boot)
-    sw_boot.set_sensitive(ollama_ok)
+    sw_boot.set_sensitive(ollama_svc)
 
     def _toggle_ollama_boot(r, _p):
         act = "enable" if r.get_active() else "disable"
-        rc = subprocess.run(["systemctl", act, "ollama"]).returncode
-        win.toast(T("done") if rc == 0 else T("failed") % rc)
+
+        def _do():
+            res = subprocess.run(["systemctl", act, "ollama"], capture_output=True, text=True)
+            if res.returncode != 0:
+                return False, (res.stderr or res.stdout or f"code {res.returncode}").strip()
+            return True, T("done")
+
+        _run_quick_service_action(
+            win,
+            f"Ollama boot ({act})",
+            _do,
+            lambda: win._select_section("aidev"),
+        )
 
     sw_boot.connect("notify::active", _toggle_ollama_boot)
     g_srv.add(sw_boot)
@@ -3295,31 +3597,66 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
     def _toggle_webui(r, _p):
         act = "start" if r.get_active() else "stop"
-        rc = subprocess.run(run_as_user_cmd(["podman", act, "open-webui"])).returncode
-        win.toast(T("done") if rc == 0 else T("failed") % rc)
-        win._select_section("aidev")
+
+        def _do():
+            podman = _podman_bin() or "podman"
+            cmd = [podman, act, "open-webui"]
+            full = run_as_user_cmd(cmd) if webui_owner == "user" else cmd
+            env = user_env() if webui_owner == "user" else os.environ
+            res = subprocess.run(full, capture_output=True, text=True, env=env)
+            if res.returncode != 0:
+                err = (res.stderr or res.stdout or f"code {res.returncode}").strip()
+                return False, f"podman {act} open-webui :\n{err}"
+            return True, T("done")
+
+        _run_quick_service_action(
+            win,
+            f"Open WebUI ({act})",
+            _do,
+            lambda: win._select_section("aidev"),
+        )
 
     sw_webui.connect("notify::active", _toggle_webui)
     g_srv.add(sw_webui)
 
     def _start_all():
         def _task(emit):
-            rc1 = win.run_cmd_pty(["systemctl", "start", "ollama"], emit) if _ollama_installed() else 0
-            rc2 = (
-                win.run_cmd_pty(["podman", "start", "open-webui"], emit, as_user=True)
-                if _podman_webui_state() not in ("missing", "no_podman")
-                else 0
-            )
+            did_any = False
+            rc1 = 0
+            rc2 = 0
+            if _ollama_service_exists() or _ollama_installed():
+                did_any = True
+                rc1 = win.run_cmd_pty(["systemctl", "start", "ollama"], emit)
+            else:
+                emit("Ollama non détecté sur ce système.")
+
+            st_now, owner_now = _podman_webui_context()
+            if st_now not in ("missing", "no_podman"):
+                did_any = True
+                podman = _podman_bin() or "podman"
+                rc2 = win.run_cmd_pty([podman, "start", "open-webui"], emit, as_user=(owner_now == "user"))
+            else:
+                emit("Conteneur Podman open-webui non détecté.")
+
+            if not did_any:
+                return False, "Aucun service Ollama ou Open WebUI détecté."
             ok = rc1 == 0 and rc2 == 0
             return ok, T("done") if ok else T("failed") % (rc1 or rc2)
         win.run_task("Démarrer Ollama + Open WebUI", _task, lambda *_: win._select_section("aidev"))
 
     def _stop_all():
         def _task(emit):
-            if _podman_webui_state() == "running":
-                win.run_cmd_pty(["podman", "stop", "open-webui"], emit, as_user=True)
-            if _ollama_installed():
+            did_any = False
+            st_now, owner_now = _podman_webui_context()
+            if st_now == "running":
+                did_any = True
+                podman = _podman_bin() or "podman"
+                win.run_cmd_pty([podman, "stop", "open-webui"], emit, as_user=(owner_now == "user"))
+            if _ollama_service_exists() or _ollama_service_active():
+                did_any = True
                 win.run_cmd_pty(["systemctl", "stop", "ollama"], emit)
+            if not did_any:
+                return False, "Aucun service actif détecté."
             return True, T("done")
         win.run_task("Arrêter Ollama + Open WebUI", _task, lambda *_: win._select_section("aidev"))
 
@@ -3339,40 +3676,81 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
             lambda *_: _stop_all(),
         )
     )
+
+    def _open_webui_browser():
+        if os.access(OPENWEBUI_LAUNCHER_PATH, os.X_OK) and webui_owner == "user":
+            subprocess.Popen(run_as_user_cmd([OPENWEBUI_LAUNCHER_PATH]), env=user_env())
+            return
+        st_now, _ = _podman_webui_context()
+        if st_now == "running":
+            subprocess.Popen(run_as_user_cmd(["xdg-open", "http://127.0.0.1:8080"]), env=user_env())
+        else:
+            win.show_info("Open WebUI", "Démarrez d'abord le conteneur Open WebUI.")
+
     g_srv.add(
         win.row(
             "Ouvrir Open WebUI dans le navigateur" if UI_LANG == "fr" else "Open Open WebUI in browser",
             "http://127.0.0.1:8080",
             "web-browser-symbolic",
-            lambda *_: (
-                subprocess.Popen(run_as_user_cmd(["xdg-open", "http://127.0.0.1:8080"]))
-                if webui_st == "running"
-                else win.show_info("Open WebUI", "Démarrez d'abord le conteneur Open WebUI.")
-            ),
+            lambda *_: _open_webui_browser(),
         )
     )
     page.add(g_srv)
 
     # 3) Modèles IA locaux
     g_mod = Adw.PreferencesGroup(title=T("aidev_models"), description=T("aidev_models_sub"))
+    if installed_models:
+        preview = ", ".join(list(installed_models.keys())[:4])
+        if len(installed_models) > 4:
+            preview += f" (+{len(installed_models) - 4})"
+        models_sub = f"{len(installed_models)} installé(s) : {preview}"
+    else:
+        models_sub = "0 installé · qwen2.5-coder, deepseek, gemma4, mimo, nemotron…"
     g_mod.add(
         win.row(
             "Gérer les modèles IA (catalogue & installés)" if UI_LANG == "fr" else "Manage AI models (catalog & installed)",
-            f"{len(installed_models)} installé(s) · qwen2.5-coder, deepseek, gemma4, mimo, nemotron…",
+            models_sub,
             "folder-download-symbolic",
             lambda *_: _push_ai_models(win),
         )
     )
+
+    def _show_ollama_list():
+        bin_path = _ollama_bin()
+        if not bin_path and not installed_models:
+            win.show_info("Ollama", "Ollama n'est pas installé.")
+            return
+        out = ""
+        if bin_path:
+            res = subprocess.run([bin_path, "list"], capture_output=True, text=True)
+            if res.returncode == 0 and res.stdout.strip():
+                out = res.stdout.strip()
+        if not out:
+            disk_models = _ollama_installed_models()
+            if disk_models:
+                lines = ["(Service Ollama arrêté — modèles détectés sur le disque)", "", f"{'NOM':42} {'TAILLE':12}"]
+                for m_name, m_size in sorted(disk_models.items()):
+                    lines.append(f"{m_name:42} {m_size or '-'}")
+                out = "\n".join(lines)
+            else:
+                out = "(aucun modèle)"
+        win.show_text_modal("ollama list", out)
+
+    def _show_ollama_ps():
+        bin_path = _ollama_bin()
+        if not bin_path:
+            win.show_info("Ollama", "Ollama n'est pas installé.")
+            return
+        res = subprocess.run([bin_path, "ps"], capture_output=True, text=True)
+        out = (res.stdout or res.stderr or "").strip() or "(aucun modèle actif)"
+        win.show_text_modal("ollama ps", out)
+
     g_mod.add(
         win.row(
             "Voir les modèles installés (ollama list)" if UI_LANG == "fr" else "List installed models (ollama list)",
             None,
             "view-list-symbolic",
-            lambda *_: (
-                win.show_text_modal("ollama list", subprocess.run(["ollama", "list"], capture_output=True, text=True).stdout or "(aucun modèle)")
-                if _ollama_installed()
-                else win.show_info("Ollama", "Ollama n'est pas installé.")
-            ),
+            lambda *_: _show_ollama_list(),
         )
     )
     g_mod.add(
@@ -3380,11 +3758,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
             "Modèles actifs en RAM (ollama ps)" if UI_LANG == "fr" else "Active models in RAM (ollama ps)",
             "Affiche les modèles actuellement chargés en mémoire",
             "utilities-system-monitor-symbolic",
-            lambda *_: (
-                win.show_text_modal("ollama ps", subprocess.run(["ollama", "ps"], capture_output=True, text=True).stdout or "(aucun modèle actif)")
-                if _ollama_installed()
-                else win.show_info("Ollama", "Ollama n'est pas installé.")
-            ),
+            lambda *_: _show_ollama_ps(),
         )
     )
     page.add(g_mod)
@@ -3417,7 +3791,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
             "edit-clear-all-symbolic",
             lambda *_: win.run_task(
                 "Podman prune",
-                lambda e: (win.run_cmd_pty(["podman", "image", "prune", "-f"], e, as_user=True) == 0, T("done")),
+                lambda e: (win.run_cmd_pty([_podman_bin() or "podman", "image", "prune", "-f"], e, as_user=(webui_owner == "user")) == 0, T("done")),
             ),
         )
     )
@@ -3591,21 +3965,22 @@ def _push_ollama_actions(win: Ps5ManagerWindow) -> None:
 
 
 def _push_webui_actions(win: Ps5ManagerWindow) -> None:
-    st = _podman_webui_state()
+    st, owner = _podman_webui_context()
     has_desktop = os.path.isfile(OPENWEBUI_DESKTOP_PATH) and os.path.isfile(OPENWEBUI_ICON_PATH)
     sub = Adw.PreferencesPage()
     grp = Adw.PreferencesGroup(
         title="Open WebUI (Podman)",
-        description=f"État : {st} · Icône GNOME : {'installée' if has_desktop else 'absente'}",
+        description=f"État : {st} ({owner}) · Icône GNOME : {'installée' if has_desktop else 'absente'}",
     )
 
     def _install():
         def _task(emit):
-            if not shutil.which("podman"):
+            if not _podman_bin():
                 if win.run_cmd_pty(["dnf", "install", "-y", "podman"], emit) != 0:
                     return False, T("failed") % 1
-            if _podman_webui_state() in ("missing", "no_podman"):
-                rc = _create_openwebui_container(win, emit)
+            cur_st, cur_owner = _podman_webui_context()
+            if cur_st in ("missing", "no_podman"):
+                rc = _create_openwebui_container(win, emit, owner="user")
                 if rc != 0:
                     return False, T("failed") % rc
             _install_openwebui_desktop_entry(win, emit)
@@ -3614,14 +3989,17 @@ def _push_webui_actions(win: Ps5ManagerWindow) -> None:
 
     def _update():
         def _task(emit):
-            if not shutil.which("podman"):
+            if not _podman_bin():
                 if win.run_cmd_pty(["dnf", "install", "-y", "podman"], emit) != 0:
                     return False, T("failed") % 1
-            if win.run_cmd_pty(["podman", "pull", OPENWEBUI_IMAGE], emit, as_user=True) != 0:
+            podman = _podman_bin() or "podman"
+            _, cur_owner = _podman_webui_context()
+            as_user = cur_owner == "user"
+            if win.run_cmd_pty([podman, "pull", OPENWEBUI_IMAGE], emit, as_user=as_user) != 0:
                 return False, T("failed") % 1
-            win.run_cmd_pty(["podman", "stop", "open-webui"], emit, as_user=True)
-            win.run_cmd_pty(["podman", "rm", "open-webui"], emit, as_user=True)
-            rc = _create_openwebui_container(win, emit)
+            win.run_cmd_pty([podman, "stop", "open-webui"], emit, as_user=as_user)
+            win.run_cmd_pty([podman, "rm", "open-webui"], emit, as_user=as_user)
+            rc = _create_openwebui_container(win, emit, owner=cur_owner)
             if rc != 0:
                 return False, T("failed") % rc
             _install_openwebui_desktop_entry(win, emit)
@@ -3636,11 +4014,14 @@ def _push_webui_actions(win: Ps5ManagerWindow) -> None:
 
     def _uninstall(purge_data: bool):
         def _task(emit):
-            win.run_cmd_pty(["podman", "stop", "open-webui"], emit, as_user=True)
-            win.run_cmd_pty(["podman", "rm", "open-webui"], emit, as_user=True)
+            podman = _podman_bin() or "podman"
+            _, cur_owner = _podman_webui_context()
+            as_user = cur_owner == "user"
+            win.run_cmd_pty([podman, "stop", "open-webui"], emit, as_user=as_user)
+            win.run_cmd_pty([podman, "rm", "open-webui"], emit, as_user=as_user)
             if purge_data:
-                win.run_cmd_pty(["podman", "volume", "rm", "open-webui"], emit, as_user=True)
-                win.run_cmd_pty(["podman", "rmi", OPENWEBUI_IMAGE], emit, as_user=True)
+                win.run_cmd_pty([podman, "volume", "rm", "open-webui"], emit, as_user=as_user)
+                win.run_cmd_pty([podman, "rmi", OPENWEBUI_IMAGE], emit, as_user=as_user)
             _remove_openwebui_desktop_entry(win, emit)
             return True, T("done")
         win.run_task("Désinstaller Open WebUI", _task, lambda *_: (win.nav.pop(), win._select_section("aidev")))
@@ -3666,9 +4047,9 @@ def _push_webui_actions(win: Ps5ManagerWindow) -> None:
             "Ouvrir dans le navigateur (http://127.0.0.1:8080)",
             "Démarre open-webui si arrêté puis ouvre la page web",
             "web-browser-symbolic",
-            lambda *_: subprocess.Popen(run_as_user_cmd([OPENWEBUI_LAUNCHER_PATH]))
+            lambda *_: subprocess.Popen(run_as_user_cmd([OPENWEBUI_LAUNCHER_PATH]), env=user_env())
             if os.access(OPENWEBUI_LAUNCHER_PATH, os.X_OK)
-            else subprocess.Popen(run_as_user_cmd(["xdg-open", "http://127.0.0.1:8080"])),
+            else subprocess.Popen(run_as_user_cmd(["xdg-open", "http://127.0.0.1:8080"]), env=user_env()),
         )
     )
     grp.add(
@@ -3803,8 +4184,9 @@ def _push_ai_models(win: Ps5ManagerWindow) -> None:
     if running:
         def _stop_all_models():
             def _task(emit):
+                ollama = _ollama_bin() or "ollama"
                 for m in list(_ollama_running_models()):
-                    win.run_cmd_pty(["ollama", "stop", m], emit)
+                    win.run_cmd_pty([ollama, "stop", m], emit)
                 return True, T("done")
             win.run_task("Décharger tous les modèles", _task, lambda *_: (win.nav.pop(), _push_ai_models(win)))
 
@@ -3870,7 +4252,8 @@ def _exec_model_pull(win: Ps5ManagerWindow, model_name: str, refresh_models: boo
     def _task(emit):
         if not _ensure_ollama_ready(win, emit):
             return False, "Échec préparation Ollama"
-        rc = win.run_cmd_pty(["ollama", "pull", model_name], emit)
+        ollama = _ollama_bin() or "ollama"
+        rc = win.run_cmd_pty([ollama, "pull", model_name], emit)
         return rc == 0, T("done") if rc == 0 else T("failed") % rc
 
     def _after(*_):
@@ -3908,30 +4291,34 @@ def _push_model_actions(win: Ps5ManagerWindow, model_name: str) -> None:
                 "media-playback-stop-symbolic",
                 lambda *_: win.run_task(
                     f"ollama stop {model_name}",
-                    lambda e: (win.run_cmd_pty(["ollama", "stop", model_name], e) == 0, T("done")),
+                    lambda e: (win.run_cmd_pty([_ollama_bin() or "ollama", "stop", model_name], e) == 0, T("done")),
                 ),
             )
         )
+
+        def _show_model_details():
+            ollama = _ollama_bin() or "ollama"
+            res = subprocess.run([ollama, "show", model_name], capture_output=True, text=True)
+            win.show_text_modal(model_name, res.stdout or res.stderr or "(indisponible — démarrez ollama.service)")
+
         grp.add(
             win.row(
                 "Afficher les détails du modèle (ollama show)",
                 "Architecture, quantification, paramètres et licence",
                 "dialog-information-symbolic",
-                lambda *_: win.show_text_modal(
-                    model_name,
-                    subprocess.run(["ollama", "show", model_name], capture_output=True, text=True).stdout or "(indisponible)",
-                ),
+                lambda *_: _show_model_details(),
             )
         )
 
         def _do_remove():
             def _task(emit):
-                if not _ollama_service_active():
+                ollama = _ollama_bin() or "ollama"
+                if not _ollama_service_active() and _ollama_service_exists():
                     win.run_cmd_pty(["systemctl", "start", "ollama"], emit)
                 # Toujours stopper le modèle avant de le supprimer s'il est en RAM
                 if model_name in _ollama_running_models():
-                    win.run_cmd_pty(["ollama", "stop", model_name], emit)
-                rc = win.run_cmd_pty(["ollama", "rm", model_name], emit)
+                    win.run_cmd_pty([ollama, "stop", model_name], emit)
+                rc = win.run_cmd_pty([ollama, "rm", model_name], emit)
                 return rc == 0, T("done") if rc == 0 else T("failed") % rc
 
             def _after(*_):
