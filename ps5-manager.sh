@@ -97,12 +97,15 @@ fi
 # ------------------------------------------------------------------------------
 # Zenity : dépendance obligatoire
 # ------------------------------------------------------------------------------
-if ! command -v zenity >/dev/null 2>&1; then
-    dnf install -y zenity || { echo "zenity est requis." >&2; exit 1; }
-fi
-if ! command -v zenity >/dev/null 2>&1; then
-    echo "zenity est introuvable, le gestionnaire ne peut pas démarrer." >&2
-    exit 1
+# En mode --cli (interface GTK), zenity n'est pas utilisé : aucune fenêtre.
+if [ "${1:-}" != "--cli" ]; then
+    if ! command -v zenity >/dev/null 2>&1; then
+        dnf install -y zenity || { echo "zenity est requis." >&2; exit 1; }
+    fi
+    if ! command -v zenity >/dev/null 2>&1; then
+        echo "zenity est introuvable, le gestionnaire ne peut pas démarrer." >&2
+        exit 1
+    fi
 fi
 
 # ------------------------------------------------------------------------------
@@ -546,6 +549,12 @@ EN_TR["Fenêtre de log automatique : activée."]="Automatic log window: enabled.
 EN_TR["Fenêtre de log automatique : désactivée."]="Automatic log window: disabled."
 EN_TR["Supprimer tous les journaux ?"]="Delete all logs?"
 EN_TR["Journaux effacés."]="Logs cleared."
+EN_TR["Ouvrir la nouvelle interface GTK (aperçu)"]="Open the new GTK interface (preview)"
+EN_TR["Interface GTK"]="GTK interface"
+EN_TR["ps5-manager-gui.py est introuvable (mettez le manager à jour)."]="ps5-manager-gui.py not found (update the manager)."
+EN_TR["GTK4/libadwaita est absent : sudo dnf install python3-gobject gtk4 libadwaita"]="GTK4/libadwaita is missing: sudo dnf install python3-gobject gtk4 libadwaita"
+EN_TR["L interface GTK s ouvre (aperçu). Journal : /tmp/ps5-manager-gui.log"]="The GTK interface is opening (preview). Log: /tmp/ps5-manager-gui.log"
+
 EN_FMT["Ce que fait réellement le gestionnaire, en direct.\nJournal de cette session : %s"]="What the manager is actually doing, live.\nThis session log: %s"
 
 EN_TR["Aucun message."]="No message."
@@ -592,15 +601,22 @@ log_line() {
 }
 
 log_setup() {
-    mkdir -p "$LOG_DIR" 2>/dev/null && chmod 0755 "$LOG_DIR" 2>/dev/null
+    local dir="$LOG_DIR"
+    mkdir -p "$dir" 2>/dev/null
+    if [ ! -d "$dir" ] || [ ! -w "$dir" ]; then
+        # pas les droits sur /var/log (lancement non-root) : on bascule sur /tmp
+        dir="${TMPDIR:-/tmp}/ps5-manager-logs"
+        mkdir -p "$dir" 2>/dev/null
+    fi
+    LOG_DIR="$dir"
     # rotation : on garde 14 jours de journaux
-    find "$LOG_DIR" -maxdepth 1 -name 'session-*.log' -mtime +14 -delete 2>/dev/null
-    SESSION_LOG="$LOG_DIR/session-$(date +%Y%m%d-%H%M%S)-$$.log"
-    if ! : > "$SESSION_LOG" 2>/dev/null; then
+    find "$dir" -maxdepth 1 -name 'session-*.log' -mtime +14 -delete 2>/dev/null
+    SESSION_LOG="$dir/session-$(date +%Y%m%d-%H%M%S)-$$.log"
+    if ! { : > "$SESSION_LOG"; } 2>/dev/null; then
         SESSION_LOG="$(mktemp)"
     fi
     chmod 0644 "$SESSION_LOG" 2>/dev/null
-    ln -sfn "$SESSION_LOG" "$LOG_DIR/latest.log" 2>/dev/null
+    { ln -sfn "$SESSION_LOG" "$dir/latest.log"; } 2>/dev/null
     log_line "════ PS5 Manager — $(date '+%F %T') — utilisateur : $REAL_USER — PID $$"
     log_line "système : $(uname -srm)"
 }
@@ -642,6 +658,29 @@ open_log_window() {
     return 1
 }
 
+# Ouvre la nouvelle interface GTK (aperçu), qui réutilise ce script en --cli.
+launch_gui() {
+    local gui="" c
+    for c in /usr/local/bin/ps5-manager-gui "$INSTALL_DIR/ps5-manager-gui.py" \
+             "$(dirname "$(readlink -f "$0")")/ps5-manager-gui.py"; do
+        [ -f "$c" ] && { gui="$c"; break; }
+    done
+    if [ -z "$gui" ]; then
+        error "$(tr 'Interface GTK')" \
+            "$(tr 'ps5-manager-gui.py est introuvable (mettez le manager à jour).')"
+        return 1
+    fi
+    if ! python3 -c 'import gi; gi.require_version("Gtk","4.0"); gi.require_version("Adw","1")' \
+            >/dev/null 2>&1; then
+        error "$(tr 'Interface GTK')" \
+            "$(tr 'GTK4/libadwaita est absent : sudo dnf install python3-gobject gtk4 libadwaita')"
+        return 1
+    fi
+    PS5_MANAGER_ELEVATED=1 nohup python3 "$gui" >/tmp/ps5-manager-gui.log 2>&1 &
+    info "$(tr 'Interface GTK')" \
+        "$(tr 'L interface GTK s ouvre (aperçu). Journal : /tmp/ps5-manager-gui.log')"
+}
+
 # Menu 14
 log_menu() {
     local c f logf body
@@ -654,7 +693,8 @@ log_menu() {
         "2" "$(tr 'Voir le journal de cette session')" \
         "3" "$(tr 'Voir un ancien journal')" \
         "4" "$(tr 'Activer / désactiver la fenêtre automatique')" \
-        "5" "$(tr 'Effacer les journaux')")"
+        "5" "$(tr 'Effacer les journaux')" \
+        "6" "$(tr 'Ouvrir la nouvelle interface GTK (aperçu)')")"
     [ -n "$c" ] || return 0
     case "$c" in
         1)
@@ -690,6 +730,9 @@ log_menu() {
             else
                 info "$(tr 'Journal')" "$(tr 'Fenêtre de log automatique : désactivée.')"
             fi
+            ;;
+        6)
+            launch_gui
             ;;
         5)
             if confirm "$(tr 'Journaux')" "$(tr 'Supprimer tous les journaux ?')"; then
@@ -1278,7 +1321,7 @@ kernel_install_latest() {
 }
 
 kernel_select_default() {
-    local f k cur esp entry args=() kernels=()
+    local f k cur esp entry args=() kernels=() want="${1:-}"
     for f in /boot/vmlinuz-*; do
         [ -e "$f" ] || continue
         k="${f##*/vmlinuz-}"
@@ -1302,10 +1345,14 @@ kernel_select_default() {
         args+=("$k" "$st")
     done
 
+    if [ -n "$want" ]; then
+        entry="$want"
+    else
     entry="$(Z --list --title="Kernel à démarrer" \
         --text="$(trf 'Kernel démarré : %s\nKernel sur /boot/efi : %s\n\nChoisissez le kernel à placer sur /boot/efi (celui qui démarre) :' "$cur" "${esp:-inconnu}")" \
         --width=620 --height=420 \
         --column="Version" --column="Statut" "${args[@]}")"
+    fi
     [ -n "$entry" ] || return 0
 
     if [ ! -f "/boot/vmlinuz-$entry" ]; then
@@ -1547,10 +1594,14 @@ software_action() {
                         return 0
                     fi
                     local how
+                    if [ -n "${CLI_HOW:-}" ]; then
+                        how="$CLI_HOW"
+                    else
                     how="$(Z --list --title="$sw" --text="Quel format d'installation ?" \
                         --width=460 --height=250 --column="ID" --column="Format" \
                         "1" "RPM (dépôt officiel)" \
                         "2" "Flatpak (Flathub)")"
+                    fi
                     [ -n "$how" ] || return 0
                     if [ "$how" = "1" ]; then
                         if [ "$sw" = "Opera" ]; then
@@ -1652,6 +1703,9 @@ install_files() {
         sudo install -m 0644 "$src/ps5-manager.desktop" /usr/share/applications/ps5-manager.desktop
     [ -f "$src/icon.png" ] &&
         sudo install -m 0644 "$src/icon.png" /usr/share/pixmaps/ps5-manager.png
+    if [ -f "$src/ps5-manager-gui.py" ]; then
+        sudo install -m 0755 "$src/ps5-manager-gui.py" /usr/local/bin/ps5-manager-gui || true
+    fi
     sudo update-desktop-database /usr/share/applications/ >/dev/null 2>&1 || true
 }
 
@@ -1692,6 +1746,111 @@ K_VER="$(uname -r)"
 
 # Journal de la session (créé au démarrage, avant toute action)
 log_setup
+
+# ------------------------------------------------------------------------------
+# Mode CLI — utilisé par l'interface GTK (ps5-manager-gui)
+# Tout ce qui passait par zenity écrit ici sur la sortie standard, pour que le
+# moteur reste unique : le bash fait le travail, GTK l'affiche.
+# ------------------------------------------------------------------------------
+cli_setup() {
+    Z()        { :; }
+    info()     { printf '• %s : %s\n' "$1" "$2"; }
+    warn()     { printf '! %s : %s\n' "$1" "$2" >&2; }
+    error()    { printf '✗ %s : %s\n' "$1" "$2" >&2; }
+    confirm()  { return 0; }
+    ask()      { return 0; }
+    ask_pass() { return 0; }
+    show_text(){ printf '%s\n' "$2"; }
+    choose_language() { return 1; }
+    run_with_progress() {
+        local t="$1"
+        shift 2
+        printf '▶ %s\n' "$t"
+        "$@"
+    }
+}
+
+# version<TAB>démarré<TAB>sur_esp<TAB>initrd_présent
+kernel_versions() {
+    local f k cur esp
+    cur="$(uname -r)"
+    esp="$(esp_kernel_version || true)"
+    for f in /boot/vmlinuz-*; do
+        [ -e "$f" ] || continue
+        k="${f##*/vmlinuz-}"
+        case "$k" in 0-rescue*) continue ;; esac
+        printf '%s\t%s\t%s\t%s\n' "$k" \
+            "$([ "$k" = "$cur" ] && echo 1 || echo 0)" \
+            "$([ -n "$esp" ] && [ "$k" = "$esp" ] && echo 1 || echo 0)" \
+            "$([ -f "/boot/initrd.img-$k" ] && echo 1 || echo 0)"
+    done | sort -Vr
+}
+
+cli_maint() {
+    case "${1:-}" in
+        cache)      run_with_progress "Maintenance" "Nettoyage du cache DNF…" sudo dnf clean all ;;
+        autoremove) run_with_progress "Maintenance" "Suppression des orphelins…" sudo dnf autoremove -y ;;
+        journal)    run_with_progress "Maintenance" "Réduction des journaux…" sudo journalctl --vacuum-time=7d ;;
+        tmp)        run_with_progress "Maintenance" "Nettoyage des temporaires…" \
+                        sudo bash -c 'rm -rf /tmp/* /var/tmp/* 2>/dev/null || true' ;;
+        thumbs)     run_as_user rm -rf "$REAL_HOME/.cache/thumbnails" ;;
+        kernels)    maintenance_old_kernels ;;
+        df)         df -hT -x tmpfs -x devtmpfs -x efivarfs ;;
+        *)          printf 'action maintenance inconnue : %s\n' "${1:-}" >&2; return 2 ;;
+    esac
+}
+
+cli_main() {
+    local cli_cmd="${1:-help}" out
+    cli_setup
+    [ $# -gt 0 ] && shift
+    case "$cli_cmd" in
+        log)
+            case "${1:-path}" in
+                path)  printf '%s\n' "${SESSION_LOG:-$LOG_DIR/latest.log}" ;;
+                list)  find "$LOG_DIR" -maxdepth 1 -name 'session-*.log' -printf '%f\t%T@\n' 2>/dev/null |
+                           sort -k2 -rn | cut -f1 | head -20 ;;
+                show)  [ -n "${2:-}" ] && tail -n 2000 "$2" ;;
+                clear) rm -f "$LOG_DIR"/session-*.log "$LOG_DIR"/latest.log 2>/dev/null
+                       printf 'journaux effacés\n' ;;
+                open)  open_log_window ;;
+                *)     printf 'commande log inconnue\n' >&2; return 2 ;;
+            esac
+            ;;
+        app)
+            CLI_HOW="${3:-1}"
+            software_action "${1:-}" "${2:-check}" ;;
+        maint)
+            cli_maint "${1:-}" ;;
+        kernel)
+            case "${1:-latest}" in
+                latest)
+                    if out="$(kernel_latest)"; then
+                        printf '%s\n' "$out"
+                    else
+                        printf 'impossible de joindre les releases GitHub\n' >&2
+                        return 1
+                    fi
+                    ;;
+                install) kernel_install_latest ;;
+                list)    kernel_versions ;;
+                select)  kernel_select_default "${2:-}" ;;
+                *)       printf 'commande kernel inconnue\n' >&2; return 2 ;;
+            esac
+            ;;
+        *)
+            printf 'usage : %s --cli <log|app|maint|kernel> …\n' "$0" >&2
+            return 2
+            ;;
+    esac
+}
+
+if [ "${1:-}" = "--cli" ]; then
+    shift
+    log_setup
+    cli_main "$@"
+    exit $?
+fi
 
 # ------------------------------------------------------------------------------
 # Boucle principale
