@@ -28,11 +28,12 @@ import subprocess
 import sys
 import tempfile
 import threading
+import time
 import urllib.error
 import urllib.request
 import warnings
 from dataclasses import dataclass
-from typing import Callable, Optional
+from typing import Any, Callable, Optional
 
 # ------------------------------------------------------------------------------
 # Constantes & URLs (identiques à ps5-manager.sh)
@@ -110,6 +111,16 @@ def detect_real_user() -> tuple[str, int, str]:
 
 
 REAL_USER, REAL_UID, REAL_HOME = detect_real_user()
+try:
+    _pw_real = pwd.getpwnam(REAL_USER)
+    REAL_GID = _pw_real.pw_gid
+    try:
+        REAL_GROUPS = os.getgrouplist(REAL_USER, REAL_GID)
+    except (AttributeError, OSError):
+        REAL_GROUPS = [REAL_GID]
+except KeyError:
+    REAL_GID = 0
+    REAL_GROUPS = [0]
 
 # pkexec restreint PATH à /usr/sbin:/usr/bin:/sbin:/bin : restaurer /usr/local/bin (ex: ollama)
 _base_paths = ["/usr/local/sbin", "/usr/local/bin", "/usr/sbin", "/usr/bin", "/sbin", "/bin"]
@@ -325,6 +336,17 @@ def user_env() -> dict[str, str]:
         env["HOME"] = REAL_HOME
         env["USER"] = REAL_USER
         env["LOGNAME"] = REAL_USER
+        for xdg_k in (
+            "XDG_CONFIG_HOME",
+            "XDG_DATA_HOME",
+            "XDG_CACHE_HOME",
+            "XDG_STATE_HOME",
+            "CONTAINERS_CONF",
+            "CONTAINERS_STORAGE_CONF",
+        ):
+            val = env.get(xdg_k, "")
+            if val.startswith("/root"):
+                env.pop(xdg_k, None)
     if os.path.isdir(runtime_dir):
         env["XDG_RUNTIME_DIR"] = runtime_dir
         bus_path = os.path.join(runtime_dir, "bus")
@@ -339,6 +361,18 @@ def user_env() -> dict[str, str]:
         user_paths.insert(0, os.path.join(REAL_HOME, ".local", "bin"))
     env["PATH"] = ":".join(user_paths)
     return env
+
+
+def user_subprocess_kwargs() -> dict[str, Any]:
+    """Paramètres subprocess pour exécuter directement en tant que REAL_USER sans sudo/PAM."""
+    if os.geteuid() == 0 and REAL_USER != "root":
+        return {
+            "user": REAL_UID,
+            "group": REAL_GID,
+            "extra_groups": REAL_GROUPS,
+            "env": user_env(),
+        }
+    return {"env": user_env()}
 
 
 def run_as_user_cmd(cmd: list[str]) -> list[str]:
@@ -407,12 +441,11 @@ class SystemThemeSync:
     def _read_gsetting(self, key: str) -> str:
         try:
             res = subprocess.run(
-                run_as_user_cmd(
-                    ["gsettings", "get", "org.gnome.desktop.interface", key]
-                ),
+                ["gsettings", "get", "org.gnome.desktop.interface", key],
                 capture_output=True,
                 text=True,
                 timeout=2,
+                **user_subprocess_kwargs(),
             )
             if res.returncode == 0:
                 return res.stdout.strip().strip("'\"")
@@ -1707,19 +1740,14 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         as_user: bool = False,
         shell: bool = False,
     ) -> int:
-        if as_user:
-            if isinstance(cmd, str):
-                full_cmd = run_as_user_cmd(["bash", "-c", cmd])
-                shell = False
-            else:
-                full_cmd = run_as_user_cmd(cmd)
+        if isinstance(cmd, str) and not shell:
+            full_cmd: list[str] | str = ["bash", "-c", cmd]
         else:
-            if isinstance(cmd, str) and not shell:
-                full_cmd = ["bash", "-c", cmd]
-            else:
-                full_cmd = cmd  # type: ignore[assignment]
+            full_cmd = cmd
 
-        self.logger.write_line(f"commande : {full_cmd}")
+        proc_kwargs: dict[str, Any] = user_subprocess_kwargs() if as_user else {"env": os.environ}
+        prefix = f"[{REAL_USER}] " if as_user and REAL_USER != "root" else ""
+        self.logger.write_line(f"commande : {prefix}{full_cmd}")
         master_fd, slave_fd = pty.openpty()
         proc = subprocess.Popen(
             full_cmd,
@@ -1728,7 +1756,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
             stdout=slave_fd,
             stderr=slave_fd,
             close_fds=True,
-            env=user_env() if as_user else os.environ,
+            **proc_kwargs,
         )
         os.close(slave_fd)
 
@@ -2200,8 +2228,33 @@ def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
             apply_install_permissions()
             win.run_cmd_pty(["update-desktop-database", "/usr/share/applications/"], emit)
             emit("Droits (root:root, 0755/0644, Polkit GUI, SELinux) appliqués.")
+            emit("Redémarrage automatique de PS5 Manager…")
             return True, T("done")
-        win.run_task(T("mgr_update"), _task)
+
+        def _on_update_done(ok: bool, _msg: str) -> None:
+            if not ok:
+                return
+            win.toast(
+                "Mise à jour terminée — redémarrage automatique…"
+                if UI_LANG == "fr"
+                else "Update finished — restarting…"
+            )
+
+            def _do_restart() -> bool:
+                app = win.get_application()
+                if app is not None:
+                    app.restart_on_exit = True  # type: ignore[attr-defined]
+                if win.log_window is not None:
+                    win.log_window.destroy()
+                    win.log_window = None
+                win.destroy()
+                if app is not None:
+                    app.quit()
+                return False
+
+            GLib.timeout_add(900, _do_restart)
+
+        win.run_task(T("mgr_update"), _task, _on_update_done)
 
     def _do_uninstall():
         for target in (
@@ -2297,7 +2350,7 @@ def _push_full_lang_config(win: Ps5ManagerWindow) -> None:
                 win.show_confirm(
                     T("lang_full"),
                     T("lang_logout_confirm") % (loc, kb),
-                    lambda: subprocess.Popen(run_as_user_cmd(["gnome-session-quit", "--logout", "--force"])),
+                    lambda: subprocess.Popen(["gnome-session-quit", "--logout", "--force"], **user_subprocess_kwargs()),
                     destructive=False,
                 )
         win.run_task(T("lang_full"), _task, _after)
@@ -2318,7 +2371,7 @@ def build_page_repos(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     def _list_all():
         dnf_out = subprocess.run(["dnf", "repolist", "--all"], capture_output=True, text=True).stdout
         fp_sys = subprocess.run(["flatpak", "remotes", "--system"], capture_output=True, text=True).stdout if shutil.which("flatpak") else "Flatpak absent"
-        fp_usr = subprocess.run(run_as_user_cmd(["flatpak", "remotes", "--user"]), capture_output=True, text=True).stdout if shutil.which("flatpak") else ""
+        fp_usr = subprocess.run(["flatpak", "remotes", "--user"], capture_output=True, text=True, **user_subprocess_kwargs()).stdout if shutil.which("flatpak") else ""
         win.show_text_modal(T("repo_list"), f"===== DNF =====\n{dnf_out}\n\n===== Flatpak (system) =====\n{fp_sys}\n\n===== Flatpak (user) =====\n{fp_usr}")
 
     def _install_rpmfusion_task(emit):
@@ -2697,8 +2750,8 @@ def build_page_power(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         != "masked"
     )
     idle_val = subprocess.run(
-        run_as_user_cmd(["gsettings", "get", "org.gnome.desktop.session", "idle-delay"]),
-        capture_output=True, text=True,
+        ["gsettings", "get", "org.gnome.desktop.session", "idle-delay"],
+        capture_output=True, text=True, **user_subprocess_kwargs(),
     ).stdout.strip()
     scr_sleep_enabled = not idle_val.endswith(" 0") and idle_val != "uint32 0"
 
@@ -2720,7 +2773,7 @@ def build_page_power(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
     def _on_scr_toggle(row, _p):
         delay = "300" if row.get_active() else "0"
-        rc = subprocess.run(run_as_user_cmd(["gsettings", "set", "org.gnome.desktop.session", "idle-delay", delay])).returncode
+        rc = subprocess.run(["gsettings", "set", "org.gnome.desktop.session", "idle-delay", delay], **user_subprocess_kwargs()).returncode
         win.toast(T("done") if rc == 0 else T("failed") % rc)
 
     sw_scr.connect("notify::active", _on_scr_toggle)
@@ -2731,8 +2784,8 @@ def build_page_power(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         delay = "300" if enable else "0"
         ac_type = "suspend" if enable else "nothing"
         subprocess.run(["systemctl", act, "sleep.target", "suspend.target", "hibernate.target", "hybrid-sleep.target", "suspend-then-hibernate.target"])
-        subprocess.run(run_as_user_cmd(["gsettings", "set", "org.gnome.desktop.session", "idle-delay", delay]))
-        subprocess.run(run_as_user_cmd(["gsettings", "set", "org.gnome.settings-daemon.plugins.power", "sleep-inactive-ac-type", ac_type]))
+        subprocess.run(["gsettings", "set", "org.gnome.desktop.session", "idle-delay", delay], **user_subprocess_kwargs())
+        subprocess.run(["gsettings", "set", "org.gnome.settings-daemon.plugins.power", "sleep-inactive-ac-type", ac_type], **user_subprocess_kwargs())
         win._select_section("power")
         win.toast(T("done"))
 
@@ -3340,28 +3393,45 @@ def _podman_bin() -> Optional[str]:
     return None
 
 
+def _podman_run(args: list[str], owner: str = "user", timeout: int = 12) -> subprocess.CompletedProcess[str]:
+    podman = _podman_bin() or "podman"
+    kw = user_subprocess_kwargs() if owner == "user" else {}
+    return subprocess.run([podman, *args], capture_output=True, text=True, timeout=timeout, **kw)
+
+
+def _parse_podman_ps_for_openwebui(stdout: str) -> Optional[str]:
+    for line in stdout.splitlines():
+        parts = line.strip().split("\t", 1)
+        if len(parts) < 2:
+            continue
+        name = parts[0].strip().lstrip("/")
+        state = parts[1].strip().lower()
+        if name == "open-webui":
+            if state.startswith("up"):
+                return "running"
+            return state
+    return None
+
+
 def _podman_webui_context() -> tuple[str, str]:
     """Retourne (état, propriétaire 'user'|'root')."""
     podman = _podman_bin()
     if not podman:
         return "no_podman", "user"
-    try:
-        res_user = subprocess.run(
-            run_as_user_cmd([podman, "inspect", "-f", "{{.State.Status}}", "open-webui"]),
-            capture_output=True, text=True, env=user_env(), timeout=5,
-        )
-        if res_user.returncode == 0 and res_user.stdout.strip():
-            return res_user.stdout.strip().lower(), "user"
-    except (OSError, subprocess.SubprocessError):
-        pass
-    if REAL_USER != "root":
+    contexts = ["user", "root"] if REAL_USER != "root" else ["root"]
+    for ctx in contexts:
         try:
-            res_root = subprocess.run(
-                [podman, "inspect", "-f", "{{.State.Status}}", "open-webui"],
-                capture_output=True, text=True, timeout=5,
-            )
-            if res_root.returncode == 0 and res_root.stdout.strip():
-                return res_root.stdout.strip().lower(), "root"
+            res_ps = _podman_run(["ps", "-a", "--format", "{{.Names}}\t{{.State}}"], owner=ctx, timeout=12)
+            if res_ps.returncode == 0:
+                st = _parse_podman_ps_for_openwebui(res_ps.stdout)
+                if st:
+                    return st, ctx
+        except (OSError, subprocess.SubprocessError):
+            pass
+        try:
+            res_ins = _podman_run(["inspect", "-f", "{{.State.Status}}", "open-webui"], owner=ctx, timeout=12)
+            if res_ins.returncode == 0 and res_ins.stdout.strip():
+                return res_ins.stdout.strip().lower(), ctx
         except (OSError, subprocess.SubprocessError):
             pass
     return "missing", "user"
@@ -3599,14 +3669,10 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         act = "start" if r.get_active() else "stop"
 
         def _do():
-            podman = _podman_bin() or "podman"
-            cmd = [podman, act, "open-webui"]
-            full = run_as_user_cmd(cmd) if webui_owner == "user" else cmd
-            env = user_env() if webui_owner == "user" else os.environ
-            res = subprocess.run(full, capture_output=True, text=True, env=env)
+            res = _podman_run([act, "open-webui"], owner=webui_owner, timeout=30)
             if res.returncode != 0:
                 err = (res.stderr or res.stdout or f"code {res.returncode}").strip()
-                return False, f"podman {act} open-webui :\n{err}"
+                return False, f"podman {act} open-webui ({webui_owner}) :\n{err}"
             return True, T("done")
 
         _run_quick_service_action(
@@ -3631,12 +3697,20 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
                 emit("Ollama non détecté sur ce système.")
 
             st_now, owner_now = _podman_webui_context()
-            if st_now not in ("missing", "no_podman"):
+            podman = _podman_bin()
+            if st_now not in ("missing", "no_podman") and podman:
                 did_any = True
-                podman = _podman_bin() or "podman"
                 rc2 = win.run_cmd_pty([podman, "start", "open-webui"], emit, as_user=(owner_now == "user"))
-            else:
+            elif podman:
+                # Affiche le diagnostic podman ps -a dans le journal pour transparence
+                try:
+                    diag = _podman_run(["ps", "-a"], owner="user", timeout=10)
+                    emit(f"podman ps -a ({REAL_USER}) rc={diag.returncode}: {(diag.stdout or diag.stderr).strip()}")
+                except Exception as exc:
+                    emit(f"Erreur podman ps -a : {exc}")
                 emit("Conteneur Podman open-webui non détecté.")
+            else:
+                emit("Podman non installé.")
 
             if not did_any:
                 return False, "Aucun service Ollama ou Open WebUI détecté."
@@ -3679,13 +3753,39 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
     def _open_webui_browser():
         if os.access(OPENWEBUI_LAUNCHER_PATH, os.X_OK) and webui_owner == "user":
-            subprocess.Popen(run_as_user_cmd([OPENWEBUI_LAUNCHER_PATH]), env=user_env())
+            subprocess.Popen([OPENWEBUI_LAUNCHER_PATH], **user_subprocess_kwargs())
             return
         st_now, _ = _podman_webui_context()
         if st_now == "running":
-            subprocess.Popen(run_as_user_cmd(["xdg-open", "http://127.0.0.1:8080"]), env=user_env())
+            subprocess.Popen(["xdg-open", "http://127.0.0.1:8080"], **user_subprocess_kwargs())
         else:
             win.show_info("Open WebUI", "Démarrez d'abord le conteneur Open WebUI.")
+
+    def _show_podman_ps():
+        if not _podman_bin():
+            win.show_info("Podman", "Podman n'est pas installé.")
+            return
+        chunks: list[str] = []
+        r_usr = _podman_run(["ps", "-a"], owner="user", timeout=10)
+        chunks.append(f"=== podman ps -a ({REAL_USER}) [rc={r_usr.returncode}] ===\n{(r_usr.stdout or r_usr.stderr or '(vide)').strip()}")
+        if REAL_USER != "root":
+            r_rt = _podman_run(["ps", "-a"], owner="root", timeout=10)
+            if r_rt.stdout.strip():
+                chunks.append(f"\n=== podman ps -a (root) ===\n{r_rt.stdout.strip()}")
+        win.show_text_modal("podman ps -a", "\n".join(chunks))
+
+    def _show_webui_logs():
+        if not _podman_bin():
+            win.show_info("Open WebUI", "Podman n'est pas installé.")
+            return
+        st_now, owner_now = _podman_webui_context()
+        if st_now in ("missing", "no_podman"):
+            win.show_info("Open WebUI", "Conteneur open-webui introuvable.")
+            return
+        podman = _podman_bin() or "podman"
+        kw = user_subprocess_kwargs() if owner_now == "user" else {}
+        res = subprocess.run([podman, "logs", "--tail", "30", "open-webui"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, timeout=10, **kw)
+        win.show_text_modal("podman logs --tail 30 open-webui", res.stdout.strip() or "(aucun log)")
 
     g_srv.add(
         win.row(
@@ -3693,6 +3793,22 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
             "http://127.0.0.1:8080",
             "web-browser-symbolic",
             lambda *_: _open_webui_browser(),
+        )
+    )
+    g_srv.add(
+        win.row(
+            "État des conteneurs Podman (podman ps -a)" if UI_LANG == "fr" else "Podman containers status (podman ps -a)",
+            "Vérifie l'état exact de open-webui",
+            "view-list-symbolic",
+            lambda *_: _show_podman_ps(),
+        )
+    )
+    g_srv.add(
+        win.row(
+            "Logs Open WebUI (podman logs --tail 30)" if UI_LANG == "fr" else "Open WebUI logs (podman logs --tail 30)",
+            "Affiche les 30 dernières lignes du conteneur open-webui",
+            "utilities-terminal-symbolic",
+            lambda *_: _show_webui_logs(),
         )
     )
     page.add(g_srv)
@@ -4047,9 +4163,9 @@ def _push_webui_actions(win: Ps5ManagerWindow) -> None:
             "Ouvrir dans le navigateur (http://127.0.0.1:8080)",
             "Démarre open-webui si arrêté puis ouvre la page web",
             "web-browser-symbolic",
-            lambda *_: subprocess.Popen(run_as_user_cmd([OPENWEBUI_LAUNCHER_PATH]), env=user_env())
+            lambda *_: subprocess.Popen([OPENWEBUI_LAUNCHER_PATH], **user_subprocess_kwargs())
             if os.access(OPENWEBUI_LAUNCHER_PATH, os.X_OK)
-            else subprocess.Popen(run_as_user_cmd(["xdg-open", "http://127.0.0.1:8080"]), env=user_env()),
+            else subprocess.Popen(["xdg-open", "http://127.0.0.1:8080"], **user_subprocess_kwargs()),
         )
     )
     grp.add(
@@ -4132,7 +4248,7 @@ def _push_vscodium_actions(win: Ps5ManagerWindow) -> None:
     grp.add(win.row(T("install"), "Clé GPG + vscodium.repo + dnf install codium", "system-software-install-symbolic", lambda *_: _install()))
     grp.add(win.row(T("update"), "dnf upgrade -y --refresh codium", "software-update-available-symbolic", lambda *_: _update()))
     if installed:
-        grp.add(win.row("Lancer VSCodium", "Ouvre codium sous votre session utilisateur", "applications-development-symbolic", lambda *_: subprocess.Popen(run_as_user_cmd(["codium"]))))
+        grp.add(win.row("Lancer VSCodium", "Ouvre codium sous votre session utilisateur", "applications-development-symbolic", lambda *_: subprocess.Popen(["codium"], **user_subprocess_kwargs())))
     grp.add(
         win.row(
             T("remove"),
@@ -4378,6 +4494,7 @@ class Ps5ManagerApp(Adw.Application):
             application_id=APP_ID, flags=Gio.ApplicationFlags.DEFAULT_FLAGS
         )
         self.theme_sync: Optional[SystemThemeSync] = None
+        self.restart_on_exit: bool = False
 
     def do_activate(self) -> None:
         if self.theme_sync is None:
@@ -4398,7 +4515,16 @@ def main() -> int:
             )
             return 1
     app = Ps5ManagerApp()
-    return app.run(sys.argv)
+    rc = app.run(sys.argv)
+    if app.restart_on_exit:
+        target = (
+            "/usr/local/bin/ps5-manager"
+            if os.path.isfile("/usr/local/bin/ps5-manager")
+            else os.path.abspath(sys.argv[0])
+        )
+        time.sleep(0.2)
+        os.execv(sys.executable, [sys.executable, target, *sys.argv[1:]])
+    return rc
 
 
 if __name__ == "__main__":
