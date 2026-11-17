@@ -55,6 +55,9 @@ HWCON_PYPROJECT = (
     "https://raw.githubusercontent.com/NotHavocc/ps5-hwcon-gui/main/pyproject.toml"
 )
 HWCON_PREFIX = "/opt/ps5-hwcon-gui"
+HWCON_PLUGIN_INSTALL = (
+    "https://raw.githubusercontent.com/NotHavocc/ps5-hwcon-plugin/main/install.sh"
+)
 DECKY_INSTALL = (
     "https://github.com/SteamDeckHomebrew/decky-installer/releases/latest/download/install_release.sh"
 )
@@ -778,9 +781,15 @@ STRINGS = {
         "hw_check": "Vérifier la présence du matériel PS5",
         "hw_check_sub": "Inspecte /sys/class/hwmon et les noeuds sysfs PS5",
         "hw_install": "Installer / Mettre à jour PS5 Hardware Control",
-        "hw_install_sub": "Installe python3-PyQt6 et NotHavocc/ps5-hwcon-gui",
+        "hw_install_sub": "Installe python3-PyQt6 puis NotHavocc/ps5-hwcon-gui (--passwordless)",
         "hw_check_upd": "Vérifier les mises à jour sur GitHub",
         "hw_uninstall": "Désinstaller PS5 Hardware Control",
+        "hw_plugin_group": "Hardware Control Plugin",
+        "hw_plugin_group_sub": "Plugin Decky (mode Jeu) : ventilateur, horloges CPU/GPU et LED",
+        "hw_plugin_install": "Installer le plugin Hardware Control",
+        "hw_plugin_install_sub": "Récupère les sources, compile et installe dans Decky Loader",
+        "hw_plugin_uninstall": "Désinstaller le plugin Hardware Control",
+        "hw_plugin_uninstall_confirm": "Supprimer le plugin Hardware Control et redémarrer Decky Loader ?",
         # 10. Mesa / Vulkan
         "mesa_tools": "Installer les outils Vulkan & Mesa demos",
         "mesa_tools_sub": "vulkan-tools et mesa-demos",
@@ -972,9 +981,15 @@ STRINGS = {
         "hw_check": "Check PS5 hardware presence",
         "hw_check_sub": "Inspects /sys/class/hwmon and PS5 sysfs nodes",
         "hw_install": "Install / Update PS5 Hardware Control",
-        "hw_install_sub": "Installs python3-PyQt6 and NotHavocc/ps5-hwcon-gui",
+        "hw_install_sub": "Installs python3-PyQt6 then NotHavocc/ps5-hwcon-gui (--passwordless)",
         "hw_check_upd": "Check GitHub for updates",
         "hw_uninstall": "Uninstall PS5 Hardware Control",
+        "hw_plugin_group": "Hardware Control Plugin",
+        "hw_plugin_group_sub": "Decky (Game Mode) plugin: fan, CPU/GPU clocks and LEDs",
+        "hw_plugin_install": "Install the Hardware Control plugin",
+        "hw_plugin_install_sub": "Fetches sources, builds and installs into Decky Loader",
+        "hw_plugin_uninstall": "Uninstall the Hardware Control plugin",
+        "hw_plugin_uninstall_confirm": "Remove the Hardware Control plugin and restart Decky Loader?",
         # 10. Mesa / Vulkan
         "mesa_tools": "Install Vulkan tools & Mesa demos",
         "mesa_tools_sub": "vulkan-tools and mesa-demos",
@@ -2991,8 +3006,11 @@ def build_page_hw(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         win.row(
             T("hw_install"), T("hw_install_sub"), "system-software-install-symbolic",
             lambda *_: win.run_task(T("hw_install"), lambda e: (
-                win.run_cmd_pty(["dnf", "install", "-y", "python3-PyQt6"], e) >= 0
-                and win.run_cmd_pty(f"curl -fsSL '{HWCON_INSTALL}' | bash", e, as_user=True) == 0,
+                # Dépendance obligatoire : sans PyQt6 système, l'installation est abandonnée
+                win.run_cmd_pty(["dnf", "install", "-y", "python3-PyQt6"], e) == 0
+                and win.run_cmd_pty(
+                    f"curl -fsSL '{HWCON_INSTALL}' | bash -s -- --passwordless", e, as_user=True
+                ) == 0,
                 T("done"),
             )),
         )
@@ -3011,6 +3029,34 @@ def build_page_hw(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         )
     )
     page.add(grp)
+
+    # Plugin Decky (mode Jeu) : dépôt NotHavocc/ps5-hwcon-plugin
+    grp_plugin = pref_group(title=T("hw_plugin_group"), description=T("hw_plugin_group_sub"))
+    grp_plugin.add(
+        win.row(
+            T("hw_plugin_install"), T("hw_plugin_install_sub"), "system-software-install-symbolic",
+            lambda *_: win.run_task(T("hw_plugin_install"), lambda e: (
+                win.run_cmd_pty(f"curl -fsSL '{HWCON_PLUGIN_INSTALL}' | bash", e, as_user=True) == 0,
+                T("done"),
+            )),
+        )
+    )
+    grp_plugin.add(
+        win.row(
+            T("hw_plugin_uninstall"), None, "user-trash-symbolic",
+            lambda *_: win.show_confirm(
+                T("hw_plugin_uninstall"), T("hw_plugin_uninstall_confirm"),
+                lambda: win.run_task(T("hw_plugin_uninstall"), lambda e: (
+                    win.run_cmd_pty(
+                        f"curl -fsSL '{HWCON_PLUGIN_INSTALL}' | bash -s -- --uninstall",
+                        e, as_user=True,
+                    ) == 0,
+                    T("done"),
+                )),
+            ),
+        )
+    )
+    page.add(grp_plugin)
 
 
 def build_page_mesa(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
