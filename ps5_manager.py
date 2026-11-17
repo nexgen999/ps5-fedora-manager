@@ -440,6 +440,28 @@ def run_as_user_cmd(cmd: list[str]) -> list[str]:
     return cmd
 
 
+# ------------------------------------------------------------------------------
+# Texte littéral dans l'interface
+# Adw.PreferencesRow:use-markup vaut TRUE par défaut : un « & » non échappé
+# casserait le libellé (titre vide). On désactive le markup pour les lignes, et
+# on échappe titres/descriptions des groupes qui n'offrent pas cette option.
+# ------------------------------------------------------------------------------
+def plain_row(cls: Any, **kwargs: Any) -> Any:
+    """Crée une ligne Adw dont le titre et le sous-titre sont du texte littéral."""
+    row = cls(**kwargs)
+    if hasattr(row, "set_use_markup"):
+        row.set_use_markup(False)
+    return row
+
+
+def pref_group(**kwargs: Any) -> Adw.PreferencesGroup:
+    """Crée un groupe de préférences dont le titre et la description sont littéraux."""
+    for key in ("title", "description"):
+        if isinstance(kwargs.get(key), str):
+            kwargs[key] = GLib.markup_escape_text(kwargs[key])
+    return Adw.PreferencesGroup(**kwargs)
+
+
 class SystemThemeSync:
     """
     Synchronise le thème sombre/clair et la couleur d'accentuation GNOME
@@ -539,12 +561,6 @@ class SystemThemeSync:
         @define-color accent_color {accent_text};
         @define-color accent_fg_color {fg};
 
-        :root {{
-            --accent-bg-color: {accent_bg};
-            --accent-color: {accent_text};
-            --accent-fg-color: {fg};
-        }}
-
         .ps5-accent-pill {{
             background-color: alpha(@accent_bg_color, 0.16);
             color: @accent_color;
@@ -573,16 +589,17 @@ class SystemThemeSync:
         list.navigation-sidebar row.ps5-sidebar-sep:hover,
         list.navigation-sidebar row.ps5-sidebar-sep:active,
         list.navigation-sidebar row.ps5-sidebar-sep:selected {{
-            min-height: 0px;
-            padding: 6px 12px;
-            margin: 2px 6px;
-            background: transparent;
+            min-height: 1px;
+            padding: 0;
+            margin: 8px 12px;
+            background: none;
             box-shadow: none;
+            border-radius: 0;
         }}
 
         list.navigation-sidebar row.ps5-sidebar-sep separator {{
             min-height: 1px;
-            background-color: alpha(currentColor, 0.14);
+            background-color: alpha(currentColor, 0.15);
         }}
         """
         self.css_provider.load_from_data(css.encode("utf-8"))
@@ -1519,8 +1536,8 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
                 self.sidebar_list.append(sep_row)
                 prev_group = grp
 
-            row = Adw.ActionRow(
-                title=GLib.markup_escape_text(T(label_key)),
+            row = plain_row(Adw.ActionRow,
+                title=T(label_key),
                 activatable=True,
             )
             row.add_prefix(Gtk.Image.new_from_icon_name(icon))
@@ -1581,7 +1598,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
 
     def rebuild_ui_for_language(self) -> None:
         for sec_id, row in self.sidebar_rows.items():
-            row.set_title(GLib.markup_escape_text(T(row.label_key)))  # type: ignore[attr-defined]
+            row.set_title(T(row.label_key))  # type: ignore[attr-defined]
         self.search_entry.set_placeholder_text(T("search_placeholder"))
         self._select_section(self.active_section)
 
@@ -1618,12 +1635,12 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         callback: Optional[Callable] = None,
         suffix_icon: Optional[str] = "go-next-symbolic",
     ) -> Adw.ActionRow:
-        r = Adw.ActionRow(
-            title=GLib.markup_escape_text(title),
+        r = plain_row(Adw.ActionRow,
+            title=title,
             activatable=callback is not None,
         )
         if subtitle:
-            r.set_subtitle(GLib.markup_escape_text(subtitle))
+            r.set_subtitle(subtitle)
         if icon:
             r.add_prefix(Gtk.Image.new_from_icon_name(icon))
         if suffix_icon:
@@ -1841,7 +1858,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
 # Builders des 15 pages
 # ------------------------------------------------------------------------------
 def build_page_logs(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
-    g1 = Adw.PreferencesGroup(title=T("logs_group_main"))
+    g1 = pref_group(title=T("logs_group_main"))
     g1.add(
         win.row(
             T("logs_live"),
@@ -1868,10 +1885,10 @@ def build_page_logs(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     )
     page.add(g1)
 
-    g2 = Adw.PreferencesGroup(title=T("logs_group_opts"))
-    sw = Adw.SwitchRow(
-        title=GLib.markup_escape_text(T("logs_auto")),
-        subtitle=GLib.markup_escape_text(T("logs_auto_sub")),
+    g2 = pref_group(title=T("logs_group_opts"))
+    sw = plain_row(Adw.SwitchRow,
+        title=T("logs_auto"),
+        subtitle=T("logs_auto_sub"),
     )
     sw.add_prefix(Gtk.Image.new_from_icon_name("view-refresh-symbolic"))
     sw.set_active(log_window_enabled())
@@ -1897,10 +1914,10 @@ def build_page_logs(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
 def _push_old_logs(win: Ps5ManagerWindow) -> None:
     sub = Adw.PreferencesPage()
-    grp = Adw.PreferencesGroup(title=T("logs_old"))
+    grp = pref_group(title=T("logs_old"))
     files = win.logger.list_logs()
     if not files:
-        grp.add(Adw.ActionRow(title=GLib.markup_escape_text(T("logs_none"))))
+        grp.add(plain_row(Adw.ActionRow, title=T("logs_none")))
     for path in files:
         name = os.path.basename(path)
         size_kb = max(1, os.path.getsize(path) // 1024) if os.path.exists(path) else 0
@@ -1936,7 +1953,7 @@ def build_page_library(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None
         if not items:
             continue
         seen_categories.add(cat_id)
-        grp = Adw.PreferencesGroup(title=T(title_key), description=T(sub_key))
+        grp = pref_group(title=T(title_key), description=T(sub_key))
         for item in items:
             _code, status_lbl = detect_software_status(item)
             desc = item.description_fr if UI_LANG == "fr" else item.description_en
@@ -1952,7 +1969,7 @@ def build_page_library(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None
 
     extra = [it for it in SOFTWARE_CATALOG if it.category not in seen_categories]
     if extra:
-        grp = Adw.PreferencesGroup(title=T("lib_title"), description=T("lib_sub"))
+        grp = pref_group(title=T("lib_title"), description=T("lib_sub"))
         for item in extra:
             _code, status_lbl = detect_software_status(item)
             desc = item.description_fr if UI_LANG == "fr" else item.description_en
@@ -1966,7 +1983,7 @@ def build_page_library(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None
             )
         page.add(grp)
 
-    g_ai = Adw.PreferencesGroup(title=T("sec_aidev"), description=T("aidev_open_sub"))
+    g_ai = pref_group(title=T("sec_aidev"), description=T("aidev_open_sub"))
     g_ai.add(
         win.row(
             T("sec_aidev"),
@@ -1981,7 +1998,7 @@ def build_page_library(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None
 def _push_software_actions(win: Ps5ManagerWindow, item: SoftwareItem) -> None:
     code, status_lbl = detect_software_status(item)
     sub = Adw.PreferencesPage()
-    grp = Adw.PreferencesGroup(
+    grp = pref_group(
         title=item.name,
         description=f"{status_lbl}",
     )
@@ -2194,7 +2211,7 @@ def _exec_software_action(
 
 
 def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
-    grp = Adw.PreferencesGroup(title=T("mgr_title"))
+    grp = pref_group(title=T("mgr_title"))
 
     def _do_update():
         def _task(emit):
@@ -2296,7 +2313,7 @@ def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
 
 def build_page_lang(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
-    grp = Adw.PreferencesGroup(title=T("sec_lang"))
+    grp = pref_group(title=T("sec_lang"))
 
     def _view_packs():
         packs = subprocess.run(["rpm", "-qa", "langpacks-*", "glibc-langpack-*"], capture_output=True, text=True).stdout
@@ -2333,10 +2350,10 @@ def _push_full_lang_config(win: Ps5ManagerWindow) -> None:
     keymaps = subprocess.run(["localectl", "list-x11-keymap-layouts"], capture_output=True, text=True).stdout.splitlines() or ["fr", "us", "de", "es"]
 
     sub = Adw.PreferencesPage()
-    grp = Adw.PreferencesGroup(title=T("lang_full"))
+    grp = pref_group(title=T("lang_full"))
 
-    loc_row = Adw.ComboRow(title=GLib.markup_escape_text(T("lang_pick_locale")), model=Gtk.StringList.new(sorted(set(locales))[:80]))
-    kb_row = Adw.ComboRow(title=GLib.markup_escape_text(T("lang_pick_kb")), model=Gtk.StringList.new(sorted(set(keymaps))[:80]))
+    loc_row = plain_row(Adw.ComboRow, title=T("lang_pick_locale"), model=Gtk.StringList.new(sorted(set(locales))[:80]))
+    kb_row = plain_row(Adw.ComboRow, title=T("lang_pick_kb"), model=Gtk.StringList.new(sorted(set(keymaps))[:80]))
     grp.add(loc_row)
     grp.add(kb_row)
 
@@ -2378,7 +2395,7 @@ def _push_full_lang_config(win: Ps5ManagerWindow) -> None:
 
 
 def build_page_repos(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
-    g1 = Adw.PreferencesGroup(title=T("sec_repos"))
+    g1 = pref_group(title=T("sec_repos"))
 
     def _list_all():
         dnf_out = subprocess.run(["dnf", "repolist", "--all"], capture_output=True, text=True).stdout
@@ -2414,7 +2431,7 @@ def build_page_repos(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     )
     page.add(g1)
 
-    g2 = Adw.PreferencesGroup()
+    g2 = pref_group()
     g2.add(
         win.row(
             T("repo_disable"), T("repo_disable_sub"), "action-unavailable-symbolic",
@@ -2488,7 +2505,7 @@ def _remove_dnf_repo_file(win: Ps5ManagerWindow, rid: str) -> None:
 
 
 def build_page_users(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
-    grp = Adw.PreferencesGroup(title=T("sec_users"))
+    grp = pref_group(title=T("sec_users"))
 
     def _list_users():
         lines = []
@@ -2596,7 +2613,7 @@ def _root_status_dialog(win: Ps5ManagerWindow) -> None:
 
 
 def build_page_fedora(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
-    grp = Adw.PreferencesGroup(title=T("sec_fedora"))
+    grp = pref_group(title=T("sec_fedora"))
     grp.add(
         win.row(
             T("fed_apps"), T("fed_apps_sub"), "system-software-install-symbolic",
@@ -2624,7 +2641,7 @@ def build_page_fedora(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
 
 def build_page_maint(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
-    g1 = Adw.PreferencesGroup(title=T("sec_maint"))
+    g1 = pref_group(title=T("sec_maint"))
 
     def _clean_all():
         def _task(emit):
@@ -2755,7 +2772,7 @@ def _clean_old_kernels(win: Ps5ManagerWindow) -> None:
 
 
 def build_page_power(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
-    grp = Adw.PreferencesGroup(title=T("sec_power"))
+    grp = pref_group(title=T("sec_power"))
 
     sys_sleep_enabled = (
         subprocess.run(["systemctl", "is-enabled", "sleep.target"], capture_output=True, text=True).stdout.strip()
@@ -2767,7 +2784,7 @@ def build_page_power(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     ).stdout.strip()
     scr_sleep_enabled = not idle_val.endswith(" 0") and idle_val != "uint32 0"
 
-    sw_sys = Adw.SwitchRow(title=GLib.markup_escape_text(T("pwr_sys")), subtitle=GLib.markup_escape_text(T("pwr_sys_sub")))
+    sw_sys = plain_row(Adw.SwitchRow, title=T("pwr_sys"), subtitle=T("pwr_sys_sub"))
     sw_sys.add_prefix(Gtk.Image.new_from_icon_name("preferences-system-power-symbolic"))
     sw_sys.set_active(sys_sleep_enabled)
 
@@ -2779,7 +2796,7 @@ def build_page_power(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     sw_sys.connect("notify::active", _on_sys_toggle)
     grp.add(sw_sys)
 
-    sw_scr = Adw.SwitchRow(title=GLib.markup_escape_text(T("pwr_scr")), subtitle=GLib.markup_escape_text(T("pwr_scr_sub")))
+    sw_scr = plain_row(Adw.SwitchRow, title=T("pwr_scr"), subtitle=T("pwr_scr_sub"))
     sw_scr.add_prefix(Gtk.Image.new_from_icon_name("video-display-symbolic"))
     sw_scr.set_active(scr_sleep_enabled)
 
@@ -2807,12 +2824,12 @@ def build_page_power(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
 
 def build_page_fan(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
-    grp = Adw.PreferencesGroup(title=T("sec_fan"))
+    grp = pref_group(title=T("sec_fan"))
 
     def _svc_active(name: str) -> bool:
         return subprocess.run(["systemctl", "is-active", name], capture_output=True).returncode == 0
 
-    sw_fan = Adw.SwitchRow(title=GLib.markup_escape_text(T("fan_svc")), subtitle=GLib.markup_escape_text(T("fan_svc_sub")))
+    sw_fan = plain_row(Adw.SwitchRow, title=T("fan_svc"), subtitle=T("fan_svc_sub"))
     sw_fan.add_prefix(Gtk.Image.new_from_icon_name("weather-windy-symbolic"))
     sw_fan.set_active(_svc_active("ps5fan.service"))
     sw_fan.connect(
@@ -2824,7 +2841,7 @@ def build_page_fan(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     )
     grp.add(sw_fan)
 
-    sw_boost = Adw.SwitchRow(title=GLib.markup_escape_text(T("fan_boost")), subtitle=GLib.markup_escape_text(T("fan_boost_sub")))
+    sw_boost = plain_row(Adw.SwitchRow, title=T("fan_boost"), subtitle=T("fan_boost_sub"))
     sw_boost.add_prefix(Gtk.Image.new_from_icon_name("power-profile-performance-symbolic"))
     sw_boost.set_active(_svc_active("ps5boost.service"))
     sw_boost.connect(
@@ -2859,7 +2876,7 @@ def build_page_fan(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
 
 def build_page_hw(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
-    grp = Adw.PreferencesGroup(title=T("sec_hw"))
+    grp = pref_group(title=T("sec_hw"))
 
     def _hw_nodes():
         hwmon = subprocess.run(["ls", "-l", "/sys/class/hwmon/"], capture_output=True, text=True).stdout
@@ -2921,7 +2938,7 @@ def build_page_hw(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
 
 def build_page_mesa(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
-    grp = Adw.PreferencesGroup(title=T("sec_mesa"))
+    grp = pref_group(title=T("sec_mesa"))
 
     def _vulkan_summary(radv_only: bool):
         if not shutil.which("vulkaninfo"):
@@ -2958,7 +2975,7 @@ def _esp_kernel_version() -> str:
 def build_page_kernel(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     cur_k = os.uname().release
     esp_k = _esp_kernel_version() or "—"
-    grp = Adw.PreferencesGroup(
+    grp = pref_group(
         title=T("sec_kernel"),
         description=f"{T('krn_running')}: {cur_k} · {T('krn_esp')}: {esp_k}",
     )
@@ -3051,12 +3068,12 @@ def _push_remove_kernels(win: Ps5ManagerWindow) -> None:
     pkgs = _installed_kernel_packages()
 
     sub = Adw.PreferencesPage()
-    grp = Adw.PreferencesGroup(
+    grp = pref_group(
         title=T("krn_remove"),
         description=f"{T('krn_running')}: {cur_k} · {T('krn_esp')}: {esp_k or '—'}",
     )
     if not pkgs:
-        grp.add(Adw.ActionRow(title="Aucun paquet kernel trouvé."))
+        grp.add(plain_row(Adw.ActionRow, title="Aucun paquet kernel trouvé."))
 
     for nevra, ver in pkgs:
         protected = _is_protected_kernel(ver, cur_k, esp_k)
@@ -3098,9 +3115,9 @@ def _push_boot_kernels(win: Ps5ManagerWindow) -> None:
         reverse=True,
     )
     sub = Adw.PreferencesPage()
-    grp = Adw.PreferencesGroup(title=T("krn_boot"), description=f"{T('krn_running')}: {cur_k}")
+    grp = pref_group(title=T("krn_boot"), description=f"{T('krn_running')}: {cur_k}")
     if not found:
-        grp.add(Adw.ActionRow(title="Aucun kernel dans /boot"))
+        grp.add(plain_row(Adw.ActionRow, title="Aucun kernel dans /boot"))
     for kver in found:
         flags = []
         if kver == cur_k:
@@ -3138,7 +3155,7 @@ def _push_boot_kernels(win: Ps5ManagerWindow) -> None:
 
 def build_page_ui_lang(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     global UI_LANG
-    grp = Adw.PreferencesGroup(title=T("ui_lang_title"), description=T("ui_lang_sub"))
+    grp = pref_group(title=T("ui_lang_title"), description=T("ui_lang_sub"))
 
     def _switch(code: str) -> None:
         global UI_LANG
@@ -3148,7 +3165,7 @@ def build_page_ui_lang(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None
         win.toast(T("fr_label") if code == "fr" else T("en_label"))
 
     for code, lbl_key in (("fr", "fr_label"), ("en", "en_label")):
-        r = Adw.ActionRow(title=T(lbl_key), activatable=True)
+        r = plain_row(Adw.ActionRow, title=T(lbl_key), activatable=True)
         r.add_prefix(Gtk.Image.new_from_icon_name("preferences-desktop-locale-symbolic"))
         if code == UI_LANG:
             r.add_suffix(Gtk.Image.new_from_icon_name("object-select-symbolic"))
@@ -3156,11 +3173,11 @@ def build_page_ui_lang(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None
         grp.add(r)
     page.add(grp)
 
-    g_accent = Adw.PreferencesGroup(
+    g_accent = pref_group(
         title=T("accent_label"),
         description=f"{T('follow_gnome')} ({win.theme_sync.current_accent})",
     )
-    info_row = Adw.ActionRow(
+    info_row = plain_row(Adw.ActionRow,
         title=T("follow_gnome"),
         subtitle=f"org.gnome.desktop.interface accent-color → {win.theme_sync.current_accent}",
     )
@@ -3550,7 +3567,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     installed_models = _ollama_installed_models()
 
     # 1) Outils & Applications IA / Dev
-    g_tools = Adw.PreferencesGroup(title=T("aidev_stack"), description=T("aidev_stack_sub"))
+    g_tools = pref_group(title=T("aidev_stack"), description=T("aidev_stack_sub"))
 
     if ollama_ok:
         ver_str = _ollama_version() or "Ollama"
@@ -3598,11 +3615,11 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     page.add(g_tools)
 
     # 2) Contrôle des services IA
-    g_srv = Adw.PreferencesGroup(title=T("aidev_services"), description=T("aidev_services_sub"))
+    g_srv = pref_group(title=T("aidev_services"), description=T("aidev_services_sub"))
 
-    sw_ollama = Adw.SwitchRow(
-        title=GLib.markup_escape_text("Service Ollama (ollama.service)"),
-        subtitle=GLib.markup_escape_text(
+    sw_ollama = plain_row(Adw.SwitchRow,
+        title="Service Ollama (ollama.service)",
+        subtitle=(
             "Démarrer / arrêter le serveur IA (port 11434)"
             if UI_LANG == "fr"
             else "Start / stop local AI server (port 11434)"
@@ -3640,11 +3657,11 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     sw_ollama.connect("notify::active", _toggle_ollama)
     g_srv.add(sw_ollama)
 
-    sw_boot = Adw.SwitchRow(
-        title=GLib.markup_escape_text(
+    sw_boot = plain_row(Adw.SwitchRow,
+        title=(
             "Démarrage automatique Ollama au boot" if UI_LANG == "fr" else "Start Ollama automatically at boot"
         ),
-        subtitle=GLib.markup_escape_text("systemctl enable / disable ollama"),
+        subtitle="systemctl enable / disable ollama",
     )
     sw_boot.add_prefix(Gtk.Image.new_from_icon_name("preferences-system-time-symbolic"))
     sw_boot.set_active(ollama_boot)
@@ -3669,9 +3686,9 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     sw_boot.connect("notify::active", _toggle_ollama_boot)
     g_srv.add(sw_boot)
 
-    sw_webui = Adw.SwitchRow(
-        title=GLib.markup_escape_text("Conteneur Open WebUI (Podman)"),
-        subtitle=GLib.markup_escape_text("podman start / stop open-webui"),
+    sw_webui = plain_row(Adw.SwitchRow,
+        title="Conteneur Open WebUI (Podman)",
+        subtitle="podman start / stop open-webui",
     )
     sw_webui.add_prefix(Gtk.Image.new_from_icon_name("network-server-symbolic"))
     sw_webui.set_active(webui_st == "running")
@@ -3847,7 +3864,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     page.add(g_srv)
 
     # 3) Modèles IA locaux
-    g_mod = Adw.PreferencesGroup(title=T("aidev_models"), description=T("aidev_models_sub"))
+    g_mod = pref_group(title=T("aidev_models"), description=T("aidev_models_sub"))
     if installed_models:
         preview = ", ".join(list(installed_models.keys())[:4])
         if len(installed_models) > 4:
@@ -3913,7 +3930,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     page.add(g_mod)
 
     # 4) Propositions utiles pour PS5 Linux
-    g_ext = Adw.PreferencesGroup(title=T("aidev_extras"), description=T("aidev_extras_sub"))
+    g_ext = pref_group(title=T("aidev_extras"), description=T("aidev_extras_sub"))
 
     def _hw_ai_diag():
         cmd = (
@@ -4038,7 +4055,7 @@ def _remove_openwebui_desktop_entry(win: Ps5ManagerWindow, emit: Callable[[str],
 def _push_ollama_actions(win: Ps5ManagerWindow) -> None:
     installed = _ollama_installed()
     sub = Adw.PreferencesPage()
-    grp = Adw.PreferencesGroup(
+    grp = pref_group(
         title="Ollama",
         description=_ollama_version() if installed else "Non installé · pciutils + install.sh",
     )
@@ -4117,7 +4134,7 @@ def _push_webui_actions(win: Ps5ManagerWindow) -> None:
     st, owner = _podman_webui_context()
     has_desktop = os.path.isfile(OPENWEBUI_DESKTOP_PATH) and os.path.isfile(OPENWEBUI_ICON_PATH)
     sub = Adw.PreferencesPage()
-    grp = Adw.PreferencesGroup(
+    grp = pref_group(
         title="Open WebUI (Podman)",
         description=f"État : {st} ({owner}) · Icône GNOME : {'installée' if has_desktop else 'absente'}",
     )
@@ -4246,7 +4263,7 @@ def _push_webui_actions(win: Ps5ManagerWindow) -> None:
 def _push_vscodium_actions(win: Ps5ManagerWindow) -> None:
     installed = _vscodium_installed()
     sub = Adw.PreferencesPage()
-    grp = Adw.PreferencesGroup(
+    grp = pref_group(
         title="VSCodium",
         description=T("installed_rpm") if installed else T("not_installed"),
     )
@@ -4310,14 +4327,14 @@ def _push_ai_models(win: Ps5ManagerWindow) -> None:
     sub = Adw.PreferencesPage()
 
     # 1) Modèles déjà installés sur le système (incluant modèles personnalisés)
-    g_inst = Adw.PreferencesGroup(
+    g_inst = pref_group(
         title="Modèles installés sur le système" if UI_LANG == "fr" else "Installed models on system",
         description=f"{len(installed)} modèle(s) · {len(running)} actif(s) en RAM",
     )
     if not _ollama_installed():
-        g_inst.add(Adw.ActionRow(title=GLib.markup_escape_text("Ollama n'est pas installé (sera installé au premier pull).")))
+        g_inst.add(plain_row(Adw.ActionRow, title="Ollama n'est pas installé (sera installé au premier pull)."))
     elif not installed:
-        g_inst.add(Adw.ActionRow(title=GLib.markup_escape_text("Aucun modèle installé pour le moment.")))
+        g_inst.add(plain_row(Adw.ActionRow, title="Aucun modèle installé pour le moment."))
     else:
         for name, size in installed.items():
             state = "Actif en RAM" if name in running else "Installé"
@@ -4350,7 +4367,7 @@ def _push_ai_models(win: Ps5ManagerWindow) -> None:
     sub.add(g_inst)
 
     # 2) Catalogue rapide des modèles demandés
-    g_cat = Adw.PreferencesGroup(
+    g_cat = pref_group(
         title="Catalogue des modèles recommandés" if UI_LANG == "fr" else "Recommended models catalog",
         description="Cliquez sur un modèle pour le télécharger, mettre à jour, stopper ou supprimer",
     )
@@ -4421,7 +4438,7 @@ def _push_model_actions(win: Ps5ManagerWindow, model_name: str) -> None:
     status = "Actif en RAM" if is_run else (f"Installé ({installed[model_name]})" if is_inst else "Non installé")
 
     sub = Adw.PreferencesPage()
-    grp = Adw.PreferencesGroup(title=model_name, description=status)
+    grp = pref_group(title=model_name, description=status)
 
     grp.add(
         win.row(
