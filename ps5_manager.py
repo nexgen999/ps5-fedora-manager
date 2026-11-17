@@ -3,9 +3,9 @@
 """
 PS5 Fedora Manager — GTK4 / Libadwaita (PyGObject)
 ==================================================
-Conversion native complète de ps5-manager.sh vers GTK4 + Libadwaita.
-- Couvre les 14 catégories (Journal, Logithèque, Manager, Langues, Dépôts,
-  Utilisateurs, Mises à jour Fedora, Maintenance, Alimentation, Ventilateur,
+Interface native GTK4 + Libadwaita.
+- Couvre les 15 sections (Journal, Logithèque, IA & Développeur, Manager, Langues,
+  Dépôts, Utilisateurs, Mises à jour Fedora, Maintenance, Alimentation, Ventilateur,
   Hardware Control, Mesa/Vulkan, Kernel PS5, Langue de l'interface).
 - Synchronisation dynamique de la couleur d'accentuation système GNOME
   (Adw.StyleManager + GSettings/dconf de l'utilisateur réel même sous pkexec).
@@ -36,7 +36,7 @@ from dataclasses import dataclass
 from typing import Any, Callable, Optional
 
 # ------------------------------------------------------------------------------
-# Constantes & URLs (identiques à ps5-manager.sh)
+# Constantes & URLs
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Manager"
@@ -236,7 +236,6 @@ def apply_install_permissions() -> None:
             p for p in (
                 INSTALL_DIR,
                 "/usr/local/bin/ps5-manager",
-                "/usr/local/bin/ps5-manager-gui",
                 "/usr/share/applications/ps5-manager.desktop",
                 "/usr/share/pixmaps/ps5-manager.png",
                 POLKIT_POLICY_PATH,
@@ -560,7 +559,7 @@ class SystemThemeSync:
 
 
 # ------------------------------------------------------------------------------
-# Traductions FR / EN (100% fidèles à ps5-manager.sh + UI Libadwaita)
+# Traductions FR / EN (UI Libadwaita)
 # ------------------------------------------------------------------------------
 STRINGS = {
     "fr": {
@@ -569,7 +568,6 @@ STRINGS = {
         "system_info": "Système",
         "accent_label": "Couleur d'accentuation GNOME",
         "follow_gnome": "Synchronisée avec GNOME",
-        "classic_zenity": "Ouvrir l'interface Zenity",
         "about": "À propos de PS5 Manager",
         "confirm": "Confirmer",
         "cancel": "Annuler",
@@ -764,7 +762,6 @@ STRINGS = {
         "system_info": "System",
         "accent_label": "GNOME Accent Color",
         "follow_gnome": "Synced with GNOME",
-        "classic_zenity": "Open Zenity Interface",
         "about": "About PS5 Manager",
         "confirm": "Confirm",
         "cancel": "Cancel",
@@ -1372,7 +1369,7 @@ class TextLogWindow(Adw.Window):
 
 
 # ------------------------------------------------------------------------------
-# Définition des 14 sections de la barre latérale
+# Définition des 15 sections de la barre latérale
 # ------------------------------------------------------------------------------
 SECTIONS = [
     # Groupe 1
@@ -1450,7 +1447,6 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         menu_btn = Gtk.MenuButton(icon_name="open-menu-symbolic")
         menu_model = Gio.Menu()
         menu_model.append(T("system_info"), "win.show-sysinfo")
-        menu_model.append(T("classic_zenity"), "win.open-classic")
         menu_model.append(T("about"), "win.show-about")
         menu_btn.set_menu_model(menu_model)
         header.pack_end(menu_btn)
@@ -1513,10 +1509,6 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         act_sys = Gio.SimpleAction.new("show-sysinfo", None)
         act_sys.connect("activate", lambda *_: self._show_sysinfo())
         self.add_action(act_sys)
-
-        act_classic = Gio.SimpleAction.new("open-classic", None)
-        act_classic.connect("activate", lambda *_: self._open_classic_zenity())
-        self.add_action(act_classic)
 
         act_about = Gio.SimpleAction.new("show-about", None)
         act_about.connect("activate", lambda *_: self._show_about())
@@ -1800,20 +1792,6 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         )
         self.show_info(T("system_info"), body)
 
-    def _open_classic_zenity(self) -> None:
-        sh_path = "/opt/ps5-manager/ps5-manager.sh"
-        if not os.path.isfile(sh_path):
-            sh_path = "/usr/local/bin/ps5-manager"
-        if os.path.isfile(sh_path):
-            subprocess.Popen(
-                [sh_path],
-                env=dict(os.environ, PS5_MANAGER_ELEVATED="1"),
-                start_new_session=True,
-            )
-            self.toast(T("classic_zenity"))
-        else:
-            self.show_info(T("classic_zenity"), f"{sh_path} introuvable.")
-
     def _show_about(self) -> None:
         if hasattr(Adw, "AboutDialog"):
             about = Adw.AboutDialog(
@@ -1830,7 +1808,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
 
 
 # ------------------------------------------------------------------------------
-# Builders des 14 pages
+# Builders des 15 pages
 # ------------------------------------------------------------------------------
 def build_page_logs(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     g1 = Adw.PreferencesGroup(title=T("logs_group_main"))
@@ -2207,7 +2185,7 @@ def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
             # Détecte le point d'entrée GTK4 dans le dépôt cloné
             script_src = None
-            for cand in ("ps5_manager.py", "ps5-manager.py", "ps5-manager-gui.py"):
+            for cand in ("ps5_manager.py", "ps5-manager.py"):
                 cand_path = os.path.join(INSTALL_DIR, cand)
                 if os.path.isfile(cand_path):
                     script_src = cand
@@ -2227,9 +2205,6 @@ def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
                     rc_inst = win.run_cmd_pty(["install", "-o", "root", "-g", "root", "-m", mode, p, dst], emit)
                     if rc_inst != 0:
                         return False, T("failed") % rc_inst
-
-            if os.path.isfile("/usr/local/bin/ps5-manager"):
-                win.run_cmd_pty(["ln", "-sf", "/usr/local/bin/ps5-manager", "/usr/local/bin/ps5-manager-gui"], emit)
 
             apply_install_permissions()
             win.run_cmd_pty(["update-desktop-database", "/usr/share/applications/"], emit)
@@ -2266,7 +2241,6 @@ def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         for target in (
             INSTALL_DIR,
             "/usr/local/bin/ps5-manager",
-            "/usr/local/bin/ps5-manager-gui",
             "/usr/share/applications/ps5-manager.desktop",
             "/usr/share/pixmaps/ps5-manager.png",
             POLKIT_POLICY_PATH,

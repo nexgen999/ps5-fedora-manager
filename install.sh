@@ -27,7 +27,6 @@ else
 fi
 
 sudo install -o root -g root -m 0755 "$INSTALL_DIR/ps5_manager.py" /usr/local/bin/ps5-manager
-sudo ln -sf /usr/local/bin/ps5-manager /usr/local/bin/ps5-manager-gui
 
 if [ -f "$SCRIPT_DIR/ps5-manager.desktop" ]; then
     sudo install -o root -g root -m 0644 "$SCRIPT_DIR/ps5-manager.desktop" /usr/share/applications/ps5-manager.desktop
@@ -68,7 +67,6 @@ if command -v restorecon >/dev/null 2>&1; then
     sudo restorecon -RF \
         "$INSTALL_DIR" \
         /usr/local/bin/ps5-manager \
-        /usr/local/bin/ps5-manager-gui \
         /usr/share/applications/ps5-manager.desktop \
         "$POLKIT_POLICY" \
         /etc/ps5-manager \

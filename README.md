@@ -97,7 +97,6 @@ sudo ./install.sh
 sudo rm -rf \
   /opt/ps5-manager \
   /usr/local/bin/ps5-manager \
-  /usr/local/bin/ps5-manager-gui \
   /usr/share/applications/ps5-manager.desktop \
   /usr/share/pixmaps/ps5-manager.png \
   /usr/share/polkit-1/actions/io.github.nexgen999.ps5-manager.policy
