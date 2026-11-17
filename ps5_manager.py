@@ -39,8 +39,8 @@ from typing import Any, Callable, Optional
 # Constantes & URLs
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
-APP_NAME = "PS5 Manager"
-APP_VERSION = "2.1.0"
+APP_NAME = "PS5 Fedora Manager"
+APP_VERSION = "0.1"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -229,6 +229,19 @@ def apply_install_permissions() -> None:
                     os.chmod(fp, mode)
                 except OSError:
                     pass
+
+    # Fichiers installés hors de INSTALL_DIR : propriétaire et droits stricts
+    for path, mode in (
+        ("/usr/local/bin/ps5-manager", 0o755),
+        ("/usr/share/applications/ps5-manager.desktop", 0o644),
+        ("/usr/share/pixmaps/ps5-manager.png", 0o644),
+    ):
+        if os.path.exists(path):
+            try:
+                os.chown(path, 0, 0)
+                os.chmod(path, mode)
+            except OSError:
+                pass
 
     ensure_polkit_policy()
 
@@ -611,12 +624,12 @@ class SystemThemeSync:
 # ------------------------------------------------------------------------------
 STRINGS = {
     "fr": {
-        "app_title": "PS5 Manager",
+        "app_title": "PS5 Fedora Manager",
         "search_placeholder": "Rechercher une option ou un logiciel…",
         "system_info": "Système",
         "accent_label": "Couleur d'accentuation GNOME",
         "follow_gnome": "Synchronisée avec GNOME",
-        "about": "À propos de PS5 Manager",
+        "about": "À propos de PS5 Fedora Manager",
         "confirm": "Confirmer",
         "cancel": "Annuler",
         "ok": "Valider",
@@ -679,7 +692,7 @@ STRINGS = {
         "format_rpm": "RPM (dépôt officiel)",
         "format_flatpak": "Flatpak (Flathub)",
         # 1. Manager
-        "mgr_title": "Gestionnaire PS5 Fedora",
+        "mgr_title": "PS5 Fedora Manager",
         "mgr_update": "Mettre à jour le manager + ses dépendances",
         "mgr_update_sub": "git fetch + reset depuis GitHub et installation dans /opt/ps5-manager",
         "mgr_uninstall": "Désinstaller complètement le manager",
@@ -805,12 +818,12 @@ STRINGS = {
         "aidev_extras_sub": "Vérification RAM/GPU, nettoyage Podman et persistance",
     },
     "en": {
-        "app_title": "PS5 Manager",
+        "app_title": "PS5 Fedora Manager",
         "search_placeholder": "Search an option or software…",
         "system_info": "System",
         "accent_label": "GNOME Accent Color",
         "follow_gnome": "Synced with GNOME",
-        "about": "About PS5 Manager",
+        "about": "About PS5 Fedora Manager",
         "confirm": "Confirm",
         "cancel": "Cancel",
         "ok": "Apply",
@@ -1070,7 +1083,7 @@ class SessionLogger:
             with open(path, "w", encoding="utf-8") as fh:
                 os.chmod(path, 0o644)
                 fh.write(
-                    f"════ PS5 Manager — {datetime.datetime.now():%F %T} — utilisateur : {REAL_USER} — PID {os.getpid()}\n"
+                    f"════ PS5 Fedora Manager — {datetime.datetime.now():%F %T} — utilisateur : {REAL_USER} — PID {os.getpid()}\n"
                 )
                 fh.write(f"système : {' '.join(os.uname()[:3])}\n")
             latest = os.path.join(LOG_DIR, "latest.log")
@@ -1845,18 +1858,60 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         self.show_info(T("system_info"), body)
 
     def _show_about(self) -> None:
-        if hasattr(Adw, "AboutDialog"):
-            about = Adw.AboutDialog(
-                application_name=APP_NAME,
-                application_icon="applications-system-symbolic",
-                version=f"{APP_VERSION} (GTK4 / Libadwaita)",
-                developer_name="nexgen999",
-                website="https://github.com/nexgen999/ps5-fedora-manager",
-                comments="Gestionnaire système, matériel et logiciels pour Fedora sur PS5.",
-            )
-            about.present(self)
-        else:
-            self.show_info(APP_NAME, "PS5 Fedora Manager — GTK4 / Libadwaita (nexgen999)")
+        debug_info = (
+            f"Version : {APP_VERSION}\n"
+            f"GTK {Gtk.get_major_version()}.{Gtk.get_minor_version()}.{Gtk.get_micro_version()}\n"
+            f"Libadwaita {Adw.MAJOR_VERSION}.{Adw.MINOR_VERSION}.{Adw.MICRO_VERSION}\n"
+            f"Python {sys.version.split()[0]}\n"
+            f"Fichier : {os.path.abspath(sys.argv[0])}"
+        )
+        # Vrai logo de l'application, repli sur une icône symbolique s'il est absent
+        icon_name = "ps5-manager"
+        display = Gdk.Display.get_default()
+        if display is not None and not Gtk.IconTheme.get_for_display(display).has_icon(icon_name):
+            icon_name = "applications-system-symbolic"
+
+        if not hasattr(Adw, "AboutDialog"):
+            self.show_info(APP_NAME, f"{APP_NAME} {APP_VERSION} — GTK4 / Libadwaita (nexgen999)")
+            return
+
+        about = Adw.AboutDialog(
+            application_name=APP_NAME,
+            application_icon=icon_name,
+            version=APP_VERSION,
+            developer_name="nexgen999",
+            developers=["nexgen999"],
+            copyright="© 2026 nexgen999",
+            website="https://github.com/nexgen999/ps5-fedora-manager",
+            issue_url="https://github.com/nexgen999/ps5-fedora-manager/issues",
+            comments=(
+                "Gestionnaire système, matériel et logiciels pour Fedora sur PS5."
+                if UI_LANG == "fr"
+                else "System, hardware and software manager for Fedora on PS5."
+            ),
+            debug_info=debug_info,
+            release_notes_version=APP_VERSION,
+            release_notes=(
+                (
+                    "<p>Première version publique de PS5 Fedora Manager.</p>"
+                    "<ul>"
+                    "<li>Interface native GTK4 / Libadwaita, 15 sections</li>"
+                    "<li>Journal en direct et historique sur 14 jours</li>"
+                    "<li>Logithèque, IA et Développeur, kernel PS5, matériel</li>"
+                    "</ul>"
+                )
+                if UI_LANG == "fr"
+                else (
+                    "<p>First public release of PS5 Fedora Manager.</p>"
+                    "<ul>"
+                    "<li>Native GTK4 / Libadwaita interface, 15 sections</li>"
+                    "<li>Live log and 14-day history</li>"
+                    "<li>Software library, AI and developer tools, PS5 kernel, hardware</li>"
+                    "</ul>"
+                )
+            ),
+        )
+        about.present(self)
 
 
 # ------------------------------------------------------------------------------
@@ -2230,7 +2285,22 @@ def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
                 rc = win.run_cmd_pty(["git", "-C", INSTALL_DIR, "fetch", "--all", "--prune"], emit)
                 if rc == 0:
                     rc = win.run_cmd_pty(["git", "-C", INSTALL_DIR, "reset", "--hard", "origin/main"], emit)
+                if rc == 0:
+                    # Fichiers laissés par les anciennes versions (hors suivi git)
+                    win.run_cmd_pty(["git", "-C", INSTALL_DIR, "clean", "-fdx"], emit)
             else:
+                # Ancienne installation non-git : on vide le dossier et on repart proprement
+                if os.path.isdir(INSTALL_DIR):
+                    for entry in os.listdir(INSTALL_DIR):
+                        target = os.path.join(INSTALL_DIR, entry)
+                        try:
+                            if os.path.isdir(target) and not os.path.islink(target):
+                                shutil.rmtree(target, ignore_errors=True)
+                            else:
+                                os.remove(target)
+                        except OSError:
+                            pass
+                os.makedirs(INSTALL_DIR, mode=0o755, exist_ok=True)
                 rc = win.run_cmd_pty(["git", "clone", REPO_URL, INSTALL_DIR], emit)
             if rc != 0:
                 return False, T("failed") % rc
@@ -2262,7 +2332,8 @@ def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
             apply_install_permissions()
             win.run_cmd_pty(["update-desktop-database", "/usr/share/applications/"], emit)
             emit("Droits (root:root, 0755/0644, Polkit GUI, SELinux) appliqués.")
-            emit("Redémarrage automatique de PS5 Manager…")
+            emit(f"{APP_NAME} {APP_VERSION} installé.")
+            emit("Redémarrage automatique de PS5 Fedora Manager…")
             return True, T("done")
 
         def _on_update_done(ok: bool, _msg: str) -> None:
