@@ -333,9 +333,12 @@ def user_env() -> dict[str, str]:
     env = dict(os.environ)
     env["DISPLAY"] = os.environ.get("DISPLAY", ":0")
     if REAL_USER != "root":
+        user_cwd = REAL_HOME if (REAL_HOME and os.path.isdir(REAL_HOME)) else "/tmp"
         env["HOME"] = REAL_HOME
+        env["PWD"] = user_cwd
         env["USER"] = REAL_USER
         env["LOGNAME"] = REAL_USER
+        env.pop("OLDPWD", None)
         for xdg_k in (
             "XDG_CONFIG_HOME",
             "XDG_DATA_HOME",
@@ -343,6 +346,7 @@ def user_env() -> dict[str, str]:
             "XDG_STATE_HOME",
             "CONTAINERS_CONF",
             "CONTAINERS_STORAGE_CONF",
+            "TMPDIR",
         ):
             val = env.get(xdg_k, "")
             if val.startswith("/root"):
@@ -366,10 +370,12 @@ def user_env() -> dict[str, str]:
 def user_subprocess_kwargs() -> dict[str, Any]:
     """Paramètres subprocess pour exécuter directement en tant que REAL_USER sans sudo/PAM."""
     if os.geteuid() == 0 and REAL_USER != "root":
+        user_cwd = REAL_HOME if (REAL_HOME and os.path.isdir(REAL_HOME)) else "/tmp"
         return {
             "user": REAL_UID,
             "group": REAL_GID,
             "extra_groups": REAL_GROUPS,
+            "cwd": user_cwd,
             "env": user_env(),
         }
     return {"env": user_env()}
@@ -3766,12 +3772,20 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
             win.show_info("Podman", "Podman n'est pas installé.")
             return
         chunks: list[str] = []
-        r_usr = _podman_run(["ps", "-a"], owner="user", timeout=10)
-        chunks.append(f"=== podman ps -a ({REAL_USER}) [rc={r_usr.returncode}] ===\n{(r_usr.stdout or r_usr.stderr or '(vide)').strip()}")
+        try:
+            r_usr = _podman_run(["ps", "-a"], owner="user", timeout=12)
+            txt_usr = "\n".join(p for p in (r_usr.stdout.strip(), r_usr.stderr.strip()) if p) or "(vide)"
+            chunks.append(f"=== podman ps -a ({REAL_USER}) [rc={r_usr.returncode}] ===\n{txt_usr}")
+        except Exception as exc:
+            chunks.append(f"=== podman ps -a ({REAL_USER}) ===\nErreur : {exc}")
         if REAL_USER != "root":
-            r_rt = _podman_run(["ps", "-a"], owner="root", timeout=10)
-            if r_rt.stdout.strip():
-                chunks.append(f"\n=== podman ps -a (root) ===\n{r_rt.stdout.strip()}")
+            try:
+                r_rt = _podman_run(["ps", "-a"], owner="root", timeout=12)
+                txt_rt = "\n".join(p for p in (r_rt.stdout.strip(), r_rt.stderr.strip()) if p)
+                if txt_rt:
+                    chunks.append(f"\n=== podman ps -a (root) ===\n{txt_rt}")
+            except Exception:
+                pass
         win.show_text_modal("podman ps -a", "\n".join(chunks))
 
     def _show_webui_logs():
@@ -3780,12 +3794,25 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
             return
         st_now, owner_now = _podman_webui_context()
         if st_now in ("missing", "no_podman"):
-            win.show_info("Open WebUI", "Conteneur open-webui introuvable.")
+            try:
+                r_diag = _podman_run(["ps", "-a"], owner="user", timeout=10)
+                diag = (r_diag.stderr or r_diag.stdout or "").strip()
+            except Exception as exc:
+                diag = str(exc)
+            detail = f"\n\nDiagnostic :\n{diag}" if diag else ""
+            win.show_info("Open WebUI", f"Conteneur open-webui introuvable.{detail}")
             return
         podman = _podman_bin() or "podman"
         kw = user_subprocess_kwargs() if owner_now == "user" else {}
-        res = subprocess.run([podman, "logs", "--tail", "30", "open-webui"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, timeout=10, **kw)
-        win.show_text_modal("podman logs --tail 30 open-webui", res.stdout.strip() or "(aucun log)")
+        try:
+            res = subprocess.run(
+                [podman, "logs", "--tail", "30", "open-webui"],
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, timeout=12, **kw,
+            )
+            out = strip_ansi(res.stdout or "").strip() or "(aucun log)"
+            win.show_text_modal("podman logs --tail 30 open-webui", out)
+        except Exception as exc:
+            win.show_info("podman logs --tail 30 open-webui", f"Erreur : {exc}")
 
     g_srv.add(
         win.row(
@@ -4508,6 +4535,12 @@ class Ps5ManagerApp(Adw.Application):
 
 def main() -> int:
     warnings.simplefilter("ignore", DeprecationWarning)
+    # Quitte /root (défini par pkexec) pour éviter tout EACCES lors des sous-processus utilisateur
+    try:
+        if os.getcwd() == "/root":
+            os.chdir(INSTALL_DIR if os.path.isdir(INSTALL_DIR) else "/tmp")
+    except OSError:
+        pass
     for attr in ("NavigationSplitView", "NavigationView", "PreferencesPage", "ToolbarView"):
         if not hasattr(Adw, attr):
             sys.stderr.write(
