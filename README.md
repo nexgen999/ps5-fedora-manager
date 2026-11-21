@@ -1,4 +1,26 @@
-# PS5 Fedora Manager
+<div align="center">
+
+  <h1>PS5 Fedora Manager</h1>
+
+  <p>
+    <img src="assets/Logo_fedoralogo.png" alt="PS5 Fedora Project Logo" width="180" />
+  </p>
+
+  <p>
+    <a href="https://fedoraproject.org/">
+      <img src="https://img.shields.io/badge/OS-Fedora%2045-blue?logo=fedora" alt="Fedora" />
+    </a>
+    <a href="https://github.com/ps5-linux">
+      <img src="https://img.shields.io/badge/Hardware-PlayStation%205-black?logo=playstation" alt="Hardware" />
+    </a>
+    <a href="LICENSE">
+      <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License" />
+    </a>
+  </p>
+
+</div>
+
+---
 
 Gestionnaire système, matériel et logiciel conçu pour **Fedora Linux (Fedora 45 / GNOME)** sur **PlayStation 5**, doté d'une interface native **Python + PyGObject (GTK4 & Libadwaita)** harmonisée automatiquement avec la couleur d'accentuation et le mode clair/sombre de GNOME.
 
