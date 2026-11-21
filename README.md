@@ -3,7 +3,7 @@
   <h1>PS5 Fedora Manager</h1>
 
   <p>
-    <img src="assets/Logo_fedoralogo.png" alt="PS5 Fedora Project Logo" width="180" />
+    <img src="icon.png" alt="PS5 Fedora Project Logo" width="180" />
   </p>
 
   <p>
