@@ -40,7 +40,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.1"
+APP_VERSION = "0.2"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -58,6 +58,210 @@ HWCON_PREFIX = "/opt/ps5-hwcon-gui"
 HWCON_PLUGIN_INSTALL = (
     "https://raw.githubusercontent.com/NotHavocc/ps5-hwcon-plugin/main/install.sh"
 )
+
+APPIMAGE_APPS = [
+    (
+        "io.github.prateekmedia.appimagepool",
+        "AppImage Pool",
+        "appimage_pool_desc",
+        "https://flathub.org/fr/apps/io.github.prateekmedia.appimagepool",
+    ),
+    (
+        "it.mijorus.gearlever",
+        "Gear Lever",
+        "appimage_gear_desc",
+        "https://flathub.org/fr/apps/it.mijorus.gearlever",
+    ),
+]
+
+# Scripts Gamescope / session Steam (lances en root, __USER__/__HOME__ substitues)
+GAMING_INSTALL_SCRIPT = r'''#!/bin/bash
+# Gamescope / session Steam Big Picture (PS5 Fedora)
+set -u
+U="__USER__"
+H="__HOME__"
+
+step() { printf '\n==> %s\n' "$*"; }
+fail() { printf '  x %s\n' "$*" >&2; exit 1; }
+
+[ "$(id -u)" -eq 0 ] || fail "root requis"
+id "$U" >/dev/null 2>&1 || fail "utilisateur inconnu : $U"
+
+step "AccountsService : session GNOME pour $U"
+AS="/var/lib/AccountsService/users/$U"
+mkdir -p "$(dirname "$AS")"
+if [ -f "$AS" ]; then
+  sed -i 's/^Session=.*/Session=gnome/' "$AS"
+  grep -q '^Session=' "$AS" || sed -i '1i Session=gnome' "$AS"
+else
+  printf '[User]\nSession=gnome\n' > "$AS"
+fi
+passwd -u "$U" >/dev/null 2>&1 || true
+
+step "GDM : auto-connexion de $U"
+mkdir -p /etc/gdm
+GDM="/etc/gdm/custom.conf"
+if [ -f "$GDM" ]; then
+  cp -f "$GDM" "$GDM.bak-ps5-manager"
+else
+  printf '# GDM configuration storage\n\n[daemon]\n\n[security]\n\n[xdmcp]\n\n[chooser]\n\n[debug]\n#Enable=true\n' > "$GDM"
+fi
+python3 - "$GDM" "$U" <<'PY'
+import io, re, sys
+path, user = sys.argv[1], sys.argv[2]
+lines = [l for l in io.open(path, encoding="utf-8").read().splitlines()
+         if not re.match(r"\s*AutomaticLogin(Enable)?\s*=", l)]
+try:
+    i = next(n for n, l in enumerate(lines) if l.strip() == "[daemon]")
+except StopIteration:
+    lines.insert(0, "[daemon]")
+    i = 0
+lines[i + 1:i + 1] = ["AutomaticLoginEnable=True", "AutomaticLogin=" + user]
+io.open(path, "w", encoding="utf-8").write("\n".join(lines) + "\n")
+PY
+
+step "GDM : facteur d'echelle 1.5 (dconf)"
+mkdir -p /etc/dconf/profile /etc/dconf/db/gdm.d
+printf 'user-db:user\nsystem-db:gdm\n' > /etc/dconf/profile/gdm
+printf '[org/gnome/desktop/interface]\ntext-scaling-factor=1.5\n' > /etc/dconf/db/gdm.d/00-scaling
+dconf update >/dev/null 2>&1 || true
+
+step "Session Steam + Gamescope (guide shahnawazshahin)"
+dnf install -y git >/dev/null || fail "installation de git impossible"
+rm -rf /tmp/gamescope-guide
+git clone --depth 1 https://github.com/shahnawazshahin/steam-using-gamescope-guide.git /tmp/gamescope-guide >/dev/null 2>&1 \
+  || fail "clone du guide impossible"
+( cd /tmp/gamescope-guide && bash ./installer.sh ) || fail "installer.sh du guide a echoue"
+
+step "sudoers : bascule de session sans mot de passe"
+mkdir -p /etc/sudoers.d
+printf '%s ALL=(ALL) NOPASSWD: /usr/local/bin/switch-session, /usr/bin/steamos-session-select, /usr/bin/systemd-run *\n' "$U" \
+  > /etc/sudoers.d/ps5-session
+chmod 440 /etc/sudoers.d/ps5-session
+if command -v visudo >/dev/null; then
+  visudo -c -f /etc/sudoers.d/ps5-session >/dev/null || fail "regle sudoers invalide"
+fi
+
+step "/usr/local/bin/switch-session"
+cat > /usr/local/bin/switch-session <<'SH'
+#!/bin/bash
+USER_ID=$(id -u __USER__)
+CURRENT=$(busctl get-property org.freedesktop.Accounts /org/freedesktop/Accounts/User$USER_ID org.freedesktop.Accounts.User Session | awk -F'"' '{print $2}')
+if [ "$CURRENT" = "steam" ]; then TARGET="gnome"; else TARGET="steam"; fi
+sudo systemd-run --quiet --collect bash -c "busctl call org.freedesktop.Accounts /org/freedesktop/Accounts/User$USER_ID org.freedesktop.Accounts.User SetSession s '$TARGET' && loginctl terminate-user __USER__ && sleep 2 && systemctl restart gdm"
+SH
+chmod 755 /usr/local/bin/switch-session
+
+step "/usr/bin/steamos-session-select (retour au bureau)"
+cat > /usr/bin/steamos-session-select <<'SH'
+#!/bin/bash
+USER_ID=$(id -u __USER__)
+sudo systemd-run --quiet --collect bash -c "busctl call org.freedesktop.Accounts /org/freedesktop/Accounts/User$USER_ID org.freedesktop.Accounts.User SetSession s 'gnome' && loginctl terminate-user __USER__ && sleep 2 && systemctl restart gdm"
+SH
+chmod 755 /usr/bin/steamos-session-select
+
+step "Raccourcis (menu des applications + bureau)"
+APP_DIR="$H/.local/share/applications"
+mkdir -p "$APP_DIR"
+cat > "$APP_DIR/switch-session.desktop" <<'DESK'
+[Desktop Entry]
+Type=Application
+Name=__DESK_NAME__
+Comment=GNOME / Steam Big Picture
+Exec=/usr/local/bin/switch-session
+Icon=steam
+Terminal=false
+Categories=Game;Utility;
+DESK
+chmod 755 "$APP_DIR/switch-session.desktop"
+for d in Bureau Desktop; do
+  if [ -d "$H/$d" ]; then
+    cp -f "$APP_DIR/switch-session.desktop" "$H/$d/"
+    chown "$U": "$H/$d/switch-session.desktop" 2>/dev/null || true
+  fi
+done
+chown -R "$U": "$APP_DIR" 2>/dev/null || true
+if command -v update-desktop-database >/dev/null; then
+  update-desktop-database "$APP_DIR" >/dev/null 2>&1 || true
+fi
+
+printf '\nTermine : redemarre la console pour arriver sur la session Steam.\n'
+'''
+GAMING_UNINSTALL_SCRIPT = r'''#!/bin/bash
+# Desinstallation Gamescope / bascule GNOME <-> Steam (PS5 Fedora)
+set -u
+U="__USER__"
+H="__HOME__"
+USER_ID=$(id -u "$U" 2>/dev/null || true)
+
+step() { printf '\n==> %s\n' "$*"; }
+
+step "Scripts de session Gamescope / Steam"
+rm -f /usr/local/bin/switch-session /usr/bin/steamos-session-select \
+      /usr/bin/gamescope-session /usr/bin/jupiter-biosupdate \
+      /usr/bin/steamos-select-branch /usr/bin/steamos-update
+rm -f /usr/bin/steamos-polkit-helpers/jupiter-biosupdate \
+      /usr/bin/steamos-polkit-helpers/steamos-update \
+      /usr/bin/steamos-polkit-helpers/steamos-set-timezone
+rmdir /usr/bin/steamos-polkit-helpers 2>/dev/null || true
+rm -f /usr/share/wayland-sessions/steam.desktop
+
+step "Regle sudoers"
+rm -f /etc/sudoers.d/ps5-session
+
+step "Raccourcis"
+rm -f "$H/.local/share/applications/switch-session.desktop" \
+      "$H/Bureau/switch-session.desktop" "$H/Desktop/switch-session.desktop" \
+      "$H/.local/share/applications/mode-gaming.desktop"
+if command -v update-desktop-database >/dev/null; then
+  update-desktop-database "$H/.local/share/applications" >/dev/null 2>&1 || true
+fi
+
+step "Session GNOME par defaut"
+if [ -n "$USER_ID" ]; then
+  busctl call org.freedesktop.Accounts /org/freedesktop/Accounts/User$USER_ID \
+    org.freedesktop.Accounts.User SetSession s "gnome" >/dev/null 2>&1 || true
+fi
+AS="/var/lib/AccountsService/users/$U"
+if [ -f "$AS" ]; then
+  sed -i 's/^Session=.*/Session=gnome/' "$AS"
+fi
+
+step "GDM : retrait de l'auto-connexion"
+if [ -f /etc/gdm/custom.conf ]; then
+  sed -i '/^AutomaticLoginEnable=/d;/^AutomaticLogin=/d;/^DefaultSession=/d' /etc/gdm/custom.conf
+fi
+rm -rf /tmp/gamescope-guide
+
+printf '\nDesinstallation terminee : la session GNOME redevient celle par defaut.\n'
+'''
+
+
+def _gaming_script(kind: str) -> str:
+    """Rend le script Gamescope demande pour l'utilisateur courant."""
+    text = GAMING_INSTALL_SCRIPT if kind == "install" else GAMING_UNINSTALL_SCRIPT
+    desk_name = (
+        "Basculer Session (GNOME / Steam)"
+        if UI_LANG == "fr"
+        else "Switch Session (GNOME / Steam)"
+    )
+    return (
+        text.replace("__USER__", REAL_USER)
+        .replace("__HOME__", REAL_HOME or f"/home/{REAL_USER}")
+        .replace("__DESK_NAME__", desk_name)
+    )
+
+
+def open_uri(url: str) -> None:
+    """Ouvre une URL dans le navigateur de l'utilisateur."""
+    launcher = getattr(Gtk, "UriLauncher", None)
+    if launcher is not None:
+        try:
+            launcher.new(url).launch(None, None, None)
+            return
+        except GLib.Error:
+            pass
+    Gtk.show_uri(None, url, Gdk.CURRENT_TIME)
 DECKY_INSTALL = (
     "https://github.com/SteamDeckHomebrew/decky-installer/releases/latest/download/install_release.sh"
 )
@@ -647,6 +851,9 @@ STRINGS = {
         "sec_logs": "Journal / Logs",
         "sec_library": "Logithèque",
         "sec_aidev": "IA & Développeur",
+        "sec_deps": "Dépendances Supplémentaires",
+        "sec_gaming": "Gaming Mode",
+        "sec_fix": "Divers Fix",
         "sec_update": "Mise à jour du manager",
         "sec_lang": "Langues & clavier",
         "sec_repos": "Dépôts",
@@ -790,6 +997,32 @@ STRINGS = {
         "hw_plugin_install_sub": "Récupère les sources, compile et installe dans Decky Loader",
         "hw_plugin_uninstall": "Désinstaller le plugin Hardware Control",
         "hw_plugin_uninstall_confirm": "Supprimer le plugin Hardware Control et redémarrer Decky Loader ?",
+        "deps_group": "Paquets système",
+        "deps_group_sub": "Paquets souvent réclamés par Steam, Proton, Flatpak et les AppImage",
+        "deps_fuse": "Fuse (fusermount)",
+        "deps_fuse_sub": "Pile FUSE : montage de systèmes de fichiers en espace utilisateur (fusermount, AppImage de type extract-and-run, runtimes Flatpak). fuse-libs fournit libfuse.so, utilisée par de nombreux outils.",
+        "deps_steam32": "Steam — pilotes graphiques 32 bits",
+        "deps_steam32_sub": "Mesa Vulkan et DRI 32 bits + VA-API 32 bits : sans eux, Steam, Proton/Wine et les jeux 32 bits perdent l'accélération graphique et le décodage vidéo matériel.",
+        "gaming_group": "Gamescope / session Steam Big Picture",
+        "gaming_group_sub": "Session Steam + bascule GNOME / Steam sur le compte courant (redémarrage nécessaire)",
+        "gaming_install": "Installer Gamescope",
+        "gaming_install_sub": "Session Steam Big Picture, auto-connexion GDM, bascule GNOME/Steam et raccourcis",
+        "gaming_uninstall": "Désinstaller Gamescope",
+        "gaming_uninstall_confirm": "Supprimer la session Gamescope, la bascule GNOME/Steam, la règle sudoers et les raccourcis ?",
+        "fix_group": "Steam",
+        "fix_group_sub": "Réparations rapides quand Steam se bloque",
+        "fix_steam": "Relancer Steam",
+        "fix_steam_sub": "Tue tous les processus Steam (pkill -9 steam) puis relance Steam : corrige une fenêtre noire, un « Steam is already running » ou un client resté en arrière-plan.",
+        "fix_steam_confirm": "Fermer brutalement tous les processus Steam puis relancer Steam ?",
+        "lib_appimage_group": "Gestion d'AppImage",
+        "lib_appimage_group_sub": "AppImage Pool et Gear Lever, installés depuis Flathub",
+        "appimage_pool_desc": "Parcourir AppImageHub et installer des AppImage en quelques clics (io.github.prateekmedia.appimagepool).",
+        "appimage_gear_desc": "Intègre les AppImage au menu des applications : icône, mises à jour et gestion des versions (it.mijorus.gearlever).",
+        "appimage_install": "Installer",
+        "appimage_update": "Mettre à jour",
+        "appimage_uninstall": "Désinstaller",
+        "appimage_uninstall_confirm": "Désinstaller %s (flatpak) ?",
+        "appimage_flathub": "Ouvrir la page Flathub",
         # 10. Mesa / Vulkan
         "mesa_tools": "Installer les outils Vulkan & Mesa demos",
         "mesa_tools_sub": "vulkan-tools et mesa-demos",
@@ -847,6 +1080,9 @@ STRINGS = {
         "sec_logs": "Logs",
         "sec_library": "Software library",
         "sec_aidev": "AI & Developer",
+        "sec_deps": "Additional Dependencies",
+        "sec_gaming": "Gaming Mode",
+        "sec_fix": "Misc Fixes",
         "sec_update": "Manager update",
         "sec_lang": "Languages & keyboard",
         "sec_repos": "Repositories",
@@ -990,6 +1226,32 @@ STRINGS = {
         "hw_plugin_install_sub": "Fetches sources, builds and installs into Decky Loader",
         "hw_plugin_uninstall": "Uninstall the Hardware Control plugin",
         "hw_plugin_uninstall_confirm": "Remove the Hardware Control plugin and restart Decky Loader?",
+        "deps_group": "System packages",
+        "deps_group_sub": "Packages Steam, Proton, Flatpak and AppImages commonly ask for",
+        "deps_fuse": "Fuse (fusermount)",
+        "deps_fuse_sub": "FUSE stack: user-space filesystem mounting (fusermount, extract-and-run AppImages, Flatpak runtimes). fuse-libs ships libfuse.so, used by many tools.",
+        "deps_steam32": "Steam — 32-bit graphics drivers",
+        "deps_steam32_sub": "32-bit Mesa Vulkan and DRI plus 32-bit VA-API: without them Steam, Proton/Wine and 32-bit games lose GPU acceleration and hardware video decoding.",
+        "gaming_group": "Gamescope / Steam Big Picture session",
+        "gaming_group_sub": "Steam session plus GNOME / Steam switching for the current account (reboot required)",
+        "gaming_install": "Install Gamescope",
+        "gaming_install_sub": "Steam Big Picture session, GDM auto-login, GNOME/Steam switch and shortcuts",
+        "gaming_uninstall": "Uninstall Gamescope",
+        "gaming_uninstall_confirm": "Remove the Gamescope session, the GNOME/Steam switch, the sudoers rule and the shortcuts?",
+        "fix_group": "Steam",
+        "fix_group_sub": "Quick fixes when Steam gets stuck",
+        "fix_steam": "Restart Steam",
+        "fix_steam_sub": "Kills every Steam process (pkill -9 steam) then starts Steam again: fixes a black window, a 'Steam is already running' error or a client left in the background.",
+        "fix_steam_confirm": "Force-close every Steam process and restart Steam?",
+        "lib_appimage_group": "AppImage management",
+        "lib_appimage_group_sub": "AppImage Pool and Gear Lever, installed from Flathub",
+        "appimage_pool_desc": "Browse AppImageHub and install AppImages in a few clicks (io.github.prateekmedia.appimagepool).",
+        "appimage_gear_desc": "Adds AppImages to the application menu: icon, updates and version management (it.mijorus.gearlever).",
+        "appimage_install": "Install",
+        "appimage_update": "Update",
+        "appimage_uninstall": "Uninstall",
+        "appimage_uninstall_confirm": "Uninstall %s (flatpak)?",
+        "appimage_flathub": "Open the Flathub page",
         # 10. Mesa / Vulkan
         "mesa_tools": "Install Vulkan tools & Mesa demos",
         "mesa_tools_sub": "vulkan-tools and mesa-demos",
@@ -1452,6 +1714,8 @@ SECTIONS = [
     ("logs", "utilities-terminal-symbolic", "sec_logs", 1),
     ("library", "system-software-install-symbolic", "sec_library", 1),
     ("aidev", "applications-development-symbolic", "sec_aidev", 1),
+    ("deps", "application-x-addon-symbolic", "sec_deps", 1),
+    ("gaming", "input-gaming-symbolic", "sec_gaming", 1),
     # Groupe 2
     ("update", "software-update-available-symbolic", "sec_update", 2),
     ("lang", "preferences-desktop-locale-symbolic", "sec_lang", 2),
@@ -1465,6 +1729,7 @@ SECTIONS = [
     ("hw", "applications-system-symbolic", "sec_hw", 3),
     ("mesa", "video-display-symbolic", "sec_mesa", 3),
     ("kernel", "drive-harddisk-symbolic", "sec_kernel", 3),
+    ("fix", "view-refresh-symbolic", "sec_fix", 3),
     ("ui_lang", "preferences-desktop-keyboard-symbolic", "sec_ui_lang", 3),
 ]
 
@@ -1908,20 +2173,26 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
             release_notes_version=APP_VERSION,
             release_notes=(
                 (
-                    "<p>Première version publique de PS5 Fedora Manager.</p>"
+                    "<p>Nouveautés de la 0.2</p>"
                     "<ul>"
-                    "<li>Interface native GTK4 / Libadwaita, 15 sections</li>"
-                    "<li>Journal en direct et historique sur 14 jours</li>"
-                    "<li>Logithèque, IA et Développeur, kernel PS5, matériel</li>"
+                    "<li>Gaming Mode : installation et désinstallation de Gamescope / session Steam Big Picture</li>"
+                    "<li>Dépendances Supplémentaires : Fuse et pilotes graphiques 32 bits pour Steam</li>"
+                    "<li>Divers Fix : redémarrage forcé de Steam</li>"
+                    "<li>Gestion d'AppImage dans la Logithèque : AppImage Pool et Gear Lever (Flathub)</li>"
+                    "<li>Hardware Control : installateur passwordless et plugin Decky</li>"
+                    "<li>Interface native GTK4 / Libadwaita, 18 sections</li>"
                     "</ul>"
                 )
                 if UI_LANG == "fr"
                 else (
-                    "<p>First public release of PS5 Fedora Manager.</p>"
+                    "<p>What is new in 0.2</p>"
                     "<ul>"
-                    "<li>Native GTK4 / Libadwaita interface, 15 sections</li>"
-                    "<li>Live log and 14-day history</li>"
-                    "<li>Software library, AI and developer tools, PS5 kernel, hardware</li>"
+                    "<li>Gaming Mode: install and uninstall Gamescope / Steam Big Picture session</li>"
+                    "<li>Additional Dependencies: Fuse and 32-bit graphics drivers for Steam</li>"
+                    "<li>Misc Fixes: forced Steam restart</li>"
+                    "<li>AppImage management in the Software library: AppImage Pool and Gear Lever (Flathub)</li>"
+                    "<li>Hardware Control: passwordless installer and Decky plugin</li>"
+                    "<li>Native GTK4 / Libadwaita interface, 18 sections</li>"
                     "</ul>"
                 )
             ),
@@ -1930,7 +2201,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
 
 
 # ------------------------------------------------------------------------------
-# Builders des 15 pages
+# Builders des 18 pages
 # ------------------------------------------------------------------------------
 def build_page_logs(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     g1 = pref_group(title=T("logs_group_main"))
@@ -2068,6 +2339,54 @@ def build_page_library(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None
         )
     )
     page.add(g_ai)
+
+    for app_id, app_name, desc_key, app_url in APPIMAGE_APPS:
+        g_app = pref_group(title=app_name, description=T(desc_key))
+
+        def _flatpak(action: str, app_id: str = app_id, app_name: str = app_name) -> None:
+            if action == "install":
+                cmd = (
+                    "command -v flatpak >/dev/null || dnf install -y flatpak; "
+                    "flatpak remote-add --if-not-exists flathub "
+                    "https://flathub.org/repo/flathub.flatpakrepo; "
+                    f"flatpak install -y --system flathub {app_id}"
+                )
+            elif action == "update":
+                cmd = f"flatpak update -y {app_id}"
+            else:
+                cmd = f"flatpak uninstall -y --system {app_id}"
+            label = f"{app_name} — {T('appimage_' + action)}"
+            win.run_task(label, lambda e, c=cmd: (win.run_cmd_pty(c, e) == 0, T("done")))
+
+        g_app.add(
+            win.row(
+                T("appimage_install"), app_id, "system-software-install-symbolic",
+                lambda *_, f=_flatpak: f("install"),
+            )
+        )
+        g_app.add(
+            win.row(
+                T("appimage_update"), None, "software-update-available-symbolic",
+                lambda *_, f=_flatpak: f("update"),
+            )
+        )
+        g_app.add(
+            win.row(
+                T("appimage_uninstall"), None, "user-trash-symbolic",
+                lambda *_, n=app_name: win.show_confirm(
+                    f"{n} — {T('appimage_uninstall')}",
+                    T("appimage_uninstall_confirm") % n,
+                    lambda f=_flatpak: f("uninstall"),
+                ),
+            )
+        )
+        g_app.add(
+            win.row(
+                T("appimage_flathub"), app_url, "web-browser-symbolic",
+                lambda *_, u=app_url: open_uri(u),
+            )
+        )
+        page.add(g_app)
 
 
 def _push_software_actions(win: Ps5ManagerWindow, item: SoftwareItem) -> None:
@@ -3057,6 +3376,93 @@ def build_page_hw(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         )
     )
     page.add(grp_plugin)
+
+
+def build_page_deps(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
+    grp = pref_group(title=T("deps_group"), description=T("deps_group_sub"))
+    grp.add(
+        win.row(
+            T("deps_fuse"), T("deps_fuse_sub"), "application-x-addon-symbolic",
+            lambda *_: win.run_task(T("deps_fuse"), lambda e: (
+                win.run_cmd_pty(["dnf", "install", "-y", "fuse", "fuse-libs"], e) == 0,
+                T("done"),
+            )),
+        )
+    )
+    grp.add(
+        win.row(
+            T("deps_steam32"), T("deps_steam32_sub"), "video-display-symbolic",
+            lambda *_: win.run_task(T("deps_steam32"), lambda e: (
+                win.run_cmd_pty(
+                    ["dnf", "install", "-y", "mesa-vulkan-drivers.i686",
+                     "mesa-dri-drivers.i686", "libva.i686"], e,
+                ) == 0,
+                T("done"),
+            )),
+        )
+    )
+    page.add(grp)
+
+
+def build_page_gaming(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
+    def _run_script(kind: str, title: str) -> None:
+        script = _gaming_script(kind)
+
+        def task(emit: Callable[[str], None]) -> tuple[bool, str]:
+            fd, path = tempfile.mkstemp(
+                prefix="ps5-manager-gamescope-", suffix=".sh", dir="/tmp"
+            )
+            with os.fdopen(fd, "w", encoding="utf-8") as fh:
+                fh.write(script)
+            os.chmod(path, 0o700)
+            try:
+                code = win.run_cmd_pty(["bash", path], emit)
+            finally:
+                try:
+                    os.unlink(path)
+                except OSError:
+                    pass
+            return code == 0, (T("done") if code == 0 else T("failed") % code)
+
+        win.run_task(title, task)
+
+    grp = pref_group(title=T("gaming_group"), description=T("gaming_group_sub"))
+    grp.add(
+        win.row(
+            T("gaming_install"), T("gaming_install_sub"), "system-software-install-symbolic",
+            lambda *_: _run_script("install", T("gaming_install")),
+        )
+    )
+    grp.add(
+        win.row(
+            T("gaming_uninstall"), None, "user-trash-symbolic",
+            lambda *_: win.show_confirm(
+                T("gaming_uninstall"), T("gaming_uninstall_confirm"),
+                lambda: _run_script("uninstall", T("gaming_uninstall")),
+            ),
+        )
+    )
+    page.add(grp)
+
+
+def build_page_fix(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
+    grp = pref_group(title=T("fix_group"), description=T("fix_group_sub"))
+    grp.add(
+        win.row(
+            T("fix_steam"), T("fix_steam_sub"), "view-refresh-symbolic",
+            lambda *_: win.show_confirm(
+                T("fix_steam"), T("fix_steam_confirm"),
+                lambda: win.run_task(T("fix_steam"), lambda e: (
+                    win.run_cmd_pty(
+                        "pkill -9 steam 2>/dev/null; nohup steam >/dev/null 2>&1 &",
+                        e, as_user=True,
+                    ) == 0,
+                    T("done"),
+                )),
+            ),
+        )
+    )
+    page.add(grp)
 
 
 def build_page_mesa(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
@@ -4642,6 +5048,8 @@ PAGE_BUILDERS = {
     "logs": build_page_logs,
     "library": build_page_library,
     "aidev": build_page_aidev,
+    "deps": build_page_deps,
+    "gaming": build_page_gaming,
     "update": build_page_update,
     "lang": build_page_lang,
     "repos": build_page_repos,
@@ -4653,6 +5061,7 @@ PAGE_BUILDERS = {
     "hw": build_page_hw,
     "mesa": build_page_mesa,
     "kernel": build_page_kernel,
+    "fix": build_page_fix,
     "ui_lang": build_page_ui_lang,
 }
 
