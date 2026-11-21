@@ -1023,6 +1023,29 @@ STRINGS = {
         "appimage_uninstall": "Désinstaller",
         "appimage_uninstall_confirm": "Désinstaller %s (flatpak) ?",
         "appimage_flathub": "Ouvrir la page Flathub",
+        "deps_python_group": "Python 3",
+        "deps_python_group_sub": "Interpréteur, pip, Tkinter et environnement virtuel",
+        "deps_python": "Python 3 + pip",
+        "deps_python_sub": "python3, python3-pip : interpréteur et gestionnaire de paquets Python.",
+        "deps_python_venv": "Créer l'environnement virtuel my_project",
+        "deps_python_venv_sub": "python3 -m venv my_project puis source my_project/bin/activate (dans le dossier personnel).",
+        "deps_python_venv_ready": "Environnement créé dans %s. Activation dans un terminal :\nsource %s/bin/activate",
+        "deps_python_versions": "Vérifier les versions Python",
+        "deps_python_versions_sub": "Affiche la sortie de python3 --version et pip3 --version.",
+        "deps_tkinter": "Tkinter (python3-tkinter)",
+        "deps_tkinter_sub": "Interface graphique Tk pour Python : IDLE, tkinter, TkAgg de matplotlib.",
+        "deps_node_group": "Node.js / npm",
+        "deps_node_group_sub": "Runtime JavaScript et gestionnaire de paquets",
+        "deps_node_install": "Installer Node.js + npm",
+        "deps_node_install_sub": "nodejs et npm depuis les dépôts Fedora.",
+        "deps_node_update": "Mettre à jour (dépôts Fedora)",
+        "deps_node_update_sub": "dnf upgrade --refresh nodejs npm : corrige les mises à jour mineures.",
+        "deps_node_major": "Passer à la version majeure récente (NodeSource 26 LTS)",
+        "deps_node_major_sub": "Ajoute le dépôt NodeSource 26 LTS puis réinstalle nodejs : nécessaire pour changer de version majeure.",
+        "deps_node_versions": "Vérifier les versions Node.js",
+        "deps_node_versions_sub": "Affiche la sortie de node --version et npm --version.",
+        "deps_node_uninstall": "Désinstaller Node.js + npm",
+        "deps_node_uninstall_confirm": "Supprimer nodejs et npm du système ?",
         # 10. Mesa / Vulkan
         "mesa_tools": "Installer les outils Vulkan & Mesa demos",
         "mesa_tools_sub": "vulkan-tools et mesa-demos",
@@ -1252,6 +1275,29 @@ STRINGS = {
         "appimage_uninstall": "Uninstall",
         "appimage_uninstall_confirm": "Uninstall %s (flatpak)?",
         "appimage_flathub": "Open the Flathub page",
+        "deps_python_group": "Python 3",
+        "deps_python_group_sub": "Interpreter, pip, Tkinter and virtual environment",
+        "deps_python": "Python 3 + pip",
+        "deps_python_sub": "python3, python3-pip: the Python interpreter and package manager.",
+        "deps_python_venv": "Create the my_project virtual environment",
+        "deps_python_venv_sub": "python3 -m venv my_project then source my_project/bin/activate (in your home directory).",
+        "deps_python_venv_ready": "Environment created in %s. To activate it in a terminal:\nsource %s/bin/activate",
+        "deps_python_versions": "Check the Python versions",
+        "deps_python_versions_sub": "Shows the output of python3 --version and pip3 --version.",
+        "deps_tkinter": "Tkinter (python3-tkinter)",
+        "deps_tkinter_sub": "Tk GUI toolkit for Python: IDLE, tkinter, matplotlib's TkAgg backend.",
+        "deps_node_group": "Node.js / npm",
+        "deps_node_group_sub": "JavaScript runtime and package manager",
+        "deps_node_install": "Install Node.js + npm",
+        "deps_node_install_sub": "nodejs and npm from the Fedora repositories.",
+        "deps_node_update": "Update (Fedora repositories)",
+        "deps_node_update_sub": "dnf upgrade --refresh nodejs npm: applies the minor updates.",
+        "deps_node_major": "Move to the recent major version (NodeSource 26 LTS)",
+        "deps_node_major_sub": "Adds the NodeSource 26 LTS repository then reinstalls nodejs: required to switch major version.",
+        "deps_node_versions": "Check the Node.js versions",
+        "deps_node_versions_sub": "Shows the output of node --version and npm --version.",
+        "deps_node_uninstall": "Uninstall Node.js + npm",
+        "deps_node_uninstall_confirm": "Remove nodejs and npm from the system?",
         # 10. Mesa / Vulkan
         "mesa_tools": "Install Vulkan tools & Mesa demos",
         "mesa_tools_sub": "vulkan-tools and mesa-demos",
@@ -2177,6 +2223,8 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
                     "<ul>"
                     "<li>Gaming Mode : installation et désinstallation de Gamescope / session Steam Big Picture</li>"
                     "<li>Dépendances Supplémentaires : Fuse et pilotes graphiques 32 bits pour Steam</li>"
+                    "<li>Python 3 : pip, Tkinter, environnement virtuel my_project et versions installées</li>"
+                    "<li>Node.js / npm : installation, mise à jour, version majeure NodeSource et désinstallation</li>"
                     "<li>Divers Fix : redémarrage forcé de Steam</li>"
                     "<li>Gestion d'AppImage dans la Logithèque : AppImage Pool et Gear Lever (Flathub)</li>"
                     "<li>Hardware Control : installateur passwordless et plugin Decky</li>"
@@ -2189,6 +2237,8 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
                     "<ul>"
                     "<li>Gaming Mode: install and uninstall Gamescope / Steam Big Picture session</li>"
                     "<li>Additional Dependencies: Fuse and 32-bit graphics drivers for Steam</li>"
+                    "<li>Python 3: pip, Tkinter, my_project virtual environment and installed versions</li>"
+                    "<li>Node.js / npm: install, update, NodeSource major version and uninstall</li>"
                     "<li>Misc Fixes: forced Steam restart</li>"
                     "<li>AppImage management in the Software library: AppImage Pool and Gear Lever (Flathub)</li>"
                     "<li>Hardware Control: passwordless installer and Decky plugin</li>"
@@ -3402,6 +3452,119 @@ def build_page_deps(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         )
     )
     page.add(grp)
+
+    def _versions(title: str, cmds: tuple[str, ...]) -> None:
+        blocks = []
+        for cmd in cmds:
+            out = subprocess.run(
+                ["bash", "-c", cmd], capture_output=True, text=True,
+                **user_subprocess_kwargs(),
+            )
+            txt = (out.stdout or out.stderr).strip() or T("not_installed")
+            blocks.append(f"$ {cmd}\n{txt}")
+        win.show_text_modal(title, "\n\n".join(blocks))
+
+    grp_py = pref_group(title=T("deps_python_group"), description=T("deps_python_group_sub"))
+    grp_py.add(
+        win.row(
+            T("deps_python"), T("deps_python_sub"), "applications-development-symbolic",
+            lambda *_: win.run_task(T("deps_python"), lambda e: (
+                win.run_cmd_pty(["dnf", "install", "-y", "python3", "python3-pip"], e) == 0,
+                T("done"),
+            )),
+        )
+    )
+
+    def _venv_task(emit: Callable[[str], None]) -> tuple[bool, str]:
+        code = win.run_cmd_pty(
+            "python3 -m venv my_project && . my_project/bin/activate "
+            "&& python3 --version && pip3 --version",
+            emit,
+            as_user=True,
+        )
+        if code == 0:
+            emit("")
+            emit(T("deps_python_venv_ready") % ("~/my_project", "~/my_project"))
+        return code == 0, (T("done") if code == 0 else T("failed") % code)
+
+    grp_py.add(
+        win.row(
+            T("deps_python_venv"), T("deps_python_venv_sub"), "folder-new-symbolic",
+            lambda *_: win.run_task(T("deps_python_venv"), _venv_task),
+        )
+    )
+    grp_py.add(
+        win.row(
+            T("deps_python_versions"), T("deps_python_versions_sub"), "dialog-information-symbolic",
+            lambda *_: _versions(
+                T("deps_python_versions"), ("python3 --version", "pip3 --version"),
+            ),
+        )
+    )
+    grp_py.add(
+        win.row(
+            T("deps_tkinter"), T("deps_tkinter_sub"), "application-x-addon-symbolic",
+            lambda *_: win.run_task(T("deps_tkinter"), lambda e: (
+                win.run_cmd_pty(["dnf", "install", "-y", "python3-tkinter"], e) == 0,
+                T("done"),
+            )),
+        )
+    )
+    page.add(grp_py)
+
+    grp_node = pref_group(title=T("deps_node_group"), description=T("deps_node_group_sub"))
+    grp_node.add(
+        win.row(
+            T("deps_node_install"), T("deps_node_install_sub"), "system-software-install-symbolic",
+            lambda *_: win.run_task(T("deps_node_install"), lambda e: (
+                win.run_cmd_pty(["dnf", "install", "-y", "nodejs", "npm"], e) == 0,
+                T("done"),
+            )),
+        )
+    )
+    grp_node.add(
+        win.row(
+            T("deps_node_update"), T("deps_node_update_sub"), "software-update-available-symbolic",
+            lambda *_: win.run_task(T("deps_node_update"), lambda e: (
+                win.run_cmd_pty(["dnf", "upgrade", "-y", "--refresh", "nodejs", "npm"], e) == 0,
+                T("done"),
+            )),
+        )
+    )
+    grp_node.add(
+        win.row(
+            T("deps_node_major"), T("deps_node_major_sub"), "software-update-available-symbolic",
+            lambda *_: win.run_task(T("deps_node_major"), lambda e: (
+                win.run_cmd_pty(
+                    "curl -fsSL https://rpm.nodesource.com/setup_26.x | bash - "
+                    "&& dnf install -y nodejs",
+                    e,
+                ) == 0,
+                T("done"),
+            )),
+        )
+    )
+    grp_node.add(
+        win.row(
+            T("deps_node_versions"), T("deps_node_versions_sub"), "dialog-information-symbolic",
+            lambda *_: _versions(
+                T("deps_node_versions"), ("node --version", "npm --version"),
+            ),
+        )
+    )
+    grp_node.add(
+        win.row(
+            T("deps_node_uninstall"), None, "user-trash-symbolic",
+            lambda *_: win.show_confirm(
+                T("deps_node_uninstall"), T("deps_node_uninstall_confirm"),
+                lambda: win.run_task(T("deps_node_uninstall"), lambda e: (
+                    win.run_cmd_pty(["dnf", "remove", "-y", "nodejs", "npm"], e) == 0,
+                    T("done"),
+                )),
+            ),
+        )
+    )
+    page.add(grp_node)
 
 
 def build_page_gaming(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
