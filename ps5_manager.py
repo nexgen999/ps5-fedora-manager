@@ -40,7 +40,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.2"
+APP_VERSION = "0.3"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1066,6 +1066,12 @@ STRINGS = {
         "krn_esp": "Sur /boot/efi",
         "krn_installed": "Installé",
         "krn_protected": "Protégé (actif / boot)",
+        "krn_pick": "Installer un kernel précis (toutes les releases)",
+        "krn_pick_sub": "Télécharge le RPM linux-ps5 de la release choisie : permet de revenir sur un ancien kernel",
+        "krn_pick_empty": "Aucune release récupérée depuis GitHub.",
+        "krn_available": "Non installé",
+        "krn_releases_page": "Ouvrir la page GitHub des releases",
+        "krn_no_rpm": "Cette release ne publie pas de RPM (paquet Arch uniquement).\nChoisissez une version qui propose un .rpm x86_64.",
         # 13. UI Lang
         "ui_lang_title": "Langue de l'interface",
         "ui_lang_sub": "Changement immédiat et mémorisé dans /etc/ps5-manager/language",
@@ -1318,6 +1324,12 @@ STRINGS = {
         "krn_esp": "On /boot/efi",
         "krn_installed": "Installed",
         "krn_protected": "Protected (active / boot)",
+        "krn_pick": "Install a specific kernel (all releases)",
+        "krn_pick_sub": "Downloads the linux-ps5 RPM of the chosen release: lets you roll back to an older kernel",
+        "krn_pick_empty": "No release fetched from GitHub.",
+        "krn_available": "Not installed",
+        "krn_releases_page": "Open the GitHub releases page",
+        "krn_no_rpm": "This release does not publish an RPM (Arch package only).\nPick a version that ships an x86_64 .rpm.",
         # 13. UI Lang
         "ui_lang_title": "Interface language",
         "ui_lang_sub": "Applies immediately and saved to /etc/ps5-manager/language",
@@ -1510,6 +1522,67 @@ def gh_latest_asset(repo: str, pattern: str) -> Optional[str]:
     return None
 
 
+def gh_release_tags(
+    repo: str, prefix: str = "", limit: int = 60, max_pages: int = 8
+) -> list[str]:
+    """Tags des releases du dépôt (les plus récentes d'abord).
+
+    Les pages HTML de GitHub sont parcourues (10 releases par page) afin de
+    proposer aussi les anciens kernels, pas seulement les 10 derniers.
+    """
+    tags: list[str] = []
+
+    def _add(found: list[str]) -> int:
+        added = 0
+        for tag in found:
+            if prefix and not tag.startswith(prefix):
+                continue
+            if tag in tags:
+                continue
+            tags.append(tag)
+            added += 1
+            if len(tags) >= limit:
+                break
+        return added
+
+    for page in range(1, max_pages + 1):
+        url = f"https://github.com/{repo}/releases" + (f"?page={page}" if page > 1 else "")
+        req = urllib.request.Request(url, headers={"User-Agent": "ps5-fedora-manager"})
+        try:
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                html = resp.read().decode("utf-8", errors="replace")
+        except (urllib.error.URLError, OSError):
+            break
+        found = list(dict.fromkeys(re.findall(r"/releases/tag/([^\"<]+)", html)))
+        if not found:
+            break
+        if _add(found) == 0 and tags:
+            break
+        if len(tags) >= limit:
+            break
+    return tags
+
+
+def gh_tag_rpm(repo: str, tag: str) -> tuple[str, str]:
+    """Cherche l'asset RPM d'une release donnée.
+
+    Retourne (état, url) : "ok" (url de l'asset), "norpm" (release sans RPM,
+    par exemple paquet Arch uniquement) ou "error" (GitHub injoignable).
+    """
+    url = f"https://github.com/{repo}/releases/expanded_assets/{tag}"
+    req = urllib.request.Request(url, headers={"User-Agent": "ps5-fedora-manager"})
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            html = resp.read().decode("utf-8", errors="replace")
+    except (urllib.error.URLError, OSError):
+        return "error", ""
+    found = re.findall(rf"/{re.escape(repo)}/releases/download/[^\"]+", html)
+    for match in dict.fromkeys(found):
+        if match.endswith(".rpm"):
+            return "ok", f"https://github.com{match}"
+    return "norpm", ""
+
+
 # ------------------------------------------------------------------------------
 # Modèle Logithèque
 # ------------------------------------------------------------------------------
@@ -1519,6 +1592,8 @@ class SoftwareItem:
     kind: str  # rpm | flatpak | decky | ghrpm | dual
     category: str = "system"  # gaming | browser | system
     rpm_name: str = ""
+    gh_repo: str = ""
+    gh_asset_pattern: str = r"x86_64\.rpm$"
     extra_rpms: tuple[str, ...] = ()
     copr_repo: str = ""
     post_install_user_cmd: tuple[str, ...] = ()
@@ -1611,9 +1686,22 @@ SOFTWARE_CATALOG: list[SoftwareItem] = [
         kind="ghrpm",
         category="system",
         rpm_name="balena-etcher",
+        gh_repo="balena-io/etcher",
+        gh_asset_pattern=r"x86_64\.rpm$",
         description_fr="Écrire des images ISO/IMG sur clé USB (RPM GitHub)",
         description_en="Flash OS images to USB drives (GitHub RPM)",
         icon="drive-removable-media-symbolic",
+    ),
+    SoftwareItem(
+        name="Mister Download Manager",
+        kind="ghrpm",
+        category="system",
+        rpm_name="misterdownloadmanager",
+        gh_repo="anefzaoui/misterdownloadmanager",
+        gh_asset_pattern=r"linux-x86_64\.rpm$",
+        description_fr="Gestionnaire de téléchargements (RPM GitHub)",
+        description_en="Download manager (GitHub RPM)",
+        icon="folder-download-symbolic",
     ),
     SoftwareItem(
         name="Bazaar",
@@ -2219,30 +2307,22 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
             release_notes_version=APP_VERSION,
             release_notes=(
                 (
-                    "<p>Nouveautés de la 0.2</p>"
+                    "<p>Nouveautés de la 0.3</p>"
                     "<ul>"
-                    "<li>Gaming Mode : installation et désinstallation de Gamescope / session Steam Big Picture</li>"
-                    "<li>Dépendances Supplémentaires : Fuse et pilotes graphiques 32 bits pour Steam</li>"
-                    "<li>Python 3 : pip, Tkinter, environnement virtuel my_project et versions installées</li>"
-                    "<li>Node.js / npm : installation, mise à jour, version majeure NodeSource et désinstallation</li>"
-                    "<li>Divers Fix : redémarrage forcé de Steam</li>"
-                    "<li>Gestion d'AppImage dans la Logithèque : AppImage Pool et Gear Lever (Flathub)</li>"
-                    "<li>Hardware Control : installateur passwordless et plugin Decky</li>"
-                    "<li>Interface native GTK4 / Libadwaita, 18 sections</li>"
+                    "<li>Kernel PS5 : liste de toutes les releases GitHub, téléchargement et installation du kernel choisi (retour arrière possible)</li>"
+                    "<li>Logithèque : Mister Download Manager (RPM publié sur GitHub)</li>"
+                    "<li>Fichier CHANGELOG.md avec l'historique complet des versions</li>"
+                    "<li>Dépendances : Python 3 (pip, Tkinter, venv) et Node.js / npm (arrivés en 0.2)</li>"
                     "</ul>"
                 )
                 if UI_LANG == "fr"
                 else (
-                    "<p>What is new in 0.2</p>"
+                    "<p>What is new in 0.3</p>"
                     "<ul>"
-                    "<li>Gaming Mode: install and uninstall Gamescope / Steam Big Picture session</li>"
-                    "<li>Additional Dependencies: Fuse and 32-bit graphics drivers for Steam</li>"
-                    "<li>Python 3: pip, Tkinter, my_project virtual environment and installed versions</li>"
-                    "<li>Node.js / npm: install, update, NodeSource major version and uninstall</li>"
-                    "<li>Misc Fixes: forced Steam restart</li>"
-                    "<li>AppImage management in the Software library: AppImage Pool and Gear Lever (Flathub)</li>"
-                    "<li>Hardware Control: passwordless installer and Decky plugin</li>"
-                    "<li>Native GTK4 / Libadwaita interface, 18 sections</li>"
+                    "<li>PS5 kernel: list every GitHub release, download and install the kernel you pick (roll back any time)</li>"
+                    "<li>Software library: Mister Download Manager (RPM published on GitHub)</li>"
+                    "<li>CHANGELOG.md with the full version history</li>"
+                    "<li>Dependencies: Python 3 (pip, Tkinter, venv) and Node.js / npm (added in 0.2)</li>"
                     "</ul>"
                 )
             ),
@@ -2631,8 +2711,10 @@ def _exec_software_action(
                 return True, T("installed") if fmt == "installed" else T("not_installed")
 
         if kind == "ghrpm":
+            repo = item.gh_repo or "balena-io/etcher"
+            pattern = item.gh_asset_pattern or r"x86_64\.rpm$"
             if action in ("install", "update"):
-                url = gh_latest_asset("balena-io/etcher", r"x86_64\.rpm$")
+                url = gh_latest_asset(repo, pattern)
                 if not url:
                     return False, "RPM introuvable sur GitHub"
                 rc = win.run_cmd_pty(["dnf", "install", "-y", "--setopt=localpkg_gpgcheck=0", url], emit)
@@ -2644,8 +2726,9 @@ def _exec_software_action(
                 inst = subprocess.run(["rpm", "-q", "--qf", "%{VERSION}", item.rpm_name], capture_output=True, text=True)
                 if inst.returncode != 0:
                     return True, T("not_installed")
-                url = gh_latest_asset("balena-io/etcher", r"x86_64\.rpm$") or ""
-                latest = url.split("balena-etcher-")[-1].split("-")[0] if "balena-etcher-" in url else ""
+                url = gh_latest_asset(repo, pattern) or ""
+                m = re.search(r"(\d+\.\d+(?:\.\d+)?)", url.rsplit("/", 1)[-1]) if url else None
+                latest = m.group(1) if m else ""
                 if latest and latest != inst.stdout.strip():
                     return True, f"{inst.stdout.strip()} -> {latest}"
                 return True, f"{inst.stdout.strip()} (à jour)"
@@ -3663,6 +3746,88 @@ def _esp_kernel_version() -> str:
     return ""
 
 
+def _install_kernel_release(win: Ps5ManagerWindow, tag: str, ver: str) -> None:
+    """Télécharge et installe le RPM linux-ps5 de la release GitHub demandée."""
+    if os.uname().machine != "x86_64":
+        win.show_info(T("sec_kernel"), "x86_64 uniquement.")
+        return
+    state, asset_url = gh_tag_rpm(KERNEL_REPO, tag)
+    if state == "norpm":
+        win.show_info(f"Kernel {ver}", T("krn_no_rpm"))
+        return
+    if state == "ok" and asset_url:
+        rpm_url = asset_url
+        rpm_name = os.path.basename(asset_url)
+    else:
+        rpm_name = f"linux-ps5-{ver}-1.x86_64.rpm"
+        rpm_url = f"{KERNEL_BASE}/releases/download/{tag}/{rpm_name}"
+
+    def _do():
+        def _task(emit):
+            tmp_dir = "/tmp/ps5-kernel"
+            os.makedirs(tmp_dir, exist_ok=True)
+            local_rpm = os.path.join(tmp_dir, rpm_name)
+            try:
+                rc = win.run_cmd_pty(["curl", "-fL", "--retry", "3", "-o", local_rpm, rpm_url], emit)
+                if rc != 0 or not os.path.isfile(local_rpm):
+                    return False, T("failed") % (rc or 1)
+
+                # Extrait le KVER exact depuis la liste des fichiers du RPM avant installation
+                qlp = subprocess.run(["rpm", "-qlp", local_rpm], capture_output=True, text=True).stdout
+                kver = ""
+                for path in qlp.splitlines():
+                    m = re.match(r"^/(?:usr/)?lib/modules/([^/]+)$", path.strip())
+                    if m:
+                        kver = m.group(1)
+                        break
+
+                # --replacepkgs : réinstalle une même version issue d'un autre commit
+                rc = win.run_cmd_pty(
+                    ["rpm", "-ivh", "--nosignature", "--replacefiles", "--replacepkgs", local_rpm],
+                    emit,
+                )
+                if rc != 0:
+                    return False, T("failed") % rc
+
+                if not kver and os.path.isdir("/lib/modules"):
+                    mod_dirs = sorted(
+                        [d for d in os.listdir("/lib/modules") if os.path.isdir(os.path.join("/lib/modules", d)) and ver in d],
+                        key=lambda d: os.path.getmtime(os.path.join("/lib/modules", d)),
+                        reverse=True,
+                    )
+                    kver = mod_dirs[0] if mod_dirs else ver
+                kver = kver or ver
+
+                win.run_cmd_pty(["depmod", "-a", kver], emit)
+
+                if not os.path.isfile(f"/boot/initrd.img-{kver}") and shutil.which("dracut"):
+                    win.run_cmd_pty(["dracut", "--force", "--no-hostonly", f"/boot/initrd.img-{kver}", kver], emit)
+
+                if os.access("/etc/kernel/postinst.d/zz-update-boot", os.X_OK):
+                    win.run_cmd_pty(["/etc/kernel/postinst.d/zz-update-boot", kver, f"/boot/vmlinuz-{kver}"], emit)
+                elif os.path.isdir("/boot/efi") and os.path.isfile(f"/boot/vmlinuz-{kver}"):
+                    for dst in ("/boot/efi/bzImage", "/boot/efi/initrd.img"):
+                        if os.path.isfile(dst):
+                            shutil.copy2(dst, dst + ".old")
+                    shutil.copy2(f"/boot/vmlinuz-{kver}", "/boot/efi/bzImage")
+                    if os.path.isfile(f"/boot/initrd.img-{kver}"):
+                        shutil.copy2(f"/boot/initrd.img-{kver}", "/boot/efi/initrd.img")
+                    os.sync()
+
+                return True, f"Kernel {kver} {T('done')}"
+            finally:
+                shutil.rmtree(tmp_dir, ignore_errors=True)
+
+        win.run_task(f"Kernel {ver}", _task, lambda *_: win._select_section("kernel"))
+
+    win.show_confirm(
+        f"Kernel {ver}",
+        f"{tag}\n{rpm_name}\n\n{T('krn_install_sub')}",
+        _do,
+        destructive=False,
+    )
+
+
 def build_page_kernel(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     cur_k = os.uname().release
     esp_k = _esp_kernel_version() or "—"
@@ -3680,77 +3845,63 @@ def build_page_kernel(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         win.show_info(T("krn_latest"), f"Tag : {tag}\nVersion : {ver}\nActuel : {cur_k}")
 
     def _install_latest():
-        if os.uname().machine != "x86_64":
-            win.show_info(T("sec_kernel"), "x86_64 uniquement.")
-            return
         tag = gh_latest_tag(KERNEL_REPO)
         if not tag or not tag.startswith("kernel-"):
             win.show_info(T("sec_kernel"), "Release introuvable.")
             return
         ver = tag[len("kernel-"):].rsplit("-", 1)[0]
-        rpm_url = f"{KERNEL_BASE}/releases/download/{tag}/linux-ps5-{ver}-1.x86_64.rpm"
-
-        def _do():
-            def _task(emit):
-                tmp_dir = "/tmp/ps5-kernel"
-                os.makedirs(tmp_dir, exist_ok=True)
-                local_rpm = os.path.join(tmp_dir, f"linux-ps5-{ver}-1.x86_64.rpm")
-                try:
-                    rc = win.run_cmd_pty(["curl", "-fL", "--retry", "3", "-o", local_rpm, rpm_url], emit)
-                    if rc != 0 or not os.path.isfile(local_rpm):
-                        return False, T("failed") % (rc or 1)
-
-                    # Extrait le KVER exact depuis la liste des fichiers du RPM avant installation
-                    qlp = subprocess.run(["rpm", "-qlp", local_rpm], capture_output=True, text=True).stdout
-                    kver = ""
-                    for path in qlp.splitlines():
-                        m = re.match(r"^/(?:usr/)?lib/modules/([^/]+)$", path.strip())
-                        if m:
-                            kver = m.group(1)
-                            break
-
-                    # Installation avec --nosignature --replacefiles pour cohabiter avec l'ancien linux-ps5
-                    rc = win.run_cmd_pty(["rpm", "-ivh", "--nosignature", "--replacefiles", local_rpm], emit)
-                    if rc != 0:
-                        return False, T("failed") % rc
-
-                    if not kver and os.path.isdir("/lib/modules"):
-                        mod_dirs = sorted(
-                            [d for d in os.listdir("/lib/modules") if os.path.isdir(os.path.join("/lib/modules", d)) and ver in d],
-                            key=lambda d: os.path.getmtime(os.path.join("/lib/modules", d)),
-                            reverse=True,
-                        )
-                        kver = mod_dirs[0] if mod_dirs else ver
-                    kver = kver or ver
-
-                    win.run_cmd_pty(["depmod", "-a", kver], emit)
-
-                    if not os.path.isfile(f"/boot/initrd.img-{kver}") and shutil.which("dracut"):
-                        win.run_cmd_pty(["dracut", "--force", "--no-hostonly", f"/boot/initrd.img-{kver}", kver], emit)
-
-                    if os.access("/etc/kernel/postinst.d/zz-update-boot", os.X_OK):
-                        win.run_cmd_pty(["/etc/kernel/postinst.d/zz-update-boot", kver, f"/boot/vmlinuz-{kver}"], emit)
-                    elif os.path.isdir("/boot/efi") and os.path.isfile(f"/boot/vmlinuz-{kver}"):
-                        for dst in ("/boot/efi/bzImage", "/boot/efi/initrd.img"):
-                            if os.path.isfile(dst):
-                                shutil.copy2(dst, dst + ".old")
-                        shutil.copy2(f"/boot/vmlinuz-{kver}", "/boot/efi/bzImage")
-                        if os.path.isfile(f"/boot/initrd.img-{kver}"):
-                            shutil.copy2(f"/boot/initrd.img-{kver}", "/boot/efi/initrd.img")
-                        os.sync()
-
-                    return True, f"Kernel {kver} {T('done')}"
-                finally:
-                    shutil.rmtree(tmp_dir, ignore_errors=True)
-            win.run_task(f"Kernel {ver}", _task, lambda *_: win._select_section("kernel"))
-
-        win.show_confirm(T("krn_install"), f"linux-ps5-{ver}-1.x86_64.rpm\n\n{T('krn_install_sub')}", _do, destructive=False)
+        _install_kernel_release(win, tag, ver)
 
     grp.add(win.row(T("krn_latest"), T("krn_latest_sub"), "software-update-available-symbolic", lambda *_: _check_latest()))
     grp.add(win.row(T("krn_install"), T("krn_install_sub"), "system-software-install-symbolic", lambda *_: _install_latest()))
+    grp.add(win.row(T("krn_pick"), T("krn_pick_sub"), "folder-download-symbolic", lambda *_: _push_kernel_releases(win)))
     grp.add(win.row(T("krn_boot"), T("krn_boot_sub"), "media-playback-start-symbolic", lambda *_: _push_boot_kernels(win)))
     grp.add(win.row(T("krn_remove"), T("krn_remove_sub"), "user-trash-symbolic", lambda *_: _push_remove_kernels(win)))
     page.add(grp)
+
+
+def _push_kernel_releases(win: Ps5ManagerWindow) -> None:
+    cur_k = os.uname().release
+    installed = [ver for _nevra, ver in _installed_kernel_packages()]
+    sub = Adw.PreferencesPage()
+    grp = pref_group(title=T("krn_pick"), description=T("krn_pick_sub"))
+
+    tags = gh_release_tags(KERNEL_REPO, prefix="kernel-", limit=60)
+    if not tags:
+        grp.add(plain_row(Adw.ActionRow, title=T("krn_pick_empty")))
+    for tag in tags:
+        ver = tag[len("kernel-"):].rsplit("-", 1)[0]
+        sha = tag.rsplit("-", 1)[-1]
+        flags = []
+        if cur_k.startswith(ver):
+            flags.append(T("krn_running"))
+        if any(v.startswith(ver) for v in installed):
+            flags.append(T("krn_installed"))
+        if not flags:
+            flags.append(T("krn_available"))
+        grp.add(
+            win.row(
+                f"Kernel {ver}",
+                f"{sha} · " + " · ".join(flags),
+                "drive-harddisk-symbolic",
+                lambda _r, t=tag, v=ver: _install_kernel_release(win, t, v),
+            )
+        )
+
+    grp.add(
+        win.row(
+            T("krn_releases_page"), f"{KERNEL_REPO}/releases", "web-browser-symbolic",
+            lambda *_: open_uri(f"{KERNEL_BASE}/releases"),
+        )
+    )
+
+    sub.add(grp)
+    tb = Adw.ToolbarView()
+    hb = Adw.HeaderBar()
+    hb.set_title_widget(Adw.WindowTitle(title=T("krn_pick")))
+    tb.add_top_bar(hb)
+    tb.set_content(sub)
+    win.nav.push(Adw.NavigationPage(child=tb, title=T("krn_pick")))
 
 
 def _push_remove_kernels(win: Ps5ManagerWindow) -> None:

@@ -1,0 +1,63 @@
+# Changelog
+
+Historique des versions de **PS5 Fedora Manager** (application GTK4 / Libadwaita pour Fedora sur PS5).
+
+Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le projet n'utilise pas encore de tags Git, les versions correspondent à `APP_VERSION` dans `ps5_manager.py`.
+
+## [0.3] — 2026-11-22
+
+### Ajouté
+- **Kernel PS5 — installation d'un kernel précis** : nouvelle entrée « Installer un kernel précis (toutes les releases) » qui liste les releases de [`ps5-linux/ps5-linux-patches`](https://github.com/ps5-linux/ps5-linux-patches/releases) (tags `kernel-X.Y.Z-<commit>`, jusqu'à 60 releases, toutes pages confondues) avec la version, le commit, l'état (« Démarré », « Installé », « Non installé ») et une ligne « Ouvrir la page GitHub des releases ».
+- Téléchargement du RPM `linux-ps5-<version>-1.x86_64.rpm` de la release choisie, puis `rpm -ivh --nosignature --replacefiles --replacepkgs`, `depmod -a`, génération de l'initramfs si absent (`dracut --force --no-hostonly`) et déploiement sur l'ESP (`/boot/efi/bzImage` + `initrd.img`, avec sauvegarde `.old`) : permet de **revenir sur un ancien kernel**.
+- `--replacepkgs` permet de réinstaller une même version de kernel issue d'un autre commit.
+- Les releases sans RPM (paquet Arch uniquement, ex. `kernel-7.0.5-d8d6674`) sont détectées et signalées avant tout téléchargement.
+- **Logithèque — Mister Download Manager** (`anefzaoui/misterdownloadmanager`) : installation / mise à jour / désinstallation du RPM publié sur GitHub (`misterdownloadmanager`), avec version installée et dernière version disponibles.
+- Le type d'entrée `ghrpm` de la Logithèque accepte désormais n'importe quel dépôt GitHub (`gh_repo`, `gh_asset_pattern`) au lieu du seul dépôt Etcher.
+- Fichier `CHANGELOG.md` (ce fichier).
+
+### Modifié
+- `APP_VERSION` passe à `0.3`, notes de version FR/EN de la boîte « À propos » mises à jour.
+- Détection de version des applications `ghrpm` généralisée (extraction `X.Y[.Z]` du nom du fichier publié).
+
+## [0.2] — 2026-11-21
+
+### Ajouté
+- **Gaming Mode** : installation et désinstallation de Gamescope / session Steam Big Picture, avec scripts embarqués (sauvegarde de `/etc/gdm/custom.conf`, fichiers du guide `steam-using-gamescope-guide`, ciblage de l'utilisateur réel et non du compte `ps5`).
+- **Dépendances Supplémentaires** : `fuse` + `fuse-libs`, pilotes graphiques 32 bits pour Steam (`mesa-vulkan-drivers.i686`, `mesa-dri-drivers.i686`, `libva.i686`).
+- **Python 3** : `python3` + `python3-pip`, création et activation automatique de l'environnement virtuel `my_project`, affichage de `python3 --version` / `pip3 --version`, installation de `python3-tkinter`.
+- **Node.js / npm** : installation, mise à jour via les dépôts Fedora, passage à la version majeure récente (dépôt NodeSource 26 LTS), vérification des versions et désinstallation.
+- **Divers Fix** : redémarrage forcé de Steam (`pkill -9 steam; steam`).
+- **Gestion d'AppImage** dans la Logithèque : AppImage Pool (`io.github.prateekmedia.appimagepool`) et Gear Lever (`it.mijorus.gearlever`), avec installer / mettre à jour / désinstaller / ouvrir la page Flathub.
+- **Hardware Control** : installateur en mode `--passwordless` et plugin Decky « Hardware Control Plugin ».
+- Groupe « Hardware Control Plugin » dans la Logithèque.
+
+### Modifié
+- Interface native GTK4 / Libadwaita : 18 sections (`APP_VERSION = "0.2"`), notes de version FR/EN dans « À propos ».
+- Corrections de fermeture Python sur les actions AppImage (Gear Lever héritait de la commande d'AppImage Pool).
+
+## [0.1] — 2026-11-17
+
+### Ajouté
+- Première version de l'interface graphique **GTK4 / Libadwaita** (`ps5_manager.py`, fichier unique installé dans `/usr/local/bin/ps5-manager`) remplaçant progressivement les scripts Bash.
+- 15 sections : journaux, Logithèque, IA & Développeur, mise à jour du manager, langues, dépôts, utilisateurs, Fedora, maintenance, alimentation, ventilateur, hardware, Mesa/Vulkan, kernel PS5, langue de l'interface.
+- Lancement élevé via `pkexec` avec détection de l'utilisateur réel (`PKEXEC_UID`), exécution des commandes en root ou en utilisateur selon les cas.
+- Gestion des kernels PS5 : vérification de la dernière release, installation du dernier kernel RPM, choix du kernel à démarrer sur `/boot/efi`, nettoyage des anciens kernels en protégeant le noyau actif.
+
+## Historique antérieur — scripts Bash (2025 → 2026-11)
+
+Avant l'interface graphique, le projet était une suite de scripts Bash lancés par `ps5-manager.sh` :
+
+- `02-langues.sh` — configuration des langues
+- `03-depots.sh` — ajout / suppression de dépôts (RPM Fusion, COPR…)
+- `04-utilisateurs.sh` — gestion des comptes
+- `05-maj-systeme.sh` — mises à jour du système
+- `06-maintenance.sh` — nettoyage et maintenance
+- `07-alimentation.sh` — alimentation / gestion d'énergie
+- `08-fan-manager.sh` — ventilateur
+- `09-hw-control.sh` — Hardware Control
+- `10-mesa-vulkan.sh` — Mesa / Vulkan
+- `11-kernel.sh` — kernel PS5
+- `12-logiciels.sh` — installation de logiciels
+- `13-presets.sh` — presets
+
+Ces scripts ont été remplacés par l'application Python, puis retirés du dépôt.
