@@ -40,7 +40,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.3"
+APP_VERSION = "0.4"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -866,6 +866,47 @@ STRINGS = {
         "sec_mesa": "Mesa / Vulkan",
         "sec_kernel": "Kernel PS5",
         "sec_ui_lang": "Langue de l'interface",
+
+        "sec_features": "Add Fedora Feature",
+        # Add Fedora Feature
+        "features_group_mobile": "Gestion mobile",
+        "features_group_mobile_sub": (
+            "Téléphone Android en Wi-Fi ou en USB : fichiers, notifications, ADB et Fastboot."
+        ),
+        "features_mobile_install": "Installer GSConnect, MTP / SSHFS et ADB / Fastboot",
+        "features_mobile_install_sub": (
+            "gnome-shell-extension-gsconnect gvfs-mtp fuse-sshfs nautilus-python android-tools"
+        ),
+        "features_mobile_done": (
+            "GSConnect est installé : activez l'extension depuis l'application "
+            "« Extensions » puis appairez le téléphone."
+        ),
+        "features_group_print": "Imprimantes & scanners",
+        "features_group_print_sub": (
+            "CUPS, pilotes HP / Brother / Epson / Canon et génériques, découverte réseau, "
+            "SANE et Simple Scan."
+        ),
+        "features_print_install": "Installer l'impression et la numérisation",
+        "features_print_install_sub": (
+            "cups cups-filters system-config-printer hplip gutenprint-cups splix "
+            "sane-backends sane-backends-drivers-scanners libsane-hpaio simple-scan"
+        ),
+        "features_print_enable": "Activer le service d'impression (CUPS)",
+        "features_print_enable_sub": "sudo systemctl enable --now cups",
+        "features_print_disable": "Couper et désactiver le service CUPS",
+        "features_print_disable_sub": "sudo systemctl disable --now cups",
+        "features_print_disable_confirm": (
+            "CUPS sera arrêté et désactivé : plus aucune impression possible "
+            "tant que le service n'est pas réactivé."
+        ),
+        "features_print_sockets": "Désactiver les sockets d'activation automatique",
+        "features_print_sockets_sub": "sudo systemctl disable --now cups.socket cups.path",
+        "features_print_sockets_confirm": (
+            "Sans cups.socket ni cups.path, CUPS ne redémarrera plus automatiquement "
+            "lors d'une demande d'impression."
+        ),
+        "features_print_status": "Voir l'état du service CUPS",
+        "features_print_status_sub": "systemctl status cups",
         # 14. Logs
         "logs_group_main": "Suivi en direct & historique",
         "logs_group_opts": "Préférences des journaux",
@@ -1124,6 +1165,47 @@ STRINGS = {
         "sec_mesa": "Mesa / Vulkan",
         "sec_kernel": "PS5 Kernel",
         "sec_ui_lang": "Interface language",
+
+        "sec_features": "Add Fedora Feature",
+        # Add Fedora Feature
+        "features_group_mobile": "Mobile management",
+        "features_group_mobile_sub": (
+            "Android phone over Wi-Fi or USB: files, notifications, ADB and Fastboot."
+        ),
+        "features_mobile_install": "Install GSConnect, MTP / SSHFS and ADB / Fastboot",
+        "features_mobile_install_sub": (
+            "gnome-shell-extension-gsconnect gvfs-mtp fuse-sshfs nautilus-python android-tools"
+        ),
+        "features_mobile_done": (
+            "GSConnect is installed: enable the extension from the Extensions app, "
+            "then pair your phone."
+        ),
+        "features_group_print": "Printers & scanners",
+        "features_group_print_sub": (
+            "CUPS, HP / Brother / Epson / Canon and generic drivers, network discovery, "
+            "SANE and Simple Scan."
+        ),
+        "features_print_install": "Install printing and scanning",
+        "features_print_install_sub": (
+            "cups cups-filters system-config-printer hplip gutenprint-cups splix "
+            "sane-backends sane-backends-drivers-scanners libsane-hpaio simple-scan"
+        ),
+        "features_print_enable": "Enable the printing service (CUPS)",
+        "features_print_enable_sub": "sudo systemctl enable --now cups",
+        "features_print_disable": "Stop and disable the CUPS service",
+        "features_print_disable_sub": "sudo systemctl disable --now cups",
+        "features_print_disable_confirm": (
+            "CUPS will be stopped and disabled: printing will not work again "
+            "until the service is re-enabled."
+        ),
+        "features_print_sockets": "Disable the auto-activation sockets",
+        "features_print_sockets_sub": "sudo systemctl disable --now cups.socket cups.path",
+        "features_print_sockets_confirm": (
+            "Without cups.socket or cups.path, CUPS will no longer start automatically "
+            "when a print job is sent."
+        ),
+        "features_print_status": "Show the CUPS service status",
+        "features_print_status_sub": "systemctl status cups",
         # 14. Logs
         "logs_group_main": "Live monitoring & history",
         "logs_group_opts": "Log preferences",
@@ -1850,6 +1932,7 @@ SECTIONS = [
     ("aidev", "applications-development-symbolic", "sec_aidev", 1),
     ("deps", "application-x-addon-symbolic", "sec_deps", 1),
     ("gaming", "input-gaming-symbolic", "sec_gaming", 1),
+    ("features", "application-x-executable-symbolic", "sec_features", 1),
     # Groupe 2
     ("update", "software-update-available-symbolic", "sec_update", 2),
     ("lang", "preferences-desktop-locale-symbolic", "sec_lang", 2),
@@ -2307,22 +2390,22 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
             release_notes_version=APP_VERSION,
             release_notes=(
                 (
-                    "<p>Nouveautés de la 0.3</p>"
+                    "<p>Nouveautés de la 0.4</p>"
                     "<ul>"
-                    "<li>Kernel PS5 : liste de toutes les releases GitHub, téléchargement et installation du kernel choisi (retour arrière possible)</li>"
-                    "<li>Logithèque : Mister Download Manager (RPM publié sur GitHub)</li>"
-                    "<li>Fichier CHANGELOG.md avec l'historique complet des versions</li>"
-                    "<li>Dépendances : Python 3 (pip, Tkinter, venv) et Node.js / npm (arrivés en 0.2)</li>"
+                    "<li>Nouvelle catégorie « Add Fedora Feature » dans le menu de gauche</li>"
+                    "<li>Gestion mobile : GSConnect (Wi-Fi), MTP / SSHFS en USB, intégrations Nautilus, ADB et Fastboot</li>"
+                    "<li>Imprimantes et scanners : CUPS, pilotes HP, Brother, Epson, Canon et génériques, SANE et Simple Scan</li>"
+                    "<li>Activation, désactivation (sockets compris) et état du service CUPS</li>"
                     "</ul>"
                 )
                 if UI_LANG == "fr"
                 else (
-                    "<p>What is new in 0.3</p>"
+                    "<p>What is new in 0.4</p>"
                     "<ul>"
-                    "<li>PS5 kernel: list every GitHub release, download and install the kernel you pick (roll back any time)</li>"
-                    "<li>Software library: Mister Download Manager (RPM published on GitHub)</li>"
-                    "<li>CHANGELOG.md with the full version history</li>"
-                    "<li>Dependencies: Python 3 (pip, Tkinter, venv) and Node.js / npm (added in 0.2)</li>"
+                    "<li>New “Add Fedora Feature” category in the sidebar</li>"
+                    "<li>Mobile management: GSConnect (Wi-Fi), USB MTP / SSHFS, Nautilus integrations, ADB and Fastboot</li>"
+                    "<li>Printers and scanners: CUPS, HP, Brother, Epson, Canon and generic drivers, SANE and Simple Scan</li>"
+                    "<li>Enable, disable (including sockets) and check the CUPS service</li>"
                     "</ul>"
                 )
             ),
@@ -2331,7 +2414,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
 
 
 # ------------------------------------------------------------------------------
-# Builders des 18 pages
+# Builders des 19 pages
 # ------------------------------------------------------------------------------
 def build_page_logs(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     g1 = pref_group(title=T("logs_group_main"))
@@ -3648,6 +3731,146 @@ def build_page_deps(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         )
     )
     page.add(grp_node)
+
+
+def build_page_features(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
+    """Add Fedora Feature : paquets et services Fedora activés en une action."""
+
+    def _install(
+        title_key: str, packages: list[str], hint_key: Optional[str] = None
+    ) -> Callable[[], None]:
+        def _on_done(ok: bool, _message: str) -> None:
+            if ok and hint_key:
+                win.toast(T(hint_key))
+
+        def _activate(*_args: Any) -> None:
+            win.run_task(
+                T(title_key),
+                lambda e: (
+                    win.run_cmd_pty(["dnf", "install", "-y", *packages], e) == 0,
+                    T("done"),
+                ),
+                _on_done,
+            )
+
+        return _activate
+
+    def _service(title_key: str, args: list[str]) -> Callable[[], None]:
+        def _activate(*_args: Any) -> None:
+            win.run_task(
+                T(title_key),
+                lambda e: (
+                    win.run_cmd_pty(["systemctl", *args], e) == 0,
+                    T("done"),
+                ),
+            )
+
+        return _activate
+
+    grp_mobile = pref_group(
+        title=T("features_group_mobile"), description=T("features_group_mobile_sub")
+    )
+    grp_mobile.add(
+        win.row(
+            T("features_mobile_install"),
+            T("features_mobile_install_sub"),
+            "network-wireless-symbolic",
+            _install(
+                "features_mobile_install",
+                [
+                    "gnome-shell-extension-gsconnect",
+                    "gvfs-mtp",
+                    "fuse-sshfs",
+                    "nautilus-python",
+                    "android-tools",
+                ],
+                hint_key="features_mobile_done",
+            ),
+        )
+    )
+    page.add(grp_mobile)
+
+    grp_print = pref_group(
+        title=T("features_group_print"), description=T("features_group_print_sub")
+    )
+    grp_print.add(
+        win.row(
+            T("features_print_install"),
+            T("features_print_install_sub"),
+            "system-software-install-symbolic",
+            _install(
+                "features_print_install",
+                [
+                    "cups",
+                    "cups-filters",
+                    "system-config-printer",
+                    "hplip",
+                    "gutenprint-cups",
+                    "splix",
+                    "sane-backends",
+                    "sane-backends-drivers-scanners",
+                    "libsane-hpaio",
+                    "simple-scan",
+                ],
+            ),
+        )
+    )
+    grp_print.add(
+        win.row(
+            T("features_print_enable"),
+            T("features_print_enable_sub"),
+            "system-run-symbolic",
+            _service("features_print_enable", ["enable", "--now", "cups"]),
+        )
+    )
+    grp_print.add(
+        win.row(
+            T("features_print_disable"),
+            T("features_print_disable_sub"),
+            "process-stop-symbolic",
+            lambda *_: win.show_confirm(
+                T("features_print_disable"),
+                T("features_print_disable_confirm"),
+                _service("features_print_disable", ["disable", "--now", "cups"]),
+            ),
+        )
+    )
+    grp_print.add(
+        win.row(
+            T("features_print_sockets"),
+            T("features_print_sockets_sub"),
+            "network-offline-symbolic",
+            lambda *_: win.show_confirm(
+                T("features_print_sockets"),
+                T("features_print_sockets_confirm"),
+                _service(
+                    "features_print_sockets",
+                    ["disable", "--now", "cups.socket", "cups.path"],
+                ),
+            ),
+        )
+    )
+
+    def _show_status(*_args: Any) -> None:
+        out = subprocess.run(
+            ["systemctl", "status", "cups", "--no-pager", "--full"],
+            capture_output=True,
+            text=True,
+        )
+        txt = ((out.stdout or "") + (out.stderr or "")).strip()
+        win.show_text_modal(
+            T("features_print_status"), txt or T("not_installed")
+        )
+
+    grp_print.add(
+        win.row(
+            T("features_print_status"),
+            T("features_print_status_sub"),
+            "dialog-information-symbolic",
+            _show_status,
+        )
+    )
+    page.add(grp_print)
 
 
 def build_page_gaming(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
@@ -5364,6 +5587,7 @@ PAGE_BUILDERS = {
     "aidev": build_page_aidev,
     "deps": build_page_deps,
     "gaming": build_page_gaming,
+    "features": build_page_features,
     "update": build_page_update,
     "lang": build_page_lang,
     "repos": build_page_repos,

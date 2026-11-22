@@ -4,6 +4,17 @@ Historique des versions de **PS5 Fedora Manager** (application GTK4 / Libadwaita
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le projet n'utilise pas encore de tags Git, les versions correspondent à `APP_VERSION` dans `ps5_manager.py`.
 
+## [0.4] — 2026-11-22
+
+### Ajouté
+- **Nouvelle catégorie « Add Fedora Feature »** dans la barre latérale (groupe 1, juste après « Gaming Mode ») : regroupe l'activation de fonctionnalités Fedora en une seule action par fonctionnalité.
+- **Gestion mobile (Mobile Management)** : installation en une commande de GSConnect (téléphone Android en Wi-Fi), du support USB MTP / SSHFS, des intégrations Nautilus et d'ADB / Fastboot — `gnome-shell-extension-gsconnect gvfs-mtp fuse-sshfs nautilus-python android-tools`.
+- **Imprimantes & scanners** : installation de la gestion complète des imprimantes (CUPS, `cups-filters`, `system-config-printer`, pilotes HP `hplip`, Brother / Epson `gutenprint-cups` et `splix`, génériques, découverte réseau) et des scanners (SANE, pilotes `sane-backends-drivers-scanners`, `libsane-hpaio`, application GNOME `simple-scan`) — `cups cups-filters system-config-printer hplip gutenprint-cups splix sane-backends sane-backends-drivers-scanners libsane-hpaio simple-scan`.
+- Actions CUPS : activation (`systemctl enable --now cups`), coupure et désactivation (`systemctl disable --now cups`) avec confirmation, désactivation des sockets d'activation automatique (`systemctl disable --now cups.socket cups.path`) avec confirmation, et affichage de `systemctl status cups`.
+
+### Modifié
+- `APP_VERSION` passe à `0.4`, notes de version FR/EN de la boîte « À propos » mises à jour (19 sections).
+
 ## [0.3] — 2026-11-22
 
 ### Ajouté
