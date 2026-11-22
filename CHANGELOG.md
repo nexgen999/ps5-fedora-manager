@@ -4,6 +4,19 @@ Historique des versions de **PS5 Fedora Manager** (application GTK4 / Libadwaita
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le projet n'utilise pas encore de tags Git, les versions correspondent à `APP_VERSION` dans `ps5_manager.py`.
 
+## [0.5] — 2026-11-22
+
+### Ajouté
+- **Boîte de bienvenue au premier lancement** : propose le **setup recommandé en 1 clic** ou la configuration manuelle (fermeture de la boîte). Le choix est mémorisé dans `/etc/ps5-manager/setup-welcome-done`, donc la boîte ne réapparaît plus ensuite.
+- **Setup recommandé** en 9 étapes et 29 éléments : alimentation (veille système, écran, veille complète), ventilateur (PS5 Linux Tools, `ps5fan`, `ps5boost`), Hardware Control, Mesa / Vulkan, dépôts (RPM Fusion, Flatpak/Flathub, cache), dépendances supplémentaires (fuse, pilotes 32 bits Steam, Python 3 + pip, environnement virtuel `my_project`, Tkinter, Node.js/npm, mise à jour Fedora), logithèque (Bazaar, GNOME Extension Manager, Steam, Heroic, ProtonUp-Qt, Decky Loader, Universe, AppImage Pool, Opera), plugin Hardware Control et Gaming Mode (Gamescope).
+- **Fenêtre de suivi du setup** : liste des éléments à gauche avec état en direct (`○` en attente, `●` en cours, `✔` validé, `✖` en échec), journal complet des commandes à droite et barre de progression. Un élément en échec n'interrompt pas les suivants.
+- **Reboot proposé à la fin du setup** : la fenêtre de suivi se ferme et une boîte propose le redémarrage immédiat (`systemctl reboot`) ou plus tard.
+- **Menu principal (burger)** : nouvelle entrée « Effectuer le setup recommandé » pour relancer le setup à tout moment, avec confirmation.
+- Documentation [`dev_setup.md`](dev_setup.md) : configuration de référence, commandes exactes et correspondance avec les sections de l'application.
+
+### Modifié
+- `APP_VERSION` passe à `0.5`, notes de version FR/EN de la boîte « À propos » mises à jour.
+
 ## [0.4] — 2026-11-22
 
 ### Ajouté

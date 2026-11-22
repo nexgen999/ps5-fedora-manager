@@ -40,7 +40,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.4"
+APP_VERSION = "0.5"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -867,6 +867,84 @@ STRINGS = {
         "sec_kernel": "Kernel PS5",
         "sec_ui_lang": "Langue de l'interface",
 
+        # Setup recommandé
+        "setup_menu": "Effectuer le setup recommandé",
+        "setup_title": "Setup recommandé",
+        "setup_welcome_title": "Bienvenue dans PS5 Fedora Manager",
+        "setup_welcome_body": (
+            "Premier lancement. Le setup recommandé par le développeur applique "
+            "en une seule fois la configuration de base de la PS5 sous Fedora :\n\n"
+            "1. Alimentation (veille désactivée)\n"
+            "2. Ventilateur (PS5 Linux Tools, ps5fan, ps5boost)\n"
+            "3. Hardware Control\n"
+            "4. Mesa / Vulkan (vulkan-tools, mesa-demos)\n"
+            "5. Dépôts (RPM Fusion, Flathub, cache)\n"
+            "6. Dépendances (fuse, pilotes 32 bits, Python, venv, Tkinter, Node.js, mises à jour)\n"
+            "7. Logithèque (Bazaar, Extension Manager, Steam, Heroic, ProtonUp-Qt, Decky, Universe, AppImage Pool, Opera)\n"
+            "8. Plugin Hardware Control\n"
+            "9. Gaming Mode (Gamescope)\n\n"
+            "Un redémarrage vous sera proposé à la fin. Vous pouvez aussi configurer "
+            "l'environnement vous-même, section par section."
+        ),
+        "setup_welcome_recommended": "Setup recommandé (1 clic)",
+        "setup_welcome_manual": "Configurer moi-même",
+        "setup_confirm_body": (
+            "Le setup recommandé installe et configure l'ensemble des éléments listés. "
+            "Cela peut prendre plusieurs minutes ; la fenêtre de suivi affiche chaque "
+            "élément validé et le journal des opérations."
+        ),
+        "setup_running": "Installation en cours…",
+        "setup_finished": "Setup terminé",
+        "setup_log": "Journal des opérations",
+        "setup_close": "Fermer",
+        "setup_summary": "%d réussite(s) · %d échec(s)",
+        "setup_reboot_title": "Redémarrage nécessaire",
+        "setup_reboot_body": (
+            "Setup terminé : %d élément(s) installé(s), %d échec(s).\n\n"
+            "Un redémarrage est nécessaire pour activer les services et les pilotes. "
+            "Redémarrer maintenant ?"
+        ),
+        "setup_reboot_now": "Redémarrer maintenant",
+        "setup_later": "Plus tard",
+        "setup_step1": "1. Alimentation",
+        "setup_step2": "2. Ventilateur",
+        "setup_step3": "3. Hardware Control",
+        "setup_step4": "4. Mesa / Vulkan",
+        "setup_step5": "5. Dépôts",
+        "setup_step6": "6. Dépendances supplémentaires",
+        "setup_step7": "7. Logithèque",
+        "setup_step8": "8. Hardware Control — plugin",
+        "setup_step9": "9. Gaming Mode",
+        "setup_pwr_sys": "Désactiver la veille système",
+        "setup_pwr_scr": "Désactiver la mise en veille de l'écran",
+        "setup_pwr_full": "Désactiver la veille complète",
+        "setup_fan_tools": "Installer / mettre à jour PS5 Linux Tools",
+        "setup_fan_svc": "Activer le service ps5fan",
+        "setup_fan_boot": "Activer le service ps5boost (démarrage)",
+        "setup_hw": "Installer / mettre à jour Hardware Control",
+        "setup_mesa": "Installer Vulkan Tools et Mesa Demos",
+        "setup_repo_rpmfusion": "Installer RPM Fusion (free + nonfree)",
+        "setup_repo_flathub": "Installer Flatpak et Flathub",
+        "setup_repo_refresh": "Mettre à jour les dépôts et nettoyer le cache",
+        "setup_dep_fuse": "Installer FUSE",
+        "setup_dep_steam32": "Installer les pilotes graphiques 32 bits pour Steam",
+        "setup_dep_python": "Installer Python 3 et pip",
+        "setup_dep_venv": "Créer l'environnement virtuel my_project",
+        "setup_dep_tk": "Installer Tkinter",
+        "setup_dep_node": "Installer Node.js et npm",
+        "setup_dep_fedora": "Mettre à jour les paquets Fedora",
+        "setup_app_bazaar": "Installer Bazaar",
+        "setup_app_extmgr": "Installer GNOME Extension Manager",
+        "setup_app_steam": "Installer Steam",
+        "setup_app_heroic": "Installer Heroic Games Launcher",
+        "setup_app_protonup": "Installer ProtonUp-Qt",
+        "setup_app_decky": "Installer Decky Loader",
+        "setup_app_universe": "Installer Universe",
+        "setup_app_appimagepool": "Installer AppImage Pool",
+        "setup_app_opera": "Installer Opera",
+        "setup_hw_plugin": "Installer le plugin Hardware Control",
+        "setup_gaming": "Installer Gamescope (Gaming Mode)",
+
         "sec_features": "Add Fedora Feature",
         # Add Fedora Feature
         "features_group_mobile": "Gestion mobile",
@@ -1165,6 +1243,84 @@ STRINGS = {
         "sec_mesa": "Mesa / Vulkan",
         "sec_kernel": "PS5 Kernel",
         "sec_ui_lang": "Interface language",
+
+        # Recommended setup
+        "setup_menu": "Run recommended setup",
+        "setup_title": "Recommended setup",
+        "setup_welcome_title": "Welcome to PS5 Fedora Manager",
+        "setup_welcome_body": (
+            "First launch. The developer-recommended setup applies the whole base "
+            "configuration of a PS5 running Fedora in one go:\n\n"
+            "1. Power (sleep disabled)\n"
+            "2. Fan (PS5 Linux Tools, ps5fan, ps5boost)\n"
+            "3. Hardware Control\n"
+            "4. Mesa / Vulkan (vulkan-tools, mesa-demos)\n"
+            "5. Repositories (RPM Fusion, Flathub, cache)\n"
+            "6. Dependencies (fuse, 32-bit drivers, Python, venv, Tkinter, Node.js, updates)\n"
+            "7. App store (Bazaar, Extension Manager, Steam, Heroic, ProtonUp-Qt, Decky, Universe, AppImage Pool, Opera)\n"
+            "8. Hardware Control plugin\n"
+            "9. Gaming Mode (Gamescope)\n\n"
+            "A reboot will be offered at the end. You can also configure the "
+            "environment yourself, section by section."
+        ),
+        "setup_welcome_recommended": "Recommended setup (1 click)",
+        "setup_welcome_manual": "I'll configure it myself",
+        "setup_confirm_body": (
+            "The recommended setup installs and configures every listed item. "
+            "It can take several minutes; the progress window shows each validated "
+            "item and the operations log."
+        ),
+        "setup_running": "Installing…",
+        "setup_finished": "Setup finished",
+        "setup_log": "Operations log",
+        "setup_close": "Close",
+        "setup_summary": "%d succeeded · %d failed",
+        "setup_reboot_title": "Reboot required",
+        "setup_reboot_body": (
+            "Setup finished: %d item(s) installed, %d failed.\n\n"
+            "A reboot is required to enable the services and drivers. "
+            "Reboot now?"
+        ),
+        "setup_reboot_now": "Reboot now",
+        "setup_later": "Later",
+        "setup_step1": "1. Power",
+        "setup_step2": "2. Fan",
+        "setup_step3": "3. Hardware Control",
+        "setup_step4": "4. Mesa / Vulkan",
+        "setup_step5": "5. Repositories",
+        "setup_step6": "6. Extra dependencies",
+        "setup_step7": "7. App store",
+        "setup_step8": "8. Hardware Control — plugin",
+        "setup_step9": "9. Gaming Mode",
+        "setup_pwr_sys": "Disable system sleep",
+        "setup_pwr_scr": "Disable screen blanking",
+        "setup_pwr_full": "Disable full sleep",
+        "setup_fan_tools": "Install / update PS5 Linux Tools",
+        "setup_fan_svc": "Enable the ps5fan service",
+        "setup_fan_boot": "Enable the ps5boost service (boot)",
+        "setup_hw": "Install / update Hardware Control",
+        "setup_mesa": "Install Vulkan Tools and Mesa Demos",
+        "setup_repo_rpmfusion": "Install RPM Fusion (free + nonfree)",
+        "setup_repo_flathub": "Install Flatpak and Flathub",
+        "setup_repo_refresh": "Refresh repositories and clean the cache",
+        "setup_dep_fuse": "Install FUSE",
+        "setup_dep_steam32": "Install 32-bit graphics drivers for Steam",
+        "setup_dep_python": "Install Python 3 and pip",
+        "setup_dep_venv": "Create the my_project virtual environment",
+        "setup_dep_tk": "Install Tkinter",
+        "setup_dep_node": "Install Node.js and npm",
+        "setup_dep_fedora": "Update Fedora packages",
+        "setup_app_bazaar": "Install Bazaar",
+        "setup_app_extmgr": "Install GNOME Extension Manager",
+        "setup_app_steam": "Install Steam",
+        "setup_app_heroic": "Install Heroic Games Launcher",
+        "setup_app_protonup": "Install ProtonUp-Qt",
+        "setup_app_decky": "Install Decky Loader",
+        "setup_app_universe": "Install Universe",
+        "setup_app_appimagepool": "Install AppImage Pool",
+        "setup_app_opera": "Install Opera",
+        "setup_hw_plugin": "Install the Hardware Control plugin",
+        "setup_gaming": "Install Gamescope (Gaming Mode)",
 
         "sec_features": "Add Fedora Feature",
         # Add Fedora Feature
@@ -1923,6 +2079,584 @@ class TextLogWindow(Adw.Window):
 
 
 # ------------------------------------------------------------------------------
+# Setup recommandé (bienvenue au premier lancement + menu principal)
+# ------------------------------------------------------------------------------
+SETUP_WELCOME_FILE = "/etc/ps5-manager/setup-welcome-done"
+
+
+def welcome_seen() -> bool:
+    """Vrai si la boîte de bienvenue du premier lancement a déjà été affichée."""
+    return os.path.exists(SETUP_WELCOME_FILE)
+
+
+def mark_welcome_seen() -> None:
+    try:
+        os.makedirs(os.path.dirname(SETUP_WELCOME_FILE), exist_ok=True)
+        with open(SETUP_WELCOME_FILE, "w", encoding="utf-8") as fh:
+            fh.write(f"{datetime.datetime.now():%F %T} {REAL_USER}\n")
+    except OSError:
+        pass
+
+
+def _setup_cmd(
+    win: "Ps5ManagerWindow",
+    cmd: list[str] | str,
+    as_user: bool = False,
+) -> Callable[[Callable[[str], None]], bool]:
+    """Étape de setup exécutant une commande unique."""
+
+    def _run(emit: Callable[[str], None]) -> bool:
+        return win.run_cmd_pty(cmd, emit, as_user=as_user) == 0
+
+    return _run
+
+
+def _flatpak_app_installed(app_id: str) -> bool:
+    if not shutil.which("flatpak"):
+        return False
+    for scope in ("--system", "--user"):
+        if subprocess.run(
+            ["flatpak", "info", scope, app_id], capture_output=True
+        ).returncode == 0:
+            return True
+    return False
+
+
+def _setup_flatpak_app(
+    win: "Ps5ManagerWindow", app_id: str
+) -> Callable[[Callable[[str], None]], bool]:
+    """Étape de setup installant une application Flatpak depuis Flathub."""
+
+    def _run(emit: Callable[[str], None]) -> bool:
+        if _flatpak_app_installed(app_id):
+            emit(f"{app_id} : {T('installed')}")
+            return True
+        if not shutil.which("flatpak") and win.run_cmd_pty(
+            ["dnf", "install", "-y", "flatpak"], emit
+        ) != 0:
+            return False
+        _ensure_flathub()
+        return (
+            win.run_cmd_pty(
+                [
+                    "flatpak",
+                    "install",
+                    "--system",
+                    "--noninteractive",
+                    "-y",
+                    "flathub",
+                    app_id,
+                ],
+                emit,
+            )
+            == 0
+        )
+
+    return _run
+
+
+def _setup_fan_tools(win: "Ps5ManagerWindow") -> Callable[[Callable[[str], None]], bool]:
+    def _run(emit: Callable[[str], None]) -> bool:
+        cmd = (
+            "tmp=$(mktemp -d) && git clone --depth=1 "
+            f"'{TOOLS_REPO}' \"$tmp/tools\" && cd \"$tmp/tools\" "
+            "&& ./install.sh && rm -rf \"$tmp\""
+        )
+        return win.run_cmd_pty(["bash", "-c", cmd], emit) == 0
+
+    return _run
+
+
+def _setup_hwcon(win: "Ps5ManagerWindow") -> Callable[[Callable[[str], None]], bool]:
+    def _run(emit: Callable[[str], None]) -> bool:
+        if win.run_cmd_pty(["dnf", "install", "-y", "python3-PyQt6"], emit) != 0:
+            return False
+        return (
+            win.run_cmd_pty(
+                f"curl -fsSL '{HWCON_INSTALL}' | bash -s -- --passwordless",
+                emit,
+                as_user=True,
+            )
+            == 0
+        )
+
+    return _run
+
+
+def _setup_hwcon_plugin(
+    win: "Ps5ManagerWindow",
+) -> Callable[[Callable[[str], None]], bool]:
+    def _run(emit: Callable[[str], None]) -> bool:
+        return win.run_cmd_pty(f"curl -fsSL '{HWCON_PLUGIN_INSTALL}' | bash", emit, as_user=True) == 0
+
+    return _run
+
+
+def _setup_rpmfusion(win: "Ps5ManagerWindow") -> Callable[[Callable[[str], None]], bool]:
+    def _run(emit: Callable[[str], None]) -> bool:
+        return _ensure_rpmfusion(win, emit)
+
+    return _run
+
+
+def _setup_flathub(win: "Ps5ManagerWindow") -> Callable[[Callable[[str], None]], bool]:
+    def _run(emit: Callable[[str], None]) -> bool:
+        if not shutil.which("flatpak") and win.run_cmd_pty(
+            ["dnf", "install", "-y", "flatpak"], emit
+        ) != 0:
+            return False
+        return _ensure_flathub()
+
+    return _run
+
+
+def _setup_repos_refresh(
+    win: "Ps5ManagerWindow",
+) -> Callable[[Callable[[str], None]], bool]:
+    def _run(emit: Callable[[str], None]) -> bool:
+        if win.run_cmd_pty(
+            ["bash", "-c", "dnf clean all && dnf makecache --refresh"], emit
+        ) != 0:
+            return False
+        if shutil.which("flatpak"):
+            win.run_cmd_pty(["flatpak", "update", "--appstream", "-y"], emit)
+        return True
+
+    return _run
+
+
+def _setup_venv(win: "Ps5ManagerWindow") -> Callable[[Callable[[str], None]], bool]:
+    def _run(emit: Callable[[str], None]) -> bool:
+        return (
+            win.run_cmd_pty(
+                "python3 -m venv my_project && . my_project/bin/activate "
+                "&& python3 --version && pip3 --version",
+                emit,
+                as_user=True,
+            )
+            == 0
+        )
+
+    return _run
+
+
+def _setup_steam(win: "Ps5ManagerWindow") -> Callable[[Callable[[str], None]], bool]:
+    def _run(emit: Callable[[str], None]) -> bool:
+        _ensure_rpmfusion(win, emit)
+        return win.run_cmd_pty(["dnf", "install", "-y", "steam"], emit) == 0
+
+    return _run
+
+
+def _setup_decky(win: "Ps5ManagerWindow") -> Callable[[Callable[[str], None]], bool]:
+    def _run(emit: Callable[[str], None]) -> bool:
+        return win.run_cmd_pty(f"curl -fsSL '{DECKY_INSTALL}' | bash", emit, as_user=True) == 0
+
+    return _run
+
+
+def _setup_universe(win: "Ps5ManagerWindow") -> Callable[[Callable[[str], None]], bool]:
+    def _run(emit: Callable[[str], None]) -> bool:
+        if not _ensure_copr_repo(win, "ilyasturki/universe", emit):
+            return False
+        if win.run_cmd_pty(
+            ["dnf", "install", "-y", "universe", "universe-desktop"], emit
+        ) != 0:
+            return False
+        win.run_cmd_pty(["universe", "setup"], emit, as_user=True)
+        return True
+
+    return _run
+
+
+def _setup_opera(win: "Ps5ManagerWindow") -> Callable[[Callable[[str], None]], bool]:
+    def _run(emit: Callable[[str], None]) -> bool:
+        win.run_cmd_pty(["rpm", "--import", OPERA_KEY], emit)
+        try:
+            with open(OPERA_REPO_FILE, "w", encoding="utf-8") as fh:
+                fh.write(
+                    "[opera]\nname=Opera packages\ntype=rpm-md\n"
+                    "baseurl=https://rpm.opera.com/rpm\ngpgcheck=1\n"
+                    f"gpgkey={OPERA_KEY}\nenabled=1\n"
+                )
+        except OSError as exc:
+            emit(str(exc))
+            return False
+        return win.run_cmd_pty(["dnf", "install", "-y", "opera-stable"], emit) == 0
+
+    return _run
+
+
+def _setup_gamescope(win: "Ps5ManagerWindow") -> Callable[[Callable[[str], None]], bool]:
+    def _run(emit: Callable[[str], None]) -> bool:
+        fd, path = tempfile.mkstemp(
+            prefix="ps5-manager-setup-gamescope-", suffix=".sh", dir="/tmp"
+        )
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            fh.write(_gaming_script("install"))
+        os.chmod(path, 0o700)
+        try:
+            return win.run_cmd_pty(["bash", path], emit) == 0
+        finally:
+            try:
+                os.unlink(path)
+            except OSError:
+                pass
+
+    return _run
+
+
+@dataclass
+class SetupStep:
+    """Une étape du setup recommandé et ses éléments à installer."""
+
+    title_key: str
+    items: list[tuple[str, Callable[[Callable[[str], None]], bool]]]
+
+
+def _build_setup_plan(win: "Ps5ManagerWindow") -> list[SetupStep]:
+    """Plan du setup recommandé par le développeur (9 étapes, 29 éléments)."""
+    return [
+        SetupStep(
+            "setup_step1",
+            [
+                (
+                    "setup_pwr_sys",
+                    _setup_cmd(
+                        win,
+                        [
+                            "systemctl",
+                            "mask",
+                            "sleep.target",
+                            "suspend.target",
+                            "hibernate.target",
+                            "hybrid-sleep.target",
+                            "suspend-then-hibernate.target",
+                        ],
+                    ),
+                ),
+                (
+                    "setup_pwr_scr",
+                    _setup_cmd(
+                        win,
+                        [
+                            "gsettings",
+                            "set",
+                            "org.gnome.desktop.session",
+                            "idle-delay",
+                            "0",
+                        ],
+                        as_user=True,
+                    ),
+                ),
+                (
+                    "setup_pwr_full",
+                    _setup_cmd(
+                        win,
+                        [
+                            "gsettings",
+                            "set",
+                            "org.gnome.settings-daemon.plugins.power",
+                            "sleep-inactive-ac-type",
+                            "nothing",
+                        ],
+                        as_user=True,
+                    ),
+                ),
+            ],
+        ),
+        SetupStep(
+            "setup_step2",
+            [
+                ("setup_fan_tools", _setup_fan_tools(win)),
+                (
+                    "setup_fan_svc",
+                    _setup_cmd(win, ["systemctl", "enable", "--now", "ps5fan.service"]),
+                ),
+                (
+                    "setup_fan_boot",
+                    _setup_cmd(
+                        win, ["systemctl", "enable", "--now", "ps5boost.service"]
+                    ),
+                ),
+            ],
+        ),
+        SetupStep("setup_step3", [("setup_hw", _setup_hwcon(win))]),
+        SetupStep(
+            "setup_step4",
+            [
+                (
+                    "setup_mesa",
+                    _setup_cmd(win, ["dnf", "install", "-y", "vulkan-tools", "mesa-demos"]),
+                )
+            ],
+        ),
+        SetupStep(
+            "setup_step5",
+            [
+                ("setup_repo_rpmfusion", _setup_rpmfusion(win)),
+                ("setup_repo_flathub", _setup_flathub(win)),
+                ("setup_repo_refresh", _setup_repos_refresh(win)),
+            ],
+        ),
+        SetupStep(
+            "setup_step6",
+            [
+                (
+                    "setup_dep_fuse",
+                    _setup_cmd(win, ["dnf", "install", "-y", "fuse", "fuse-libs"]),
+                ),
+                (
+                    "setup_dep_steam32",
+                    _setup_cmd(
+                        win,
+                        [
+                            "dnf",
+                            "install",
+                            "-y",
+                            "mesa-vulkan-drivers.i686",
+                            "mesa-dri-drivers.i686",
+                            "libva.i686",
+                        ],
+                    ),
+                ),
+                (
+                    "setup_dep_python",
+                    _setup_cmd(win, ["dnf", "install", "-y", "python3", "python3-pip"]),
+                ),
+                ("setup_dep_venv", _setup_venv(win)),
+                (
+                    "setup_dep_tk",
+                    _setup_cmd(win, ["dnf", "install", "-y", "python3-tkinter"]),
+                ),
+                (
+                    "setup_dep_node",
+                    _setup_cmd(win, ["dnf", "install", "-y", "nodejs", "npm"]),
+                ),
+                (
+                    "setup_dep_fedora",
+                    _setup_cmd(win, ["dnf", "upgrade", "-y", "--refresh"]),
+                ),
+            ],
+        ),
+        SetupStep(
+            "setup_step7",
+            [
+                (
+                    "setup_app_bazaar",
+                    _setup_flatpak_app(win, "io.github.kolunmi.Bazaar"),
+                ),
+                (
+                    "setup_app_extmgr",
+                    _setup_flatpak_app(win, "com.mattjakeman.ExtensionManager"),
+                ),
+                ("setup_app_steam", _setup_steam(win)),
+                (
+                    "setup_app_heroic",
+                    _setup_flatpak_app(win, "com.heroicgameslauncher.hgl"),
+                ),
+                (
+                    "setup_app_protonup",
+                    _setup_flatpak_app(win, "net.davidotek.pupgui2"),
+                ),
+                ("setup_app_decky", _setup_decky(win)),
+                ("setup_app_universe", _setup_universe(win)),
+                (
+                    "setup_app_appimagepool",
+                    _setup_flatpak_app(win, "io.github.prateekmedia.appimagepool"),
+                ),
+                ("setup_app_opera", _setup_opera(win)),
+            ],
+        ),
+        SetupStep("setup_step8", [("setup_hw_plugin", _setup_hwcon_plugin(win))]),
+        SetupStep("setup_step9", [("setup_gaming", _setup_gamescope(win))]),
+    ]
+
+
+class SetupWindow(Adw.Window):
+    """Suivi du setup recommandé : liste validée en direct + journal visible."""
+
+    def __init__(self, win: "Ps5ManagerWindow", plan: list[SetupStep]) -> None:
+        super().__init__(
+            transient_for=win,
+            title=T("setup_title"),
+            default_width=1120,
+            default_height=740,
+        )
+        self.win = win
+        self.plan = plan
+        self._labels: dict[tuple[int, int], Gtk.Label] = {}
+        self._buffer: list[str] = []
+        self._buffer_lock = threading.Lock()
+        self._flush_id: Optional[int] = None
+        self._running = True
+        self._done_count = 0
+        self._fail_count = 0
+        self._total = sum(len(step.items) for step in plan)
+
+        header = Adw.HeaderBar()
+        self.title_widget = Adw.WindowTitle(
+            title=T("setup_title"), subtitle=T("setup_running")
+        )
+        header.set_title_widget(self.title_widget)
+
+        page = Adw.PreferencesPage()
+        for s_idx, step in enumerate(plan):
+            grp = pref_group(title=T(step.title_key))
+            for i_idx, (item_key, _runner) in enumerate(step.items):
+                row = plain_row(Adw.ActionRow, title=T(item_key))
+                lbl = Gtk.Label(label="○")
+                lbl.add_css_class("dim-label")
+                lbl.set_valign(Gtk.Align.CENTER)
+                row.add_suffix(lbl)
+                self._labels[(s_idx, i_idx)] = lbl
+                grp.add(row)
+            page.add(grp)
+
+        self.log_view = Gtk.TextView(
+            editable=False, monospace=True, cursor_visible=False
+        )
+        self.log_view.set_wrap_mode(Gtk.WrapMode.WORD_CHAR)
+        self.log_view.set_left_margin(12)
+        self.log_view.set_right_margin(12)
+        self.log_view.set_top_margin(8)
+        self.log_view.set_bottom_margin(8)
+        self.log_buf = self.log_view.get_buffer()
+
+        log_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        log_box.set_margin_top(8)
+        log_box.set_margin_bottom(8)
+        log_box.set_margin_start(8)
+        log_box.set_margin_end(8)
+        log_title = Gtk.Label(label=T("setup_log"), xalign=0)
+        log_title.add_css_class("heading")
+        log_box.append(log_title)
+        log_box.append(
+            Gtk.ScrolledWindow(child=self.log_view, hexpand=True, vexpand=True)
+        )
+
+        split = Gtk.Paned(orientation=Gtk.Orientation.HORIZONTAL)
+        split.set_start_child(page)
+        split.set_end_child(log_box)
+        split.set_resize_start_child(False)
+        split.set_shrink_start_child(False)
+        split.set_position(470)
+
+        self.progress = Gtk.ProgressBar(show_text=True)
+        self.progress.set_hexpand(True)
+        self.progress.set_valign(Gtk.Align.CENTER)
+        self.progress.set_text(f"0 / {self._total}")
+        self.close_btn = Gtk.Button(label=T("setup_close"))
+        self.close_btn.set_sensitive(False)
+        self.close_btn.connect("clicked", lambda *_: self.close())
+
+        bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        bottom.set_margin_top(10)
+        bottom.set_margin_bottom(10)
+        bottom.set_margin_start(12)
+        bottom.set_margin_end(12)
+        bottom.append(self.progress)
+        bottom.append(self.close_btn)
+
+        toolbar = Adw.ToolbarView()
+        toolbar.add_top_bar(header)
+        toolbar.set_content(split)
+        toolbar.add_bottom_bar(bottom)
+        self.set_content(toolbar)
+        self.connect("close-request", self._on_close_request)
+
+    # ---- Suivi de l'interface (thread principal) ----
+    def _set_status(self, key: tuple[int, int], text: str, css: str) -> bool:
+        lbl = self._labels.get(key)
+        if lbl is not None:
+            lbl.set_text(text)
+            for name in ("dim-label", "accent", "success", "error"):
+                lbl.remove_css_class(name)
+            if css:
+                lbl.add_css_class(css)
+        return False
+
+    def _log_line(self, text: str) -> bool:
+        with self._buffer_lock:
+            self._buffer.append(text)
+        return False
+
+    def _append(self, line: str) -> None:
+        """Reçoit les lignes du PTY (thread d'installation)."""
+        with self._buffer_lock:
+            self._buffer.append(line + "\n")
+
+    def _flush(self) -> bool:
+        with self._buffer_lock:
+            chunk = "".join(self._buffer)
+            self._buffer.clear()
+        if chunk:
+            end = self.log_buf.get_end_iter()
+            self.log_buf.insert(end, chunk)
+            end = self.log_buf.get_end_iter()
+            self.log_buf.place_cursor(end)
+            self.log_view.scroll_to_iter(end, 0.0, False, 0.0, 0.0)
+        return self._running
+
+    def _tick_progress(self, ok: bool) -> bool:
+        if ok:
+            self._done_count += 1
+        else:
+            self._fail_count += 1
+        done = self._done_count + self._fail_count
+        self.progress.set_fraction(done / max(self._total, 1))
+        self.progress.set_text(f"{done} / {self._total}")
+        return False
+
+    def _finish(self) -> bool:
+        self._running = False
+        if self._flush_id is not None:
+            GLib.source_remove(self._flush_id)
+            self._flush_id = None
+        self._flush()
+        self.title_widget.set_subtitle(T("setup_finished"))
+        self.progress.set_fraction(1.0)
+        self.progress.set_text(T("setup_summary") % (self._done_count, self._fail_count))
+        self.close_btn.set_sensitive(True)
+        self.win.busy = False
+        self.win.busy_spinner.stop()
+        self.close()
+        self.win.prompt_reboot(self._done_count, self._fail_count)
+        return False
+
+    # ---- Exécution ----
+    def start(self) -> None:
+        self._flush_id = GLib.timeout_add(150, self._flush)
+        threading.Thread(target=self._worker, daemon=True).start()
+
+    def _worker(self) -> None:
+        for s_idx, step in enumerate(self.plan):
+            GLib.idle_add(self._log_line, f"\n=== {T(step.title_key)} ===\n")
+            for i_idx, (item_key, runner) in enumerate(step.items):
+                GLib.idle_add(self._set_status, (s_idx, i_idx), "●", "accent")
+                GLib.idle_add(self._log_line, f"→ {T(item_key)}\n")
+                ok = False
+                try:
+                    ok = bool(runner(self._append))
+                except Exception as exc:  # noqa: BLE001 - le setup ne doit pas s'arrêter
+                    self._append(f"  ! {exc}")
+                    ok = False
+                GLib.idle_add(
+                    self._set_status,
+                    (s_idx, i_idx),
+                    "✔" if ok else "✖",
+                    "success" if ok else "error",
+                )
+                GLib.idle_add(self._tick_progress, ok)
+        GLib.idle_add(self._finish)
+
+    def _on_close_request(self, *_args) -> bool:
+        if self._running:
+            return True
+        self.win.setup_window = None
+        return False
+
+# ------------------------------------------------------------------------------
 # Définition des 15 sections de la barre latérale
 # ------------------------------------------------------------------------------
 SECTIONS = [
@@ -1967,6 +2701,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         self.busy = False
         self.auto_log_opened = False
         self.log_window: Optional[TextLogWindow] = None
+        self.setup_window: Optional["SetupWindow"] = None
         self.active_section = "logs"
         self.sidebar_rows: dict[str, Adw.ActionRow] = {}
 
@@ -2004,6 +2739,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
 
         menu_btn = Gtk.MenuButton(icon_name="open-menu-symbolic")
         menu_model = Gio.Menu()
+        menu_model.append(T("setup_menu"), "win.run-setup")
         menu_model.append(T("system_info"), "win.show-sysinfo")
         menu_model.append(T("about"), "win.show-about")
         menu_btn.set_menu_model(menu_model)
@@ -2071,6 +2807,10 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         act_about = Gio.SimpleAction.new("show-about", None)
         act_about.connect("activate", lambda *_: self._show_about())
         self.add_action(act_about)
+
+        act_setup = Gio.SimpleAction.new("run-setup", None)
+        act_setup.connect("activate", lambda *_: self.start_recommended_setup())
+        self.add_action(act_setup)
 
     def _filter_sidebar_row(self, row: Gtk.ListBoxRow) -> bool:
         q = self.search_entry.get_text().strip().lower()
@@ -2237,6 +2977,80 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         if follow:
             self.log_window.follow(self.logger.path)
 
+    # ---- Setup recommandé ----
+    def maybe_show_welcome(self) -> None:
+        """Boîte de bienvenue du premier lancement (une seule fois)."""
+        if welcome_seen():
+            return
+        mark_welcome_seen()
+        # Différé d'une boucle : la fenêtre principale doit être réalisée avant la boîte.
+        GLib.idle_add(self._present_welcome)
+
+    def _present_welcome(self) -> bool:
+        dlg = Adw.AlertDialog(
+            heading=T("setup_welcome_title"), body=T("setup_welcome_body")
+        )
+        dlg.add_response("manual", T("setup_welcome_manual"))
+        dlg.add_response("setup", T("setup_welcome_recommended"))
+        dlg.set_response_appearance("setup", Adw.ResponseAppearance.SUGGESTED)
+        dlg.set_default_response("setup")
+        dlg.set_close_response("manual")
+
+        def _on_resp(_d, resp: str) -> None:
+            if resp == "setup":
+                self.start_recommended_setup(confirm=False)
+
+        dlg.connect("response", _on_resp)
+        dlg.present(self)
+        return False
+
+    def start_recommended_setup(self, confirm: bool = True) -> None:
+        if self.busy:
+            self.toast(T("busy"))
+            return
+        if self.setup_window is not None:
+            self.setup_window.present()
+            return
+
+        def _go() -> None:
+            self.busy = True
+            self.busy_spinner.start()
+            self.setup_window = SetupWindow(self, _build_setup_plan(self))
+            self.setup_window.present()
+            self.setup_window.start()
+
+        if confirm:
+            self.show_confirm(
+                T("setup_title"), T("setup_confirm_body"), _go, destructive=False
+            )
+        else:
+            _go()
+
+    def prompt_reboot(self, done: int, failed: int) -> None:
+        dlg = Adw.AlertDialog(
+            heading=T("setup_reboot_title"),
+            body=T("setup_reboot_body") % (done, failed),
+        )
+        dlg.add_response("later", T("setup_later"))
+        dlg.add_response("reboot", T("setup_reboot_now"))
+        dlg.set_response_appearance("reboot", Adw.ResponseAppearance.SUGGESTED)
+        dlg.set_default_response("later")
+        dlg.set_close_response("later")
+
+        def _on_resp(_d, resp: str) -> None:
+            if resp == "reboot":
+                self.run_task(
+                    T("setup_reboot_title"),
+                    lambda e: (
+                        self.run_cmd_pty(["systemctl", "reboot"], e) == 0,
+                        T("done"),
+                    ),
+                )
+
+        dlg.connect("response", _on_resp)
+        dlg.present(self)
+
+
     # ---- Exécuteur asynchrone via PTY ----
     def run_task(
         self,
@@ -2390,22 +3204,24 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
             release_notes_version=APP_VERSION,
             release_notes=(
                 (
-                    "<p>Nouveautés de la 0.4</p>"
+                                        "<p>Nouveautés de la 0.5</p>"
                     "<ul>"
-                    "<li>Nouvelle catégorie « Add Fedora Feature » dans le menu de gauche</li>"
-                    "<li>Gestion mobile : GSConnect (Wi-Fi), MTP / SSHFS en USB, intégrations Nautilus, ADB et Fastboot</li>"
-                    "<li>Imprimantes et scanners : CUPS, pilotes HP, Brother, Epson, Canon et génériques, SANE et Simple Scan</li>"
-                    "<li>Activation, désactivation (sockets compris) et état du service CUPS</li>"
+                    "<li>Boîte de bienvenue au premier lancement : setup recommandé en 1 clic ou configuration manuelle</li>"
+                    "<li>Fenêtre de suivi du setup : 9 étapes et 29 éléments, validation en direct et journal visible</li>"
+                    "<li>Redémarrage proposé à la fin du setup</li>"
+                    "<li>Menu principal : « Effectuer le setup recommandé »</li>"
+                    "<li><b>0.4 :</b> catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)</li>"
                     "</ul>"
                 )
                 if UI_LANG == "fr"
                 else (
-                    "<p>What is new in 0.4</p>"
+                                        "<p>What is new in 0.5</p>"
                     "<ul>"
-                    "<li>New “Add Fedora Feature” category in the sidebar</li>"
-                    "<li>Mobile management: GSConnect (Wi-Fi), USB MTP / SSHFS, Nautilus integrations, ADB and Fastboot</li>"
-                    "<li>Printers and scanners: CUPS, HP, Brother, Epson, Canon and generic drivers, SANE and Simple Scan</li>"
-                    "<li>Enable, disable (including sockets) and check the CUPS service</li>"
+                    "<li>First-launch welcome dialog: 1-click recommended setup or manual configuration</li>"
+                    "<li>Setup progress window: 9 steps and 29 items, live validation and visible log</li>"
+                    "<li>Reboot offered once the setup is finished</li>"
+                    "<li>Main menu: “Run recommended setup”</li>"
+                    "<li><b>0.4:</b> “Add Fedora Feature” category (mobile, printers &amp; scanners)</li>"
                     "</ul>"
                 )
             ),
@@ -5623,6 +6439,7 @@ class Ps5ManagerApp(Adw.Application):
         if not win:
             win = Ps5ManagerWindow(self, self.theme_sync)
         win.present()
+        win.maybe_show_welcome()
 
 
 def main() -> int:
