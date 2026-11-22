@@ -2269,24 +2269,6 @@ def _setup_universe(win: "Ps5ManagerWindow") -> Callable[[Callable[[str], None]]
     return _run
 
 
-def _setup_opera(win: "Ps5ManagerWindow") -> Callable[[Callable[[str], None]], bool]:
-    def _run(emit: Callable[[str], None]) -> bool:
-        win.run_cmd_pty(["rpm", "--import", OPERA_KEY], emit)
-        try:
-            with open(OPERA_REPO_FILE, "w", encoding="utf-8") as fh:
-                fh.write(
-                    "[opera]\nname=Opera packages\ntype=rpm-md\n"
-                    "baseurl=https://rpm.opera.com/rpm\ngpgcheck=1\n"
-                    f"gpgkey={OPERA_KEY}\nenabled=1\n"
-                )
-        except OSError as exc:
-            emit(str(exc))
-            return False
-        return win.run_cmd_pty(["dnf", "install", "-y", "opera-stable"], emit) == 0
-
-    return _run
-
-
 def _setup_gamescope(win: "Ps5ManagerWindow") -> Callable[[Callable[[str], None]], bool]:
     def _run(emit: Callable[[str], None]) -> bool:
         fd, path = tempfile.mkstemp(
@@ -2465,7 +2447,10 @@ def _build_setup_plan(win: "Ps5ManagerWindow") -> list[SetupStep]:
                     "setup_app_appimagepool",
                     _setup_flatpak_app(win, "io.github.prateekmedia.appimagepool"),
                 ),
-                ("setup_app_opera", _setup_opera(win)),
+                (
+                    "setup_app_opera",
+                    _setup_flatpak_app(win, "com.opera.Opera"),
+                ),
             ],
         ),
         SetupStep("setup_step8", [("setup_hw_plugin", _setup_hwcon_plugin(win))]),

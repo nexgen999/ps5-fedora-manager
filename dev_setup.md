@@ -74,7 +74,7 @@ suivant. À la fin, un redémarrage est proposé.
 | Decky Loader | `curl -fsSL https://github.com/SteamDeckHomebrew/decky-installer/releases/latest/download/install_release.sh \| bash` (utilisateur) |
 | Universe | `dnf copr enable -y ilyasturki/universe`, `dnf install -y universe universe-desktop`, puis `universe setup` (utilisateur) |
 | AppImage Pool | `flatpak install --system -y flathub io.github.prateekmedia.appimagepool` |
-| Opera | `rpm --import https://rpm.opera.com/rpmrepo.key`, dépôt `opera.repo`, puis `dnf install -y opera-stable` |
+| Opera | `flatpak install --system -y flathub com.opera.Opera` |
 
 ## 8. Hardware Control — plugin — section « Hardware Control »
 
