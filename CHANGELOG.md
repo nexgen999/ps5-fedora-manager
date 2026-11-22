@@ -4,6 +4,8 @@ Historique des versions de **PS5 Fedora Manager** (application GTK4 / Libadwaita
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le projet n'utilise pas encore de tags Git, les versions correspondent à `APP_VERSION` dans `ps5_manager.py`.
 
+Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
+
 ## [0.5] — 2026-11-22
 
 ### Ajouté

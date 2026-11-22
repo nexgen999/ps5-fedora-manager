@@ -9,6 +9,8 @@ Le setup s'exécute en une seule passe, dans l'ordre ci-dessous. Chaque élémen
 est indépendant : un échec est signalé (✖) et le setup continue avec l'élément
 suivant. À la fin, un redémarrage est proposé.
 
+Version anglaise : [dev_setup_en.md](dev_setup_en.md)
+
 > La liste d'origine fournie par le mainteneur comportait deux « étape 4 » ;
 > les étapes sont donc numérotées ici de 1 à 9 dans l'ordre réel d'exécution.
 
