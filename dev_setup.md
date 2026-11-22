@@ -92,13 +92,17 @@ suivant. À la fin, un redémarrage est proposé.
 
 ## Déroulement dans l'application
 
-1. **Premier lancement** : une boîte de bienvenue propose « Setup recommandé
+1. **Premier lancement — langue** : la boîte bilingue « Choose your language ·
+   Choisissez votre langue » (boutons *English* / *Français*) s'affiche en
+   premier et applique immédiatement la langue choisie.
+2. **Premier lancement — bienvenue** : une boîte propose « Setup recommandé
    (1 clic) » ou « Configurer moi-même ». Le choix « Configurer moi-même »
    ferme simplement la boîte ; le choix recommandé démarre le setup.
-2. **Fenêtre de suivi** : à gauche la liste des 9 étapes et de leurs 29
-   éléments (`○` en attente, `●` en cours, `✔` validé, `✖` en échec), à
-   droite le journal complet des commandes, avec une barre de progression.
-3. **Fin du setup** : la fenêtre de suivi se ferme et un redémarrage est
+3. **Fenêtre de suivi** (1320 × 800) : à gauche la liste des 9 étapes et de
+   leurs 29 éléments (`○` en attente, `●` en cours, `✔` validé, `✖` en
+   échec), à droite le journal complet des commandes, avec une barre de
+   progression.
+4. **Fin du setup** : la fenêtre de suivi se ferme et un redémarrage est
    proposé (`systemctl reboot`).
 
 La marque du premier lancement est stockée dans

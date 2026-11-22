@@ -2480,8 +2480,8 @@ class SetupWindow(Adw.Window):
         super().__init__(
             transient_for=win,
             title=T("setup_title"),
-            default_width=1120,
-            default_height=740,
+            default_width=1320,
+            default_height=800,
         )
         self.win = win
         self.plan = plan
@@ -2540,7 +2540,7 @@ class SetupWindow(Adw.Window):
         split.set_end_child(log_box)
         split.set_resize_start_child(False)
         split.set_shrink_start_child(False)
-        split.set_position(470)
+        split.set_position(540)
 
         self.progress = Gtk.ProgressBar(show_text=True)
         self.progress.set_hexpand(True)
@@ -2979,12 +2979,47 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
 
     # ---- Setup recommandé ----
     def maybe_show_welcome(self) -> None:
-        """Boîte de bienvenue du premier lancement (une seule fois)."""
+        """Choix de la langue, puis boîte de bienvenue (premier lancement)."""
         if welcome_seen():
             return
         mark_welcome_seen()
         # Différé d'une boucle : la fenêtre principale doit être réalisée avant la boîte.
-        GLib.idle_add(self._present_welcome)
+        GLib.idle_add(self._present_welcome_language)
+
+    def set_ui_language(self, code: str) -> None:
+        global UI_LANG
+        UI_LANG = code
+        write_ui_lang(code)
+        self.rebuild_ui_for_language()
+
+    def _present_welcome_language(self) -> bool:
+        """Premier choix de la langue, avant le message de setup.
+
+        Le texte est volontairement bilingue : la langue de l'interface n'est pas
+        encore connue au tout premier lancement.
+        """
+        dlg = Adw.AlertDialog(
+            heading="Choose your language · Choisissez votre langue",
+            body=(
+                "PS5 Fedora Manager is available in English and French.\n"
+                "PS5 Fedora Manager est disponible en français et en anglais."
+            ),
+        )
+        dlg.add_response("en", "English")
+        dlg.add_response("fr", "Français")
+        default = "fr" if UI_LANG == "fr" else "en"
+        dlg.set_response_appearance(default, Adw.ResponseAppearance.SUGGESTED)
+        dlg.set_default_response(default)
+        dlg.set_close_response(default)
+
+        def _on_resp(_d, resp: str) -> None:
+            if resp in ("fr", "en"):
+                self.set_ui_language(resp)
+            GLib.idle_add(self._present_welcome)
+
+        dlg.connect("response", _on_resp)
+        dlg.present(self)
+        return False
 
     def _present_welcome(self) -> bool:
         dlg = Adw.AlertDialog(
