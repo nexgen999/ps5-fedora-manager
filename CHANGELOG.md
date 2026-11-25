@@ -6,6 +6,13 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.8.1] — 2026-11-25
+
+### Corrigé
+- **Icône du raccourci de session** : le raccourci « Basculer Session » et le lanceur du menu utilisaient `Icon=steam` (logo Steam). L'installation du mode Gaming écrit désormais l'icône Gamescope fournie (Steam Deck) dans `/usr/share/pixmaps/ps5-gaming-mode.png` et `/usr/share/icons/hicolor/96x96/apps/`, puis la déclare dans `switch-session.desktop` et dans la session `steam.desktop` (le sélecteur de session GDM / SDDM / LightDM affiche donc lui aussi cette icône).
+- La désinstallation du mode Gaming supprime les deux fichiers d'icône et rafraîchit le cache du thème.
+- `APP_VERSION` passe à `0.8.1`.
+
 ## [0.8] — 2026-11-25
 
 ### Ajouté

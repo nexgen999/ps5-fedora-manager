@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.8"
+APP_VERSION = "0.8.1"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -233,9 +233,21 @@ Name=Steam (Gamescope)
 Comment=Run Steam directly in Gamescope
 Exec=gamescope-session
 Type=Application
+Icon=ps5-gaming-mode
 DesktopNames=gamescope
 DESK
 chmod 644 /usr/share/wayland-sessions/steam.desktop
+
+step "Icone Gamescope des raccourcis"
+ICON_PNG="/usr/share/pixmaps/ps5-gaming-mode.png"
+mkdir -p /usr/share/pixmaps /usr/share/icons/hicolor/96x96/apps
+base64 -d > "$ICON_PNG" <<'B64'
+__GAMING_ICON_B64__
+B64
+install -m 0644 "$ICON_PNG" /usr/share/icons/hicolor/96x96/apps/ps5-gaming-mode.png
+if command -v gtk-update-icon-cache >/dev/null; then
+  gtk-update-icon-cache -f -t /usr/share/icons/hicolor >/dev/null 2>&1 || true
+fi
 
 step "sudoers : bascule de session sans mot de passe"
 mkdir -p /etc/sudoers.d
@@ -399,7 +411,7 @@ Type=Application
 Name=__DESK_NAME__
 Comment=__SESSION_LABEL__ / Steam Big Picture
 Exec=/usr/local/bin/switch-session steam
-Icon=steam
+Icon=ps5-gaming-mode
 Terminal=false
 Categories=Game;Utility;
 DESK
@@ -435,6 +447,11 @@ rm -f /usr/bin/steamos-polkit-helpers/jupiter-biosupdate \
       /usr/bin/steamos-polkit-helpers/steamos-set-timezone
 rmdir /usr/bin/steamos-polkit-helpers 2>/dev/null || true
 rm -f /usr/share/wayland-sessions/steam.desktop
+rm -f /usr/share/pixmaps/ps5-gaming-mode.png \
+      /usr/share/icons/hicolor/96x96/apps/ps5-gaming-mode.png
+if command -v gtk-update-icon-cache >/dev/null; then
+  gtk-update-icon-cache -f -t /usr/share/icons/hicolor >/dev/null 2>&1 || true
+fi
 
 step "Regle sudoers"
 rm -f /etc/sudoers.d/ps5-session
@@ -557,6 +574,7 @@ def _gaming_script(kind: str) -> str:
         .replace("__SESSION__", DESKTOP_SESSION)
         .replace("__DM_SERVICE__", DM_SERVICE)
         .replace("__DISPLAY_MANAGER__", DISPLAY_MANAGER)
+        .replace("__GAMING_ICON_B64__", ICONS_B64.get("gamescope", ""))
         .replace("__AUTOLOGIN_BLOCK__", _gaming_autologin_block())
         .replace("__SCALING_BLOCK__", _gaming_scaling_block())
     )
@@ -6448,8 +6466,9 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
             release_notes_version=APP_VERSION,
             release_notes=_safe_release_notes(
                 (
-                                        "<p>Nouveautés de la 0.8</p>"
+                                        "<p>Nouveautés de la 0.8.1</p>"
                     "<ul>"
+                    "<li>0.8.1 : le raccourci « Basculer Session » et la session Steam utilisent l'icône Gamescope (Steam Deck) fournie, installée dans le thème d'icônes</li>"
                     "<li>0.8 : fenêtre « Système » repensée (logos Fedora, bureau et Gamescope, informations regroupées, copie en un clic) et traductions complétées en espagnol, italien, allemand et portugais</li>"
                     "<li>0.7.1 : mode Gaming (Gamescope) réparé — retour au bureau à la fermeture de Steam, plus de relance en boucle, accès DRM et journal de session</li>"
                     "<li>0.7 : interface en 6 langues (français, anglais, espagnol, italien, allemand, portugais du Brésil)</li>"
@@ -6464,8 +6483,9 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
                 )
                 if UI_LANG == "fr"
                 else (
-                                        "<p>What is new in 0.8</p>"
+                                        "<p>What is new in 0.8.1</p>"
                     "<ul>"
+                    "<li>0.8.1: the “Switch Session” shortcut and the Steam session now use the provided Gamescope (Steam Deck) icon, installed in the icon theme</li>"
                     "<li>0.8: redesigned “System” window (Fedora, desktop and Gamescope logos, grouped information, one-click copy) and completed translations in Spanish, Italian, German and Portuguese</li>"
                     "<li>0.7.1: Gaming Mode (Gamescope) fixed — closing Steam returns to the desktop, no more relaunch loop, DRM access and session log</li>"
                     "<li>0.7: interface in 6 languages (French, English, Spanish, Italian, German, Brazilian Portuguese)</li>"

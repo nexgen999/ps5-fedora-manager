@@ -7,6 +7,13 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.8.1] — 2026-11-25
+
+### Fixed
+- **Session shortcut icon**: the “Switch Session” shortcut and the menu launcher used `Icon=steam` (Steam logo). Installing Gaming Mode now writes the provided Gamescope (Steam Deck) icon to `/usr/share/pixmaps/ps5-gaming-mode.png` and `/usr/share/icons/hicolor/96x96/apps/`, then references it from `switch-session.desktop` and from the `steam.desktop` session (so the GDM / SDDM / LightDM session picker shows it too).
+- Uninstalling Gaming Mode removes both icon files and refreshes the icon theme cache.
+- `APP_VERSION` bumped to `0.8.1`.
+
 ## [0.8] — 2026-11-25
 
 ### Added
