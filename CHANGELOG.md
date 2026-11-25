@@ -9,6 +9,7 @@ Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 ## [0.5] — 2026-11-22
 
 ### Ajouté
+- **Compatibilité GNOME / KDE Plasma / Cinnamon / Budgie** : détection automatique du bureau (variables de session, processus de l'utilisateur, `loginctl`) et du gestionnaire de connexion (GDM / SDDM / LightDM), avec adaptation des commandes concernées.
 - **Choix de la langue au premier lancement** : la boîte « Choose your language · Choisissez votre langue » (texte bilingue, boutons *English* / *Français*) s'affiche avant le message de setup, pour que chacun comprenne les deux options ; l'interface bascule immédiatement dans la langue choisie.
 - **Boîte de bienvenue au premier lancement** : propose le **setup recommandé en 1 clic** ou la configuration manuelle (fermeture de la boîte). Le choix est mémorisé dans `/etc/ps5-manager/setup-welcome-done`, donc la boîte ne réapparaît plus ensuite.
 - **Setup recommandé** en 9 étapes et 29 éléments : alimentation (veille système, écran, veille complète), ventilateur (PS5 Linux Tools, `ps5fan`, `ps5boost`), Hardware Control, Mesa / Vulkan, dépôts (RPM Fusion, Flatpak/Flathub, cache), dépendances supplémentaires (fuse, pilotes 32 bits Steam, Python 3 + pip, environnement virtuel `my_project`, Tkinter, Node.js/npm, mise à jour Fedora), logithèque (Bazaar, GNOME Extension Manager, Steam, Heroic, ProtonUp-Qt, Decky Loader, Universe, AppImage Pool, Opera en Flatpak `com.opera.Opera`), plugin Hardware Control et Gaming Mode (Gamescope).
@@ -18,6 +19,9 @@ Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 - Documentation [`dev_setup.md`](dev_setup.md) : configuration de référence, commandes exactes et correspondance avec les sections de l'application.
 
 ### Modifié
+- **Alimentation par bureau** : veille de l'écran et veille complète via `gsettings` (GNOME, Cinnamon, Budgie) ou `kwriteconfig6` + Powerdevil (KDE Plasma), rechargement de Powerdevil inclus.
+- **Éléments propres à GNOME** : l'Extension Manager disparaît de la Logithèque et du setup recommandé (28 éléments hors GNOME) ; la gestion mobile utilise KDE Connect (KDE), Nemo (Cinnamon) ou Nautilus (GNOME / Budgie) ; les imprimantes ajoutent `print-manager` sous KDE.
+- **Gamescope multi-bureau** : auto-connexion écrite pour GDM, SDDM ou LightDM et bascule vers la session du bureau détecté (`gnome`, `plasma`, `cinnamon`, `budgie-desktop`) au lieu de « gnome » codé en dur.
 - **Fenêtre de suivi du setup élargie** (1320 × 800 au lieu de 1120 × 740) et colonne de gauche plus large, pour une lecture plus confortable de la liste et du journal.
 - `APP_VERSION` passe à `0.5`, notes de version FR/EN de la boîte « À propos » mises à jour.
 

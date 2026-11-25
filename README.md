@@ -22,7 +22,7 @@
 
 ---
 
-Gestionnaire système, matériel et logiciel conçu pour **Fedora Linux (Fedora 45 / GNOME)** sur **PlayStation 5**, doté d'une interface native **Python + PyGObject (GTK4 & Libadwaita)** harmonisée automatiquement avec la couleur d'accentuation et le mode clair/sombre de GNOME.
+Gestionnaire système, matériel et logiciel conçu pour **Fedora Linux (41 à 45)** sur **PlayStation 5**, compatible **GNOME, KDE Plasma, Cinnamon et Budgie**, doté d'une interface native **Python + PyGObject (GTK4 & Libadwaita)** harmonisée automatiquement avec la couleur d'accentuation et le mode clair/sombre de GNOME.
 
 ---
 
@@ -35,10 +35,10 @@ Gestionnaire système, matériel et logiciel conçu pour **Fedora Linux (Fedora 
 * **Logithèque PS5 organisée par catégories** :
   * **Gaming** : Steam (active RPM Fusion automatiquement), Heroic Games Launcher, ProtonUp-Qt, Decky Loader, **Universe** (COPR `ilyasturki/universe` + `universe setup`).
   * **Navigateurs** : Opera, Brave (choix RPM officiel ou Flatpak).
-  * **Système & Utilitaires** : Etcher (RPM GitHub), Bazaar, GNOME Extension Manager.
+  * **Système & Utilitaires** : Etcher (RPM GitHub), Bazaar, GNOME Extension Manager (GNOME uniquement).
 * **Gestion du Kernel PS5 (`ps5-linux-patches`)** : vérification des releases GitHub, installation RPM (`rpm -ivh --nosignature --replacefiles`), `depmod`, `zz-update-boot` sur `/boot/efi`, choix du noyau au démarrage et suppression sécurisée des anciens paquets `linux-ps5-*` (avec protection du noyau actif et de `/boot/efi/bzImage`).
 * **Matériel PS5 & Graphique** : contrôle des services `ps5fan.service` / `ps5boost.service`, installation de `ps5-linux-tools` et `ps5-hwcon-gui`, vérification des nœuds `hwmon`/`sysfs`, diagnostic Mesa / Vulkan / RADV.
-* **Alimentation GNOME & Système** : gestion de la mise en veille système (`systemd`), écran (`gsettings idle-delay`) et veille complète.
+* **Alimentation & Système** : mise en veille système (`systemd`), veille de l'écran et veille complète adaptées au bureau détecté — `gsettings` sous GNOME / Cinnamon / Budgie, `kwriteconfig6` + Powerdevil sous KDE Plasma.
 * **Système Fedora** : langues & clavier (`localectl` + AccountsService), dépôts RPM Fusion & Flathub, utilisateurs, mises à jour DNF/Flatpak, maintenance & nettoyage.
 * **Bilingue FR / EN** : changement immédiat depuis l'interface, mémorisé dans `/etc/ps5-manager/language`.
 
@@ -46,7 +46,7 @@ Gestionnaire système, matériel et logiciel conçu pour **Fedora Linux (Fedora 
 
 ## Prérequis
 
-* **Fedora Linux 41 à 45** (Workstation / GNOME recommandé) sur architecture `x86_64`
+* **Fedora Linux 41 à 45** (Workstation ; GNOME, KDE Plasma, Cinnamon ou Budgie) sur architecture `x86_64`
 * Connexion Internet (pour DNF, Flatpak, COPR et GitHub)
 * Droits administrateur (`sudo` / `pkexec`)
 

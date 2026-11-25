@@ -21,8 +21,8 @@ Version anglaise : [dev_setup_en.md](dev_setup_en.md)
 | Élément | Commande |
 | --- | --- |
 | Désactiver la veille système | `systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target` |
-| Désactiver la mise en veille de l'écran | `gsettings set org.gnome.desktop.session idle-delay 0` (utilisateur) |
-| Désactiver la veille complète | `gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type nothing` (utilisateur) |
+| Désactiver la mise en veille de l'écran | selon le bureau (voir [Compatibilité](#compatibilité-des-environnements-de-bureau)) : `gsettings set org.gnome.desktop.session idle-delay 0` (GNOME / Budgie), `gsettings set org.cinnamon.desktop.session idle-delay 0` (Cinnamon), `kwriteconfig6 --file powermanagementprofilesrc --group AC --group DimDisplay --key idleTime 0` et `--group DPMSControl --key idleTime 0` (KDE) |
+| Désactiver la veille complète | selon le bureau : `sleep-inactive-ac-type nothing` (GNOME / Budgie), `org.cinnamon.settings-daemon.plugins.power sleep-inactive-ac-type nothing` (Cinnamon), `--group SuspendSession --key idleTime 0 --key suspendType 0` (KDE) — utilisateur |
 
 ## 2. Ventilateur — section « Ventilateur »
 
@@ -69,7 +69,7 @@ Version anglaise : [dev_setup_en.md](dev_setup_en.md)
 | Élément | Commande |
 | --- | --- |
 | Bazaar | `flatpak install --system -y flathub io.github.kolunmi.Bazaar` |
-| GNOME Extension Manager | `flatpak install --system -y flathub com.mattjakeman.ExtensionManager` |
+| GNOME Extension Manager (GNOME uniquement, retiré ailleurs) | `flatpak install --system -y flathub com.mattjakeman.ExtensionManager` |
 | Steam | `dnf install -y steam` (RPM Fusion activé au préalable) |
 | Heroic Games Launcher | `flatpak install --system -y flathub com.heroicgameslauncher.hgl` |
 | ProtonUp-Qt | `flatpak install --system -y flathub net.davidotek.pupgui2` |
@@ -91,6 +91,41 @@ Version anglaise : [dev_setup_en.md](dev_setup_en.md)
 | Installer Gamescope | script d'installation embarqué de la section « Gaming Mode » (Gamescope + session Steam Big Picture) |
 
 ---
+
+## Compatibilité des environnements de bureau
+
+L'application détecte le bureau au démarrage (variable `PS5_MANAGER_DESKTOP` si
+elle est définie, puis `XDG_CURRENT_DESKTOP` / `XDG_SESSION_DESKTOP` /
+`DESKTOP_SESSION`, puis l'environnement des processus de l'utilisateur réel,
+puis `loginctl show-session -p Desktop`). Le gestionnaire de connexion est
+détecté de la même façon (`gdm.service`, `sddm.service`, `lightdm.service`).
+
+| Élément | GNOME | KDE Plasma | Cinnamon | Budgie |
+| --- | --- | --- | --- | --- |
+| Veille écran | `gsettings org.gnome.desktop.session idle-delay` | `kwriteconfig6` + Powerdevil (`DimDisplay`, `DPMSControl`) | `gsettings org.cinnamon.desktop.session idle-delay` | `gsettings org.gnome.desktop.session idle-delay` |
+| Veille complète | `sleep-inactive-ac-type` (gnome-settings-daemon) | `SuspendSession` (`idleTime`, `suspendType`) | `org.cinnamon.settings-daemon.plugins.power` | `sleep-inactive-ac-type` (gnome-settings-daemon) |
+| Veille système (`systemctl mask …`) | oui | oui | oui | oui |
+| Logithèque : Extension Manager | affiché | masqué | masqué | masqué |
+| Gestion mobile | GSConnect + Nautilus | KDE Connect + Dolphin | MTP / SSHFS + Nemo | MTP / SSHFS + Nautilus |
+| Imprimantes & scanners | CUPS + `system-config-printer` | CUPS + `print-manager` | CUPS + `system-config-printer` | CUPS + `system-config-printer` |
+| Gamescope / session Steam | GDM | SDDM | GDM ou LightDM | GDM ou LightDM |
+
+Remarques :
+
+- Sous KDE Plasma, la configuration est écrite dans
+  `~/.config/powermanagementprofilesrc` puis Powerdevil est rechargé
+  (`qdbus … org.kde.Solid.PowerManagement.reparseConfiguration`).
+- Le setup recommandé ne comporte que **28 éléments hors GNOME** : l'Extension
+  Manager est retiré du plan (et de la Logithèque).
+- Gamescope : l'auto-connexion est écrite dans `[daemon]` de
+  `/etc/gdm/custom.conf`, dans `/etc/sddm.conf.d/zz-ps5-manager-autologin.conf`
+  ou dans `[Seat:*]` de `/etc/lightdm/lightdm.conf`. La session restaurée est
+  celle du bureau détecté (`gnome`, `plasma`, `cinnamon`, `budgie-desktop`) et
+  non plus « gnome » en dur. Le facteur d'échelle 1.5 de l'écran de connexion
+  n'est appliqué que sous GDM.
+- Un bureau non identifié (`unknown`) applique les commandes GNOME par défaut ;
+  les interrupteurs de veille apparaissent alors désactivés si `gsettings`
+  n'est pas disponible.
 
 ## Déroulement dans l'application
 

@@ -10,6 +10,7 @@ French version: [CHANGELOG.md](CHANGELOG.md)
 ## [0.5] — 2026-11-22
 
 ### Added
+- **GNOME / KDE Plasma / Cinnamon / Budgie support**: the desktop (session variables, user processes, `loginctl`) and the display manager (GDM / SDDM / LightDM) are detected automatically, and the affected commands adapt to them.
 - **Language choice on first launch**: the bilingual “Choose your language · Choisissez votre langue” dialog (text in both languages, *English* / *Français* buttons) is shown before the setup message, so everyone understands both options; the interface switches to the chosen language immediately.
 - **First-launch welcome dialog**: offers the **1-click recommended setup** or manual configuration (which simply closes the dialog). The choice is remembered in `/etc/ps5-manager/setup-welcome-done`, so the dialog never appears again afterwards.
 - **Recommended setup** in 9 steps and 29 items: power (system sleep, screen blanking, full sleep), fan (PS5 Linux Tools, `ps5fan`, `ps5boost`), Hardware Control, Mesa / Vulkan, repositories (RPM Fusion, Flatpak/Flathub, cache), extra dependencies (fuse, 32-bit Steam drivers, Python 3 + pip, `my_project` virtual environment, Tkinter, Node.js/npm, Fedora update), app store (Bazaar, GNOME Extension Manager, Steam, Heroic, ProtonUp-Qt, Decky Loader, Universe, AppImage Pool, Opera as the Flatpak `com.opera.Opera`), the Hardware Control plugin and Gaming Mode (Gamescope).
@@ -20,6 +21,9 @@ French version: [CHANGELOG.md](CHANGELOG.md)
 - English versions of the documentation: [`CHANGELOG_en.md`](CHANGELOG_en.md) and [`dev_setup_en.md`](dev_setup_en.md).
 
 ### Changed
+- **Power per desktop**: screen blanking and full sleep through `gsettings` (GNOME, Cinnamon, Budgie) or `kwriteconfig6` + Powerdevil (KDE Plasma), including a Powerdevil reload.
+- **GNOME-specific items**: the Extension Manager disappears from the app store and from the recommended setup (28 items outside GNOME); mobile management uses KDE Connect (KDE), Nemo (Cinnamon) or Nautilus (GNOME / Budgie); printers add `print-manager` on KDE.
+- **Multi-desktop Gamescope**: autologin is written for GDM, SDDM or LightDM and switches back to the detected desktop session (`gnome`, `plasma`, `cinnamon`, `budgie-desktop`) instead of a hard-coded “gnome”.
 - **Wider setup progress window** (1320 × 800 instead of 1120 × 740) with a wider left column, for a more comfortable reading of the list and the log.
 - `APP_VERSION` bumped to `0.5`, FR/EN release notes of the “About” dialog updated.
 

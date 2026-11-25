@@ -22,8 +22,8 @@ French version: [dev_setup.md](dev_setup.md)
 | Item | Command |
 | --- | --- |
 | Disable system sleep | `systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target` |
-| Disable screen blanking | `gsettings set org.gnome.desktop.session idle-delay 0` (user) |
-| Disable full sleep | `gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type nothing` (user) |
+| Disable screen blanking | depending on the desktop (see [Compatibility](#desktop-environment-compatibility)): `gsettings set org.gnome.desktop.session idle-delay 0` (GNOME / Budgie), `gsettings set org.cinnamon.desktop.session idle-delay 0` (Cinnamon), `kwriteconfig6 --file powermanagementprofilesrc --group AC --group DimDisplay --key idleTime 0` and `--group DPMSControl --key idleTime 0` (KDE) |
+| Disable full sleep | depending on the desktop: `sleep-inactive-ac-type nothing` (GNOME / Budgie), `org.cinnamon.settings-daemon.plugins.power sleep-inactive-ac-type nothing` (Cinnamon), `--group SuspendSession --key idleTime 0 --key suspendType 0` (KDE) — user |
 
 ## 2. Fan — “Fan” section
 
@@ -70,7 +70,7 @@ French version: [dev_setup.md](dev_setup.md)
 | Item | Command |
 | --- | --- |
 | Bazaar | `flatpak install --system -y flathub io.github.kolunmi.Bazaar` |
-| GNOME Extension Manager | `flatpak install --system -y flathub com.mattjakeman.ExtensionManager` |
+| GNOME Extension Manager (GNOME only, removed elsewhere) | `flatpak install --system -y flathub com.mattjakeman.ExtensionManager` |
 | Steam | `dnf install -y steam` (RPM Fusion enabled beforehand) |
 | Heroic Games Launcher | `flatpak install --system -y flathub com.heroicgameslauncher.hgl` |
 | ProtonUp-Qt | `flatpak install --system -y flathub net.davidotek.pupgui2` |
@@ -92,6 +92,39 @@ French version: [dev_setup.md](dev_setup.md)
 | Install Gamescope | install script embedded in the “Gaming Mode” section (Gamescope + Steam Big Picture session) |
 
 ---
+
+## Desktop environment compatibility
+
+The application detects the desktop at startup (`PS5_MANAGER_DESKTOP` when set,
+then `XDG_CURRENT_DESKTOP` / `XDG_SESSION_DESKTOP` / `DESKTOP_SESSION`, then the
+environment of the real user's processes, then `loginctl show-session -p
+Desktop`). The display manager is detected the same way (`gdm.service`,
+`sddm.service`, `lightdm.service`).
+
+| Item | GNOME | KDE Plasma | Cinnamon | Budgie |
+| --- | --- | --- | --- | --- |
+| Screen blanking | `gsettings org.gnome.desktop.session idle-delay` | `kwriteconfig6` + Powerdevil (`DimDisplay`, `DPMSControl`) | `gsettings org.cinnamon.desktop.session idle-delay` | `gsettings org.gnome.desktop.session idle-delay` |
+| Full sleep | `sleep-inactive-ac-type` (gnome-settings-daemon) | `SuspendSession` (`idleTime`, `suspendType`) | `org.cinnamon.settings-daemon.plugins.power` | `sleep-inactive-ac-type` (gnome-settings-daemon) |
+| System sleep (`systemctl mask …`) | yes | yes | yes | yes |
+| App store: Extension Manager | shown | hidden | hidden | hidden |
+| Mobile management | GSConnect + Nautilus | KDE Connect + Dolphin | MTP / SSHFS + Nemo | MTP / SSHFS + Nautilus |
+| Printers & scanners | CUPS + `system-config-printer` | CUPS + `print-manager` | CUPS + `system-config-printer` | CUPS + `system-config-printer` |
+| Gamescope / Steam session | GDM | SDDM | GDM or LightDM | GDM or LightDM |
+
+Notes:
+
+- On KDE Plasma the settings are written to
+  `~/.config/powermanagementprofilesrc` and Powerdevil is reloaded
+  (`qdbus … org.kde.Solid.PowerManagement.reparseConfiguration`).
+- Outside GNOME the recommended setup has **28 items** instead of 29: the
+  Extension Manager is removed from the plan (and from the app store).
+- Gamescope: autologin is written to `[daemon]` in `/etc/gdm/custom.conf`, to
+  `/etc/sddm.conf.d/zz-ps5-manager-autologin.conf` or to `[Seat:*]` in
+  `/etc/lightdm/lightdm.conf`. The restored session is the detected desktop
+  (`gnome`, `plasma`, `cinnamon`, `budgie-desktop`) instead of a hard-coded
+  “gnome”. The 1.5 scaling factor of the login screen is only applied on GDM.
+- An unidentified desktop (`unknown`) applies the GNOME commands by default;
+  the power switches then appear disabled when `gsettings` is unavailable.
 
 ## Application flow
 

@@ -87,44 +87,20 @@ fail() { printf '  x %s\n' "$*" >&2; exit 1; }
 [ "$(id -u)" -eq 0 ] || fail "root requis"
 id "$U" >/dev/null 2>&1 || fail "utilisateur inconnu : $U"
 
-step "AccountsService : session GNOME pour $U"
+step "AccountsService : session __SESSION_LABEL__ pour $U"
 AS="/var/lib/AccountsService/users/$U"
 mkdir -p "$(dirname "$AS")"
 if [ -f "$AS" ]; then
-  sed -i 's/^Session=.*/Session=gnome/' "$AS"
-  grep -q '^Session=' "$AS" || sed -i '1i Session=gnome' "$AS"
+  sed -i 's/^Session=.*/Session=__SESSION__/' "$AS"
+  grep -q '^Session=' "$AS" || sed -i '1i Session=__SESSION__' "$AS"
 else
-  printf '[User]\nSession=gnome\n' > "$AS"
+  printf '[User]\nSession=__SESSION__\n' > "$AS"
 fi
 passwd -u "$U" >/dev/null 2>&1 || true
 
-step "GDM : auto-connexion de $U"
-mkdir -p /etc/gdm
-GDM="/etc/gdm/custom.conf"
-if [ -f "$GDM" ]; then
-  cp -f "$GDM" "$GDM.bak-ps5-manager"
-else
-  printf '# GDM configuration storage\n\n[daemon]\n\n[security]\n\n[xdmcp]\n\n[chooser]\n\n[debug]\n#Enable=true\n' > "$GDM"
-fi
-python3 - "$GDM" "$U" <<'PY'
-import io, re, sys
-path, user = sys.argv[1], sys.argv[2]
-lines = [l for l in io.open(path, encoding="utf-8").read().splitlines()
-         if not re.match(r"\s*AutomaticLogin(Enable)?\s*=", l)]
-try:
-    i = next(n for n, l in enumerate(lines) if l.strip() == "[daemon]")
-except StopIteration:
-    lines.insert(0, "[daemon]")
-    i = 0
-lines[i + 1:i + 1] = ["AutomaticLoginEnable=True", "AutomaticLogin=" + user]
-io.open(path, "w", encoding="utf-8").write("\n".join(lines) + "\n")
-PY
+__AUTOLOGIN_BLOCK__
 
-step "GDM : facteur d'echelle 1.5 (dconf)"
-mkdir -p /etc/dconf/profile /etc/dconf/db/gdm.d
-printf 'user-db:user\nsystem-db:gdm\n' > /etc/dconf/profile/gdm
-printf '[org/gnome/desktop/interface]\ntext-scaling-factor=1.5\n' > /etc/dconf/db/gdm.d/00-scaling
-dconf update >/dev/null 2>&1 || true
+__SCALING_BLOCK__
 
 step "Session Steam + Gamescope (guide shahnawazshahin)"
 dnf install -y git >/dev/null || fail "installation de git impossible"
@@ -147,8 +123,8 @@ cat > /usr/local/bin/switch-session <<'SH'
 #!/bin/bash
 USER_ID=$(id -u __USER__)
 CURRENT=$(busctl get-property org.freedesktop.Accounts /org/freedesktop/Accounts/User$USER_ID org.freedesktop.Accounts.User Session | awk -F'"' '{print $2}')
-if [ "$CURRENT" = "steam" ]; then TARGET="gnome"; else TARGET="steam"; fi
-sudo systemd-run --quiet --collect bash -c "busctl call org.freedesktop.Accounts /org/freedesktop/Accounts/User$USER_ID org.freedesktop.Accounts.User SetSession s '$TARGET' && loginctl terminate-user __USER__ && sleep 2 && systemctl restart gdm"
+if [ "$CURRENT" = "steam" ]; then TARGET="__SESSION__"; else TARGET="steam"; fi
+sudo systemd-run --quiet --collect bash -c "busctl call org.freedesktop.Accounts /org/freedesktop/Accounts/User$USER_ID org.freedesktop.Accounts.User SetSession s '$TARGET' && loginctl terminate-user __USER__ && sleep 2 && systemctl restart __DM_SERVICE__"
 SH
 chmod 755 /usr/local/bin/switch-session
 
@@ -156,7 +132,7 @@ step "/usr/bin/steamos-session-select (retour au bureau)"
 cat > /usr/bin/steamos-session-select <<'SH'
 #!/bin/bash
 USER_ID=$(id -u __USER__)
-sudo systemd-run --quiet --collect bash -c "busctl call org.freedesktop.Accounts /org/freedesktop/Accounts/User$USER_ID org.freedesktop.Accounts.User SetSession s 'gnome' && loginctl terminate-user __USER__ && sleep 2 && systemctl restart gdm"
+sudo systemd-run --quiet --collect bash -c "busctl call org.freedesktop.Accounts /org/freedesktop/Accounts/User$USER_ID org.freedesktop.Accounts.User SetSession s '__SESSION__' && loginctl terminate-user __USER__ && sleep 2 && systemctl restart __DM_SERVICE__"
 SH
 chmod 755 /usr/bin/steamos-session-select
 
@@ -167,7 +143,7 @@ cat > "$APP_DIR/switch-session.desktop" <<'DESK'
 [Desktop Entry]
 Type=Application
 Name=__DESK_NAME__
-Comment=GNOME / Steam Big Picture
+Comment=__SESSION_LABEL__ / Steam Big Picture
 Exec=/usr/local/bin/switch-session
 Icon=steam
 Terminal=false
@@ -217,38 +193,120 @@ if command -v update-desktop-database >/dev/null; then
   update-desktop-database "$H/.local/share/applications" >/dev/null 2>&1 || true
 fi
 
-step "Session GNOME par defaut"
+step "Session __SESSION_LABEL__ par defaut"
 if [ -n "$USER_ID" ]; then
   busctl call org.freedesktop.Accounts /org/freedesktop/Accounts/User$USER_ID \
-    org.freedesktop.Accounts.User SetSession s "gnome" >/dev/null 2>&1 || true
+    org.freedesktop.Accounts.User SetSession s "__SESSION__" >/dev/null 2>&1 || true
 fi
 AS="/var/lib/AccountsService/users/$U"
 if [ -f "$AS" ]; then
-  sed -i 's/^Session=.*/Session=gnome/' "$AS"
+  sed -i 's/^Session=.*/Session=__SESSION__/' "$AS"
 fi
 
-step "GDM : retrait de l'auto-connexion"
+step "Gestionnaire de connexion : retrait de l'auto-connexion"
 if [ -f /etc/gdm/custom.conf ]; then
   sed -i '/^AutomaticLoginEnable=/d;/^AutomaticLogin=/d;/^DefaultSession=/d' /etc/gdm/custom.conf
 fi
+rm -f /etc/sddm.conf.d/zz-ps5-manager-autologin.conf
+if [ -f /etc/lightdm/lightdm.conf ]; then
+  sed -i '/^[[:space:]]*autologin-user[[:space:]]*=/d;/^[[:space:]]*autologin-session[[:space:]]*=/d' /etc/lightdm/lightdm.conf
+fi
 rm -rf /tmp/gamescope-guide
 
-printf '\nDesinstallation terminee : la session GNOME redevient celle par defaut.\n'
+printf '\nDesinstallation terminee : la session __SESSION_LABEL__ redevient celle par defaut.\n'
 '''
+
+
+def _gaming_autologin_block() -> str:
+    """Bloc d'auto-connexion adapté au gestionnaire de connexion détecté."""
+    if DISPLAY_MANAGER == "sddm":
+        return r"""step "SDDM : auto-connexion de $U"
+mkdir -p /etc/sddm.conf.d
+SDDM_CONF="/etc/sddm.conf.d/zz-ps5-manager-autologin.conf"
+printf '[Autologin]\nUser=%s\nSession=steam\nRelogin=false\n' "$U" > "$SDDM_CONF"
+chmod 644 "$SDDM_CONF"
+"""
+    if DISPLAY_MANAGER == "lightdm":
+        return r"""step "LightDM : auto-connexion de $U"
+mkdir -p /etc/lightdm
+LCONF="/etc/lightdm/lightdm.conf"
+if [ -f "$LCONF" ]; then
+  cp -f "$LCONF" "$LCONF.bak-ps5-manager"
+else
+  printf '[Seat:*]\n' > "$LCONF"
+fi
+python3 - "$LCONF" "$U" <<'PY'
+import io, re, sys
+path, user = sys.argv[1], sys.argv[2]
+lines = [l for l in io.open(path, encoding="utf-8").read().splitlines()
+         if not re.match(r"\s*autologin-(user|session)\s*=", l)]
+try:
+    i = next(n for n, l in enumerate(lines) if l.strip() == "[Seat:*]")
+except StopIteration:
+    lines.insert(0, "[Seat:*]")
+    i = 0
+lines[i + 1:i + 1] = ["autologin-user=" + user, "autologin-session=steam"]
+io.open(path, "w", encoding="utf-8").write("\n".join(lines) + "\n")
+PY
+"""
+    return r"""step "GDM : auto-connexion de $U"
+mkdir -p /etc/gdm
+GDM="/etc/gdm/custom.conf"
+if [ -f "$GDM" ]; then
+  cp -f "$GDM" "$GDM.bak-ps5-manager"
+else
+  printf '# GDM configuration storage\n\n[daemon]\n\n[security]\n\n[xdmcp]\n\n[chooser]\n\n[debug]\n#Enable=true\n' > "$GDM"
+fi
+python3 - "$GDM" "$U" <<'PY'
+import io, re, sys
+path, user = sys.argv[1], sys.argv[2]
+lines = [l for l in io.open(path, encoding="utf-8").read().splitlines()
+         if not re.match(r"\s*AutomaticLogin(Enable)?\s*=", l)]
+try:
+    i = next(n for n, l in enumerate(lines) if l.strip() == "[daemon]")
+except StopIteration:
+    lines.insert(0, "[daemon]")
+    i = 0
+lines[i + 1:i + 1] = ["AutomaticLoginEnable=True", "AutomaticLogin=" + user]
+io.open(path, "w", encoding="utf-8").write("\n".join(lines) + "\n")
+PY
+"""
+
+
+def _gaming_scaling_block() -> str:
+    """Mise à l'échelle de l'écran de connexion (GDM uniquement)."""
+    if DISPLAY_MANAGER != "gdm":
+        return (
+            "step \"Facteur d'echelle de l'ecran de connexion : non modifie "
+            f"({DISPLAY_MANAGER_LABEL})\"\n"
+        )
+    return (
+        "step \"GDM : facteur d'echelle 1.5 (dconf)\"\n"
+        "mkdir -p /etc/dconf/profile /etc/dconf/db/gdm.d\n"
+        "printf 'user-db:user\\nsystem-db:gdm\\n' > /etc/dconf/profile/gdm\n"
+        "printf '[org/gnome/desktop/interface]\\ntext-scaling-factor=1.5\\n' "
+        "> /etc/dconf/db/gdm.d/00-scaling\n"
+        "dconf update >/dev/null 2>&1 || true"
+    )
 
 
 def _gaming_script(kind: str) -> str:
     """Rend le script Gamescope demande pour l'utilisateur courant."""
     text = GAMING_INSTALL_SCRIPT if kind == "install" else GAMING_UNINSTALL_SCRIPT
     desk_name = (
-        "Basculer Session (GNOME / Steam)"
+        f"Basculer Session ({DESKTOP_LABEL} / Steam)"
         if UI_LANG == "fr"
-        else "Switch Session (GNOME / Steam)"
+        else f"Switch Session ({DESKTOP_LABEL} / Steam)"
     )
     return (
         text.replace("__USER__", REAL_USER)
         .replace("__HOME__", REAL_HOME or f"/home/{REAL_USER}")
         .replace("__DESK_NAME__", desk_name)
+        .replace("__SESSION_LABEL__", DESKTOP_LABEL)
+        .replace("__SESSION__", DESKTOP_SESSION)
+        .replace("__DM_SERVICE__", DM_SERVICE)
+        .replace("__AUTOLOGIN_BLOCK__", _gaming_autologin_block())
+        .replace("__SCALING_BLOCK__", _gaming_scaling_block())
     )
 
 
@@ -579,6 +637,325 @@ if hasattr(Adw, "AccentColor"):
             ADW_ACCENT_ENUM_MAP[_enum_val] = _name
 
 
+# ------------------------------------------------------------------------------
+# Environnement de bureau : GNOME, KDE Plasma, Cinnamon, Budgie
+# L'application tourne en root (pkexec) : l'environnement de la session
+# graphique n'est pas forcément dans os.environ, on le retrouve donc via les
+# variables, les processus de l'utilisateur réel puis loginctl.
+# ------------------------------------------------------------------------------
+DESKTOP_LABELS = {
+    "gnome": "GNOME",
+    "kde": "KDE Plasma",
+    "cinnamon": "Cinnamon",
+    "budgie": "Budgie",
+    "unknown": "?",
+}
+# Nom de session XDG utilisé par AccountsService / les gestionnaires de connexion
+DESKTOP_SESSIONS = {
+    "gnome": "gnome",
+    "kde": "plasma",
+    "cinnamon": "cinnamon",
+    "budgie": "budgie-desktop",
+    "unknown": "gnome",
+}
+DESKTOP_NAMES = {
+    "gdm": "GDM",
+    "sddm": "SDDM",
+    "lightdm": "LightDM",
+}
+
+
+def _desktop_from_string(raw: str) -> str:
+    value = (raw or "").strip().lower()
+    if not value:
+        return ""
+    if "kde" in value or "plasma" in value:
+        return "kde"
+    if "cinnamon" in value:
+        return "cinnamon"
+    if "budgie" in value:
+        return "budgie"
+    if "gnome" in value or value in ("ubuntu", "unity", "pop"):
+        return "gnome"
+    return ""
+
+
+def _desktop_from_user_processes() -> str:
+    """Lit XDG_CURRENT_DESKTOP dans l'environnement des processus de l'utilisateur."""
+    try:
+        pids = [name for name in os.listdir("/proc") if name.isdigit()]
+    except OSError:
+        return ""
+    for pid in pids:
+        try:
+            if os.stat(f"/proc/{pid}").st_uid != REAL_UID:
+                continue
+            with open(f"/proc/{pid}/environ", "rb") as fh:
+                data = fh.read(16384)
+        except OSError:
+            continue
+        for entry in data.split(b"\0"):
+            if entry.startswith(b"XDG_CURRENT_DESKTOP="):
+                found = _desktop_from_string(
+                    entry.split(b"=", 1)[1].decode("utf-8", "replace")
+                )
+                if found:
+                    return found
+    return ""
+
+
+def _desktop_from_loginctl() -> str:
+    if not shutil.which("loginctl"):
+        return ""
+    try:
+        out = subprocess.run(
+            ["loginctl", "list-sessions", "--no-legend"],
+            capture_output=True, text=True, timeout=3,
+        ).stdout
+    except (OSError, subprocess.SubprocessError):
+        return ""
+    for line in out.splitlines():
+        parts = line.split()
+        if len(parts) < 3 or parts[2] != REAL_USER:
+            continue
+        try:
+            desktop = subprocess.run(
+                ["loginctl", "show-session", parts[0], "-p", "Desktop", "--value"],
+                capture_output=True, text=True, timeout=3,
+            ).stdout
+        except (OSError, subprocess.SubprocessError):
+            continue
+        found = _desktop_from_string(desktop)
+        if found:
+            return found
+    return ""
+
+
+def detect_desktop() -> str:
+    """Bureau réel : gnome | kde | cinnamon | budgie | unknown."""
+    override = _desktop_from_string(os.environ.get("PS5_MANAGER_DESKTOP", ""))
+    if override:
+        return override
+    for var in ("XDG_CURRENT_DESKTOP", "XDG_SESSION_DESKTOP", "DESKTOP_SESSION"):
+        found = _desktop_from_string(os.environ.get(var, ""))
+        if found:
+            return found
+    for probe in (_desktop_from_user_processes, _desktop_from_loginctl):
+        found = probe()
+        if found:
+            return found
+    return "unknown"
+
+
+def detect_display_manager() -> str:
+    """Gestionnaire de connexion : gdm | sddm | lightdm."""
+    for state in ("is-enabled", "is-active"):
+        for dm in ("gdm", "sddm", "lightdm"):
+            try:
+                rc = subprocess.run(
+                    ["systemctl", state, f"{dm}.service"],
+                    capture_output=True, timeout=3,
+                ).returncode
+            except (OSError, subprocess.SubprocessError):
+                rc = 1
+            if rc == 0:
+                return dm
+    if os.path.isdir("/etc/sddm.conf.d") or os.path.exists("/etc/sddm.conf"):
+        return "sddm"
+    if os.path.isdir("/etc/lightdm"):
+        return "lightdm"
+    return "gdm"
+
+
+def _accounts_service_session() -> str:
+    """Session enregistrée par AccountsService (celle que la console démarre)."""
+    try:
+        with open(f"/var/lib/AccountsService/users/{REAL_USER}", encoding="utf-8") as fh:
+            for line in fh:
+                if line.startswith("Session="):
+                    value = line.split("=", 1)[1].strip()
+                    if value and value != "steam":
+                        return value
+    except OSError:
+        pass
+    return ""
+
+
+DESKTOP_ID = detect_desktop()
+DESKTOP_LABEL = DESKTOP_LABELS.get(DESKTOP_ID, "?")
+DESKTOP_SESSION = _accounts_service_session() or DESKTOP_SESSIONS.get(DESKTOP_ID, "gnome")
+DISPLAY_MANAGER = detect_display_manager()
+DISPLAY_MANAGER_LABEL = DESKTOP_NAMES.get(DISPLAY_MANAGER, DISPLAY_MANAGER)
+DM_SERVICE = f"{DISPLAY_MANAGER}.service"
+
+
+def _desktop_tool(*names: str) -> Optional[str]:
+    for name in names:
+        if shutil.which(name):
+            return name
+    return None
+
+
+def _kde_power_write(group: str, key: str, value: str) -> Optional[list[str]]:
+    tool = _desktop_tool("kwriteconfig6", "kwriteconfig5")
+    if not tool:
+        return None
+    return [
+        tool, "--file", "powermanagementprofilesrc",
+        "--group", "AC", "--group", group, "--key", key, value,
+    ]
+
+
+def _kde_power_read(group: str, key: str) -> str:
+    tool = _desktop_tool("kreadconfig6", "kreadconfig5")
+    if not tool:
+        return ""
+    try:
+        return subprocess.run(
+            [
+                tool, "--file", "powermanagementprofilesrc",
+                "--group", "AC", "--group", group, "--key", key,
+            ],
+            capture_output=True, text=True, timeout=3,
+            **user_subprocess_kwargs(),
+        ).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        return ""
+
+
+def _kde_power_reload() -> None:
+    """Demande à Powerdevil de relire sa configuration."""
+    tool = _desktop_tool("qdbus6", "qdbus")
+    if not tool:
+        return
+    try:
+        subprocess.run(
+            [
+                tool, "org.kde.Solid.PowerManagement",
+                "/org/kde/Solid/PowerManagement",
+                "org.kde.Solid.PowerManagement.reparseConfiguration",
+            ],
+            capture_output=True, timeout=5, **user_subprocess_kwargs(),
+        )
+    except (OSError, subprocess.SubprocessError):
+        pass
+
+
+def _idle_schema() -> str:
+    return (
+        "org.cinnamon.desktop.session"
+        if DESKTOP_ID == "cinnamon"
+        else "org.gnome.desktop.session"
+    )
+
+
+def screen_sleep_state() -> bool:
+    """La mise en veille de l'écran est-elle active ?"""
+    if DESKTOP_ID == "kde":
+        return _kde_power_read("DimDisplay", "idleTime") not in ("", "0")
+    try:
+        value = subprocess.run(
+            ["gsettings", "get", _idle_schema(), "idle-delay"],
+            capture_output=True, text=True, timeout=3,
+            **user_subprocess_kwargs(),
+        ).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return bool(value) and not (value.endswith(" 0") or value == "uint32 0")
+
+
+def screen_sleep_commands(enable: bool) -> list[list[str]]:
+    """Commandes utilisateur pour la mise en veille de l'écran du bureau courant."""
+    if DESKTOP_ID == "kde":
+        ms = "300000" if enable else "0"
+        cmds = [
+            _kde_power_write("DimDisplay", "idleTime", ms),
+            _kde_power_write("DPMSControl", "idleTime", ms),
+        ]
+        return [cmd for cmd in cmds if cmd]
+    return [["gsettings", "set", _idle_schema(), "idle-delay", "300" if enable else "0"]]
+
+
+def full_sleep_commands(enable: bool) -> list[list[str]]:
+    """Mise en veille complète (écran + suspension sur inactivité)."""
+    cmds = screen_sleep_commands(enable)
+    if DESKTOP_ID == "kde":
+        ms = "300000" if enable else "0"
+        for key, value in (("idleTime", ms), ("suspendType", "1" if enable else "0")):
+            cmd = _kde_power_write("SuspendSession", key, value)
+            if cmd:
+                cmds.append(cmd)
+        return cmds
+    if DESKTOP_ID == "cinnamon":
+        cmds.append([
+            "gsettings", "set",
+            "org.cinnamon.settings-daemon.plugins.power",
+            "sleep-inactive-ac-type", "suspend" if enable else "nothing",
+        ])
+        return cmds
+    # GNOME, Budgie et bureau non identifié (gnome-settings-daemon)
+    cmds.append([
+        "gsettings", "set",
+        "org.gnome.settings-daemon.plugins.power",
+        "sleep-inactive-ac-type", "suspend" if enable else "nothing",
+    ])
+    return cmds
+
+
+def run_user_commands(cmds: list[list[str]]) -> int:
+    """Exécute des commandes en tant qu'utilisateur réel ; renvoie le 1er code d'échec."""
+    rc = 0
+    for cmd in cmds:
+        try:
+            code = subprocess.run(cmd, timeout=30, **user_subprocess_kwargs()).returncode
+        except (OSError, subprocess.SubprocessError):
+            code = 1
+        if code != 0 and rc == 0:
+            rc = code
+    if DESKTOP_ID == "kde":
+        _kde_power_reload()
+    return rc
+
+
+def mobile_feature_packages() -> list[str]:
+    """Paquets « gestion mobile » adaptés au bureau (GSConnect = GNOME seulement)."""
+    base = ["gvfs-mtp", "fuse-sshfs", "android-tools"]
+    if DESKTOP_ID == "kde":
+        return ["kdeconnect-kde", "dolphin-plugins", *base]
+    if DESKTOP_ID == "cinnamon":
+        return [*base, "nemo-python"]
+    if DESKTOP_ID == "budgie":
+        return [*base, "nautilus-python"]
+    return ["gnome-shell-extension-gsconnect", *base, "nautilus-python"]
+
+
+def printer_feature_packages() -> list[str]:
+    """CUPS et pilotes (communs) + l'interface d'imprimantes du bureau courant."""
+    packages = [
+        "cups",
+        "cups-filters",
+        "system-config-printer",
+        "hplip",
+        "gutenprint-cups",
+        "splix",
+        "sane-backends",
+        "sane-backends-drivers-scanners",
+        "libsane-hpaio",
+        "simple-scan",
+    ]
+    if DESKTOP_ID == "kde":
+        packages.append("print-manager")
+    return packages
+
+
+def _software_supported(item: Any) -> bool:
+    """Masque les applications propres à GNOME sur les autres bureaux."""
+    fp_id = getattr(item, "fp_id", "") or ""
+    if fp_id == "com.mattjakeman.ExtensionManager":
+        return DESKTOP_ID == "gnome"
+    return True
+
+
 def user_env() -> dict[str, str]:
     env = dict(os.environ)
     env["DISPLAY"] = os.environ.get("DISPLAY", ":0")
@@ -861,6 +1238,14 @@ STRINGS = {
         "sec_fedora": "Mises à jour Fedora",
         "sec_maint": "Maintenance",
         "sec_power": "Alimentation",
+        "pwr_env": "Environnement de bureau détecté",
+        "pwr_env_sub": "%s · commandes adaptées automatiquement",
+        "pwr_note_gnome": "commande GNOME (gsettings, gnome-settings-daemon)",
+        "pwr_note_kde": "commandes KDE Plasma (kwriteconfig6, Powerdevil)",
+        "pwr_note_cinnamon": "commandes Cinnamon (gsettings)",
+        "pwr_note_budgie": "commandes Budgie (gnome-settings-daemon)",
+        "pwr_note_unknown": "bureau non identifié : commandes GNOME appliquées",
+        "features_de_sub": "paquets adaptés à %s",
         "sec_fan": "Ventilateur",
         "sec_hw": "Hardware Control",
         "sec_mesa": "Mesa / Vulkan",
@@ -880,7 +1265,7 @@ STRINGS = {
             "4. Mesa / Vulkan (vulkan-tools, mesa-demos)\n"
             "5. Dépôts (RPM Fusion, Flathub, cache)\n"
             "6. Dépendances (fuse, pilotes 32 bits, Python, venv, Tkinter, Node.js, mises à jour)\n"
-            "7. Logithèque (Bazaar, Extension Manager, Steam, Heroic, ProtonUp-Qt, Decky, Universe, AppImage Pool, Opera)\n"
+            "7. Logithèque (Bazaar, Extension Manager (GNOME), Steam, Heroic, ProtonUp-Qt, Decky, Universe, AppImage Pool, Opera)\n"
             "8. Plugin Hardware Control\n"
             "9. Gaming Mode (Gamescope)\n\n"
             "Un redémarrage vous sera proposé à la fin. Vous pouvez aussi configurer "
@@ -1238,6 +1623,14 @@ STRINGS = {
         "sec_fedora": "Fedora updates",
         "sec_maint": "Maintenance",
         "sec_power": "Power",
+        "pwr_env": "Detected desktop environment",
+        "pwr_env_sub": "%s · commands adapted automatically",
+        "pwr_note_gnome": "GNOME commands (gsettings, gnome-settings-daemon)",
+        "pwr_note_kde": "KDE Plasma commands (kwriteconfig6, Powerdevil)",
+        "pwr_note_cinnamon": "Cinnamon commands (gsettings)",
+        "pwr_note_budgie": "Budgie commands (gnome-settings-daemon)",
+        "pwr_note_unknown": "desktop not identified: GNOME commands applied",
+        "features_de_sub": "packages adapted to %s",
         "sec_fan": "Fan",
         "sec_hw": "Hardware Control",
         "sec_mesa": "Mesa / Vulkan",
@@ -1257,7 +1650,7 @@ STRINGS = {
             "4. Mesa / Vulkan (vulkan-tools, mesa-demos)\n"
             "5. Repositories (RPM Fusion, Flathub, cache)\n"
             "6. Dependencies (fuse, 32-bit drivers, Python, venv, Tkinter, Node.js, updates)\n"
-            "7. App store (Bazaar, Extension Manager, Steam, Heroic, ProtonUp-Qt, Decky, Universe, AppImage Pool, Opera)\n"
+            "7. App store (Bazaar, Extension Manager (GNOME), Steam, Heroic, ProtonUp-Qt, Decky, Universe, AppImage Pool, Opera)\n"
             "8. Hardware Control plugin\n"
             "9. Gaming Mode (Gamescope)\n\n"
             "A reboot will be offered at the end. You can also configure the "
@@ -2111,6 +2504,23 @@ def _setup_cmd(
     return _run
 
 
+def _setup_user_cmds(
+    win: "Ps5ManagerWindow", cmds: list[list[str]]
+) -> Callable[[Callable[[str], None]], bool]:
+    """Étape de setup exécutant plusieurs commandes utilisateur (bureau courant)."""
+
+    def _run(emit: Callable[[str], None]) -> bool:
+        ok = True
+        for cmd in cmds:
+            if win.run_cmd_pty(cmd, emit, as_user=True) != 0:
+                ok = False
+        if DESKTOP_ID == "kde":
+            _kde_power_reload()
+        return ok
+
+    return _run
+
+
 def _flatpak_app_installed(app_id: str) -> bool:
     if not shutil.which("flatpak"):
         return False
@@ -2317,34 +2727,8 @@ def _build_setup_plan(win: "Ps5ManagerWindow") -> list[SetupStep]:
                         ],
                     ),
                 ),
-                (
-                    "setup_pwr_scr",
-                    _setup_cmd(
-                        win,
-                        [
-                            "gsettings",
-                            "set",
-                            "org.gnome.desktop.session",
-                            "idle-delay",
-                            "0",
-                        ],
-                        as_user=True,
-                    ),
-                ),
-                (
-                    "setup_pwr_full",
-                    _setup_cmd(
-                        win,
-                        [
-                            "gsettings",
-                            "set",
-                            "org.gnome.settings-daemon.plugins.power",
-                            "sleep-inactive-ac-type",
-                            "nothing",
-                        ],
-                        as_user=True,
-                    ),
-                ),
+                ("setup_pwr_scr", _setup_user_cmds(win, screen_sleep_commands(False))),
+                ("setup_pwr_full", _setup_user_cmds(win, full_sleep_commands(False))),
             ],
         ),
         SetupStep(
@@ -2428,9 +2812,15 @@ def _build_setup_plan(win: "Ps5ManagerWindow") -> list[SetupStep]:
                     "setup_app_bazaar",
                     _setup_flatpak_app(win, "io.github.kolunmi.Bazaar"),
                 ),
-                (
-                    "setup_app_extmgr",
-                    _setup_flatpak_app(win, "com.mattjakeman.ExtensionManager"),
+                *(
+                    [
+                        (
+                            "setup_app_extmgr",
+                            _setup_flatpak_app(win, "com.mattjakeman.ExtensionManager"),
+                        )
+                    ]
+                    if DESKTOP_ID == "gnome"
+                    else []
                 ),
                 ("setup_app_steam", _setup_steam(win)),
                 (
@@ -3230,6 +3620,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
                     "<li>Fenêtre de suivi du setup : 9 étapes et 29 éléments, validation en direct et journal visible</li>"
                     "<li>Redémarrage proposé à la fin du setup</li>"
                     "<li>Menu principal : « Effectuer le setup recommandé »</li>"
+                    "<li>Compatibilité GNOME, KDE Plasma, Cinnamon et Budgie : veille, logithèque, gestion mobile, impression et Gamescope s'adaptent au bureau et au gestionnaire de connexion</li>"
                     "<li><b>0.4 :</b> catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)</li>"
                     "</ul>"
                 )
@@ -3241,6 +3632,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
                     "<li>Setup progress window: 9 steps and 29 items, live validation and visible log</li>"
                     "<li>Reboot offered once the setup is finished</li>"
                     "<li>Main menu: “Run recommended setup”</li>"
+                    "<li>GNOME, KDE Plasma, Cinnamon and Budgie support: power, app store, mobile management, printing and Gamescope adapt to the desktop and display manager</li>"
                     "<li><b>0.4:</b> “Add Fedora Feature” category (mobile, printers &amp; scanners)</li>"
                     "</ul>"
                 )
@@ -3344,7 +3736,10 @@ def _open_file_log(win: Ps5ManagerWindow, path: str, name: str) -> None:
 def build_page_library(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     seen_categories: set[str] = set()
     for cat_id, title_key, sub_key in SOFTWARE_CATEGORIES:
-        items = [it for it in SOFTWARE_CATALOG if it.category == cat_id]
+        items = [
+            it for it in SOFTWARE_CATALOG
+            if it.category == cat_id and _software_supported(it)
+        ]
         if not items:
             continue
         seen_categories.add(cat_id)
@@ -3362,7 +3757,10 @@ def build_page_library(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None
             )
         page.add(grp)
 
-    extra = [it for it in SOFTWARE_CATALOG if it.category not in seen_categories]
+    extra = [
+        it for it in SOFTWARE_CATALOG
+        if it.category not in seen_categories and _software_supported(it)
+    ]
     if extra:
         grp = pref_group(title=T("lib_title"), description=T("lib_sub"))
         for item in extra:
@@ -4234,17 +4632,20 @@ def _clean_old_kernels(win: Ps5ManagerWindow) -> None:
 
 
 def build_page_power(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
-    grp = pref_group(title=T("sec_power"))
+    grp = pref_group(title=T("sec_power"), description=T("pwr_env_sub") % DESKTOP_LABEL)
 
     sys_sleep_enabled = (
         subprocess.run(["systemctl", "is-enabled", "sleep.target"], capture_output=True, text=True).stdout.strip()
         != "masked"
     )
-    idle_val = subprocess.run(
-        ["gsettings", "get", "org.gnome.desktop.session", "idle-delay"],
-        capture_output=True, text=True, **user_subprocess_kwargs(),
-    ).stdout.strip()
-    scr_sleep_enabled = not idle_val.endswith(" 0") and idle_val != "uint32 0"
+
+    info = plain_row(
+        Adw.ActionRow,
+        title=T("pwr_env"),
+        subtitle=f"{DESKTOP_LABEL} · {T('pwr_note_' + DESKTOP_ID)}",
+    )
+    info.add_prefix(Gtk.Image.new_from_icon_name("computer-symbolic"))
+    grp.add(info)
 
     sw_sys = plain_row(Adw.SwitchRow, title=T("pwr_sys"), subtitle=T("pwr_sys_sub"))
     sw_sys.add_prefix(Gtk.Image.new_from_icon_name("preferences-system-power-symbolic"))
@@ -4260,11 +4661,10 @@ def build_page_power(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
     sw_scr = plain_row(Adw.SwitchRow, title=T("pwr_scr"), subtitle=T("pwr_scr_sub"))
     sw_scr.add_prefix(Gtk.Image.new_from_icon_name("video-display-symbolic"))
-    sw_scr.set_active(scr_sleep_enabled)
+    sw_scr.set_active(screen_sleep_state())
 
     def _on_scr_toggle(row, _p):
-        delay = "300" if row.get_active() else "0"
-        rc = subprocess.run(["gsettings", "set", "org.gnome.desktop.session", "idle-delay", delay], **user_subprocess_kwargs()).returncode
+        rc = run_user_commands(screen_sleep_commands(row.get_active()))
         win.toast(T("done") if rc == 0 else T("failed") % rc)
 
     sw_scr.connect("notify::active", _on_scr_toggle)
@@ -4272,13 +4672,12 @@ def build_page_power(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
     def _set_full(enable: bool):
         act = "unmask" if enable else "mask"
-        delay = "300" if enable else "0"
-        ac_type = "suspend" if enable else "nothing"
-        subprocess.run(["systemctl", act, "sleep.target", "suspend.target", "hibernate.target", "hybrid-sleep.target", "suspend-then-hibernate.target"])
-        subprocess.run(["gsettings", "set", "org.gnome.desktop.session", "idle-delay", delay], **user_subprocess_kwargs())
-        subprocess.run(["gsettings", "set", "org.gnome.settings-daemon.plugins.power", "sleep-inactive-ac-type", ac_type], **user_subprocess_kwargs())
+        rc = run_user_commands(full_sleep_commands(enable))
+        sys_rc = subprocess.run(["systemctl", act, "sleep.target", "suspend.target", "hibernate.target", "hybrid-sleep.target", "suspend-then-hibernate.target"]).returncode
+        if rc == 0:
+            rc = sys_rc
         win._select_section("power")
-        win.toast(T("done"))
+        win.toast(T("done") if rc == 0 else T("failed") % rc)
 
     grp.add(win.row(T("pwr_enable_full"), T("pwr_full_sub"), "object-select-symbolic", lambda *_: _set_full(True)))
     grp.add(win.row(T("pwr_disable_full"), T("pwr_full_sub"), "action-unavailable-symbolic", lambda *_: _set_full(False)))
@@ -4609,18 +5008,12 @@ def build_page_features(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> Non
     grp_mobile.add(
         win.row(
             T("features_mobile_install"),
-            T("features_mobile_install_sub"),
+            f"{T('features_mobile_install_sub')} · {T('features_de_sub') % DESKTOP_LABEL}",
             "network-wireless-symbolic",
             _install(
                 "features_mobile_install",
-                [
-                    "gnome-shell-extension-gsconnect",
-                    "gvfs-mtp",
-                    "fuse-sshfs",
-                    "nautilus-python",
-                    "android-tools",
-                ],
-                hint_key="features_mobile_done",
+                mobile_feature_packages(),
+                hint_key="features_mobile_done" if DESKTOP_ID == "gnome" else None,
             ),
         )
     )
@@ -4632,22 +5025,11 @@ def build_page_features(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> Non
     grp_print.add(
         win.row(
             T("features_print_install"),
-            T("features_print_install_sub"),
+            f"{T('features_print_install_sub')} · {T('features_de_sub') % DESKTOP_LABEL}",
             "system-software-install-symbolic",
             _install(
                 "features_print_install",
-                [
-                    "cups",
-                    "cups-filters",
-                    "system-config-printer",
-                    "hplip",
-                    "gutenprint-cups",
-                    "splix",
-                    "sane-backends",
-                    "sane-backends-drivers-scanners",
-                    "libsane-hpaio",
-                    "simple-scan",
-                ],
+                printer_feature_packages(),
             ),
         )
     )
@@ -4731,7 +5113,10 @@ def build_page_gaming(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
         win.run_task(title, task)
 
-    grp = pref_group(title=T("gaming_group"), description=T("gaming_group_sub"))
+    grp = pref_group(
+        title=T("gaming_group"),
+        description=f"{T('gaming_group_sub')} · {DESKTOP_LABEL} / {DISPLAY_MANAGER_LABEL}",
+    )
     grp.add(
         win.row(
             T("gaming_install"), T("gaming_install_sub"), "system-software-install-symbolic",
