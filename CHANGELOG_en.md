@@ -7,27 +7,39 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.6.1] — 2026-11-25
+
+### Added
+- **Per-desktop repositories**: the Repositories page installs or repairs the detected desktop's official comps group (`@gnome-desktop`, `@kde-desktop-environment`, `@cinnamon-desktop-environment`, `@budgie-desktop-environment`), enables `fedora-cisco-openh264` (H.264) and offers GStreamer codecs through RPM Fusion — no third-party repository is needed for the four desktops.
+
+### Changed
+- **Fedora updates**: `fed_apps` updates Flatpak both system-wide **and** for the user; DNF, langpacks, Flatpak and repository refresh commands stay identical on all 4 desktops.
+- **Maintenance**: added `update-desktop-database` and `fc-cache -f` (shared) plus a “KDE Plasma maintenance” group with `kbuildsycoca6 --noincremental` (KDE only).
+- **Locale & keyboard**: `gsettings org.gnome.system.locale` is only applied on GNOME / Budgie, and the logout uses the detected desktop's command (`gnome-session-quit`, `cinnamon-session-quit`, `qdbus … org.kde.Shutdown.logout`) with a `loginctl terminate-user` fallback.
+- **GNOME accent colour**: the group is hidden and the dconf polling is disabled outside GNOME.
+- **PS5 kernel**: section audited with no desktop or display-manager dependency; its texts now go through the FR/EN strings.
+- `APP_VERSION` bumped to `0.6.1`, FR/EN release notes of the “About” dialog updated.
+
+### Fixed
+- **App store**: RPM / Flatpak statuses are computed in a thread and filled in after rendering — no more freeze when the page opens.
+- **AI & Developer**: the Podman / Open WebUI state and the Ollama model list are read off the GTK thread (30 s cache, the section is rebuilt once the data arrives).
+- **Repositories page**: the comps group check runs when the action starts, never when the page opens.
+- **Release notes (“What's new”)**: no `<b>` tag left and a `_safe_release_notes()` filter (Libadwaita rejected the markup).
+- **Group titles**: `pref_group()` no longer escapes plain text (`IA &amp;` is `IA &` again).
+- **Hard-coded texts**: kernel, users, repositories, Mesa and AI now use `STRINGS` (FR/EN).
+
 ## [0.6] — 2026-11-25
 
 ### Added
 - **GNOME / KDE Plasma / Cinnamon / Budgie support**: the desktop (session variables, user processes, `loginctl`) and the display manager (GDM / SDDM / LightDM) are detected automatically, and the affected commands adapt to them.
 - **Desktop-aware 1-click setup**: the power step applies the detected desktop's commands, the Extension Manager is dropped from the plan outside GNOME (28 items instead of 29) and the Gamescope step follows the display manager; the setup log starts with a “Detected environment” line (desktop · display manager · session).
 
-### Added
-- **Per-desktop repositories**: the Repositories page installs or repairs the detected desktop's official comps group (`@gnome-desktop`, `@kde-desktop-environment`, `@cinnamon-desktop-environment`, `@budgie-desktop-environment`), enables `fedora-cisco-openh264` (H.264) and offers GStreamer codecs through RPM Fusion — no third-party repository is needed for the four desktops.
-
 ### Changed
-- **Fedora updates**: `fed_apps` now updates Flatpak both system-wide **and** for the user; DNF, langpacks, Flatpak and repository refresh commands are identical on all 4 desktops.
-- **Maintenance**: added `update-desktop-database` and `fc-cache -f` (shared) plus a “KDE Plasma maintenance” group with `kbuildsycoca6 --noincremental` (KDE only).
 - **Power per desktop**: screen blanking and full sleep through `gsettings` (GNOME, Cinnamon, Budgie) or `kwriteconfig6` + Powerdevil (KDE Plasma), including a Powerdevil reload.
 - **GNOME-specific items**: the Extension Manager disappears from the app store and from the recommended setup (28 items outside GNOME); mobile management uses KDE Connect (KDE), Nemo (Cinnamon) or Nautilus (GNOME / Budgie); printers add `print-manager` on KDE.
 - **Multi-desktop Gamescope**: autologin is written for GDM, SDDM or LightDM and switches back to the detected desktop session (`gnome`, `plasma`, `cinnamon`, `budgie-desktop`) instead of a hard-coded “gnome”.
+- **Wider setup progress window** (1320 × 800 instead of 1120 × 740) with a wider left column.
 - `APP_VERSION` bumped to `0.6`, FR/EN release notes of the “About” dialog updated.
-
-### Fixed
-- **Repositories page**: no `dnf` call happens while building the page any more — the desktop comps group check runs in the background task (with the log), which avoids freezing the UI for up to a minute when the page opens.
-- **Release notes (“What's new”)**: no `<b>` tag is left in the text, and the new `_safe_release_notes()` filter keeps only `p` / `ul` / `ol` / `li` / `a` — Libadwaita rejected the markup and displayed “Could not parse release notes: Unexpected element 'b'” instead of the text.
-- **Group titles**: `pref_group()` no longer escapes markup, because `Adw.PreferencesGroup` renders title and description as plain text; `IA &amp; Développeur` is `IA & Développeur` again (same for `Imprimantes &amp; scanners`, `Langues &amp; clavier`, `Suivi en direct &amp; historique`, `Système &amp; Utilitaires`).
 
 ## [0.5] — 2026-11-22
 

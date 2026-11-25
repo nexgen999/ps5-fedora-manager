@@ -40,7 +40,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.6"
+APP_VERSION = "0.6.1"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1660,6 +1660,17 @@ STRINGS = {
         "krn_install": "Installer le dernier kernel PS5 (RPM)",
         "krn_install_sub": "rpm -ivh --nosignature --replacefiles puis déploiement EFI",
         "krn_boot": "Choisir le kernel à démarrer (/boot/efi)",
+        "krn_none": "Aucun paquet kernel trouvé.",
+        "krn_boot_none": "Aucun kernel dans /boot",
+        "krn_no_old": "Aucun ancien noyau à supprimer.",
+        "krn_files_missing": "vmlinuz-%s ou initrd.img-%s absent.",
+        "gh_unreachable": "Impossible de contacter GitHub.",
+        "gh_release_missing": "Release introuvable.",
+        "repo_none": "Aucun fichier .repo pour [%s]",
+        "usr_refuse": "Refusé pour %s",
+        "mesa_no_vulkaninfo": "vulkaninfo absent — installez d'abord vulkan-tools.",
+        "ai_ollama_absent": "Ollama n'est pas installé.",
+        "ai_podman_absent": "Podman n'est pas installé.",
         "krn_boot_sub": "Copie vmlinuz et initrd.img sélectionnés vers l'ESP",
         "krn_remove": "Nettoyer / supprimer d'anciens kernels",
         "krn_remove_sub": "Supprime les anciens paquets linux-ps5 en protégeant le noyau actif",
@@ -2062,6 +2073,17 @@ STRINGS = {
         "krn_install": "Install latest PS5 kernel (RPM)",
         "krn_install_sub": "rpm -ivh --nosignature --replacefiles then EFI deploy",
         "krn_boot": "Choose boot kernel (/boot/efi)",
+        "krn_none": "No kernel package found.",
+        "krn_boot_none": "No kernel in /boot",
+        "krn_no_old": "No old kernel to remove.",
+        "krn_files_missing": "vmlinuz-%s or initrd.img-%s missing.",
+        "gh_unreachable": "Cannot reach GitHub.",
+        "gh_release_missing": "Release not found.",
+        "repo_none": "No .repo file for [%s]",
+        "usr_refuse": "Refused for %s",
+        "mesa_no_vulkaninfo": "vulkaninfo missing — install vulkan-tools first.",
+        "ai_ollama_absent": "Ollama is not installed.",
+        "ai_podman_absent": "Podman is not installed.",
         "krn_boot_sub": "Copies selected vmlinuz & initrd.img to ESP",
         "krn_remove": "Clean / remove old kernels",
         "krn_remove_sub": "Removes old linux-ps5 packages while protecting the active kernel",
@@ -3734,8 +3756,9 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
             release_notes_version=APP_VERSION,
             release_notes=_safe_release_notes(
                 (
-                                        "<p>Nouveautés de la 0.6</p>"
+                                        "<p>Nouveautés de la 0.6.1</p>"
                     "<ul>"
+                    "<li>0.6.1 : interfaces sans gel (Logithèque, Dépôts, IA), textes traduits et notes de version corrigées</li>"
                     "<li>Boîte de bienvenue au premier lancement : setup recommandé en 1 clic ou configuration manuelle</li>"
                     "<li>Fenêtre de suivi du setup : 9 étapes et 28/29 éléments selon le bureau, validation en direct et journal visible</li>"
                     "<li>Redémarrage proposé à la fin du setup</li>"
@@ -3746,8 +3769,9 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
                 )
                 if UI_LANG == "fr"
                 else (
-                                        "<p>What is new in 0.6</p>"
+                                        "<p>What is new in 0.6.1</p>"
                     "<ul>"
+                    "<li>0.6.1: no more UI freezes (app store, repositories, AI), translated texts and fixed release notes</li>"
                     "<li>First-launch welcome dialog: 1-click recommended setup or manual configuration</li>"
                     "<li>Setup progress window: 9 steps and 28/29 items depending on the desktop, live validation and visible log</li>"
                     "<li>Reboot offered once the setup is finished</li>"
@@ -3853,8 +3877,39 @@ def _open_file_log(win: Ps5ManagerWindow, path: str, name: str) -> None:
         win.show_info(name, str(exc))
 
 
+def _fill_software_status(
+    win: "Ps5ManagerWindow", pending: list[tuple[Adw.ActionRow, SoftwareItem]]
+) -> None:
+    """Complète les statuts RPM / Flatpak hors du fil GTK.
+
+    `rpm -q` et surtout `flatpak info` prennent du temps : les exécuter pendant
+    la construction de la page gelait l'interface. Les lignes sont affichées
+    tout de suite avec leur description, puis leur sous-titre est complété.
+    """
+    if not pending:
+        return
+
+    def _worker() -> None:
+        results = [
+            (row, item, detect_software_status(item)[1]) for row, item in pending
+        ]
+        GLib.idle_add(_apply, results)
+
+    def _apply(results: list[tuple[Adw.ActionRow, SoftwareItem, str]]) -> bool:
+        for row, item, label in results:
+            desc = item.description_fr if UI_LANG == "fr" else item.description_en
+            try:
+                row.set_subtitle(f"{desc} · {label}")
+            except Exception:  # ligne déjà détruite (page quittée)
+                pass
+        return False
+
+    threading.Thread(target=_worker, daemon=True).start()
+
+
 def build_page_library(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     seen_categories: set[str] = set()
+    pending: list[tuple[Adw.ActionRow, SoftwareItem]] = []
     for cat_id, title_key, sub_key in SOFTWARE_CATEGORIES:
         items = [
             it for it in SOFTWARE_CATALOG
@@ -3865,16 +3920,15 @@ def build_page_library(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None
         seen_categories.add(cat_id)
         grp = pref_group(title=T(title_key), description=T(sub_key))
         for item in items:
-            _code, status_lbl = detect_software_status(item)
             desc = item.description_fr if UI_LANG == "fr" else item.description_en
-            grp.add(
-                win.row(
-                    item.name,
-                    f"{desc} · {status_lbl}",
-                    item.icon,
-                    lambda _r, it=item: _push_software_actions(win, it),
-                )
+            row = win.row(
+                item.name,
+                desc,
+                item.icon,
+                lambda _r, it=item: _push_software_actions(win, it),
             )
+            pending.append((row, item))
+            grp.add(row)
         page.add(grp)
 
     extra = [
@@ -3884,17 +3938,18 @@ def build_page_library(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None
     if extra:
         grp = pref_group(title=T("lib_title"), description=T("lib_sub"))
         for item in extra:
-            _code, status_lbl = detect_software_status(item)
             desc = item.description_fr if UI_LANG == "fr" else item.description_en
-            grp.add(
-                win.row(
-                    item.name,
-                    f"{desc} · {status_lbl}",
-                    item.icon,
-                    lambda _r, it=item: _push_software_actions(win, it),
-                )
+            row = win.row(
+                item.name,
+                desc,
+                item.icon,
+                lambda _r, it=item: _push_software_actions(win, it),
             )
+            pending.append((row, item))
+            grp.add(row)
         page.add(grp)
+
+    _fill_software_status(win, pending)
 
     g_ai = pref_group(title=T("sec_aidev"), description=T("aidev_open_sub"))
     g_ai.add(
@@ -4524,7 +4579,7 @@ def _remove_dnf_repo_file(win: Ps5ManagerWindow, rid: str) -> None:
         except OSError:
             pass
     if not matches:
-        win.show_info(T("repo_rm_dnf"), f"Aucun .repo pour [{rid}]")
+        win.show_info(T("repo_rm_dnf"), T("repo_none") % rid)
         return
     def _do_rm_files():
         for p in matches:
@@ -4625,7 +4680,7 @@ def _create_user(win: Ps5ManagerWindow, uname: str, pw: str) -> None:
 
 def _delete_user(win: Ps5ManagerWindow, uname: str) -> None:
     if not uname or uname in ("root", REAL_USER):
-        win.show_info(T("usr_del"), f"Refusé pour {uname}")
+        win.show_info(T("usr_del"), T("usr_refuse") % uname)
         return
     win.show_confirm(
         T("usr_del"),
@@ -4804,7 +4859,7 @@ def _remove_kernel_package(win: Ps5ManagerWindow, nevra: str, ver: str, emit: Ca
 def _clean_old_kernels(win: Ps5ManagerWindow) -> None:
     pkgs = _installed_kernel_packages()
     if not pkgs:
-        win.show_info(T("mnt_kernels"), "Aucun paquet kernel trouvé.")
+        win.show_info(T("mnt_kernels"), T("krn_none"))
         return
 
     cur_k = os.uname().release
@@ -4823,7 +4878,7 @@ def _clean_old_kernels(win: Ps5ManagerWindow) -> None:
 
     if not removable:
         lines = [f"• {n} ({T('krn_protected') if _is_protected_kernel(v, cur_k, esp_k) else T('krn_installed')})" for n, v in pkgs]
-        win.show_info(T("mnt_kernels"), "Aucun ancien noyau à supprimer.\n\n" + "\n".join(lines))
+        win.show_info(T("mnt_kernels"), T("krn_no_old") + "\n\n" + "\n".join(lines))
         return
 
     summary = "\n".join(f"• {n}" for n, _v in removable)
@@ -5372,7 +5427,7 @@ def build_page_mesa(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
     def _vulkan_summary(radv_only: bool):
         if not shutil.which("vulkaninfo"):
-            win.show_info(T("sec_mesa"), "vulkaninfo absent — installez d'abord vulkan-tools.")
+            win.show_info(T("sec_mesa"), T("mesa_no_vulkaninfo"))
             return
         out = subprocess.run(["vulkaninfo", "--summary"], capture_output=True, text=True).stdout
         if radv_only:
@@ -5495,7 +5550,7 @@ def build_page_kernel(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     def _check_latest():
         tag = gh_latest_tag(KERNEL_REPO)
         if not tag or not tag.startswith("kernel-"):
-            win.show_info(T("sec_kernel"), "Impossible de contacter GitHub.")
+            win.show_info(T("sec_kernel"), T("gh_unreachable"))
             return
         ver = tag[len("kernel-"):].rsplit("-", 1)[0]
         win.show_info(T("krn_latest"), f"Tag : {tag}\nVersion : {ver}\nActuel : {cur_k}")
@@ -5503,7 +5558,7 @@ def build_page_kernel(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     def _install_latest():
         tag = gh_latest_tag(KERNEL_REPO)
         if not tag or not tag.startswith("kernel-"):
-            win.show_info(T("sec_kernel"), "Release introuvable.")
+            win.show_info(T("sec_kernel"), T("gh_release_missing"))
             return
         ver = tag[len("kernel-"):].rsplit("-", 1)[0]
         _install_kernel_release(win, tag, ver)
@@ -5571,7 +5626,7 @@ def _push_remove_kernels(win: Ps5ManagerWindow) -> None:
         description=f"{T('krn_running')}: {cur_k} · {T('krn_esp')}: {esp_k or '—'}",
     )
     if not pkgs:
-        grp.add(plain_row(Adw.ActionRow, title="Aucun paquet kernel trouvé."))
+        grp.add(plain_row(Adw.ActionRow, title=T("krn_none")))
 
     for nevra, ver in pkgs:
         protected = _is_protected_kernel(ver, cur_k, esp_k)
@@ -5615,7 +5670,7 @@ def _push_boot_kernels(win: Ps5ManagerWindow) -> None:
     sub = Adw.PreferencesPage()
     grp = pref_group(title=T("krn_boot"), description=f"{T('krn_running')}: {cur_k}")
     if not found:
-        grp.add(plain_row(Adw.ActionRow, title="Aucun kernel dans /boot"))
+        grp.add(plain_row(Adw.ActionRow, title=T("krn_boot_none")))
     for kver in found:
         flags = []
         if kver == cur_k:
@@ -5628,7 +5683,7 @@ def _push_boot_kernels(win: Ps5ManagerWindow) -> None:
         def _copy_kernel(ver: str):
             def _do():
                 if not (os.path.isfile(f"/boot/vmlinuz-{ver}") and os.path.isfile(f"/boot/initrd.img-{ver}")):
-                    win.show_info(T("sec_kernel"), f"vmlinuz-{ver} ou initrd.img-{ver} absent.")
+                    win.show_info(T("sec_kernel"), T("krn_files_missing") % (ver, ver))
                     return
                 for dst in ("/boot/efi/bzImage", "/boot/efi/initrd.img"):
                     if os.path.isfile(dst):
@@ -6056,14 +6111,64 @@ def _run_quick_service_action(
     threading.Thread(target=_worker, daemon=True).start()
 
 
+_AIDEV_STATE: dict[str, Any] = {}
+_AIDEV_STATE_AT = 0.0
+_AIDEV_LOADING = False
+AIDEV_STATE_TTL = 30.0
+
+
+def _aidev_state(win: "Ps5ManagerWindow") -> dict[str, Any]:
+    """État Podman / Ollama sans bloquer le rendu de la page IA.
+
+    Le premier rendu utilise des valeurs provisoires et lance la collecte dans
+    un thread ; la section est reconstruite une fois les données prêtes (cache
+    30 s) pour éviter tout gel à l'ouverture.
+    """
+    global _AIDEV_LOADING, _AIDEV_STATE_AT
+    fresh = _AIDEV_STATE and (time.monotonic() - _AIDEV_STATE_AT) < AIDEV_STATE_TTL
+    if fresh:
+        return _AIDEV_STATE
+    if not _AIDEV_LOADING:
+        _AIDEV_LOADING = True
+
+        def _after() -> bool:
+            # Ne reconstruit que si la page IA est affichée à la racine :
+            # sinon on arracherait l'utilisateur d'une sous-page ouverte.
+            try:
+                depth = win.nav.get_navigation_stack().get_n_items()
+            except Exception:  # noqa: BLE001
+                depth = 1
+            if win.active_section == "aidev" and depth <= 1:
+                win._select_section("aidev")
+            return False
+
+        def _worker() -> None:
+            global _AIDEV_LOADING, _AIDEV_STATE_AT
+            try:
+                data = {
+                    "webui": _podman_webui_context(),
+                    "models": _ollama_installed_models(),
+                }
+            except Exception:  # noqa: BLE001 - jamais bloquant
+                data = {"webui": ("", ""), "models": {}}
+            _AIDEV_STATE.update(data)
+            _AIDEV_STATE_AT = time.monotonic()
+            _AIDEV_LOADING = False
+            GLib.idle_add(_after)
+
+        threading.Thread(target=_worker, daemon=True).start()
+    return _AIDEV_STATE or {"webui": ("loading", ""), "models": {}}
+
+
 def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     ollama_ok = _ollama_installed()
     ollama_svc = _ollama_service_exists()
     ollama_act = _ollama_service_active() if (ollama_ok or ollama_svc) else False
     ollama_boot = _ollama_service_enabled() if ollama_svc else False
-    webui_st, webui_owner = _podman_webui_context()
+    ai_state = _aidev_state(win)
+    webui_st, webui_owner = ai_state["webui"]
     codium_ok = _vscodium_installed()
-    installed_models = _ollama_installed_models()
+    installed_models = ai_state["models"]
 
     # 1) Outils & Applications IA / Dev
     g_tools = pref_group(title=T("aidev_stack"), description=T("aidev_stack_sub"))
@@ -6086,6 +6191,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
     owner_tag = "Podman root" if webui_owner == "root" else "Podman"
     webui_labels = {
+        "loading": "…",
         "running": f"Actif ({owner_tag}) · http://127.0.0.1:8080",
         "exited": f"Installé (arrêté) · {owner_tag}",
         "stopped": f"Installé (arrêté) · {owner_tag}",
@@ -6291,7 +6397,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
     def _show_podman_ps():
         if not _podman_bin():
-            win.show_info("Podman", "Podman n'est pas installé.")
+            win.show_info("Podman", T("ai_podman_absent"))
             return
         chunks: list[str] = []
         try:
@@ -6383,7 +6489,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     def _show_ollama_list():
         bin_path = _ollama_bin()
         if not bin_path and not installed_models:
-            win.show_info("Ollama", "Ollama n'est pas installé.")
+            win.show_info("Ollama", T("ai_ollama_absent"))
             return
         out = ""
         if bin_path:
@@ -6404,7 +6510,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     def _show_ollama_ps():
         bin_path = _ollama_bin()
         if not bin_path:
-            win.show_info("Ollama", "Ollama n'est pas installé.")
+            win.show_info("Ollama", T("ai_ollama_absent"))
             return
         res = subprocess.run([bin_path, "ps"], capture_output=True, text=True)
         out = (res.stdout or res.stderr or "").strip() or "(aucun modèle actif)"
@@ -6821,7 +6927,9 @@ def _push_vscodium_actions(win: Ps5ManagerWindow) -> None:
 
 
 def _push_ai_models(win: Ps5ManagerWindow) -> None:
-    installed = _ollama_installed_models()
+    # Réutilise la liste déjà collectée par la page IA quand elle existe,
+    # pour ne pas relancer `ollama list` à chaque navigation.
+    installed = _AIDEV_STATE.get("models") or _ollama_installed_models()
     running = _ollama_running_models()
     sub = Adw.PreferencesPage()
 

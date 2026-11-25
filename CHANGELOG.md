@@ -6,27 +6,39 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.6.1] — 2026-11-25
+
+### Ajouté
+- **Dépôts par bureau** : la page Dépôts installe ou répare le groupe comps officiel du bureau détecté (`@gnome-desktop`, `@kde-desktop-environment`, `@cinnamon-desktop-environment`, `@budgie-desktop-environment`), active `fedora-cisco-openh264` (H.264) et propose l'installation des codecs GStreamer via RPM Fusion — aucun dépôt tiers n'est nécessaire pour les quatre bureaux.
+
+### Modifié
+- **Mises à jour Fedora** : `fed_apps` met à jour Flatpak côté système **et** utilisateur ; DNF, langpacks, Flatpak et rafraîchissement des dépôts restent identiques sur les 4 bureaux.
+- **Maintenance** : ajout de `update-desktop-database` et `fc-cache -f` (communs), et d'un groupe « Maintenance KDE Plasma » avec `kbuildsycoca6 --noincremental` (KDE uniquement).
+- **Langues & clavier** : `gsettings org.gnome.system.locale` n'est appliqué que sous GNOME / Budgie, et la déconnexion utilise la commande du bureau détecté (`gnome-session-quit`, `cinnamon-session-quit`, `qdbus … org.kde.Shutdown.logout`) avec repli `loginctl terminate-user`.
+- **Couleur d'accentuation GNOME** : groupe masqué et sondage dconf désactivé hors GNOME.
+- **Kernel PS5** : section auditée sans dépendance au bureau ni au gestionnaire de connexion ; ses textes passent par les traductions FR/EN.
+- `APP_VERSION` passe à `0.6.1`, notes de version FR/EN de la boîte « À propos » mises à jour.
+
+### Corrigé
+- **Logithèque** : les statuts RPM / Flatpak sont calculés dans un thread et remplis après le rendu — plus de gel à l'ouverture de la page.
+- **IA & Développeur** : l'état Podman / Open WebUI et la liste des modèles Ollama sont lus hors du fil GTK (cache 30 s, reconstruction de la section quand les données arrivent).
+- **Page Dépôts** : la vérification du groupe comps s'exécute au lancement de l'action, plus jamais à l'ouverture de la page.
+- **Notes de version (« Quoi de neuf »)** : plus aucune balise `<b>` et filtre `_safe_release_notes()` (Libadwaita refusait l'analyse).
+- **Titres de groupes** : `pref_group()` n'échappe plus le texte brut (`IA &amp;` redevient `IA &`).
+- **Textes codés en dur** : kernel, utilisateurs, dépôts, Mesa et IA passent désormais par `STRINGS` (FR/EN).
+
 ## [0.6] — 2026-11-25
 
 ### Ajouté
 - **Compatibilité GNOME / KDE Plasma / Cinnamon / Budgie** : détection automatique du bureau (variables de session, processus de l'utilisateur, `loginctl`) et du gestionnaire de connexion (GDM / SDDM / LightDM), avec adaptation des commandes concernées.
 - **Setup 1 clic adapté au bureau** : l'étape Alimentation applique les commandes du bureau détecté, l'Extension Manager est retiré du plan hors GNOME (28 éléments au lieu de 29) et l'étape Gamescope suit le gestionnaire de connexion ; le journal du setup commence par une ligne « Environnement détecté » (bureau · gestionnaire de connexion · session).
 
-### Ajouté
-- **Dépôts par bureau** : la page Dépôts installe ou répare le groupe comps officiel du bureau détecté (`@gnome-desktop`, `@kde-desktop-environment`, `@cinnamon-desktop-environment`, `@budgie-desktop-environment`), active `fedora-cisco-openh264` (H.264) et propose l'installation des codecs GStreamer via RPM Fusion — aucun dépôt tiers n'est nécessaire pour les quatre bureaux.
-
 ### Modifié
-- **Mises à jour Fedora** : `fed_apps` met désormais à jour Flatpak côté système **et** utilisateur ; les commandes DNF, langpacks, Flatpak et le rafraîchissement des dépôts sont identiques sur les 4 bureaux.
-- **Maintenance** : ajout de `update-desktop-database` et `fc-cache -f` (communs) et d'un groupe « Maintenance KDE Plasma » avec `kbuildsycoca6 --noincremental` (KDE uniquement).
 - **Alimentation par bureau** : veille de l'écran et veille complète via `gsettings` (GNOME, Cinnamon, Budgie) ou `kwriteconfig6` + Powerdevil (KDE Plasma), rechargement de Powerdevil inclus.
 - **Éléments propres à GNOME** : l'Extension Manager disparaît de la Logithèque et du setup recommandé (28 éléments hors GNOME) ; la gestion mobile utilise KDE Connect (KDE), Nemo (Cinnamon) ou Nautilus (GNOME / Budgie) ; les imprimantes ajoutent `print-manager` sous KDE.
 - **Gamescope multi-bureau** : auto-connexion écrite pour GDM, SDDM ou LightDM et bascule vers la session du bureau détecté (`gnome`, `plasma`, `cinnamon`, `budgie-desktop`) au lieu de « gnome » codé en dur.
+- **Fenêtre de suivi du setup élargie** (1320 × 800 au lieu de 1120 × 740) et colonne de gauche plus large.
 - `APP_VERSION` passe à `0.6`, notes de version FR/EN de la boîte « À propos » mises à jour.
-
-### Corrigé
-- **Page Dépôts** : plus aucun appel `dnf` pendant la construction de la page — la vérification du groupe comps du bureau s'exécute dans la tâche de fond (avec le journal), ce qui évite un gel de l'interface jusqu'à une minute à l'ouverture.
-- **Notes de version (« Quoi de neuf »)** : plus aucune balise `<b>` dans le texte, et nouveau filtre `_safe_release_notes()` qui ne conserve que `p` / `ul` / `ol` / `li` / `a` — Libadwaita refusait l'analyse et affichait « Impossible d'analyser les notes de version : Unexpected element 'b' » à la place du texte.
-- **Titres de groupes** : `pref_group()` n'échappe plus le markup, car `Adw.PreferencesGroup` affiche titre et description en texte brut ; `IA &amp; Développeur` redevient `IA & Développeur` (idem `Imprimantes &amp; scanners`, `Langues &amp; clavier`, `Suivi en direct &amp; historique`, `Système &amp; Utilitaires`).
 
 ## [0.5] — 2026-11-22
 
