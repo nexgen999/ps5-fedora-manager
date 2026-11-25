@@ -156,8 +156,9 @@ Notes:
 
 - **No specific repository is needed for KDE Plasma, Cinnamon or Budgie**: all four
   desktops ship in the official Fedora repositories. The Repositories page can install or
-  repair the detected desktop's group, and reports “group not found” when the Fedora
-  release does not provide it.
+  repair the detected desktop's group; the group is checked when the action runs (never
+  when the page opens) and “group not found” is reported when the Fedora release does not
+  provide it.
 - The only useful additional repositories are the same everywhere: **RPM Fusion**
   (codecs, Steam, drivers), **Flathub** and **fedora-cisco-openh264** (H.264).
 - Update commands and common maintenance are identical on all four environments; only KDE

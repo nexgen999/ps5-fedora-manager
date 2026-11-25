@@ -157,8 +157,9 @@ Remarques :
 
 - **Aucun dépôt spécifique n'est nécessaire pour KDE Plasma, Cinnamon ou Budgie** : les
   quatre bureaux sont fournis par les dépôts Fedora officiels. La page Dépôts propose
-  d'installer ou de réparer le groupe du bureau détecté, et affiche « groupe introuvable »
-  si la version de Fedora ne le fournit pas.
+  d'installer ou de réparer le groupe du bureau détecté ; la vérification du groupe
+  s'exécute au lancement de l'action (jamais à l'ouverture de la page) et signale
+  « groupe introuvable » si la version de Fedora ne le fournit pas.
 - Les seuls dépôts complémentaires utiles sont les mêmes partout : **RPM Fusion**
   (codecs, Steam, pilotes), **Flathub** et **fedora-cisco-openh264** (H.264).
 - Les commandes de mise à jour et la maintenance commune sont identiques sur les quatre
