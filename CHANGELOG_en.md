@@ -19,6 +19,10 @@ French version: [CHANGELOG.md](CHANGELOG.md)
 - **Multi-desktop Gamescope**: autologin is written for GDM, SDDM or LightDM and switches back to the detected desktop session (`gnome`, `plasma`, `cinnamon`, `budgie-desktop`) instead of a hard-coded “gnome”.
 - `APP_VERSION` bumped to `0.6`, FR/EN release notes of the “About” dialog updated.
 
+### Fixed
+- **Release notes (“What's new”)**: no `<b>` tag is left in the text, and the new `_safe_release_notes()` filter keeps only `p` / `ul` / `ol` / `li` / `a` — Libadwaita rejected the markup and displayed “Could not parse release notes: Unexpected element 'b'” instead of the text.
+- **Group titles**: `pref_group()` no longer escapes markup, because `Adw.PreferencesGroup` renders title and description as plain text; “IA &amp; Développeur” is “IA & Développeur” again (same for “Imprimantes &amp; scanners”, “Langues &amp; clavier”, “Suivi en direct &amp; historique”, “Système &amp; Utilitaires”).
+
 ## [0.5] — 2026-11-22
 
 ### Added

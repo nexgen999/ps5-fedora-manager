@@ -18,6 +18,10 @@ Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 - **Gamescope multi-bureau** : auto-connexion écrite pour GDM, SDDM ou LightDM et bascule vers la session du bureau détecté (`gnome`, `plasma`, `cinnamon`, `budgie-desktop`) au lieu de « gnome » codé en dur.
 - `APP_VERSION` passe à `0.6`, notes de version FR/EN de la boîte « À propos » mises à jour.
 
+### Corrigé
+- **Notes de version (« Quoi de neuf »)** : plus aucune balise `<b>` dans le texte, et nouveau filtre `_safe_release_notes()` qui ne conserve que `p` / `ul` / `ol` / `li` / `a` — Libadwaita refusait l'analyse et affichait « Impossible d'analyser les notes de version : Unexpected element 'b' » à la place du texte.
+- **Titres de groupes** : `pref_group()` n'échappe plus le markup, car `Adw.PreferencesGroup` affiche titre et description en texte brut ; « IA &amp; Développeur » redevient « IA & Développeur » (idem « Imprimantes &amp; scanners », « Langues &amp; clavier », « Suivi en direct &amp; historique », « Système &amp; Utilitaires »).
+
 ## [0.5] — 2026-11-22
 
 ### Ajouté

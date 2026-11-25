@@ -1041,8 +1041,8 @@ def run_as_user_cmd(cmd: list[str]) -> list[str]:
 # ------------------------------------------------------------------------------
 # Texte littéral dans l'interface
 # Adw.PreferencesRow:use-markup vaut TRUE par défaut : un « & » non échappé
-# casserait le libellé (titre vide). On désactive le markup pour les lignes, et
-# on échappe titres/descriptions des groupes qui n'offrent pas cette option.
+# casserait le libellé (titre vide). On désactive donc le markup pour les lignes.
+# Les groupes (Adw.PreferencesGroup) affichent du texte brut : rien à échapper.
 # ------------------------------------------------------------------------------
 def plain_row(cls: Any, **kwargs: Any) -> Any:
     """Crée une ligne Adw dont le titre et le sous-titre sont du texte littéral."""
@@ -1053,11 +1053,28 @@ def plain_row(cls: Any, **kwargs: Any) -> Any:
 
 
 def pref_group(**kwargs: Any) -> Adw.PreferencesGroup:
-    """Crée un groupe de préférences dont le titre et la description sont littéraux."""
-    for key in ("title", "description"):
-        if isinstance(kwargs.get(key), str):
-            kwargs[key] = GLib.markup_escape_text(kwargs[key])
+    """Crée un groupe de préférences dont le titre et la description sont littéraux.
+
+    Adw.PreferencesGroup affiche titre et description en texte brut
+    (gtk_label_set_label) : il ne faut donc pas échapper le markup, sinon un
+    « & » apparaît littéralement sous la forme « &amp; » (« IA &amp; Développeur »).
+    """
     return Adw.PreferencesGroup(**kwargs)
+
+
+# Balises acceptées par Adw.AboutDialog pour release_notes : toute autre balise
+# (b, i, span…) fait échouer l'analyse et remplace les notes par « Impossible
+# d'analyser les notes de version ».
+_NOTES_TAGS = ("p", "ul", "ol", "li", "a")
+
+
+def _safe_release_notes(html: str) -> str:
+    """Ne conserve que les balises comprises par Adw.AboutDialog."""
+
+    def _keep(match: "re.Match[str]") -> str:
+        return match.group(0) if match.group(1).lower() in _NOTES_TAGS else ""
+
+    return re.sub(r"</?([A-Za-z][A-Za-z0-9]*)[^>]*>", _keep, html or "")
 
 
 class SystemThemeSync:
@@ -3620,7 +3637,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
             ),
             debug_info=debug_info,
             release_notes_version=APP_VERSION,
-            release_notes=(
+            release_notes=_safe_release_notes(
                 (
                                         "<p>Nouveautés de la 0.6</p>"
                     "<ul>"
@@ -3629,7 +3646,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
                     "<li>Redémarrage proposé à la fin du setup</li>"
                     "<li>Menu principal : « Effectuer le setup recommandé »</li>"
                     "<li>Compatibilité GNOME, KDE Plasma, Cinnamon et Budgie : setup 1 clic, veille, logithèque, gestion mobile, impression et Gamescope s'adaptent au bureau et au gestionnaire de connexion</li>"
-                    "<li><b>0.4 :</b> catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)</li>"
+                    "<li>0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)</li>"
                     "</ul>"
                 )
                 if UI_LANG == "fr"
@@ -3641,7 +3658,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
                     "<li>Reboot offered once the setup is finished</li>"
                     "<li>Main menu: “Run recommended setup”</li>"
                     "<li>GNOME, KDE Plasma, Cinnamon and Budgie support: the 1-click setup, power, app store, mobile management, printing and Gamescope adapt to the desktop and display manager</li>"
-                    "<li><b>0.4:</b> “Add Fedora Feature” category (mobile, printers &amp; scanners)</li>"
+                    "<li>0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)</li>"
                     "</ul>"
                 )
             ),
