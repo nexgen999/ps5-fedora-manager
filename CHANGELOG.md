@@ -12,7 +12,12 @@ Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 - **Compatibilité GNOME / KDE Plasma / Cinnamon / Budgie** : détection automatique du bureau (variables de session, processus de l'utilisateur, `loginctl`) et du gestionnaire de connexion (GDM / SDDM / LightDM), avec adaptation des commandes concernées.
 - **Setup 1 clic adapté au bureau** : l'étape Alimentation applique les commandes du bureau détecté, l'Extension Manager est retiré du plan hors GNOME (28 éléments au lieu de 29) et l'étape Gamescope suit le gestionnaire de connexion ; le journal du setup commence par une ligne « Environnement détecté » (bureau · gestionnaire de connexion · session).
 
+### Ajouté
+- **Dépôts par bureau** : la page Dépôts installe ou répare le groupe comps officiel du bureau détecté (`@gnome-desktop`, `@kde-desktop-environment`, `@cinnamon-desktop-environment`, `@budgie-desktop-environment`), active `fedora-cisco-openh264` (H.264) et propose l'installation des codecs GStreamer via RPM Fusion — aucun dépôt tiers n'est nécessaire pour les quatre bureaux.
+
 ### Modifié
+- **Mises à jour Fedora** : `fed_apps` met désormais à jour Flatpak côté système **et** utilisateur ; les commandes DNF, langpacks, Flatpak et le rafraîchissement des dépôts sont identiques sur les 4 bureaux.
+- **Maintenance** : ajout de `update-desktop-database` et `fc-cache -f` (communs) et d'un groupe « Maintenance KDE Plasma » avec `kbuildsycoca6 --noincremental` (KDE uniquement).
 - **Alimentation par bureau** : veille de l'écran et veille complète via `gsettings` (GNOME, Cinnamon, Budgie) ou `kwriteconfig6` + Powerdevil (KDE Plasma), rechargement de Powerdevil inclus.
 - **Éléments propres à GNOME** : l'Extension Manager disparaît de la Logithèque et du setup recommandé (28 éléments hors GNOME) ; la gestion mobile utilise KDE Connect (KDE), Nemo (Cinnamon) ou Nautilus (GNOME / Budgie) ; les imprimantes ajoutent `print-manager` sous KDE.
 - **Gamescope multi-bureau** : auto-connexion écrite pour GDM, SDDM ou LightDM et bascule vers la session du bureau détecté (`gnome`, `plasma`, `cinnamon`, `budgie-desktop`) au lieu de « gnome » codé en dur.

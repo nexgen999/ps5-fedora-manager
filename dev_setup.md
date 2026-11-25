@@ -140,6 +140,30 @@ Remarques :
   les interrupteurs de veille apparaissent alors désactivés si `gsettings`
   n'est pas disponible.
 
+## Dépôts, mises à jour et maintenance par bureau
+
+| Élément | Commande / valeur | GNOME | KDE Plasma | Cinnamon | Budgie |
+| --- | --- | --- | --- | --- | --- |
+| Dépôt du bureau lui-même | aucun dépôt tiers : groupe comps officiel | `@gnome-desktop` | `@kde-desktop-environment` | `@cinnamon-desktop-environment` | `@budgie-desktop-environment` |
+| Codecs H.264 | dépôt `fedora-cisco-openh264` (activé depuis la page Dépôts) | oui | oui | oui | oui |
+| Codecs multimédias | RPM Fusion (free + nonfree) puis `gstreamer1-plugins-ugly`, `gstreamer1-plugins-bad-free-extras` | oui | oui | oui | oui |
+| Applications Flatpak | Flathub (`flatpak remote-add --system --if-not-exists flathub …`) | oui | oui | oui | oui |
+| Mises à jour Fedora | `dnf upgrade -y`, `dnf upgrade --refresh -y`, `dnf upgrade -y langpacks-* glibc-langpack-*` | idem | idem | idem | idem |
+| Mises à jour Flatpak | `flatpak update --system` **et** `--user --noninteractive` | idem | idem | idem | idem |
+| Maintenance commune | `dnf clean all`, `dnf autoremove -y`, `journalctl --vacuum-time=7d`, `/tmp` + `/var/tmp`, vignettes, `update-desktop-database`, `fc-cache -f` | idem | idem | idem | idem |
+| Maintenance spécifique | `kbuildsycoca6 --noincremental` (cache des menus) | — | oui | — | — |
+
+Remarques :
+
+- **Aucun dépôt spécifique n'est nécessaire pour KDE Plasma, Cinnamon ou Budgie** : les
+  quatre bureaux sont fournis par les dépôts Fedora officiels. La page Dépôts propose
+  d'installer ou de réparer le groupe du bureau détecté, et affiche « groupe introuvable »
+  si la version de Fedora ne le fournit pas.
+- Les seuls dépôts complémentaires utiles sont les mêmes partout : **RPM Fusion**
+  (codecs, Steam, pilotes), **Flathub** et **fedora-cisco-openh264** (H.264).
+- Les commandes de mise à jour et la maintenance commune sont identiques sur les quatre
+  environnements ; seul KDE ajoute la reconstruction du cache des menus.
+
 ## Déroulement dans l'application
 
 1. **Premier lancement — langue** : la boîte bilingue « Choose your language ·

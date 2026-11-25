@@ -139,6 +139,30 @@ Notes:
 - An unidentified desktop (`unknown`) applies the GNOME commands by default;
   the power switches then appear disabled when `gsettings` is unavailable.
 
+## Repositories, updates and maintenance per desktop
+
+| Item | Command / value | GNOME | KDE Plasma | Cinnamon | Budgie |
+| --- | --- | --- | --- | --- | --- |
+| Desktop repository itself | no third-party repo: official comps group | `@gnome-desktop` | `@kde-desktop-environment` | `@cinnamon-desktop-environment` | `@budgie-desktop-environment` |
+| H.264 codec | `fedora-cisco-openh264` repository (enabled from the Repositories page) | yes | yes | yes | yes |
+| Multimedia codecs | RPM Fusion (free + nonfree) then `gstreamer1-plugins-ugly`, `gstreamer1-plugins-bad-free-extras` | yes | yes | yes | yes |
+| Flatpak applications | Flathub (`flatpak remote-add --system --if-not-exists flathub …`) | yes | yes | yes | yes |
+| Fedora updates | `dnf upgrade -y`, `dnf upgrade --refresh -y`, `dnf upgrade -y langpacks-* glibc-langpack-*` | same | same | same | same |
+| Flatpak updates | `flatpak update --system` **and** `--user --noninteractive` | same | same | same | same |
+| Common maintenance | `dnf clean all`, `dnf autoremove -y`, `journalctl --vacuum-time=7d`, `/tmp` + `/var/tmp`, thumbnails, `update-desktop-database`, `fc-cache -f` | same | same | same | same |
+| Specific maintenance | `kbuildsycoca6 --noincremental` (menu cache) | — | yes | — | — |
+
+Notes:
+
+- **No specific repository is needed for KDE Plasma, Cinnamon or Budgie**: all four
+  desktops ship in the official Fedora repositories. The Repositories page can install or
+  repair the detected desktop's group, and reports “group not found” when the Fedora
+  release does not provide it.
+- The only useful additional repositories are the same everywhere: **RPM Fusion**
+  (codecs, Steam, drivers), **Flathub** and **fedora-cisco-openh264** (H.264).
+- Update commands and common maintenance are identical on all four environments; only KDE
+  adds the menu cache rebuild.
+
 ## Application flow
 
 1. **First launch — language**: the bilingual “Choose your language ·

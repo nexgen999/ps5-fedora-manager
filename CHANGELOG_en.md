@@ -13,7 +13,12 @@ French version: [CHANGELOG.md](CHANGELOG.md)
 - **GNOME / KDE Plasma / Cinnamon / Budgie support**: the desktop (session variables, user processes, `loginctl`) and the display manager (GDM / SDDM / LightDM) are detected automatically, and the affected commands adapt to them.
 - **Desktop-aware 1-click setup**: the power step applies the detected desktop's commands, the Extension Manager is dropped from the plan outside GNOME (28 items instead of 29) and the Gamescope step follows the display manager; the setup log starts with a “Detected environment” line (desktop · display manager · session).
 
+### Added
+- **Per-desktop repositories**: the Repositories page installs or repairs the detected desktop's official comps group (`@gnome-desktop`, `@kde-desktop-environment`, `@cinnamon-desktop-environment`, `@budgie-desktop-environment`), enables `fedora-cisco-openh264` (H.264) and offers GStreamer codecs through RPM Fusion — no third-party repository is needed for the four desktops.
+
 ### Changed
+- **Fedora updates**: `fed_apps` now updates Flatpak both system-wide **and** for the user; DNF, langpacks, Flatpak and repository refresh commands are identical on all 4 desktops.
+- **Maintenance**: added `update-desktop-database` and `fc-cache -f` (shared) plus a “KDE Plasma maintenance” group with `kbuildsycoca6 --noincremental` (KDE only).
 - **Power per desktop**: screen blanking and full sleep through `gsettings` (GNOME, Cinnamon, Budgie) or `kwriteconfig6` + Powerdevil (KDE Plasma), including a Powerdevil reload.
 - **GNOME-specific items**: the Extension Manager disappears from the app store and from the recommended setup (28 items outside GNOME); mobile management uses KDE Connect (KDE), Nemo (Cinnamon) or Nautilus (GNOME / Budgie); printers add `print-manager` on KDE.
 - **Multi-desktop Gamescope**: autologin is written for GDM, SDDM or LightDM and switches back to the detected desktop session (`gnome`, `plasma`, `cinnamon`, `budgie-desktop`) instead of a hard-coded “gnome”.

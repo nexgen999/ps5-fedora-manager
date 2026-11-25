@@ -956,6 +956,45 @@ def _software_supported(item: Any) -> bool:
     return True
 
 
+# Groupes comps officiels Fedora : aucun dépôt tiers n'est nécessaire pour
+# installer ou réparer le bureau lui-même.
+DESKTOP_GROUPS = {
+    "gnome": "gnome-desktop",
+    "kde": "kde-desktop-environment",
+    "cinnamon": "cinnamon-desktop-environment",
+    "budgie": "budgie-desktop-environment",
+}
+
+
+def desktop_group() -> str:
+    """Groupe comps du bureau détecté (dépôts Fedora officiels)."""
+    return DESKTOP_GROUPS.get(DESKTOP_ID, DESKTOP_GROUPS["gnome"])
+
+
+def _dnf_group_exists(group: str) -> bool:
+    """Le groupe comps existe-t-il dans les dépôts configurés ?"""
+    if not shutil.which("dnf"):
+        return False
+    try:
+        res = subprocess.run(
+            ["dnf", "group", "info", group], capture_output=True, text=True, timeout=60
+        )
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return res.returncode == 0
+
+
+def _install_desktop_group(win: "Ps5ManagerWindow") -> None:
+    """Installe / répare les paquets du bureau depuis les dépôts Fedora."""
+    group = desktop_group()
+
+    def _task(emit: Callable[[str], None]) -> tuple[bool, str]:
+        rc = win.run_cmd_pty(["dnf", "group", "install", "-y", group], emit)
+        return rc == 0, T("done") if rc == 0 else T("failed") % rc
+
+    win.run_task(f"@{group}", _task)
+
+
 def logout_command() -> list[str]:
     """Commande de déconnexion du bureau courant (repli : loginctl)."""
     if DESKTOP_ID == "kde":
@@ -1464,6 +1503,22 @@ STRINGS = {
         "repo_flathub": "Installer Flathub (portée système)",
         "repo_flathub_sub": "Dépôt principal des applications Flatpak",
         "repo_refresh": "Mettre à jour les dépôts & nettoyer le cache",
+        "repo_openh264": "Activer le dépôt fedora-cisco-openh264",
+        "repo_openh264_sub": "Codec H.264/AVC officiel Fedora (Firefox, GStreamer, navigation) — utile sur les quatre bureaux",
+        "repo_codecs": "Installer les codecs multimédias (RPM Fusion)",
+        "repo_codecs_sub": "gstreamer1-plugins-ugly et bad-free-extras : lecture H.264 / MPEG dans GNOME, KDE Plasma, Cinnamon et Budgie",
+        "repo_de_title": "Dépôts du bureau %s",
+        "repo_de_sub": "Aucun dépôt tiers n'est nécessaire : le groupe @%s vient des dépôts Fedora officiels",
+        "repo_de_group": "Installer / réparer les paquets du bureau",
+        "repo_de_missing": "Groupe @%s introuvable dans les dépôts configurés",
+        "mnt_desktop_db": "Reconstruire la base des applications",
+        "mnt_desktop_db_sub": "update-desktop-database /usr/share/applications + ~/.local/share/applications",
+        "mnt_fonts": "Reconstruire le cache des polices",
+        "mnt_fonts_sub": "fc-cache -f (après une mise à jour du bureau)",
+        "mnt_kde_title": "Maintenance KDE Plasma",
+        "mnt_kde_sub": "Caches propres à KDE Plasma",
+        "mnt_kde_menu": "Reconstruire le cache des menus KDE",
+        "mnt_kde_menu_sub": "kbuildsycoca6 --noincremental",
         "repo_refresh_sub": "dnf clean all, makecache --refresh et appstream Flatpak",
         "repo_add": "Ajouter un dépôt personnalisé (URL .repo)",
         "repo_add_prompt": "URL du fichier .repo :",
@@ -1849,7 +1904,23 @@ STRINGS = {
         "repo_rpmfusion_sub": "Required for Steam, multimedia codecs and drivers",
         "repo_flathub": "Install Flathub (system-wide)",
         "repo_flathub_sub": "Primary Flatpak application repository",
-        "repo_refresh": "Refresh repositories & clean cache",
+        "repo_refresh": "Refresh repositories & clean the cache",
+        "repo_openh264": "Enable the fedora-cisco-openh264 repository",
+        "repo_openh264_sub": "Official Fedora H.264/AVC codec (Firefox, GStreamer, browsing) — useful on all four desktops",
+        "repo_codecs": "Install multimedia codecs (RPM Fusion)",
+        "repo_codecs_sub": "gstreamer1-plugins-ugly and bad-free-extras: H.264 / MPEG playback in GNOME, KDE Plasma, Cinnamon and Budgie",
+        "repo_de_title": "%s desktop repositories",
+        "repo_de_sub": "No third-party repository is needed: the @%s group comes from the official Fedora repositories",
+        "repo_de_group": "Install / repair the desktop packages",
+        "repo_de_missing": "@%s group not found in the configured repositories",
+        "mnt_desktop_db": "Rebuild the application database",
+        "mnt_desktop_db_sub": "update-desktop-database /usr/share/applications + ~/.local/share/applications",
+        "mnt_fonts": "Rebuild the font cache",
+        "mnt_fonts_sub": "fc-cache -f (after a desktop update)",
+        "mnt_kde_title": "KDE Plasma maintenance",
+        "mnt_kde_sub": "KDE Plasma-specific caches",
+        "mnt_kde_menu": "Rebuild the KDE menu cache",
+        "mnt_kde_menu_sub": "kbuildsycoca6 --noincremental",
         "repo_refresh_sub": "dnf clean all, makecache --refresh and Flatpak appstream",
         "repo_add": "Add custom repository (.repo URL)",
         "repo_add_prompt": "URL of the .repo file:",
@@ -4329,7 +4400,31 @@ def build_page_repos(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     g1.add(win.row(T("repo_list"), T("repo_list_sub"), "view-list-symbolic", lambda *_: _list_all()))
     g1.add(win.row(T("repo_rpmfusion"), T("repo_rpmfusion_sub"), "system-software-install-symbolic", lambda *_: win.run_task("RPM Fusion", _install_rpmfusion_task)))
     g1.add(win.row(T("repo_flathub"), T("repo_flathub_sub"), "system-software-install-symbolic", lambda *_: win.run_task("Flathub", _install_flathub_task)))
+    def _enable_openh264_task(emit):
+        cmd = (
+            ["dnf", "config-manager", "setopt", "fedora-cisco-openh264.enabled=1"]
+            if IS_DNF5
+            else ["dnf", "config-manager", "--set-enabled", "fedora-cisco-openh264"]
+        )
+        rc = win.run_cmd_pty(cmd, emit)
+        return rc == 0, T("done") if rc == 0 else T("failed") % rc
+
+    def _install_codecs_task(emit):
+        if not _ensure_rpmfusion(win, emit):
+            return False, T("failed") % 1
+        rc = win.run_cmd_pty(
+            [
+                "dnf", "install", "-y",
+                "gstreamer1-plugins-ugly",
+                "gstreamer1-plugins-bad-free-extras",
+            ],
+            emit,
+        )
+        return rc == 0, T("done") if rc == 0 else T("failed") % rc
+
     g1.add(win.row(T("repo_refresh"), T("repo_refresh_sub"), "view-refresh-symbolic", lambda *_: _refresh_repos_task(win)))
+    g1.add(win.row(T("repo_openh264"), T("repo_openh264_sub"), "software-update-available-symbolic", lambda *_: win.run_task(T("repo_openh264"), _enable_openh264_task)))
+    g1.add(win.row(T("repo_codecs"), T("repo_codecs_sub"), "video-display-symbolic", lambda *_: win.run_task(T("repo_codecs"), _install_codecs_task)))
     g1.add(
         win.row(
             T("repo_add"),
@@ -4345,6 +4440,30 @@ def build_page_repos(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         )
     )
     page.add(g1)
+
+    group = desktop_group()
+    g_de = pref_group(
+        title=T("repo_de_title") % DESKTOP_LABEL,
+        description=T("repo_de_sub") % group,
+    )
+    if _dnf_group_exists(group):
+        g_de.add(
+            win.row(
+                T("repo_de_group"),
+                f"@{group}",
+                "system-software-install-symbolic",
+                lambda *_: _install_desktop_group(win),
+            )
+        )
+    elif shutil.which("dnf"):
+        g_de.add(
+            plain_row(
+                Adw.ActionRow,
+                title=T("repo_de_group"),
+                subtitle=T("repo_de_missing") % group,
+            )
+        )
+    page.add(g_de)
 
     g2 = pref_group()
     g2.add(
@@ -4534,7 +4653,13 @@ def build_page_fedora(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
             T("fed_apps"), T("fed_apps_sub"), "system-software-install-symbolic",
             lambda *_: win.run_task(T("fed_apps"), lambda e: (
                 win.run_cmd_pty(["dnf", "upgrade", "-y"], e) == 0
-                and (not shutil.which("flatpak") or win.run_cmd_pty(["flatpak", "update", "--system", "--noninteractive"], e) == 0),
+                and (
+                    not shutil.which("flatpak")
+                    or (
+                        win.run_cmd_pty(["flatpak", "update", "--system", "--noninteractive"], e) == 0
+                        and win.run_cmd_pty(["flatpak", "update", "--user", "--noninteractive"], e, as_user=True) == 0
+                    )
+                ),
                 T("done"),
             )),
         )
@@ -4579,9 +4704,41 @@ def build_page_maint(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         win.toast(T("done"))
 
     g1.add(win.row(T("mnt_thumbs"), "~/.cache/thumbnails", "image-x-generic-symbolic", lambda *_: _clean_thumbs()))
+    def _desktop_db_task(emit):
+        win.run_cmd_pty(["update-desktop-database", "-q", "/usr/share/applications"], emit)
+        win.run_cmd_pty(
+            ["update-desktop-database", "-q", os.path.join(REAL_HOME, ".local", "share", "applications")],
+            emit,
+            as_user=True,
+        )
+        return True, T("done")
+
+    g1.add(win.row(T("mnt_desktop_db"), T("mnt_desktop_db_sub"), "view-refresh-symbolic", lambda *_: win.run_task(T("mnt_desktop_db"), _desktop_db_task)))
+    g1.add(win.row(T("mnt_fonts"), "fc-cache -f", "font-x-generic-symbolic", lambda *_: win.run_task(T("mnt_fonts"), lambda e: (win.run_cmd_pty(["fc-cache", "-f"], e) == 0, T("done")))))
     g1.add(win.row(T("mnt_kernels"), None, "drive-harddisk-symbolic", lambda *_: _clean_old_kernels(win)))
     g1.add(win.row(T("mnt_disk"), "df -hT", "drive-harddisk-symbolic", lambda *_: win.show_text_modal(T("mnt_disk"), subprocess.run(["df", "-hT"], capture_output=True, text=True).stdout)))
     page.add(g1)
+
+    if DESKTOP_ID == "kde":
+        g_kde = pref_group(title=T("mnt_kde_title"), description=T("mnt_kde_sub"))
+
+        def _kde_menu_task(emit):
+            tool = _desktop_tool("kbuildsycoca6", "kbuildsycoca5")
+            if not tool:
+                emit(T("not_installed"))
+                return False
+            rc = win.run_cmd_pty([tool, "--noincremental"], emit, as_user=True)
+            return rc == 0, T("done") if rc == 0 else T("failed") % rc
+
+        g_kde.add(
+            win.row(
+                T("mnt_kde_menu"),
+                T("mnt_kde_menu_sub"),
+                "view-refresh-symbolic",
+                lambda *_: win.run_task(T("mnt_kde_menu"), _kde_menu_task),
+            )
+        )
+        page.add(g_kde)
 
 
 def _installed_kernel_packages() -> list[tuple[str, str]]:
