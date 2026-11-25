@@ -985,10 +985,19 @@ def _dnf_group_exists(group: str) -> bool:
 
 
 def _install_desktop_group(win: "Ps5ManagerWindow") -> None:
-    """Installe / répare les paquets du bureau depuis les dépôts Fedora."""
+    """Installe / répare les paquets du bureau depuis les dépôts Fedora.
+
+    La vérification du groupe se fait dans la tâche de fond : `dnf group info`
+    peut charger les métadonnées pendant plusieurs secondes, ce qui ne doit
+    jamais bloquer la construction de la page.
+    """
     group = desktop_group()
 
     def _task(emit: Callable[[str], None]) -> tuple[bool, str]:
+        if not _dnf_group_exists(group):
+            message = T("repo_de_missing") % group
+            emit(message)
+            return False, message
         rc = win.run_cmd_pty(["dnf", "group", "install", "-y", group], emit)
         return rc == 0, T("done") if rc == 0 else T("failed") % rc
 
@@ -4446,23 +4455,14 @@ def build_page_repos(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         title=T("repo_de_title") % DESKTOP_LABEL,
         description=T("repo_de_sub") % group,
     )
-    if _dnf_group_exists(group):
-        g_de.add(
-            win.row(
-                T("repo_de_group"),
-                f"@{group}",
-                "system-software-install-symbolic",
-                lambda *_: _install_desktop_group(win),
-            )
+    g_de.add(
+        win.row(
+            T("repo_de_group"),
+            f"@{group}",
+            "system-software-install-symbolic",
+            lambda *_: _install_desktop_group(win),
         )
-    elif shutil.which("dnf"):
-        g_de.add(
-            plain_row(
-                Adw.ActionRow,
-                title=T("repo_de_group"),
-                subtitle=T("repo_de_missing") % group,
-            )
-        )
+    )
     page.add(g_de)
 
     g2 = pref_group()

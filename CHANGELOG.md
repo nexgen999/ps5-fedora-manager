@@ -24,6 +24,7 @@ Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 - `APP_VERSION` passe à `0.6`, notes de version FR/EN de la boîte « À propos » mises à jour.
 
 ### Corrigé
+- **Page Dépôts** : plus aucun appel `dnf` pendant la construction de la page — la vérification du groupe comps du bureau s'exécute dans la tâche de fond (avec le journal), ce qui évite un gel de l'interface jusqu'à une minute à l'ouverture.
 - **Notes de version (« Quoi de neuf »)** : plus aucune balise `<b>` dans le texte, et nouveau filtre `_safe_release_notes()` qui ne conserve que `p` / `ul` / `ol` / `li` / `a` — Libadwaita refusait l'analyse et affichait « Impossible d'analyser les notes de version : Unexpected element 'b' » à la place du texte.
 - **Titres de groupes** : `pref_group()` n'échappe plus le markup, car `Adw.PreferencesGroup` affiche titre et description en texte brut ; `IA &amp; Développeur` redevient `IA & Développeur` (idem `Imprimantes &amp; scanners`, `Langues &amp; clavier`, `Suivi en direct &amp; historique`, `Système &amp; Utilitaires`).
 
