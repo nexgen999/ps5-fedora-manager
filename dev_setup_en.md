@@ -1,7 +1,7 @@
 # Recommended setup — reference configuration
 
 This document describes the **developer-recommended setup** applied by
-PS5 Fedora Manager (version 0.6.1). It is offered on the first launch of the
+PS5 Fedora Manager (version 0.7). It is offered on the first launch of the
 application and stays available at any time through the **main (burger)
 menu → “Run recommended setup”**.
 

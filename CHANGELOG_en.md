@@ -7,6 +7,19 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.7] — 2026-11-25
+
+### Added
+- **Interface in 6 languages**: French, English, **Spanish**, **Italian**, **German** and **Brazilian Portuguese**. All 350 `STRINGS` labels are fully translated in every language (no missing key).
+- **Language picker**: the “Interface language” page lists the six languages with their native names (Français, English, Español, Italiano, Deutsch, Português (Brasil)); the first-launch welcome dialog offers the six choices.
+- `LANG_ORDER` / `LANG_LABELS` centralise the display order and the native names.
+
+### Changed
+- **`read_ui_lang()`** accepts variants (`pt_BR`, `pt-BR`, `es_ES`…) and falls back to the base language stored in `/etc/ps5-manager/language`.
+- **`T()`** now falls back to English then French: a missing key no longer prints its technical name.
+- **`_L(fr, en)`** checks an `LSTRINGS` dictionary (empty for now) before falling back to English, so texts outside `STRINGS` can be translated later without touching the call sites.
+- `APP_VERSION` bumped to `0.7`, FR/EN release notes of the “About” dialog updated.
+
 ## [0.6.1] — 2026-11-25
 
 ### Added

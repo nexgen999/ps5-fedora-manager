@@ -6,6 +6,19 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.7] — 2026-11-25
+
+### Ajouté
+- **Interface en 6 langues** : français, anglais, **espagnol**, **italien**, **allemand** et **portugais du Brésil**. Les 350 libellés de `STRINGS` sont traduits intégralement dans chaque langue (aucune clé manquante).
+- **Sélecteur de langue** : la page « Langue de l'interface » liste les six langues avec leur nom natif (Français, English, Español, Italiano, Deutsch, Português (Brasil)) ; la boîte de bienvenue du premier lancement propose les six choix.
+- `LANG_ORDER` / `LANG_LABELS` centralisent l'ordre d'affichage et les noms natifs.
+
+### Modifié
+- **`read_ui_lang()`** accepte les variantes (`pt_BR`, `pt-BR`, `es_ES`…) et se replie sur la langue de base enregistrée dans `/etc/ps5-manager/language`.
+- **`T()`** se replie désormais sur l'anglais puis sur le français : une clé absente n'affiche plus le nom technique de la clé.
+- **`_L(fr, en)`** consulte un dictionnaire `LSTRINGS` (aujourd'hui vide) avant de retomber sur l'anglais, pour traduire plus tard les textes hors `STRINGS` sans toucher aux appels.
+- `APP_VERSION` passe à `0.7`, notes de version FR/EN de la boîte « À propos » mises à jour.
+
 ## [0.6.1] — 2026-11-25
 
 ### Ajouté
