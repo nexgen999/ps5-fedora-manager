@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.8.3"
+APP_VERSION = "0.9.0"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -5650,6 +5650,24 @@ SECTIONS = [
 # Fenêtre principale (GNOME Settings / Libadwaita NavigationSplitView)
 # ------------------------------------------------------------------------------
 _L_TABLE = {
+    "Mise à jour %s installée — redémarrage…": (
+        "Actualización %s instalada: reiniciando…",
+        "Aggiornamento %s installato: riavvio…",
+        "Aktualisierung %s installiert – Neustart…",
+        "Atualização %s instalada: reiniciando…",
+    ),
+    "Mise à jour %s disponible : installe-la depuis « Mise à jour du manager ».": (
+        "Actualización %s disponible: instálala desde «Actualización del gestor».",
+        "Aggiornamento %s disponibile: installalo da «Aggiornamento del gestore».",
+        "Aktualisierung %s verfügbar: installiere sie über „Manager-Aktualisierung“.",
+        "Atualização %s disponível: instale-a em «Atualização do gerenciador».",
+    ),
+    "Mise à jour installée — active au prochain démarrage.": (
+        "Actualización instalada: activa en el próximo inicio.",
+        "Aggiornamento installato: attivo al prossimo avvio.",
+        "Aktualisierung installiert – beim nächsten Start aktiv.",
+        "Atualização instalada: ativa no próximo início.",
+    ),
     "Droits (root:root, 0755/0644, Polkit GUI, SELinux) appliqués.": (
         "Permisos (root:root, 0755/0644, Polkit GUI, SELinux) aplicados.",
         "Permessi (root:root, 0755/0644, Polkit GUI, SELinux) applicati.",
@@ -6316,6 +6334,9 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
 
         self._select_section("logs")
 
+        # Vérification de mise à jour en arrière-plan (l'ouverture reste instantanée)
+        self.start_auto_update()
+
     # ---- Barre latérale ----
     def _build_sidebar(self) -> Adw.NavigationPage:
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -6692,6 +6713,65 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         dlg.connect("response", _on_resp)
         dlg.present(self)
 
+
+    # ---- Mise à jour automatique au lancement ----
+    def start_auto_update(self) -> None:
+        """Cherche une version plus récente et l'installe, sans bloquer l'ouverture."""
+        if os.environ.get("PS5_MANAGER_NO_UPDATE_CHECK"):
+            return
+        threading.Thread(target=self._auto_update_worker, daemon=True).start()
+
+    def _auto_update_worker(self) -> None:
+        latest = fetch_latest_version()
+        if not latest or version_tuple(latest) <= version_tuple(APP_VERSION):
+            return
+        if os.environ.get("PS5_MANAGER_SKIP_UPDATE") == latest:
+            # Déjà tenté au lancement précédent : ne jamais boucler sur un échec.
+            GLib.idle_add(self._auto_update_result, latest, False)
+            return
+        installed = install_update(latest)
+        GLib.idle_add(self._auto_update_result, latest, installed)
+
+    def _auto_update_result(self, latest: str, installed: bool) -> bool:
+        if not installed:
+            self.toast(
+                _L(
+                    "Mise à jour %s disponible : installe-la depuis « Mise à jour du manager »."
+                    % latest,
+                    "Update %s available: install it from “Manager update”." % latest,
+                )
+            )
+            return False
+        self.toast(
+            _L(
+                "Mise à jour %s installée — redémarrage…" % latest,
+                "Update %s installed — restarting…" % latest,
+            )
+        )
+        os.environ["PS5_MANAGER_SKIP_UPDATE"] = latest
+        GLib.timeout_add(2500, self._restart_after_update)
+        return False
+
+    def _restart_after_update(self) -> bool:
+        """Relance l'application sur la nouvelle version, sauf action en cours."""
+        if getattr(self, "busy", False):
+            self.toast(
+                _L(
+                    "Mise à jour installée — active au prochain démarrage.",
+                    "Update installed — active on next start.",
+                )
+            )
+            return False
+        app = self.get_application()
+        if app is not None:
+            app.restart_on_exit = True  # type: ignore[attr-defined]
+        if self.log_window is not None:
+            self.log_window.destroy()
+            self.log_window = None
+        self.destroy()
+        if app is not None:
+            app.quit()
+        return False
 
     # ---- Exécuteur asynchrone via PTY ----
     def run_task(
@@ -7278,6 +7358,106 @@ def _exec_software_action(
         return False, "Action inconnue"
 
     win.run_task(f"{item.name} — {T(action)}", _task, lambda *_: win._select_section("library"))
+
+
+# ------------------------------------------------------------------------------
+# Mise à jour automatique au lancement
+# La version publiée est lue dans version.txt (quelques octets), le script est
+# téléchargé seulement si une version plus récente existe, puis validé (taille,
+# APP_VERSION, compilation) avant d'être installé dans /usr/local/bin.
+# ------------------------------------------------------------------------------
+RAW_BRANCH = "main"
+MIN_SCRIPT_BYTES = 20000
+
+
+def raw_base_url() -> str:
+    """URL « raw » du dépôt, déduite de REPO_URL (surchargée par PS5_MANAGER_REPO)."""
+    match = re.search(r"github\.com[/:]([^/]+)/([^/\s]+?)(?:\.git)?$", REPO_URL.strip())
+    if not match:
+        return ""
+    return f"https://raw.githubusercontent.com/{match.group(1)}/{match.group(2)}/{RAW_BRANCH}"
+
+
+def version_tuple(value: str) -> tuple[int, int, int]:
+    """« 0.9.0 » → (0, 9, 0) : comparaison numérique, pas alphabétique."""
+    numbers = [int(part) for part in re.findall(r"\d+", value or "")[:3]]
+    while len(numbers) < 3:
+        numbers.append(0)
+    return (numbers[0], numbers[1], numbers[2])
+
+
+def fetch_latest_version(timeout: float = 8.0) -> str:
+    """Version publiée dans le dépôt, chaîne vide si hors ligne ou dépôt inconnu."""
+    base = raw_base_url()
+    if not base:
+        return ""
+    request = urllib.request.Request(
+        f"{base}/version.txt",
+        headers={"User-Agent": f"{APP_NAME}/{APP_VERSION}"},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            raw = response.read(64).decode("utf-8", "replace")
+    except (urllib.error.URLError, OSError, ValueError):
+        return ""
+    found = re.search(r"\d+\.\d+(?:\.\d+)?", raw)
+    return found.group(0) if found else ""
+
+
+def install_update(expected: str, timeout: float = 60.0) -> bool:
+    """Télécharge le script du dépôt et l'installe dans /usr/local/bin.
+
+    Le profil « fichier unique » est mis à jour en place ; une installation
+    pilotée par git (/opt/ps5-manager) reste gérée par la page « Mise à jour du
+    manager », qui fait un `reset --hard`.
+    """
+    base = raw_base_url()
+    if not base:
+        return False
+    request = urllib.request.Request(
+        f"{base}/ps5_manager.py",
+        headers={"User-Agent": f"{APP_NAME}/{APP_VERSION}"},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            data = response.read()
+    except (urllib.error.URLError, OSError, ValueError):
+        return False
+    if len(data) < MIN_SCRIPT_BYTES:
+        return False
+    found = re.search(rb'APP_VERSION = "([^"]+)"', data)
+    if not found:
+        return False
+    downloaded = found.group(1).decode("utf-8", "replace")
+    if version_tuple(downloaded) < version_tuple(expected):
+        return False
+    try:
+        compile(data, "ps5-manager.py", "exec")  # script valide ou rien
+    except SyntaxError:
+        return False
+    tmp_path = os.path.join(tempfile.gettempdir(), "ps5-manager-update.py")
+    try:
+        with open(tmp_path, "wb") as handle:
+            handle.write(data)
+        os.chmod(tmp_path, 0o755)
+        rc = subprocess.run(
+            [
+                "install", "-o", "root", "-g", "root", "-m", "0755",
+                tmp_path, "/usr/local/bin/ps5-manager",
+            ],
+            capture_output=True,
+        ).returncode
+        if rc != 0:
+            return False
+        apply_install_permissions()
+        return True
+    except OSError:
+        return False
+    finally:
+        try:
+            os.remove(tmp_path)
+        except OSError:
+            pass
 
 
 def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:

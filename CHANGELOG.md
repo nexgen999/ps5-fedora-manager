@@ -6,6 +6,17 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.9.0] — 2026-11-25
+
+### Ajouté
+- **Mise à jour automatique au lancement** : l'application lit `version.txt` du dépôt (quelques octets) dans un fil de fond, juste après l'ouverture de la fenêtre. Si une version plus récente existe, elle télécharge `ps5_manager.py`, vérifie sa taille, son `APP_VERSION` et sa compilation Python, l'installe dans `/usr/local/bin/ps5-manager` (`root:root`, `0755`, droits et contextes SELinux réappliqués), affiche un toast puis redémarre automatiquement sur la nouvelle version.
+- **Silencieux en cas de problème** : hors ligne, dépôt injoignable ou script invalide, l'application s'ouvre normalement sans message ; si l'installation échoue, un toast renvoie vers la page « Mise à jour du manager ».
+- **Garde-fous** : pas de seconde tentative pour la même version (`PS5_MANAGER_SKIP_UPDATE`), redémarrage reporté si une action est en cours, et vérification désactivable avec `PS5_MANAGER_NO_UPDATE_CHECK=1`.
+- `version.txt` publié dans le dépôt : c'est la seule information téléchargée lors de la vérification.
+
+### Modifié
+- `APP_VERSION` passe à `0.9.0`.
+
 ## [0.8.3] — 2026-11-25
 
 ### Corrigé

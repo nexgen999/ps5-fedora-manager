@@ -7,6 +7,17 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.9.0] — 2026-11-25
+
+### Added
+- **Automatic update at launch**: the application reads the repository's `version.txt` (a few bytes) in a background thread right after the window opens. When a newer version exists it downloads `ps5_manager.py`, checks its size, its `APP_VERSION` and that it compiles as Python, installs it to `/usr/local/bin/ps5-manager` (`root:root`, `0755`, permissions and SELinux contexts reapplied), shows a toast and restarts automatically on the new version.
+- **Silent when something goes wrong**: offline, unreachable repository or invalid script, the application opens normally with no message; if installation fails, a toast points to the “Manager update” page.
+- **Safeguards**: no second attempt for the same version (`PS5_MANAGER_SKIP_UPDATE`), restart postponed while an action is running, and the check can be disabled with `PS5_MANAGER_NO_UPDATE_CHECK=1`.
+- `version.txt` published in the repository: it is the only thing fetched during the check.
+
+### Changed
+- `APP_VERSION` bumped to `0.9.0`.
+
 ## [0.8.3] — 2026-11-25
 
 ### Fixed
