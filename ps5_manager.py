@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.8.2"
+APP_VERSION = "0.8.3"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -697,6 +697,7 @@ INTERFACE_DEPS = [
     "curl",
     "git",
     "desktop-file-utils",
+    "polkit-gnome",
     "util-linux",
 ]
 
@@ -827,6 +828,186 @@ def remove_legacy_install(emit: Optional[Callable[[str], None]] = None) -> list[
     return removed
 
 
+# ------------------------------------------------------------------------------
+# Lancement depuis l'icône du menu (sans terminal)
+# Sans agent PolicyKit graphique, pkexec retombe sur son agent texte : appelé
+# depuis une icône il n'y a plus de terminal, l'authentification échoue et
+# l'application ne s'ouvre jamais (constaté sous Budgie). On démarre donc un
+# agent si nécessaire, on journalise les échecs et on les explique à l'écran.
+# ------------------------------------------------------------------------------
+LAUNCH_LOG_PATH = os.path.join(
+    os.environ.get("XDG_CACHE_HOME") or os.path.join(REAL_HOME or "/tmp", ".cache"),
+    "ps5-manager",
+    "launcher.log",
+)
+
+_POLKIT_AGENT_NAMES = (
+    "polkit-gnome-authentication-agent-1",
+    "polkit-kde-authentication-agent-1",
+    "polkit-mate-authentication-agent-1",
+    "cinnamon-polkit-authentication-agent-1",
+    "lxpolkit",
+    "lxqt-policykit-agent",
+    "xfce-polkit",
+    "hyprpolkitagent",
+)
+_POLKIT_AGENT_DIRS = (
+    "/usr/libexec",
+    "/usr/lib/polkit-gnome",
+    "/usr/lib/polkit-kde",
+    "/usr/lib/mate-polkit",
+    "/usr/lib/xfce-polkit",
+    "/usr/lib/hyprpolkitagent",
+    "/usr/local/libexec",
+)
+
+
+def launcher_log(message: str) -> None:
+    """Journalise un échec de lancement hors terminal (icône du menu)."""
+    line = f"[{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {message}\n"
+    try:
+        os.makedirs(os.path.dirname(LAUNCH_LOG_PATH), exist_ok=True)
+        with open(LAUNCH_LOG_PATH, "a", encoding="utf-8") as fh:
+            fh.write(line)
+    except OSError:
+        pass
+    try:
+        if sys.stderr is not None:
+            sys.stderr.write(line)
+    except (OSError, ValueError):
+        pass
+
+
+def has_terminal() -> bool:
+    """Un terminal interactif est-il attaché au processus ?
+
+    L'agent texte de pkexec lit le mot de passe sur le terminal de contrôle :
+    seul stdin compte (une sortie redirigée n'empêche pas l'authentification).
+    """
+    try:
+        return bool(sys.stdin is not None and sys.stdin.isatty())
+    except (OSError, ValueError):
+        return False
+
+
+def polkit_agent_paths() -> list[str]:
+    """Agents PolicyKit graphiques installés sur la machine."""
+    paths: list[str] = []
+    for name in _POLKIT_AGENT_NAMES:
+        found = shutil.which(name)
+        if found and found not in paths:
+            paths.append(found)
+        for directory in _POLKIT_AGENT_DIRS:
+            candidate = os.path.join(directory, name)
+            if candidate not in paths and os.access(candidate, os.X_OK):
+                paths.append(candidate)
+    return paths
+
+
+def polkit_agent_running() -> bool:
+    """Un agent PolicyKit (graphique) tourne-t-il déjà dans la session ?
+
+    Seul le nom du programme lancé (premier argument) est comparé : chercher le
+    nom n'importe où dans la ligne de commande donnerait un faux positif avec
+    n'importe quel processus dont le texte mentionne polkit.
+    """
+    if not shutil.which("ps"):
+        return True  # impossible de vérifier : laisser pkexec essayer
+    try:
+        out = subprocess.run(
+            ["ps", "-eo", "args="], capture_output=True, text=True, timeout=4
+        ).stdout
+    except (OSError, subprocess.SubprocessError):
+        return True
+    for line in out.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        name = os.path.basename(line.split(" ", 1)[0])
+        if name.startswith("polkit-") or name in (
+            "lxpolkit",
+            "lxqt-policykit-agent",
+            "xfce-polkit",
+            "hyprpolkitagent",
+            "gnome-shell",
+        ):
+            return True
+    return False
+
+
+def start_polkit_agent() -> bool:
+    """Démarre un agent PolicyKit graphique quand la session n'en a pas."""
+    if polkit_agent_running():
+        return True
+    for path in polkit_agent_paths():
+        try:
+            subprocess.Popen(
+                [path],
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                start_new_session=True,
+                env=dict(os.environ),
+            )
+        except OSError as exc:
+            launcher_log(f"Agent PolicyKit non démarré ({path}) : {exc}")
+            continue
+        for _ in range(20):
+            time.sleep(0.1)
+            if polkit_agent_running():
+                launcher_log(f"Agent PolicyKit démarré : {path}")
+                return True
+    launcher_log("Aucun agent PolicyKit graphique disponible.")
+    return False
+
+
+def show_launch_error(code: int) -> None:
+    """Explique l'échec d'élévation quand aucune fenêtre n'a pu s'ouvrir."""
+    detail = f"pkexec : code {code} — journal : {LAUNCH_LOG_PATH}"
+    try:
+        import gi
+
+        gi.require_version("Gtk", "4.0")
+        gi.require_version("Adw", "1")
+        from gi.repository import Adw, Gio, Gtk
+    except (ImportError, ValueError):
+        return
+
+    class LaunchErrorApp(Adw.Application):
+        def __init__(self) -> None:
+            super().__init__(
+                application_id=f"{APP_ID}.LaunchError",
+                flags=Gio.ApplicationFlags.NON_UNIQUE,
+            )
+
+        def do_activate(self) -> None:
+            dialog = Adw.MessageDialog(
+                heading="Authentification impossible / Authentication failed",
+                body=(
+                    "Aucun agent PolicyKit graphique n'est actif dans cette session : "
+                    "le mot de passe ne peut pas être demandé depuis l'icône du menu.\n\n"
+                    "• installez l'agent : sudo dnf install polkit-gnome\n"
+                    "• ou lancez l'application depuis un terminal :\n"
+                    "  pkexec /usr/local/bin/ps5-manager\n\n"
+                    "No graphical PolicyKit agent is running, so the password prompt "
+                    "cannot be shown from the menu icon. Install polkit-gnome or start "
+                    "the application from a terminal."
+                ),
+            )
+            dialog.add_response("close", "Fermer / Close")
+            dialog.set_default_response("close")
+            dialog.connect("response", lambda *_: self.quit())
+            info = Gtk.Label(label=detail, selectable=True, wrap=True)
+            info.add_css_class("dim-label")
+            dialog.set_extra_child(info)
+            dialog.present()
+
+    try:
+        LaunchErrorApp().run([sys.argv[0] if sys.argv else "ps5-manager"])
+    except Exception as exc:  # noqa: BLE001
+        launcher_log(f"Fenêtre d'erreur indisponible : {exc}")
+
+
 def elevate_if_needed() -> None:
     if os.geteuid() == 0 or os.environ.get("PS5_MANAGER_ELEVATED"):
         return
@@ -853,19 +1034,46 @@ def elevate_if_needed() -> None:
             env_args.append(f"{_k}={_v}")
     pkexec = shutil.which("pkexec")
     if pkexec:
-        try:
-            os.execv(
-                pkexec,
-                [pkexec, "env", *env_args, sys.executable, self_path, *sys.argv[1:]],
+        cmd = [pkexec, "env", *env_args, sys.executable, self_path, *sys.argv[1:]]
+        if has_terminal():
+            # Terminal : pkexec utilise son agent texte, comportement habituel.
+            try:
+                os.execv(pkexec, cmd)
+            except OSError as exc:
+                launcher_log(f"pkexec n'a pas pu être lancé : {exc}")
+        else:
+            # Icône du menu : sans agent graphique, pkexec échoue en silence.
+            agent_was_running = polkit_agent_running()
+            started_agent = False if agent_was_running else start_polkit_agent()
+            try:
+                code = subprocess.call(cmd)
+            except OSError as exc:
+                launcher_log(f"pkexec n'a pas pu être lancé : {exc}")
+                code = 127
+            if code == 0:
+                raise SystemExit(0)
+            launcher_log(
+                f"Échec de l'élévation (code {code}, "
+                f"bureau {os.environ.get('XDG_CURRENT_DESKTOP', 'inconnu')}, "
+                f"agent PolicyKit au départ : {'oui' if agent_was_running else 'non'})"
             )
-        except OSError:
-            pass
+            if started_agent:
+                try:
+                    code = subprocess.call(cmd)
+                except OSError:
+                    code = 127
+                if code == 0:
+                    raise SystemExit(0)
+                launcher_log(f"Second échec de l'élévation (code {code})")
+            show_launch_error(code)
+            raise SystemExit(code)
     sudo = shutil.which("sudo")
     if sudo:
         os.execvp(
             sudo,
             [sudo, "-E", "env", *env_args, sys.executable, self_path, *sys.argv[1:]],
         )
+    launcher_log("Ni pkexec ni sudo ne sont disponibles.")
     sys.stderr.write("Ce gestionnaire doit être lancé en root (pkexec ou sudo).\n")
     raise SystemExit(1)
 
@@ -1500,10 +1708,24 @@ def run_as_user_cmd(cmd: list[str]) -> list[str]:
 # Les groupes (Adw.PreferencesGroup) affichent du texte brut : rien à échapper.
 # ------------------------------------------------------------------------------
 def plain_row(cls: Any, **kwargs: Any) -> Any:
-    """Crée une ligne Adw dont le titre et le sous-titre sont du texte littéral."""
+    """Crée une ligne Adw dont le titre et le sous-titre sont du texte littéral.
+
+    Adw.PreferencesRow:use-markup vaut TRUE par défaut : un titre contenant
+    « & » passé au constructeur est analysé comme du Pango avant que le markup
+    ne puisse être désactivé, d'où l'avertissement GTK « L'entité ne se termine
+    pas par un point-virgule ». On construit donc la ligne sans texte, on coupe
+    le markup, puis on renseigne titre et sous-titre : plus aucun avertissement
+    et le « & » s'affiche tel quel.
+    """
+    title = kwargs.pop("title", None)
+    subtitle = kwargs.pop("subtitle", None)
     row = cls(**kwargs)
     if hasattr(row, "set_use_markup"):
         row.set_use_markup(False)
+    if title is not None and hasattr(row, "set_title"):
+        row.set_title(title)
+    if subtitle is not None and hasattr(row, "set_subtitle"):
+        row.set_subtitle(subtitle)
     return row
 
 

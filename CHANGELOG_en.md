@@ -7,6 +7,17 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.8.3] — 2026-11-25
+
+### Fixed
+- **Launching from the menu icon**: with no graphical PolicyKit agent in the session (seen on Budgie), `pkexec` fell back to its textual agent; started from an icon there is no terminal, so authentication failed and the application never opened — only a terminal launch worked. The application now starts a PolicyKit agent (`polkit-gnome`, `polkit-kde`, `mate-polkit`, `lxpolkit`…) before elevating, retries once, then shows a clear, copyable explanation if authentication is still impossible.
+- **Launch log**: elevation failures are written to `~/.cache/ps5-manager/launcher.log` (detected desktop, return code, command) instead of vanishing without a terminal.
+- **GTK warnings “Entity did not end with a semicolon”**: row titles containing “&” (“AI & Developer”, “Languages & keyboard”, “Live monitoring & history”) were passed to the Adwaita constructor while markup is enabled by default. Text is now set after markup is disabled: no warning at all and the “&” shows as typed.
+
+### Changed
+- `polkit-gnome` joins the interface dependencies for desktops that ship no authentication agent.
+- `APP_VERSION` bumped to `0.8.3`.
+
 ## [0.8.2] — 2026-11-25
 
 ### Fixed

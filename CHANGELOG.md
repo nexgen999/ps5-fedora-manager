@@ -6,6 +6,17 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.8.3] — 2026-11-25
+
+### Corrigé
+- **Lancement depuis l'icône du menu** : faute d'agent PolicyKit graphique dans la session (constaté sous Budgie), `pkexec` retombait sur son agent texte ; appelé depuis une icône il n'y a plus de terminal, l'authentification échouait et l'application ne s'ouvrait jamais — seul le lancement en terminal fonctionnait. L'application démarre désormais un agent PolicyKit (`polkit-gnome`, `polkit-kde`, `mate-polkit`, `lxpolkit`…) avant l'élévation, réessaie une fois, puis affiche une explication claire et copiable si l'authentification reste impossible.
+- **Journal de lancement** : les échecs d'élévation sont écrits dans `~/.cache/ps5-manager/launcher.log` (bureau détecté, code de retour, commande) au lieu de disparaître faute de terminal.
+- **Avertissements GTK « L'entité ne se termine pas par un point-virgule »** : les titres de lignes contenant « & » (« IA & Développeur », « Langues & clavier », « Suivi en direct & historique ») étaient transmis au constructeur Adwaita alors que le markup est actif par défaut. Le texte est maintenant posé après la désactivation du markup : plus aucun avertissement et le « & » s'affiche tel quel.
+
+### Modifié
+- `polkit-gnome` rejoint les dépendances de l'interface pour les bureaux qui ne fournissent pas d'agent d'authentification.
+- `APP_VERSION` passe à `0.8.3`.
+
 ## [0.8.2] — 2026-11-25
 
 ### Corrigé

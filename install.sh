@@ -4,7 +4,7 @@ set -euo pipefail
 # Dépendances complètes pour l'interface GTK4 / Libadwaita / PyGObject sur Fedora 45
 sudo dnf install -y \
     python3 python3-gobject gtk4 libadwaita gobject-introspection \
-    polkit glib2 curl git desktop-file-utils util-linux
+    polkit glib2 curl git desktop-file-utils polkit-gnome util-linux
 sudo dnf install -y xhost || true
 
 INSTALL_DIR="/opt/ps5-manager"
