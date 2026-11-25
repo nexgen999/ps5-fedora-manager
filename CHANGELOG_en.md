@@ -21,7 +21,7 @@ French version: [CHANGELOG.md](CHANGELOG.md)
 
 ### Fixed
 - **Release notes (“What's new”)**: no `<b>` tag is left in the text, and the new `_safe_release_notes()` filter keeps only `p` / `ul` / `ol` / `li` / `a` — Libadwaita rejected the markup and displayed “Could not parse release notes: Unexpected element 'b'” instead of the text.
-- **Group titles**: `pref_group()` no longer escapes markup, because `Adw.PreferencesGroup` renders title and description as plain text; “IA &amp; Développeur” is “IA & Développeur” again (same for “Imprimantes &amp; scanners”, “Langues &amp; clavier”, “Suivi en direct &amp; historique”, “Système &amp; Utilitaires”).
+- **Group titles**: `pref_group()` no longer escapes markup, because `Adw.PreferencesGroup` renders title and description as plain text; `IA &amp; Développeur` is `IA & Développeur` again (same for `Imprimantes &amp; scanners`, `Langues &amp; clavier`, `Suivi en direct &amp; historique`, `Système &amp; Utilitaires`).
 
 ## [0.5] — 2026-11-22
 
