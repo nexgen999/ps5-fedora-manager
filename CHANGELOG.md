@@ -26,6 +26,7 @@ Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 - **Notes de version (« Quoi de neuf »)** : plus aucune balise `<b>` et filtre `_safe_release_notes()` (Libadwaita refusait l'analyse).
 - **Titres de groupes** : `pref_group()` n'échappe plus le texte brut (`IA &amp;` redevient `IA &`).
 - **Textes codés en dur** : kernel, utilisateurs, dépôts, Mesa et IA passent désormais par `STRINGS` (FR/EN).
+- **Page IA & Développeur** : les 49 libellés, sous-titres et confirmations encore en français dur (Open WebUI, Ollama, VSCodium, modèles) sont bilingues via le nouvel assistant `_L(fr, en)`, donc l'interface anglaise est complète.
 
 ## [0.6] — 2026-11-25
 

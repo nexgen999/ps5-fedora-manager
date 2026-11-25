@@ -3205,6 +3205,11 @@ SECTIONS = [
 # ------------------------------------------------------------------------------
 # Fenêtre principale (GNOME Settings / Libadwaita NavigationSplitView)
 # ------------------------------------------------------------------------------
+def _L(fr: str, en: str) -> str:
+    """Libellé bilingue ponctuel pour les textes hors dictionnaire `STRINGS`."""
+    return fr if UI_LANG == "fr" else en
+
+
 class Ps5ManagerWindow(Adw.ApplicationWindow):
     def __init__(self, app: Adw.Application, theme_sync: SystemThemeSync) -> None:
         super().__init__(
@@ -4290,9 +4295,9 @@ def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
             remove_legacy_install(emit)
             apply_install_permissions()
             win.run_cmd_pty(["update-desktop-database", "/usr/share/applications/"], emit)
-            emit("Droits (root:root, 0755/0644, Polkit GUI, SELinux) appliqués.")
+            emit(_L("Droits (root:root, 0755/0644, Polkit GUI, SELinux) appliqués.", "Permissions (root:root, 0755/0644, Polkit GUI, SELinux) applied."))
             emit(f"{APP_NAME} {APP_VERSION} installé.")
-            emit("Redémarrage automatique de PS5 Fedora Manager…")
+            emit(_L("Redémarrage automatique de PS5 Fedora Manager…", "Restarting PS5 Fedora Manager…"))
             return True, T("done")
 
         def _on_update_done(ok: bool, _msg: str) -> None:
@@ -6046,7 +6051,7 @@ def _ensure_vscodium_repo(win: Ps5ManagerWindow, emit: Callable[[str], None]) ->
 
 def _ensure_ollama_ready(win: Ps5ManagerWindow, emit: Callable[[str], None]) -> bool:
     if not _ollama_installed():
-        emit("Ollama non détecté — installation avec pciutils…")
+        emit(_L("Ollama non détecté — installation avec pciutils…", "Ollama not detected — installing with pciutils…"))
         if win.run_cmd_pty(["dnf", "install", "-y", "pciutils"], emit) != 0:
             return False
         if win.run_cmd_pty("curl -fsSL https://ollama.com/install.sh | sh", emit) != 0:
@@ -6211,7 +6216,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
     g_tools.add(
         win.row(
-            "VSCodium (éditeur de code libre)",
+            _L("VSCodium (éditeur de code libre)", "VSCodium (free code editor)"),
             T("installed_rpm") if codium_ok else f"{T('not_installed')} · dépôt officiel RPM",
             "applications-development-symbolic",
             lambda *_: _push_vscodium_actions(win),
@@ -6328,7 +6333,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
                 did_any = True
                 rc1 = win.run_cmd_pty(["systemctl", "start", "ollama"], emit)
             else:
-                emit("Ollama non détecté sur ce système.")
+                emit(_L("Ollama non détecté sur ce système.", "Ollama not detected on this system."))
 
             st_now, owner_now = _podman_webui_context()
             podman = _podman_bin()
@@ -6342,9 +6347,9 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
                     emit(f"podman ps -a ({REAL_USER}) rc={diag.returncode}: {(diag.stdout or diag.stderr).strip()}")
                 except Exception as exc:
                     emit(f"Erreur podman ps -a : {exc}")
-                emit("Conteneur Podman open-webui non détecté.")
+                emit(_L("Conteneur Podman open-webui non détecté.", "open-webui Podman container not detected."))
             else:
-                emit("Podman non installé.")
+                emit(_L("Podman non installé.", "Podman not installed."))
 
             if not did_any:
                 return False, "Aucun service Ollama ou Open WebUI détecté."
@@ -6393,7 +6398,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         if st_now == "running":
             subprocess.Popen(["xdg-open", "http://127.0.0.1:8080"], **user_subprocess_kwargs())
         else:
-            win.show_info("Open WebUI", "Démarrez d'abord le conteneur Open WebUI.")
+            win.show_info("Open WebUI", _L("Démarrez d'abord le conteneur Open WebUI.", "Start the Open WebUI container first."))
 
     def _show_podman_ps():
         if not _podman_bin():
@@ -6418,7 +6423,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
     def _show_webui_logs():
         if not _podman_bin():
-            win.show_info("Open WebUI", "Podman n'est pas installé.")
+            win.show_info("Open WebUI", T("ai_podman_absent"))
             return
         st_now, owner_now = _podman_webui_context()
         if st_now in ("missing", "no_podman"):
@@ -6453,7 +6458,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     g_srv.add(
         win.row(
             "État des conteneurs Podman (podman ps -a)" if UI_LANG == "fr" else "Podman containers status (podman ps -a)",
-            "Vérifie l'état exact de open-webui",
+            _L("Vérifie l'état exact de open-webui", "Check open-webui's exact state"),
             "view-list-symbolic",
             lambda *_: _show_podman_ps(),
         )
@@ -6461,7 +6466,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     g_srv.add(
         win.row(
             "Logs Open WebUI (podman logs --tail 30)" if UI_LANG == "fr" else "Open WebUI logs (podman logs --tail 30)",
-            "Affiche les 30 dernières lignes du conteneur open-webui",
+            _L("Affiche les 30 dernières lignes du conteneur open-webui", "Show the last 30 lines of the open-webui container"),
             "utilities-terminal-symbolic",
             lambda *_: _show_webui_logs(),
         )
@@ -6527,7 +6532,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     g_mod.add(
         win.row(
             "Modèles actifs en RAM (ollama ps)" if UI_LANG == "fr" else "Active models in RAM (ollama ps)",
-            "Affiche les modèles actuellement chargés en mémoire",
+            _L("Affiche les modèles actuellement chargés en mémoire", "Show the models currently loaded in memory"),
             "utilities-system-monitor-symbolic",
             lambda *_: _show_ollama_ps(),
         )
@@ -6545,12 +6550,12 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
             "echo ''; echo '=== Espace disque modèles ==='; df -h / /var /usr/share/ollama 2>/dev/null || df -h /"
         )
         out = subprocess.run(["bash", "-c", cmd], capture_output=True, text=True).stdout
-        win.show_text_modal("Diagnostic matériel IA (PS5)", out)
+        win.show_text_modal(_L("Diagnostic matériel IA (PS5)", "AI hardware diagnostics (PS5)"), out)
 
     g_ext.add(
         win.row(
             "Diagnostic RAM / GPU / Disque pour l'IA" if UI_LANG == "fr" else "AI RAM / GPU / Disk diagnostic",
-            "Vérifie la mémoire libre avant d'exécuter un modèle 7B / 9B / 12B",
+            _L("Vérifie la mémoire libre avant d'exécuter un modèle 7B / 9B / 12B", "Check free memory before running a 7B / 9B / 12B model"),
             "applications-system-symbolic",
             lambda *_: _hw_ai_diag(),
         )
@@ -6558,7 +6563,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     g_ext.add(
         win.row(
             "Nettoyer les anciennes images Podman" if UI_LANG == "fr" else "Prune unused Podman images",
-            "podman image prune -f (libère l'espace après mise à jour Open WebUI)",
+            _L("podman image prune -f (libère l'espace après mise à jour Open WebUI)", "podman image prune -f (frees space after updating Open WebUI)"),
             "edit-clear-all-symbolic",
             lambda *_: win.run_task(
                 "Podman prune",
@@ -6594,7 +6599,7 @@ def _install_openwebui_desktop_entry(win: Ps5ManagerWindow, emit: Callable[[str]
         except OSError:
             pass
     else:
-        emit("Avertissement : impossible de télécharger open-webui.png (icône générique utilisée).")
+        emit(_L("Avertissement : impossible de télécharger open-webui.png (icône générique utilisée).", "Warning: could not download open-webui.png (generic icon used)."))
 
     launcher_script = """#!/bin/sh
 if command -v podman >/dev/null 2>&1 && podman container exists open-webui 2>/dev/null; then
@@ -6687,7 +6692,7 @@ def _push_ollama_actions(win: Ps5ManagerWindow) -> None:
                 cmds.append("rm -rf /usr/share/ollama")
             win.run_cmd_pty(["bash", "-c", " && ".join(cmds)], emit)
             return True, T("done")
-        win.run_task("Désinstaller Ollama", _task, lambda *_: (win.nav.pop(), win._select_section("aidev")))
+        win.run_task(_L("Désinstaller Ollama", "Uninstall Ollama"), _task, lambda *_: (win.nav.pop(), win._select_section("aidev")))
 
     grp.add(
         win.row(
@@ -6700,7 +6705,7 @@ def _push_ollama_actions(win: Ps5ManagerWindow) -> None:
     grp.add(
         win.row(
             T("update"),
-            "Met à jour Ollama vers la dernière version officielle",
+            _L("Met à jour Ollama vers la dernière version officielle", "Update Ollama to the latest official version"),
             "software-update-available-symbolic",
             lambda *_: _install_or_update("Mettre à jour Ollama"),
         )
@@ -6708,10 +6713,10 @@ def _push_ollama_actions(win: Ps5ManagerWindow) -> None:
     grp.add(
         win.row(
             T("remove"),
-            "Supprime le service et les binaires, conserve /usr/share/ollama",
+            _L("Supprime le service et les binaires, conserve /usr/share/ollama", "Removes the service and binaries, keeps /usr/share/ollama"),
             "user-trash-symbolic",
             lambda *_: (
-                win.show_confirm("Désinstaller Ollama", "Supprimer Ollama tout en conservant les modèles dans /usr/share/ollama ?", lambda: _uninstall(False))
+                win.show_confirm(_L("Désinstaller Ollama", "Uninstall Ollama"), _L("Supprimer Ollama tout en conservant les modèles dans /usr/share/ollama ?", "Remove Ollama while keeping the models in /usr/share/ollama?"), lambda: _uninstall(False))
                 if _ollama_installed()
                 else win.show_info("Ollama", T("not_installed"))
             ),
@@ -6720,10 +6725,10 @@ def _push_ollama_actions(win: Ps5ManagerWindow) -> None:
     if installed:
         grp.add(
             win.row(
-                "Désinstaller complètement (+ supprimer tous les modèles)",
+                _L("Désinstaller complètement (+ supprimer tous les modèles)", "Uninstall completely (+ delete all models)"),
                 "Supprime aussi /usr/share/ollama",
                 "edit-delete-symbolic",
-                lambda *_: win.show_confirm("Purger Ollama", "Supprimer définitivement Ollama ET tous les modèles téléchargés (/usr/share/ollama) ?", lambda: _uninstall(True)),
+                lambda *_: win.show_confirm("Purger Ollama", _L("Supprimer définitivement Ollama ET tous les modèles téléchargés (/usr/share/ollama) ?", "Permanently remove Ollama AND all downloaded models (/usr/share/ollama)?"), lambda: _uninstall(True)),
             )
         )
     sub.add(grp)
@@ -6795,12 +6800,12 @@ def _push_webui_actions(win: Ps5ManagerWindow) -> None:
                 win.run_cmd_pty([podman, "rmi", OPENWEBUI_IMAGE], emit, as_user=as_user)
             _remove_openwebui_desktop_entry(win, emit)
             return True, T("done")
-        win.run_task("Désinstaller Open WebUI", _task, lambda *_: (win.nav.pop(), win._select_section("aidev")))
+        win.run_task(_L("Désinstaller Open WebUI", "Uninstall Open WebUI"), _task, lambda *_: (win.nav.pop(), win._select_section("aidev")))
 
     grp.add(
         win.row(
             T("install"),
-            "Podman + conteneur open-webui + icône locale dans le menu GNOME",
+            _L("Podman + conteneur open-webui + icône locale dans le menu GNOME", "Podman + open-webui container + local applications-menu icon"),
             "system-software-install-symbolic",
             lambda *_: _install(),
         )
@@ -6808,15 +6813,15 @@ def _push_webui_actions(win: Ps5ManagerWindow) -> None:
     grp.add(
         win.row(
             T("update"),
-            "podman pull + recréation (données conservées) + icône GNOME",
+            _L("podman pull + recréation (données conservées) + icône GNOME", "podman pull + recreate (data kept) + menu icon"),
             "software-update-available-symbolic",
             lambda *_: _update(),
         )
     )
     grp.add(
         win.row(
-            "Ouvrir dans le navigateur (http://127.0.0.1:8080)",
-            "Démarre open-webui si arrêté puis ouvre la page web",
+            _L("Ouvrir dans le navigateur (http://127.0.0.1:8080)", "Open in the browser (http://127.0.0.1:8080)"),
+            _L("Démarre open-webui si arrêté puis ouvre la page web", "Starts open-webui if stopped, then opens the web page"),
             "web-browser-symbolic",
             lambda *_: subprocess.Popen([OPENWEBUI_LAUNCHER_PATH], **user_subprocess_kwargs())
             if os.access(OPENWEBUI_LAUNCHER_PATH, os.X_OK)
@@ -6825,8 +6830,8 @@ def _push_webui_actions(win: Ps5ManagerWindow) -> None:
     )
     grp.add(
         win.row(
-            "Installer / mettre à jour l'icône GNOME (menu Applications)",
-            "Télécharge open-webui.png dans /usr/share/pixmaps/ et crée open-webui.desktop",
+            _L("Installer / mettre à jour l'icône GNOME (menu Applications)", "Install / update the menu icon (Applications)"),
+            _L("Télécharge open-webui.png dans /usr/share/pixmaps/ et crée open-webui.desktop", "Downloads open-webui.png into /usr/share/pixmaps/ and creates open-webui.desktop"),
             "image-x-generic-symbolic",
             lambda *_: _install_icon_only(),
         )
@@ -6834,11 +6839,11 @@ def _push_webui_actions(win: Ps5ManagerWindow) -> None:
     grp.add(
         win.row(
             T("remove"),
-            "Supprime conteneur + lanceur/icône GNOME (conserve les conversations)",
+            _L("Supprime conteneur + lanceur/icône GNOME (conserve les conversations)", "Removes the container + menu launcher/icon (keeps conversations)"),
             "user-trash-symbolic",
             lambda *_: win.show_confirm(
-                "Désinstaller Open WebUI",
-                "Supprimer le conteneur open-webui et son icône du menu GNOME en conservant vos données ?",
+                _L("Désinstaller Open WebUI", "Uninstall Open WebUI"),
+                _L("Supprimer le conteneur open-webui et son icône du menu GNOME en conservant vos données ?", "Remove the open-webui container and its menu icon while keeping your data?"),
                 lambda: _uninstall(False),
             ),
         )
@@ -6846,12 +6851,12 @@ def _push_webui_actions(win: Ps5ManagerWindow) -> None:
     if st not in ("missing", "no_podman"):
         grp.add(
             win.row(
-                "Désinstaller complètement (conteneur + volume + image + icône)",
-                "Supprime aussi le volume open-webui et l'image",
+                _L("Désinstaller complètement (conteneur + volume + image + icône)", "Uninstall completely (container + volume + image + icon)"),
+                _L("Supprime aussi le volume open-webui et l'image", "Also removes the open-webui volume and image"),
                 "edit-delete-symbolic",
                 lambda *_: win.show_confirm(
                     "Purger Open WebUI",
-                    "Supprimer le conteneur, l'icône, l'image ET toutes les conversations (volume open-webui) ?",
+                    _L("Supprimer le conteneur, l'icône, l'image ET toutes les conversations (volume open-webui) ?", "Remove the container, the icon, the image AND all conversations (open-webui volume)?"),
                     lambda: _uninstall(True),
                 ),
             )
@@ -6898,19 +6903,19 @@ def _push_vscodium_actions(win: Ps5ManagerWindow) -> None:
                 except OSError:
                     pass
             return rc == 0, T("done") if rc == 0 else T("failed") % rc
-        win.run_task("Désinstaller VSCodium", _task, lambda *_: (win.nav.pop(), win._select_section("aidev")))
+        win.run_task(_L("Désinstaller VSCodium", "Uninstall VSCodium"), _task, lambda *_: (win.nav.pop(), win._select_section("aidev")))
 
-    grp.add(win.row(T("install"), "Clé GPG + vscodium.repo + dnf install codium", "system-software-install-symbolic", lambda *_: _install()))
+    grp.add(win.row(T("install"), _L("Clé GPG + vscodium.repo + dnf install codium", "GPG key + vscodium.repo + dnf install codium"), "system-software-install-symbolic", lambda *_: _install()))
     grp.add(win.row(T("update"), "dnf upgrade -y --refresh codium", "software-update-available-symbolic", lambda *_: _update()))
     if installed:
-        grp.add(win.row("Lancer VSCodium", "Ouvre codium sous votre session utilisateur", "applications-development-symbolic", lambda *_: subprocess.Popen(["codium"], **user_subprocess_kwargs())))
+        grp.add(win.row("Lancer VSCodium", _L("Ouvre codium sous votre session utilisateur", "Opens codium in your user session"), "applications-development-symbolic", lambda *_: subprocess.Popen(["codium"], **user_subprocess_kwargs())))
     grp.add(
         win.row(
             T("remove"),
-            "dnf remove -y codium + retrait dépôt",
+            _L("dnf remove -y codium + retrait dépôt", "dnf remove -y codium + repository removal"),
             "user-trash-symbolic",
             lambda *_: (
-                win.show_confirm("Désinstaller VSCodium", "Supprimer VSCodium (codium) et son dépôt ?", _remove)
+                win.show_confirm(_L("Désinstaller VSCodium", "Uninstall VSCodium"), _L("Supprimer VSCodium (codium) et son dépôt ?", "Remove VSCodium (codium) and its repository?"), _remove)
                 if _vscodium_installed()
                 else win.show_info("VSCodium", T("not_installed"))
             ),
@@ -6939,9 +6944,9 @@ def _push_ai_models(win: Ps5ManagerWindow) -> None:
         description=f"{len(installed)} modèle(s) · {len(running)} actif(s) en RAM",
     )
     if not _ollama_installed():
-        g_inst.add(plain_row(Adw.ActionRow, title="Ollama n'est pas installé (sera installé au premier pull)."))
+        g_inst.add(plain_row(Adw.ActionRow, title=_L("Ollama n'est pas installé (sera installé au premier pull).", "Ollama is not installed (installed on the first pull).")))
     elif not installed:
-        g_inst.add(plain_row(Adw.ActionRow, title="Aucun modèle installé pour le moment."))
+        g_inst.add(plain_row(Adw.ActionRow, title=_L("Aucun modèle installé pour le moment.", "No model installed yet.")))
     else:
         for name, size in installed.items():
             state = "Actif en RAM" if name in running else "Installé"
@@ -6966,7 +6971,7 @@ def _push_ai_models(win: Ps5ManagerWindow) -> None:
         g_inst.add(
             win.row(
                 "Décharger tous les modèles de la RAM" if UI_LANG == "fr" else "Unload all models from RAM",
-                "ollama stop sur tous les modèles actifs",
+                _L("ollama stop sur tous les modèles actifs", "ollama stop on all active models"),
                 "media-playback-stop-symbolic",
                 lambda *_: _stop_all_models(),
             )
@@ -6976,7 +6981,7 @@ def _push_ai_models(win: Ps5ManagerWindow) -> None:
     # 2) Catalogue rapide des modèles demandés
     g_cat = pref_group(
         title="Catalogue des modèles recommandés" if UI_LANG == "fr" else "Recommended models catalog",
-        description="Cliquez sur un modèle pour le télécharger, mettre à jour, stopper ou supprimer",
+        description=_L("Cliquez sur un modèle pour le télécharger, mettre à jour, stopper ou supprimer", "Click a model to download, update, stop or remove it"),
     )
     for model_id, desc_fr, desc_en in AI_MODELS_CATALOG:
         desc = desc_fr if UI_LANG == "fr" else desc_en
@@ -7059,7 +7064,7 @@ def _push_model_actions(win: Ps5ManagerWindow, model_name: str) -> None:
     if is_inst:
         grp.add(
             win.row(
-                "Décharger de la RAM (ollama stop)",
+                _L("Décharger de la RAM (ollama stop)", "Unload from RAM (ollama stop)"),
                 f"ollama stop {model_name}",
                 "media-playback-stop-symbolic",
                 lambda *_: win.run_task(
@@ -7076,8 +7081,8 @@ def _push_model_actions(win: Ps5ManagerWindow, model_name: str) -> None:
 
         grp.add(
             win.row(
-                "Afficher les détails du modèle (ollama show)",
-                "Architecture, quantification, paramètres et licence",
+                _L("Afficher les détails du modèle (ollama show)", "Show model details (ollama show)"),
+                _L("Architecture, quantification, paramètres et licence", "Architecture, quantization, parameters and licence"),
                 "dialog-information-symbolic",
                 lambda *_: _show_model_details(),
             )
@@ -7103,7 +7108,7 @@ def _push_model_actions(win: Ps5ManagerWindow, model_name: str) -> None:
 
         grp.add(
             win.row(
-                "Supprimer le modèle (stop auto + ollama rm)",
+                _L("Supprimer le modèle (stop auto + ollama rm)", "Remove the model (auto stop + ollama rm)"),
                 f"Stoppe si actif puis exécute ollama rm {model_name}",
                 "user-trash-symbolic",
                 lambda *_: win.show_confirm(

@@ -27,6 +27,7 @@ French version: [CHANGELOG.md](CHANGELOG.md)
 - **Release notes (“What's new”)**: no `<b>` tag left and a `_safe_release_notes()` filter (Libadwaita rejected the markup).
 - **Group titles**: `pref_group()` no longer escapes plain text (`IA &amp;` is `IA &` again).
 - **Hard-coded texts**: kernel, users, repositories, Mesa and AI now use `STRINGS` (FR/EN).
+- **AI & Developer page**: the 49 labels, subtitles and confirmations still hard-coded in French (Open WebUI, Ollama, VSCodium, models) are bilingual through the new `_L(fr, en)` helper, so the English interface is complete.
 
 ## [0.6] — 2026-11-25
 
