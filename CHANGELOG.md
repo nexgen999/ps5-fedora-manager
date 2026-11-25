@@ -6,6 +6,18 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.8.2] — 2026-11-25
+
+### Corrigé
+- **Menu principal (« burger ») non rafraîchi** : c'est un `Gio.Menu` construit une seule fois au démarrage ; après un changement de langue il conservait les libellés de l'ancienne langue jusqu'au redémarrage. `rebuild_ui_for_language()` reconstruit désormais ses trois entrées (`setup_menu`, `system_info`, `about`) et l'infobulle du bouton de recherche.
+- **Boîte « À propos » traduite** : les notes de version et les informations de débogage (« Version », « Fichier ») n'existaient qu'en français et en anglais. Elles sont maintenant disponibles dans les six langues (`_RELEASE_NOTES_ITEMS`, repli anglais si une langue manque).
+- Vérification de tous les menus : les 20 entrées de la barre latérale et les 3 entrées du menu burger passent par `T()` et sont traduites dans les six langues.
+- **Page IA & Développeur** : les deux descriptions encore écrites en dur (état d'Open WebUI et icône GNOME, nombre de modèles installés et actifs) passent par `STRINGS`.
+- `APP_VERSION` passe à `0.8.2`.
+
+### Ajouté
+- Traductions des notes de version (`release_notes_html()`) : 11 points d'historique × 6 langues.
+
 ## [0.8.1] — 2026-11-25
 
 ### Corrigé

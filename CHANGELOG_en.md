@@ -7,6 +7,18 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.8.2] — 2026-11-25
+
+### Fixed
+- **Main (“burger”) menu not refreshed**: it is a `Gio.Menu` built once at startup, so after a language change it kept the previous language's labels until the app restarted. `rebuild_ui_for_language()` now rebuilds its three entries (`setup_menu`, `system_info`, `about`) and the search button tooltip.
+- **Translated “About” dialog**: release notes and debug information (“Version”, “File”) only existed in French and English. They are now available in all six languages (`_RELEASE_NOTES_ITEMS`, with an English fallback when a language is missing).
+- Every menu verified: the 20 sidebar entries and the 3 burger menu entries go through `T()` and are translated in all six languages.
+- **AI & Developer page**: the two descriptions still hard-coded (Open WebUI state and GNOME icon, installed/active model count) now go through `STRINGS`.
+- `APP_VERSION` bumped to `0.8.2`.
+
+### Added
+- Translated release notes (`release_notes_html()`): 11 history items × 6 languages.
+
 ## [0.8.1] — 2026-11-25
 
 ### Fixed

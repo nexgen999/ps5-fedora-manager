@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.8.1"
+APP_VERSION = "0.8.2"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -908,6 +908,107 @@ if hasattr(Adw, "AccentColor"):
 
 
 # ------------------------------------------------------------------------------
+# Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
+# ------------------------------------------------------------------------------
+_RELEASE_NOTES_TITLE = {
+    "fr": "Nouveautés de la 0.8.2",
+    "en": "What is new in 0.8.2",
+    "es": "Novedades de la 0.8.2",
+    "it": "Novità della 0.8.2",
+    "de": "Neu in 0.8.2",
+    "pt": "Novidades da 0.8.2",
+}
+
+_RELEASE_NOTES_ITEMS = {
+    "fr": [
+        "0.8.2 : boîte « À propos » entièrement traduite (notes de version, informations de débogage) et menu principal vérifié dans les six langues",
+        "0.8.1 : le raccourci « Basculer Session » et la session Steam utilisent l'icône Gamescope (Steam Deck) fournie, installée dans le thème d'icônes",
+        "0.8 : fenêtre « Système » repensée (logos Fedora, bureau et Gamescope, informations regroupées, copie en un clic) et traductions complétées en espagnol, italien, allemand et portugais",
+        "0.7.1 : mode Gaming (Gamescope) réparé — retour au bureau à la fermeture de Steam, plus de relance en boucle, accès DRM et journal de session",
+        "0.7 : interface en 6 langues (français, anglais, espagnol, italien, allemand, portugais du Brésil)",
+        "0.6.1 : interfaces sans gel (Logithèque, Dépôts, IA), textes traduits et notes de version corrigées",
+        "Boîte de bienvenue au premier lancement : setup recommandé en 1 clic ou configuration manuelle",
+        "Fenêtre de suivi du setup : 9 étapes et 28/29 éléments selon le bureau, validation en direct et journal visible",
+        "Redémarrage proposé à la fin du setup et menu principal « Effectuer le setup recommandé »",
+        "Compatibilité GNOME, KDE Plasma, Cinnamon et Budgie : setup 1 clic, veille, logithèque, gestion mobile, impression et Gamescope s'adaptent au bureau et au gestionnaire de connexion",
+        "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
+    ],
+    "en": [
+        "0.8.2: fully translated “About” dialog (release notes, debug information) and main menu checked in all six languages",
+        "0.8.1: the “Switch Session” shortcut and the Steam session now use the provided Gamescope (Steam Deck) icon, installed in the icon theme",
+        "0.8: redesigned “System” window (Fedora, desktop and Gamescope logos, grouped information, one-click copy) and completed translations in Spanish, Italian, German and Portuguese",
+        "0.7.1: Gaming Mode (Gamescope) fixed — closing Steam returns to the desktop, no more relaunch loop, DRM access and session log",
+        "0.7: interface in 6 languages (French, English, Spanish, Italian, German, Brazilian Portuguese)",
+        "0.6.1: no more UI freezes (app store, repositories, AI), translated texts and fixed release notes",
+        "First-launch welcome dialog: 1-click recommended setup or manual configuration",
+        "Setup progress window: 9 steps and 28/29 items depending on the desktop, live validation and visible log",
+        "Reboot offered once the setup is finished, main menu “Run recommended setup”",
+        "GNOME, KDE Plasma, Cinnamon and Budgie support: the 1-click setup, power, app store, mobile management, printing and Gamescope adapt to the desktop and display manager",
+        "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
+    ],
+    "es": [
+        "0.8.2 : diálogo «Acerca de» totalmente traducido (notas de versión, información de depuración) y menú principal revisado en los seis idiomas",
+        "0.8.1 : el atajo «Cambiar de sesión» y la sesión Steam usan el icono Gamescope (Steam Deck) proporcionado, instalado en el tema de iconos",
+        "0.8 : ventana «Sistema» rediseñada (logos de Fedora, escritorio y Gamescope, información agrupada, copia con un clic) y traducciones completadas en español, italiano, alemán y portugués",
+        "0.7.1 : modo Gaming (Gamescope) reparado — vuelve al escritorio al cerrar Steam, sin reinicios en bucle, acceso DRM y registro de sesión",
+        "0.7 : interfaz en 6 idiomas (francés, inglés, español, italiano, alemán, portugués de Brasil)",
+        "0.6.1 : interfaces sin bloqueos (Tienda, Repositorios, IA), textos traducidos y notas de versión corregidas",
+        "Diálogo de bienvenida en el primer inicio: configuración recomendada en 1 clic o configuración manual",
+        "Ventana de seguimiento de la configuración: 9 pasos y 28/29 elementos según el escritorio, validación en directo y registro visible",
+        "Reinicio propuesto al finalizar la configuración y menú principal «Ejecutar la configuración recomendada»",
+        "Compatibilidad con GNOME, KDE Plasma, Cinnamon y Budgie: configuración en 1 clic, suspensión, tienda, gestión móvil, impresión y Gamescope se adaptan al escritorio y al gestor de sesiones",
+        "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
+    ],
+    "it": [
+        "0.8.2 : finestra «Informazioni su» completamente tradotta (note di versione, informazioni di debug) e menu principale verificato nelle sei lingue",
+        "0.8.1 : il collegamento «Cambia sessione» e la sessione Steam usano l'icona Gamescope (Steam Deck) fornita, installata nel tema delle icone",
+        "0.8 : finestra «Sistema» ridisegnata (logo Fedora, desktop e Gamescope, informazioni raggruppate, copia con un clic) e traduzioni completate in spagnolo, italiano, tedesco e portoghese",
+        "0.7.1 : modalità Gaming (Gamescope) riparata — ritorno al desktop alla chiusura di Steam, nessun riavvio in loop, accesso DRM e log di sessione",
+        "0.7 : interfaccia in 6 lingue (francese, inglese, spagnolo, italiano, tedesco, portoghese brasiliano)",
+        "0.6.1 : interfacce senza blocchi (App store, Repository, IA), testi tradotti e note di versione corrette",
+        "Finestra di benvenuto al primo avvio: configurazione consigliata in 1 clic o configurazione manuale",
+        "Finestra di avanzamento della configurazione: 9 passaggi e 28/29 elementi secondo il desktop, verifica in tempo reale e log visibile",
+        "Riavvio proposto al termine della configurazione e menu principale «Esegui la configurazione consigliata»",
+        "Compatibilità con GNOME, KDE Plasma, Cinnamon e Budgie: configurazione in 1 clic, sospensione, app store, gestione mobile, stampa e Gamescope si adattano al desktop e al display manager",
+        "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
+    ],
+    "de": [
+        "0.8.2 : Dialog „Info über“ vollständig übersetzt (Versionshinweise, Debug-Informationen) und Hauptmenü in allen sechs Sprachen geprüft",
+        "0.8.1 : Die Verknüpfung „Sitzung wechseln“ und die Steam-Sitzung verwenden das mitgelieferte Gamescope-Symbol (Steam Deck), installiert im Icon-Theme",
+        "0.8 : „System“-Fenster neu gestaltet (Fedora-, Desktop- und Gamescope-Logos, gruppierte Informationen, Kopieren mit einem Klick) und Übersetzungen für Spanisch, Italienisch, Deutsch und Portugiesisch vervollständigt",
+        "0.7.1 : Gaming-Modus (Gamescope) repariert — Rückkehr zum Desktop beim Schließen von Steam, keine Neustartschleife mehr, DRM-Zugriff und Sitzungsprotokoll",
+        "0.7 : Oberfläche in 6 Sprachen (Französisch, Englisch, Spanisch, Italienisch, Deutsch, brasilianisches Portugiesisch)",
+        "0.6.1 : Oberflächen ohne Hänger (App-Store, Paketquellen, KI), übersetzte Texte und korrigierte Versionshinweise",
+        "Willkommensdialog beim ersten Start: empfohlenes Setup mit einem Klick oder manuelle Einrichtung",
+        "Setup-Fortschrittsfenster: 9 Schritte und 28/29 Elemente je nach Desktop, Live-Prüfung und sichtbares Protokoll",
+        "Neustart am Ende des Setups angeboten und Hauptmenü „Empfohlenes Setup ausführen“",
+        "Unterstützung für GNOME, KDE Plasma, Cinnamon und Budgie: 1-Klick-Setup, Energieoptionen, App-Store, Mobilgeräteverwaltung, Drucken und Gamescope passen sich an Desktop und Anmeldemanager an",
+        "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
+    ],
+    "pt": [
+        "0.8.2 : caixa «Sobre» totalmente traduzida (notas de versão, informações de depuração) e menu principal verificado nos seis idiomas",
+        "0.8.1 : o atalho «Alternar sessão» e a sessão Steam usam o ícone Gamescope (Steam Deck) fornecido, instalado no tema de ícones",
+        "0.8 : janela «Sistema» redesenhada (logos do Fedora, da área de trabalho e do Gamescope, informações agrupadas, cópia com um clique) e traduções concluídas em espanhol, italiano, alemão e português",
+        "0.7.1 : modo Gaming (Gamescope) corrigido — volta à área de trabalho ao fechar o Steam, sem reinícios em loop, acesso DRM e registro da sessão",
+        "0.7 : interface em 6 idiomas (francês, inglês, espanhol, italiano, alemão, português do Brasil)",
+        "0.6.1 : interfaces sem travamentos (Loja, Repositórios, IA), textos traduzidos e notas de versão corrigidas",
+        "Diálogo de boas-vindas no primeiro início: configuração recomendada em 1 clique ou configuração manual",
+        "Janela de acompanhamento da configuração: 9 etapas e 28/29 itens conforme a área de trabalho, validação ao vivo e registro visível",
+        "Reinício proposto ao final da configuração e menu principal «Executar a configuração recomendada»",
+        "Compatibilidade com GNOME, KDE Plasma, Cinnamon e Budgie: configuração em 1 clique, suspensão, loja, gestão móvel, impressão e Gamescope adaptam-se à área de trabalho e ao gerenciador de sessão",
+        "0.4 : categoria «Add Fedora Feature» (celular, impressoras e scanners)",
+    ],
+}
+
+
+def release_notes_html() -> str:
+    """Notes de version localisées pour la boîte « À propos »."""
+    lang = UI_LANG if UI_LANG in _RELEASE_NOTES_ITEMS else "en"
+    bullets = "".join(f"<li>{item}</li>" for item in _RELEASE_NOTES_ITEMS[lang])
+    return f"<p>{_RELEASE_NOTES_TITLE[lang]}</p><ul>{bullets}</ul>"
+
+
+# ------------------------------------------------------------------------------
 # Environnement de bureau : GNOME, KDE Plasma, Cinnamon, Budgie
 # L'application tourne en root (pkexec) : l'environnement de la session
 # graphique n'est pas forcément dans os.environ, on le retrouve donc via les
@@ -1607,6 +1708,11 @@ STRINGS = {
         "switch_session": "Basculer Session (%s / Steam)",
         "podman_linger": "Activer le maintien de session Podman (%s)",
         "podman_linger_sub": "loginctl enable-linger %s · démarre Open WebUI sans terminal",
+        "debug_version": "Version",
+        "ai_webui_state": "État : %s (%s) · Icône GNOME : %s",
+        "ai_icon_installed": "installée",
+        "ai_icon_absent": "absente",
+        "ai_models_count": "%d modèle(s) · %d actif(s) en RAM",
         "system_info": "Système",
         "accent_label": "Couleur d'accentuation GNOME",
         "follow_gnome": "Synchronisée avec GNOME",
@@ -2047,6 +2153,11 @@ STRINGS = {
         "switch_session": "Switch Session (%s / Steam)",
         "podman_linger": "Enable Podman session lingering (%s)",
         "podman_linger_sub": "loginctl enable-linger %s · starts Open WebUI without a terminal",
+        "debug_version": "Version",
+        "ai_webui_state": "State: %s (%s) · GNOME icon: %s",
+        "ai_icon_installed": "installed",
+        "ai_icon_absent": "missing",
+        "ai_models_count": "%d model(s) · %d active in RAM",
         "system_info": "System",
         "accent_label": "GNOME Accent Color",
         "follow_gnome": "Synced with GNOME",
@@ -2501,6 +2612,11 @@ STRINGS['es'] = {'app_title': 'PS5 Fedora Manager',
  'switch_session': 'Cambiar de sesión (%s / Steam)',
  'podman_linger': 'Activar la persistencia de sesión de Podman (%s)',
  'podman_linger_sub': 'loginctl enable-linger %s · inicia Open WebUI sin terminal',
+ 'debug_version': 'Versión',
+ 'ai_webui_state': 'Estado: %s (%s) · Icono de GNOME: %s',
+ 'ai_icon_installed': 'instalado',
+ 'ai_icon_absent': 'ausente',
+ 'ai_models_count': '%d modelo(s) · %d activo(s) en RAM',
  'system_info': 'Sistema',
  'accent_label': 'Color de acento de GNOME',
  'follow_gnome': 'Sincronizado con GNOME',
@@ -2936,6 +3052,11 @@ STRINGS['it'] = {'app_title': 'PS5 Fedora Manager',
  'switch_session': 'Cambia sessione (%s / Steam)',
  'podman_linger': 'Attiva la persistenza di sessione Podman (%s)',
  'podman_linger_sub': 'loginctl enable-linger %s · avvia Open WebUI senza terminale',
+ 'debug_version': 'Versione',
+ 'ai_webui_state': 'Stato: %s (%s) · Icona GNOME: %s',
+ 'ai_icon_installed': 'installata',
+ 'ai_icon_absent': 'assente',
+ 'ai_models_count': '%d modello(i) · %d attivo(i) in RAM',
  'system_info': 'Sistema',
  'accent_label': "Colore d'accento di GNOME",
  'follow_gnome': 'Sincronizzato con GNOME',
@@ -3367,6 +3488,11 @@ STRINGS['de'] = {'app_title': 'PS5 Fedora Manager',
  'switch_session': 'Sitzung wechseln (%s / Steam)',
  'podman_linger': 'Podman-Sitzung dauerhaft aktivieren (%s)',
  'podman_linger_sub': 'loginctl enable-linger %s · startet Open WebUI ohne Terminal',
+ 'debug_version': 'Version',
+ 'ai_webui_state': 'Status: %s (%s) · GNOME-Symbol: %s',
+ 'ai_icon_installed': 'installiert',
+ 'ai_icon_absent': 'fehlt',
+ 'ai_models_count': '%d Modell(e) · %d aktiv im RAM',
  'system_info': 'System',
  'accent_label': 'GNOME-Akzentfarbe',
  'follow_gnome': 'Mit GNOME synchronisiert',
@@ -3798,6 +3924,11 @@ STRINGS['pt'] = {'app_title': 'PS5 Fedora Manager',
  'switch_session': 'Alternar sessão (%s / Steam)',
  'podman_linger': 'Ativar a persistência de sessão do Podman (%s)',
  'podman_linger_sub': 'loginctl enable-linger %s · inicia o Open WebUI sem terminal',
+ 'debug_version': 'Versão',
+ 'ai_webui_state': 'Estado: %s (%s) · Ícone do GNOME: %s',
+ 'ai_icon_installed': 'instalado',
+ 'ai_icon_absent': 'ausente',
+ 'ai_models_count': '%d modelo(s) · %d ativo(s) na RAM',
  'system_info': 'Sistema',
  'accent_label': 'Cor de destaque do GNOME',
  'follow_gnome': 'Sincronizada com o GNOME',
@@ -5973,6 +6104,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
 
         search_btn = Gtk.ToggleButton(icon_name="system-search-symbolic")
         search_btn.set_tooltip_text(T("search_placeholder"))
+        self.search_btn = search_btn
         header.pack_start(search_btn)
 
         menu_btn = Gtk.MenuButton(icon_name="open-menu-symbolic")
@@ -5981,6 +6113,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         menu_model.append(T("system_info"), "win.show-sysinfo")
         menu_model.append(T("about"), "win.show-about")
         menu_btn.set_menu_model(menu_model)
+        self.menu_model = menu_model
         header.pack_end(menu_btn)
 
         self._register_window_actions()
@@ -6089,6 +6222,18 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         for sec_id, row in self.sidebar_rows.items():
             row.set_title(T(row.label_key))  # type: ignore[attr-defined]
         self.search_entry.set_placeholder_text(T("search_placeholder"))
+        search_btn = getattr(self, "search_btn", None)
+        if search_btn is not None:
+            search_btn.set_tooltip_text(T("search_placeholder"))
+        # Le menu burger est un Gio.Menu construit une seule fois : sans cette
+        # reconstruction il gardait les libellés de l'ancienne langue jusqu'au
+        # redémarrage de l'application.
+        menu_model = getattr(self, "menu_model", None)
+        if menu_model is not None:
+            menu_model.remove_all()
+            menu_model.append(T("setup_menu"), "win.run-setup")
+            menu_model.append(T("system_info"), "win.show-sysinfo")
+            menu_model.append(T("about"), "win.show-about")
         self._select_section(self.active_section)
 
     def _make_section_page(self, sec_id: str) -> Adw.NavigationPage:
@@ -6434,11 +6579,11 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
 
     def _show_about(self) -> None:
         debug_info = (
-            f"Version : {APP_VERSION}\n"
+            f"{T('debug_version')} : {APP_VERSION}\n"
             f"GTK {Gtk.get_major_version()}.{Gtk.get_minor_version()}.{Gtk.get_micro_version()}\n"
             f"Libadwaita {Adw.MAJOR_VERSION}.{Adw.MINOR_VERSION}.{Adw.MICRO_VERSION}\n"
             f"Python {sys.version.split()[0]}\n"
-            f"Fichier : {os.path.abspath(sys.argv[0])}"
+            f"{T('sys_file')} : {os.path.abspath(sys.argv[0])}"
         )
         # Vrai logo de l'application, repli sur une icône symbolique s'il est absent
         icon_name = "ps5-manager"
@@ -6464,41 +6609,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
             ),
             debug_info=debug_info,
             release_notes_version=APP_VERSION,
-            release_notes=_safe_release_notes(
-                (
-                                        "<p>Nouveautés de la 0.8.1</p>"
-                    "<ul>"
-                    "<li>0.8.1 : le raccourci « Basculer Session » et la session Steam utilisent l'icône Gamescope (Steam Deck) fournie, installée dans le thème d'icônes</li>"
-                    "<li>0.8 : fenêtre « Système » repensée (logos Fedora, bureau et Gamescope, informations regroupées, copie en un clic) et traductions complétées en espagnol, italien, allemand et portugais</li>"
-                    "<li>0.7.1 : mode Gaming (Gamescope) réparé — retour au bureau à la fermeture de Steam, plus de relance en boucle, accès DRM et journal de session</li>"
-                    "<li>0.7 : interface en 6 langues (français, anglais, espagnol, italien, allemand, portugais du Brésil)</li>"
-                    "<li>0.6.1 : interfaces sans gel (Logithèque, Dépôts, IA), textes traduits et notes de version corrigées</li>"
-                    "<li>Boîte de bienvenue au premier lancement : setup recommandé en 1 clic ou configuration manuelle</li>"
-                    "<li>Fenêtre de suivi du setup : 9 étapes et 28/29 éléments selon le bureau, validation en direct et journal visible</li>"
-                    "<li>Redémarrage proposé à la fin du setup</li>"
-                    "<li>Menu principal : « Effectuer le setup recommandé »</li>"
-                    "<li>Compatibilité GNOME, KDE Plasma, Cinnamon et Budgie : setup 1 clic, veille, logithèque, gestion mobile, impression et Gamescope s'adaptent au bureau et au gestionnaire de connexion</li>"
-                    "<li>0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)</li>"
-                    "</ul>"
-                )
-                if UI_LANG == "fr"
-                else (
-                                        "<p>What is new in 0.8.1</p>"
-                    "<ul>"
-                    "<li>0.8.1: the “Switch Session” shortcut and the Steam session now use the provided Gamescope (Steam Deck) icon, installed in the icon theme</li>"
-                    "<li>0.8: redesigned “System” window (Fedora, desktop and Gamescope logos, grouped information, one-click copy) and completed translations in Spanish, Italian, German and Portuguese</li>"
-                    "<li>0.7.1: Gaming Mode (Gamescope) fixed — closing Steam returns to the desktop, no more relaunch loop, DRM access and session log</li>"
-                    "<li>0.7: interface in 6 languages (French, English, Spanish, Italian, German, Brazilian Portuguese)</li>"
-                    "<li>0.6.1: no more UI freezes (app store, repositories, AI), translated texts and fixed release notes</li>"
-                    "<li>First-launch welcome dialog: 1-click recommended setup or manual configuration</li>"
-                    "<li>Setup progress window: 9 steps and 28/29 items depending on the desktop, live validation and visible log</li>"
-                    "<li>Reboot offered once the setup is finished</li>"
-                    "<li>Main menu: “Run recommended setup”</li>"
-                    "<li>GNOME, KDE Plasma, Cinnamon and Budgie support: the 1-click setup, power, app store, mobile management, printing and Gamescope adapt to the desktop and display manager</li>"
-                    "<li>0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)</li>"
-                    "</ul>"
-                )
-            ),
+            release_notes=_safe_release_notes(release_notes_html()),
         )
         about.present(self)
 
@@ -9479,7 +9590,8 @@ def _push_webui_actions(win: Ps5ManagerWindow) -> None:
     sub = Adw.PreferencesPage()
     grp = pref_group(
         title="Open WebUI (Podman)",
-        description=f"État : {st} ({owner}) · Icône GNOME : {'installée' if has_desktop else 'absente'}",
+        description=T("ai_webui_state")
+        % (st, owner, T("ai_icon_installed") if has_desktop else T("ai_icon_absent")),
     )
 
     def _install():
@@ -9674,7 +9786,7 @@ def _push_ai_models(win: Ps5ManagerWindow) -> None:
     # 1) Modèles déjà installés sur le système (incluant modèles personnalisés)
     g_inst = pref_group(
         title=_L("Modèles installés sur le système", "Installed models on system"),
-        description=f"{len(installed)} modèle(s) · {len(running)} actif(s) en RAM",
+        description=T("ai_models_count") % (len(installed), len(running)),
     )
     if not _ollama_installed():
         g_inst.add(plain_row(Adw.ActionRow, title=_L("Ollama n'est pas installé (sera installé au premier pull).", "Ollama is not installed (installed on the first pull).")))
