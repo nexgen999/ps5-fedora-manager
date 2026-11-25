@@ -1,7 +1,7 @@
 # Setup recommandé — configuration de référence
 
 Ce document décrit le **setup recommandé par le développeur** appliqué par
-PS5 Fedora Manager (version 0.5). Il est proposé au premier lancement de
+PS5 Fedora Manager (version 0.6). Il est proposé au premier lancement de
 l'application, puis reste accessible à tout moment via le **menu principal
 (burger) → « Effectuer le setup recommandé »**.
 
@@ -115,8 +115,11 @@ Remarques :
 - Sous KDE Plasma, la configuration est écrite dans
   `~/.config/powermanagementprofilesrc` puis Powerdevil est rechargé
   (`qdbus … org.kde.Solid.PowerManagement.reparseConfiguration`).
-- Le setup recommandé ne comporte que **28 éléments hors GNOME** : l'Extension
-  Manager est retiré du plan (et de la Logithèque).
+- Le **setup recommandé (1 clic)** réutilise exactement ces commandes : l'étape
+  1 applique la veille du bureau détecté, le plan ignore l'Extension Manager hors
+  GNOME (**28 éléments** au lieu de 29) et l'étape 9 génère le script Gamescope du
+  gestionnaire de connexion. Le journal du setup commence par
+  « Environnement détecté : bureau · gestionnaire de connexion · session ».
 - Gamescope : l'auto-connexion est écrite dans `[daemon]` de
   `/etc/gdm/custom.conf`, dans `/etc/sddm.conf.d/zz-ps5-manager-autologin.conf`
   ou dans `[Seat:*]` de `/etc/lightdm/lightdm.conf`. La session restaurée est
@@ -136,7 +139,7 @@ Remarques :
    (1 clic) » ou « Configurer moi-même ». Le choix « Configurer moi-même »
    ferme simplement la boîte ; le choix recommandé démarre le setup.
 3. **Fenêtre de suivi** (1320 × 800) : à gauche la liste des 9 étapes et de
-   leurs 29 éléments (`○` en attente, `●` en cours, `✔` validé, `✖` en
+   leurs 28 ou 29 éléments selon le bureau (`○` en attente, `●` en cours, `✔` validé, `✖` en
    échec), à droite le journal complet des commandes, avec une barre de
    progression.
 4. **Fin du setup** : la fenêtre de suivi se ferme et un redémarrage est

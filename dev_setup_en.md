@@ -1,7 +1,7 @@
 # Recommended setup — reference configuration
 
 This document describes the **developer-recommended setup** applied by
-PS5 Fedora Manager (version 0.5). It is offered on the first launch of the
+PS5 Fedora Manager (version 0.6). It is offered on the first launch of the
 application and stays available at any time through the **main (burger)
 menu → “Run recommended setup”**.
 
@@ -116,8 +116,11 @@ Notes:
 - On KDE Plasma the settings are written to
   `~/.config/powermanagementprofilesrc` and Powerdevil is reloaded
   (`qdbus … org.kde.Solid.PowerManagement.reparseConfiguration`).
-- Outside GNOME the recommended setup has **28 items** instead of 29: the
-  Extension Manager is removed from the plan (and from the app store).
+- The **recommended setup (1 click)** uses exactly these commands: step 1 applies
+  the detected desktop's power settings, the plan skips the Extension Manager
+  outside GNOME (**28 items** instead of 29) and step 9 generates the Gamescope
+  script for the detected display manager. The setup log starts with
+  “Detected environment: desktop · display manager · session”.
 - Gamescope: autologin is written to `[daemon]` in `/etc/gdm/custom.conf`, to
   `/etc/sddm.conf.d/zz-ps5-manager-autologin.conf` or to `[Seat:*]` in
   `/etc/lightdm/lightdm.conf`. The restored session is the detected desktop
@@ -135,7 +138,7 @@ Notes:
    or “I'll configure it myself”. Choosing the manual option simply closes the
    dialog; choosing the recommended setup starts it.
 3. **Progress window** (1320 × 800): the list of the 9 steps and their
-   29 items on the left (`○` pending, `●` running, `✔` done, `✖` failed),
+   28 or 29 items depending on the desktop (`○` pending, `●` running, `✔` done, `✖` failed),
    the full command log on the right, with a progress bar.
 4. **End of the setup**: the progress window closes and a reboot is offered
    (`systemctl reboot`).

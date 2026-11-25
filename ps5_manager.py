@@ -40,7 +40,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.5"
+APP_VERSION = "0.6"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1281,6 +1281,7 @@ STRINGS = {
         "setup_running": "Installation en cours…",
         "setup_finished": "Setup terminé",
         "setup_log": "Journal des opérations",
+        "setup_env_line": "Environnement détecté : %s · %s · session %s",
         "setup_close": "Fermer",
         "setup_summary": "%d réussite(s) · %d échec(s)",
         "setup_reboot_title": "Redémarrage nécessaire",
@@ -1666,6 +1667,7 @@ STRINGS = {
         "setup_running": "Installing…",
         "setup_finished": "Setup finished",
         "setup_log": "Operations log",
+        "setup_env_line": "Detected environment: %s · %s · session %s",
         "setup_close": "Close",
         "setup_summary": "%d succeeded · %d failed",
         "setup_reboot_title": "Reboot required",
@@ -3005,6 +3007,12 @@ class SetupWindow(Adw.Window):
         threading.Thread(target=self._worker, daemon=True).start()
 
     def _worker(self) -> None:
+        GLib.idle_add(
+            self._log_line,
+            T("setup_env_line")
+            % (DESKTOP_LABEL, DISPLAY_MANAGER_LABEL, DESKTOP_SESSION)
+            + "\n",
+        )
         for s_idx, step in enumerate(self.plan):
             GLib.idle_add(self._log_line, f"\n=== {T(step.title_key)} ===\n")
             for i_idx, (item_key, runner) in enumerate(step.items):
@@ -3614,25 +3622,25 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
             release_notes_version=APP_VERSION,
             release_notes=(
                 (
-                                        "<p>Nouveautés de la 0.5</p>"
+                                        "<p>Nouveautés de la 0.6</p>"
                     "<ul>"
                     "<li>Boîte de bienvenue au premier lancement : setup recommandé en 1 clic ou configuration manuelle</li>"
-                    "<li>Fenêtre de suivi du setup : 9 étapes et 29 éléments, validation en direct et journal visible</li>"
+                    "<li>Fenêtre de suivi du setup : 9 étapes et 28/29 éléments selon le bureau, validation en direct et journal visible</li>"
                     "<li>Redémarrage proposé à la fin du setup</li>"
                     "<li>Menu principal : « Effectuer le setup recommandé »</li>"
-                    "<li>Compatibilité GNOME, KDE Plasma, Cinnamon et Budgie : veille, logithèque, gestion mobile, impression et Gamescope s'adaptent au bureau et au gestionnaire de connexion</li>"
+                    "<li>Compatibilité GNOME, KDE Plasma, Cinnamon et Budgie : setup 1 clic, veille, logithèque, gestion mobile, impression et Gamescope s'adaptent au bureau et au gestionnaire de connexion</li>"
                     "<li><b>0.4 :</b> catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)</li>"
                     "</ul>"
                 )
                 if UI_LANG == "fr"
                 else (
-                                        "<p>What is new in 0.5</p>"
+                                        "<p>What is new in 0.6</p>"
                     "<ul>"
                     "<li>First-launch welcome dialog: 1-click recommended setup or manual configuration</li>"
-                    "<li>Setup progress window: 9 steps and 29 items, live validation and visible log</li>"
+                    "<li>Setup progress window: 9 steps and 28/29 items depending on the desktop, live validation and visible log</li>"
                     "<li>Reboot offered once the setup is finished</li>"
                     "<li>Main menu: “Run recommended setup”</li>"
-                    "<li>GNOME, KDE Plasma, Cinnamon and Budgie support: power, app store, mobile management, printing and Gamescope adapt to the desktop and display manager</li>"
+                    "<li>GNOME, KDE Plasma, Cinnamon and Budgie support: the 1-click setup, power, app store, mobile management, printing and Gamescope adapt to the desktop and display manager</li>"
                     "<li><b>0.4:</b> “Add Fedora Feature” category (mobile, printers &amp; scanners)</li>"
                     "</ul>"
                 )
