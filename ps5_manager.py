@@ -40,7 +40,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.7"
+APP_VERSION = "0.7.1"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -83,9 +83,30 @@ H="__HOME__"
 
 step() { printf '\n==> %s\n' "$*"; }
 fail() { printf '  x %s\n' "$*" >&2; exit 1; }
+warn() { printf '  ! %s\n' "$*" >&2; }
 
 [ "$(id -u)" -eq 0 ] || fail "root requis"
 id "$U" >/dev/null 2>&1 || fail "utilisateur inconnu : $U"
+
+step "Dependances : Gamescope et acces DRM"
+if ! command -v gamescope >/dev/null 2>&1; then
+  dnf install -y gamescope >/dev/null || fail "installation de gamescope impossible"
+fi
+command -v gamescope >/dev/null 2>&1 || fail "gamescope introuvable apres installation"
+# Gamescope doit ouvrir /dev/dri/card* : sans les groupes video/render le
+# lancement echoue sur une erreur DRM (permission refusee).
+for g in video render; do
+  if getent group "$g" >/dev/null 2>&1; then
+    usermod -aG "$g" "$U" >/dev/null 2>&1 || warn "ajout au groupe $g impossible"
+  fi
+done
+if ! command -v steam >/dev/null 2>&1; then
+  warn "Steam n'est pas installe : le mode Gaming restera sur un ecran noir."
+  warn "Installe Steam depuis la Logitheque de PS5 Fedora Manager."
+fi
+mkdir -p /var/log/ps5-manager
+touch /var/log/ps5-manager/gaming-session.log 2>/dev/null || true
+chmod 666 /var/log/ps5-manager/gaming-session.log 2>/dev/null || true
 
 step "AccountsService : session __SESSION_LABEL__ pour $U"
 AS="/var/lib/AccountsService/users/$U"
@@ -103,11 +124,117 @@ __AUTOLOGIN_BLOCK__
 __SCALING_BLOCK__
 
 step "Session Steam + Gamescope (guide shahnawazshahin)"
-dnf install -y git >/dev/null || fail "installation de git impossible"
-rm -rf /tmp/gamescope-guide
-git clone --depth 1 https://github.com/shahnawazshahin/steam-using-gamescope-guide.git /tmp/gamescope-guide >/dev/null 2>&1 \
-  || fail "clone du guide impossible"
-( cd /tmp/gamescope-guide && bash ./installer.sh ) || fail "installer.sh du guide a echoue"
+if command -v git >/dev/null 2>&1; then
+  rm -rf /tmp/gamescope-guide
+  if git clone --depth 1 https://github.com/shahnawazshahin/steam-using-gamescope-guide.git /tmp/gamescope-guide >/dev/null 2>&1; then
+    ( cd /tmp/gamescope-guide && bash ./installer.sh ) >/dev/null 2>&1 \
+      || warn "installer.sh du guide a echoue : les outils SteamOS sont ignores"
+  else
+    warn "guide shahnawazshahin inaccessible : les outils SteamOS sont ignores"
+  fi
+else
+  warn "git absent : les outils SteamOS du guide sont ignores"
+fi
+
+step "Session Gaming (Gamescope) : scripts PS5 Fedora Manager"
+cat > /usr/bin/gamescope-session <<'SH'
+#!/bin/bash
+# Session Gaming (Gamescope + Steam Big Picture) - PS5 Fedora Manager
+# Fermer Steam ramene au bureau (__SESSION_LABEL__) : la session n'est plus
+# relancee en boucle par le gestionnaire de connexion.
+LOG="/var/log/ps5-manager/gaming-session.log"
+if ! { mkdir -p "$(dirname "$LOG")" 2>/dev/null && : >>"$LOG" 2>/dev/null; }; then
+  LOG="$HOME/.cache/ps5-manager/gaming-session.log"
+  mkdir -p "$(dirname "$LOG")" 2>/dev/null || true
+  : >>"$LOG" 2>/dev/null || true
+fi
+exec >>"$LOG" 2>&1
+printf '\n=== %s : session Gaming (%s) ===\n' "$(date '+%F %T')" "__SESSION_LABEL__"
+
+NEXT="$HOME/.cache/ps5-manager/next-session"
+mkdir -p "$(dirname "$NEXT")" 2>/dev/null || true
+rm -f "$NEXT"
+
+switch_to() {
+  if [ "$(id -u)" -eq 0 ]; then
+    /usr/local/bin/switch-session "$1" >/dev/null 2>&1 || true
+  else
+    sudo -n /usr/local/bin/switch-session "$1" >/dev/null 2>&1 || true
+  fi
+}
+
+if ! command -v gamescope >/dev/null 2>&1; then
+  echo "gamescope introuvable : retour au bureau"
+  switch_to desktop
+  exit 1
+fi
+if ! command -v steam >/dev/null 2>&1; then
+  echo "steam introuvable : retour au bureau"
+  switch_to desktop
+  exit 1
+fi
+
+# Pas de composition imbriquee : Gamescope doit piloter directement le DRM.
+unset WAYLAND_DISPLAY WAYLAND_SOCKET DISPLAY
+export XDG_SESSION_TYPE=wayland
+export GAMESCOPE_MODE_SAVE_FILE="$HOME/.config/gamescope/modes.cfg"
+mkdir -p "$HOME/.config/gamescope" 2>/dev/null || true
+
+FLAGS=()
+if command -v mangoapp >/dev/null 2>&1; then
+  FLAGS=(--mangoapp)
+else
+  echo "mangoapp absent : lancement sans --mangoapp"
+fi
+
+gamescope "${FLAGS[@]}" -e -- steam -steamdeck -steamos3
+RC=$?
+echo "gamescope termine (code $RC)"
+
+REQUEST=""
+if [ -f "$NEXT" ]; then
+  REQUEST=$(head -n 1 "$NEXT" 2>/dev/null || true)
+  rm -f "$NEXT"
+fi
+if [ "$REQUEST" = "steam" ]; then
+  echo "mode Gaming redemande : relance de Gamescope"
+  exec /usr/bin/gamescope-session
+fi
+echo "retour au bureau (__SESSION_LABEL__)"
+switch_to desktop
+exit 0
+SH
+chmod 755 /usr/bin/gamescope-session
+
+step "/usr/bin/steamos-session-select (choix de la session suivante)"
+cat > /usr/bin/steamos-session-select <<'SH'
+#!/bin/bash
+# Appele par Steam (mode Gaming) : choisit la session suivante puis ferme Steam.
+NEXT="$HOME/.cache/ps5-manager/next-session"
+mkdir -p "$(dirname "$NEXT")" 2>/dev/null || true
+case "${1:-desktop}" in
+  steam|gamescope|game|gaming) printf 'steam\n' >"$NEXT" ;;
+  *) printf 'desktop\n' >"$NEXT" ;;
+esac
+if command -v steam >/dev/null 2>&1; then
+  timeout 10 steam -shutdown >/dev/null 2>&1 || true
+fi
+exit 0
+SH
+chmod 755 /usr/bin/steamos-session-select
+
+step "Fichier de session /usr/share/wayland-sessions/steam.desktop"
+mkdir -p /usr/share/wayland-sessions
+cat > /usr/share/wayland-sessions/steam.desktop <<'DESK'
+[Desktop Entry]
+Encoding=UTF-8
+Name=Steam (Gamescope)
+Comment=Run Steam directly in Gamescope
+Exec=gamescope-session
+Type=Application
+DesktopNames=gamescope
+DESK
+chmod 644 /usr/share/wayland-sessions/steam.desktop
 
 step "sudoers : bascule de session sans mot de passe"
 mkdir -p /etc/sudoers.d
@@ -121,20 +248,146 @@ fi
 step "/usr/local/bin/switch-session"
 cat > /usr/local/bin/switch-session <<'SH'
 #!/bin/bash
-USER_ID=$(id -u __USER__)
-CURRENT=$(busctl get-property org.freedesktop.Accounts /org/freedesktop/Accounts/User$USER_ID org.freedesktop.Accounts.User Session | awk -F'"' '{print $2}')
-if [ "$CURRENT" = "steam" ]; then TARGET="__SESSION__"; else TARGET="steam"; fi
-sudo systemd-run --quiet --collect bash -c "busctl call org.freedesktop.Accounts /org/freedesktop/Accounts/User$USER_ID org.freedesktop.Accounts.User SetSession s '$TARGET' && loginctl terminate-user __USER__ && sleep 2 && systemctl restart __DM_SERVICE__"
+# Bascule de session PS5 Fedora Manager.
+#   switch-session            bascule bureau <-> Gaming
+#   switch-session desktop    revient au bureau (__SESSION_LABEL__)
+#   switch-session steam      demarre la session Gaming (Gamescope)
+# La bascule est deleguee au gestionnaire systeme : elle survit a la fermeture
+# de la session en cours.
+set -u
+SELF="/usr/local/bin/switch-session"
+U="__USER__"
+USER_ID=$(id -u "$U" 2>/dev/null || true)
+
+if [ "${1:-}" != "apply" ]; then
+  ARGS="${1:-}"
+  if [ "$(id -u)" -eq 0 ]; then
+    if [ -n "$ARGS" ]; then
+      exec systemd-run --quiet --collect "$SELF" apply "$ARGS"
+    fi
+    exec systemd-run --quiet --collect "$SELF" apply
+  fi
+  if [ -n "$ARGS" ]; then
+    exec sudo -n systemd-run --quiet --collect "$SELF" apply "$ARGS"
+  fi
+  exec sudo -n systemd-run --quiet --collect "$SELF" apply
+fi
+shift
+
+[ "$(id -u)" -eq 0 ] || { echo "root requis" >&2; exit 1; }
+[ -n "$USER_ID" ] || { echo "utilisateur inconnu : $U" >&2; exit 1; }
+
+DESKTOP_SESSION="__SESSION__"
+TARGET="${1:-}"
+
+# Gestionnaire de connexion reellement utilise par systemd
+DM=$(systemctl show -p Id --value display-manager.service 2>/dev/null | sed 's/\.service$//')
+if [ -z "$DM" ] || [ "$DM" = "display-manager" ]; then
+  for d in gdm sddm lightdm; do
+    if systemctl is-active --quiet "$d.service" 2>/dev/null; then DM="$d"; break; fi
+  done
+fi
+case "$DM" in
+  gdm|sddm|lightdm) ;;
+  *) DM="__DISPLAY_MANAGER__" ;;
+esac
+
+CURRENT=$(busctl get-property org.freedesktop.Accounts \
+  /org/freedesktop/Accounts/User"$USER_ID" \
+  org.freedesktop.Accounts.User Session 2>/dev/null | awk -F'"' '{print $2}')
+
+case "$TARGET" in
+  desktop|"$DESKTOP_SESSION") TARGET="$DESKTOP_SESSION" ;;
+  steam|gamescope|game|gaming) TARGET="steam" ;;
+  "")
+    if [ "$CURRENT" = "steam" ]; then TARGET="$DESKTOP_SESSION"; else TARGET="steam"; fi
+    ;;
+  *) echo "session inconnue : $TARGET" >&2; exit 2 ;;
+esac
+
+# 1. AccountsService : session que le gestionnaire de connexion doit demarrer
+busctl call org.freedesktop.Accounts /org/freedesktop/Accounts/User"$USER_ID" \
+  org.freedesktop.Accounts.User SetSession s "$TARGET" >/dev/null 2>&1 || true
+AS="/var/lib/AccountsService/users/$U"
+mkdir -p "$(dirname "$AS")" 2>/dev/null || true
+if [ -f "$AS" ]; then
+  sed -i "s/^Session=.*/Session=$TARGET/" "$AS" 2>/dev/null || true
+  grep -q '^Session=' "$AS" 2>/dev/null || sed -i "1i Session=$TARGET" "$AS" 2>/dev/null || true
+else
+  printf '[User]\nSession=%s\n' "$TARGET" >"$AS" 2>/dev/null || true
+fi
+
+# 2. Auto-connexion : elle doit viser la nouvelle session, sinon le
+#    gestionnaire de connexion relance indefiniment l'ancienne (mode Gaming).
+case "$DM" in
+  sddm)
+    mkdir -p /etc/sddm.conf.d
+    printf '[Autologin]\nUser=%s\nSession=%s\nRelogin=false\n' "$U" "$TARGET" \
+      > /etc/sddm.conf.d/zz-ps5-manager-autologin.conf
+    ;;
+  lightdm)
+    mkdir -p /etc/lightdm
+    LCONF="/etc/lightdm/lightdm.conf"
+    [ -f "$LCONF" ] || printf '[Seat:*]\n' > "$LCONF"
+    python3 - "$LCONF" "$U" "$TARGET" <<'PY'
+import io, re, sys
+path, user, session = sys.argv[1], sys.argv[2], sys.argv[3]
+lines = [l for l in io.open(path, encoding="utf-8").read().splitlines()
+         if not re.match(r"\s*autologin-(user|session)\s*=", l)]
+try:
+    i = next(n for n, l in enumerate(lines) if l.strip() == "[Seat:*]")
+except StopIteration:
+    lines.insert(0, "[Seat:*]")
+    i = 0
+lines[i + 1:i + 1] = ["autologin-user=" + user, "autologin-session=" + session]
+io.open(path, "w", encoding="utf-8").write("\n".join(lines) + "\n")
+PY
+    ;;
+  gdm)
+    mkdir -p /etc/gdm
+    GDM="/etc/gdm/custom.conf"
+    if [ -f "$GDM" ]; then
+      cp -f "$GDM" "$GDM.ps5-manager.bak" 2>/dev/null || true
+    else
+      printf '[daemon]\n' > "$GDM"
+    fi
+    grep -q '^\[daemon\]' "$GDM" || printf '\n[daemon]\n' >> "$GDM"
+    python3 - "$GDM" "$U" <<'PY'
+import io, re, sys
+path, user = sys.argv[1], sys.argv[2]
+lines = [l for l in io.open(path, encoding="utf-8").read().splitlines()
+         if not re.match(r"\s*AutomaticLogin(Enable)?\s*=", l)]
+try:
+    i = next(n for n, l in enumerate(lines) if l.strip() == "[daemon]")
+except StopIteration:
+    lines.insert(0, "[daemon]")
+    i = 0
+lines[i + 1:i + 1] = ["AutomaticLoginEnable=True", "AutomaticLogin=" + user]
+io.open(path, "w", encoding="utf-8").write("\n".join(lines) + "\n")
+PY
+    ;;
+esac
+
+# 3. Fermeture de la session courante (laisse le DRM libre pour Gamescope)
+loginctl terminate-user "$U" >/dev/null 2>&1 || true
+i=0
+while [ "$i" -lt 20 ]; do
+  if ! loginctl list-sessions --no-legend 2>/dev/null | awk '{print $3}' | grep -qx "$U"; then
+    break
+  fi
+  sleep 0.5
+  i=$((i + 1))
+done
+sleep 1
+
+# 4. Redemarrage du gestionnaire de connexion sur la nouvelle session
+if ! systemctl restart "$DM" >/dev/null 2>&1; then
+  systemctl start "$DM" >/dev/null 2>&1 || true
+fi
+echo "session $TARGET demandee (bureau $DESKTOP_SESSION, gestionnaire $DM)"
+exit 0
 SH
 chmod 755 /usr/local/bin/switch-session
-
-step "/usr/bin/steamos-session-select (retour au bureau)"
-cat > /usr/bin/steamos-session-select <<'SH'
-#!/bin/bash
-USER_ID=$(id -u __USER__)
-sudo systemd-run --quiet --collect bash -c "busctl call org.freedesktop.Accounts /org/freedesktop/Accounts/User$USER_ID org.freedesktop.Accounts.User SetSession s '__SESSION__' && loginctl terminate-user __USER__ && sleep 2 && systemctl restart __DM_SERVICE__"
-SH
-chmod 755 /usr/bin/steamos-session-select
 
 step "Raccourcis (menu des applications + bureau)"
 APP_DIR="$H/.local/share/applications"
@@ -144,7 +397,7 @@ cat > "$APP_DIR/switch-session.desktop" <<'DESK'
 Type=Application
 Name=__DESK_NAME__
 Comment=__SESSION_LABEL__ / Steam Big Picture
-Exec=/usr/local/bin/switch-session
+Exec=/usr/local/bin/switch-session steam
 Icon=steam
 Terminal=false
 Categories=Game;Utility;
@@ -164,7 +417,7 @@ fi
 printf '\nTermine : redemarre la console pour arriver sur la session Steam.\n'
 '''
 GAMING_UNINSTALL_SCRIPT = r'''#!/bin/bash
-# Desinstallation Gamescope / bascule GNOME <-> Steam (PS5 Fedora)
+# Desinstallation Gamescope / bascule bureau <-> Steam (PS5 Fedora)
 set -u
 U="__USER__"
 H="__HOME__"
@@ -189,6 +442,7 @@ step "Raccourcis"
 rm -f "$H/.local/share/applications/switch-session.desktop" \
       "$H/Bureau/switch-session.desktop" "$H/Desktop/switch-session.desktop" \
       "$H/.local/share/applications/mode-gaming.desktop"
+rm -f "$H/.cache/ps5-manager/next-session"
 if command -v update-desktop-database >/dev/null; then
   update-desktop-database "$H/.local/share/applications" >/dev/null 2>&1 || true
 fi
@@ -305,6 +559,7 @@ def _gaming_script(kind: str) -> str:
         .replace("__SESSION_LABEL__", DESKTOP_LABEL)
         .replace("__SESSION__", DESKTOP_SESSION)
         .replace("__DM_SERVICE__", DM_SERVICE)
+        .replace("__DISPLAY_MANAGER__", DISPLAY_MANAGER)
         .replace("__AUTOLOGIN_BLOCK__", _gaming_autologin_block())
         .replace("__SCALING_BLOCK__", _gaming_scaling_block())
     )
@@ -747,9 +1002,32 @@ def detect_desktop() -> str:
     return "unknown"
 
 
+def _display_manager_unit() -> str:
+    """Gestionnaire de connexion réellement utilisé (display-manager.service)."""
+    try:
+        out = subprocess.run(
+            ["systemctl", "show", "-p", "Id", "--value", "display-manager.service"],
+            capture_output=True, text=True, timeout=3,
+        ).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        out = ""
+    if out.endswith(".service"):
+        out = out[: -len(".service")]
+    for dm in ("gdm", "sddm", "lightdm"):
+        if out.startswith(dm):
+            return dm
+    return ""
+
+
 def detect_display_manager() -> str:
     """Gestionnaire de connexion : gdm | sddm | lightdm."""
-    for state in ("is-enabled", "is-active"):
+    # display-manager.service est le lien réellement démarré par systemd : seule
+    # source fiable quand plusieurs gestionnaires sont installés (Cinnamon et
+    # Budgie démarrent souvent LightDM alors que gdm.service reste « enabled »).
+    found = _display_manager_unit()
+    if found:
+        return found
+    for state in ("is-active", "is-enabled"):
         for dm in ("gdm", "sddm", "lightdm"):
             try:
                 rc = subprocess.run(
@@ -1606,6 +1884,9 @@ STRINGS = {
         "deps_steam32_sub": "Mesa Vulkan et DRI 32 bits + VA-API 32 bits : sans eux, Steam, Proton/Wine et les jeux 32 bits perdent l'accélération graphique et le décodage vidéo matériel.",
         "gaming_group": "Gamescope / session Steam Big Picture",
         "gaming_group_sub": "Session Steam + bascule GNOME / Steam sur le compte courant (redémarrage nécessaire)",
+        "gaming_log": "Journal du mode Gaming",
+        "gaming_log_sub": "Afficher le journal de la session Gamescope (erreur de lancement, retour au bureau)",
+        "gaming_log_empty": "Aucun journal de session Gaming pour le moment.",
         "gaming_install": "Installer Gamescope",
         "gaming_install_sub": "Session Steam Big Picture, auto-connexion GDM, bascule GNOME/Steam et raccourcis",
         "gaming_uninstall": "Désinstaller Gamescope",
@@ -2019,6 +2300,9 @@ STRINGS = {
         "deps_steam32_sub": "32-bit Mesa Vulkan and DRI plus 32-bit VA-API: without them Steam, Proton/Wine and 32-bit games lose GPU acceleration and hardware video decoding.",
         "gaming_group": "Gamescope / Steam Big Picture session",
         "gaming_group_sub": "Steam session plus GNOME / Steam switching for the current account (reboot required)",
+        "gaming_log": "Gaming Mode log",
+        "gaming_log_sub": "Show the Gamescope session log (launch error, return to the desktop)",
+        "gaming_log_empty": "No Gaming Mode session log yet.",
         "gaming_install": "Install Gamescope",
         "gaming_install_sub": "Steam Big Picture session, GDM auto-login, GNOME/Steam switch and shortcuts",
         "gaming_uninstall": "Uninstall Gamescope",
@@ -2433,6 +2717,9 @@ STRINGS['es'] = {'app_title': 'PS5 Fedora Manager',
  'gaming_group': 'Gamescope / sesión Steam Big Picture',
  'gaming_group_sub': 'Sesión Steam + alternancia GNOME / Steam en la cuenta actual (requiere '
                      'reinicio)',
+ 'gaming_log': 'Registro del modo Gaming',
+ 'gaming_log_sub': 'Mostrar el registro de la sesión Gamescope (error de inicio, vuelta al escritorio)',
+ 'gaming_log_empty': 'Todavía no hay registro de la sesión Gaming.',
  'gaming_install': 'Instalar Gamescope',
  'gaming_install_sub': 'Sesión Steam Big Picture, autologueo en GDM, alternancia GNOME/Steam y '
                        'atajos',
@@ -2838,6 +3125,9 @@ STRINGS['it'] = {'app_title': 'PS5 Fedora Manager',
  'gaming_group': 'Gamescope / sessione Steam Big Picture',
  'gaming_group_sub': "Sessione Steam + commutazione GNOME / Steam sull'account corrente "
                      '(riavvio necessario)',
+ 'gaming_log': 'Log della modalità Gaming',
+ 'gaming_log_sub': 'Mostra il log della sessione Gamescope (errore di avvio, ritorno al desktop)',
+ 'gaming_log_empty': 'Nessun log della sessione Gaming per ora.',
  'gaming_install': 'Installa Gamescope',
  'gaming_install_sub': 'Sessione Steam Big Picture, login automatico GDM, commutazione '
                        'GNOME/Steam e scorciatoie',
@@ -3242,6 +3532,9 @@ STRINGS['de'] = {'app_title': 'PS5 Fedora Manager',
  'gaming_group': 'Gamescope / Steam-Big-Picture-Sitzung',
  'gaming_group_sub': 'Steam-Sitzung + Umschalten GNOME / Steam im aktuellen Konto (Neustart '
                      'nötig)',
+ 'gaming_log': 'Gaming-Modus-Protokoll',
+ 'gaming_log_sub': 'Protokoll der Gamescope-Sitzung anzeigen (Startfehler, Rückkehr zum Desktop)',
+ 'gaming_log_empty': 'Noch kein Protokoll der Gaming-Sitzung.',
  'gaming_install': 'Gamescope installieren',
  'gaming_install_sub': 'Steam-Big-Picture-Sitzung, GDM-Autologin, GNOME/Steam-Umschaltung und '
                        'Verknüpfungen',
@@ -3645,6 +3938,9 @@ STRINGS['pt'] = {'app_title': 'PS5 Fedora Manager',
  'gaming_group': 'Gamescope / sessão Steam Big Picture',
  'gaming_group_sub': 'Sessão Steam + alternância GNOME / Steam na conta atual (reinicialização '
                      'necessária)',
+ 'gaming_log': 'Registro do modo Gaming',
+ 'gaming_log_sub': 'Mostrar o registro da sessão Gamescope (erro de inicialização, volta à área de trabalho)',
+ 'gaming_log_empty': 'Ainda não há registro da sessão Gaming.',
  'gaming_install': 'Instalar Gamescope',
  'gaming_install_sub': 'Sessão Steam Big Picture, login automático no GDM, alternância '
                        'GNOME/Steam e atalhos',
@@ -5404,7 +5700,8 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
             release_notes_version=APP_VERSION,
             release_notes=_safe_release_notes(
                 (
-                                        "<p>Nouveautés de la 0.7</p>"
+                                        "<p>Nouveautés de la 0.7.1</p>"
+                    "<li>0.7.1 : mode Gaming (Gamescope) réparé — retour au bureau à la fermeture de Steam, plus de relance en boucle, accès DRM et journal de session</li>"
                     "<ul>"
                     "<li>0.7 : interface en 6 langues (français, anglais, espagnol, italien, allemand, portugais du Brésil)</li>"
                     "<li>0.6.1 : interfaces sans gel (Logithèque, Dépôts, IA), textes traduits et notes de version corrigées</li>"
@@ -5418,7 +5715,8 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
                 )
                 if UI_LANG == "fr"
                 else (
-                                        "<p>What is new in 0.7</p>"
+                                        "<p>What is new in 0.7.1</p>"
+                    "<li>0.7.1: Gaming Mode (Gamescope) fixed — closing Steam returns to the desktop, no more relaunch loop, DRM access and session log</li>"
                     "<ul>"
                     "<li>0.7: interface in 6 languages (French, English, Spanish, Italian, German, Brazilian Portuguese)</li>"
                     "<li>0.6.1: no more UI freezes (app store, repositories, AI), translated texts and fixed release notes</li>"
@@ -7047,6 +7345,30 @@ def build_page_gaming(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
                 T("gaming_uninstall"), T("gaming_uninstall_confirm"),
                 lambda: _run_script("uninstall", T("gaming_uninstall")),
             ),
+        )
+    )
+
+    def _show_session_log(*_args: Any) -> None:
+        paths = ["/var/log/ps5-manager/gaming-session.log"]
+        if REAL_HOME:
+            paths.append(
+                os.path.join(REAL_HOME, ".cache/ps5-manager/gaming-session.log")
+            )
+        chunks = []
+        for log_path in paths:
+            try:
+                with open(log_path, encoding="utf-8", errors="replace") as fh:
+                    chunks.append(f"{log_path}\n\n{fh.read()[-20000:]}")
+            except OSError:
+                continue
+        win.show_text_modal(
+            T("gaming_log"), "\n\n".join(chunks) or T("gaming_log_empty")
+        )
+
+    grp.add(
+        win.row(
+            T("gaming_log"), T("gaming_log_sub"), "text-x-generic-symbolic",
+            _show_session_log,
         )
     )
     page.add(grp)

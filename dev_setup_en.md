@@ -1,7 +1,7 @@
 # Recommended setup — reference configuration
 
 This document describes the **developer-recommended setup** applied by
-PS5 Fedora Manager (version 0.7). It is offered on the first launch of the
+PS5 Fedora Manager (version 0.7.1). It is offered on the first launch of the
 application and stays available at any time through the **main (burger)
 menu → “Run recommended setup”**.
 
@@ -98,8 +98,9 @@ French version: [dev_setup.md](dev_setup.md)
 The application detects the desktop at startup (`PS5_MANAGER_DESKTOP` when set,
 then `XDG_CURRENT_DESKTOP` / `XDG_SESSION_DESKTOP` / `DESKTOP_SESSION`, then the
 environment of the real user's processes, then `loginctl show-session -p
-Desktop`). The display manager is detected the same way (`gdm.service`,
-`sddm.service`, `lightdm.service`).
+Desktop`). The display manager is the one systemd actually starts
+(`systemctl show -p Id display-manager.service`, then `gdm.service` /
+`sddm.service` / `lightdm.service` as a fallback).
 
 | Item | GNOME | KDE Plasma | Cinnamon | Budgie |
 | --- | --- | --- | --- | --- |
@@ -130,6 +131,15 @@ Notes:
   `/etc/lightdm/lightdm.conf`. The restored session is the detected desktop
   (`gnome`, `plasma`, `cinnamon`, `budgie-desktop`) instead of a hard-coded
   “gnome”. The 1.5 scaling factor of the login screen is only applied on GDM.
+- **Gaming Mode**: the `steam` session
+  (`/usr/share/wayland-sessions/steam.desktop`) runs `/usr/bin/gamescope-session`,
+  which runs Gamescope and, once Steam closes, switches the console back to the
+  desktop session instead of relaunching Gaming Mode in a loop.
+  `/usr/bin/steamos-session-select` records the requested session (desktop or Gaming)
+  and shuts Steam down; `/usr/local/bin/switch-session` updates AccountsService **and**
+  the display manager's autologin configuration, waits for the session to close and
+  then restarts the display manager. The session log is written to
+  `/var/log/ps5-manager/gaming-session.log` and shown from the “Gaming Mode” page.
 - **PS5 kernel**: the section only uses system tools (`dnf` / `rpm`, `depmod`, `dracut`,
   `/etc/kernel/postinst.d/zz-update-boot`, copying `vmlinuz-*` / `initrd.img-*` to
   `/boot/efi/bzImage` and `initrd.img`): no desktop or display-manager command, so the

@@ -1,7 +1,7 @@
 # Setup recommandé — configuration de référence
 
 Ce document décrit le **setup recommandé par le développeur** appliqué par
-PS5 Fedora Manager (version 0.7). Il est proposé au premier lancement de
+PS5 Fedora Manager (version 0.7.1). Il est proposé au premier lancement de
 l'application, puis reste accessible à tout moment via le **menu principal
 (burger) → « Effectuer le setup recommandé »**.
 
@@ -98,7 +98,9 @@ L'application détecte le bureau au démarrage (variable `PS5_MANAGER_DESKTOP` s
 elle est définie, puis `XDG_CURRENT_DESKTOP` / `XDG_SESSION_DESKTOP` /
 `DESKTOP_SESSION`, puis l'environnement des processus de l'utilisateur réel,
 puis `loginctl show-session -p Desktop`). Le gestionnaire de connexion est
-détecté de la même façon (`gdm.service`, `sddm.service`, `lightdm.service`).
+celui que systemd démarre réellement (`systemctl show -p Id
+display-manager.service`, puis `gdm.service` / `sddm.service` / `lightdm.service`
+en secours).
 
 | Élément | GNOME | KDE Plasma | Cinnamon | Budgie |
 | --- | --- | --- | --- | --- |
@@ -130,6 +132,15 @@ Remarques :
   celle du bureau détecté (`gnome`, `plasma`, `cinnamon`, `budgie-desktop`) et
   non plus « gnome » en dur. Le facteur d'échelle 1.5 de l'écran de connexion
   n'est appliqué que sous GDM.
+- **Mode Gaming** : la session `steam`
+  (`/usr/share/wayland-sessions/steam.desktop`) lance `/usr/bin/gamescope-session`,
+  qui exécute Gamescope puis, à la fermeture de Steam, rebascule la console sur la
+  session du bureau au lieu de relancer la session Gaming en boucle.
+  `/usr/bin/steamos-session-select` enregistre la session demandée (bureau ou Gaming)
+  et ferme Steam ; `/usr/local/bin/switch-session` met à jour AccountsService **et**
+  l'auto-connexion du gestionnaire de connexion, attend la fermeture de la session
+  puis redémarre le gestionnaire. Le journal de la session est écrit dans
+  `/var/log/ps5-manager/gaming-session.log` et affiché depuis la page « Gaming Mode ».
 - **Kernel PS5** : la section n'utilise que des outils système (`dnf` / `rpm`, `depmod`, `dracut`,
   `/etc/kernel/postinst.d/zz-update-boot`, copie de `vmlinuz-*` / `initrd.img-*` vers
   `/boot/efi/bzImage` et `initrd.img`) : aucune commande liée au bureau ou au gestionnaire

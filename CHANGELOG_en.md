@@ -7,6 +7,20 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.7.1] — 2026-11-25
+
+### Fixed
+- **Gaming Mode on Cinnamon and Budgie (and KDE)**: the Gamescope session no longer relaunches Steam in a loop. The application now writes its own `/usr/bin/gamescope-session` (the upstream guide only ran `gamescope … steam` and exited, so the display manager reopened the `steam` session forever). Closing Steam now returns to the detected desktop session.
+- **Return to the desktop from Steam Big Picture**: `/usr/bin/steamos-session-select` records the requested session (desktop or Gaming) and shuts Steam down (`steam -shutdown`); `gamescope-session` reads that request once Gamescope exits and switches accordingly (no more being stuck on Steam).
+- **Reliable session switch**: `/usr/local/bin/switch-session` now rewrites the display manager's autologin configuration **as well as** AccountsService. With SDDM (`Session=` in `/etc/sddm.conf.d/zz-ps5-manager-autologin.conf`) and LightDM (`autologin-session=` in `[Seat:*]`) the previous session stayed hard-coded, so the display manager kept restarting Steam.
+- **DRM error when Gamescope starts**: `gamescope` is installed when missing, the user is added to the `video` and `render` groups (`/dev/dri/card*` access), `WAYLAND_DISPLAY` / `DISPLAY` are removed from the session environment (Gamescope was attempting a nested compositing) and the switch waits for the session to really close before restarting the display manager (the GPU stayed busy).
+- **Display manager detection**: `display-manager.service` is read first (`systemctl show -p Id`). Cinnamon and Budgie often start LightDM while `gdm.service` stays “enabled”: the application restarted the wrong service and the switch never happened.
+- **Session scripts**: no more failure when the `shahnawazshahin` guide is unreachable (a warning only), and the scripts shipped by the application are written after the guide's ones, so they take precedence.
+- `APP_VERSION` bumped to `0.7.1`, FR/EN release notes of the “About” dialog updated.
+
+### Added
+- **Gaming Mode log**: new entry on the “Gaming Mode” page showing `/var/log/ps5-manager/gaming-session.log` (command run, Gamescope exit code, possible DRM errors). Three labels translated in all six languages (353 keys).
+
 ## [0.7] — 2026-11-25
 
 ### Added

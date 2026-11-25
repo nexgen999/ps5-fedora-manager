@@ -6,6 +6,20 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.7.1] — 2026-11-25
+
+### Corrigé
+- **Mode Gaming sous Cinnamon et Budgie (et KDE)** : la session Gamescope ne relance plus Steam en boucle. L'application écrit désormais son propre `/usr/bin/gamescope-session` (le guide amont ne faisait que lancer `gamescope … steam` puis mourir, et le gestionnaire de connexion réouvrait la session `steam` indéfiniment). À la fermeture de Steam, la console revient sur la session du bureau détecté.
+- **Retour au bureau depuis Steam Big Picture** : `/usr/bin/steamos-session-select` enregistre la session demandée (bureau ou Gaming) puis ferme Steam (`steam -shutdown`) ; `gamescope-session` lit cette demande après la sortie de Gamescope et bascule en conséquence (plus de retour bloqué sur Steam).
+- **Bascule de session fiable** : `/usr/local/bin/switch-session` réécrit maintenant **aussi** l'auto-connexion du gestionnaire de connexion, pas seulement AccountsService. Sous SDDM (`Session=` dans `/etc/sddm.conf.d/zz-ps5-manager-autologin.conf`) et sous LightDM (`autologin-session=` dans `[Seat:*]`), l'ancienne session restait codée en dur et le gestionnaire relançait Steam à chaque fois.
+- **Erreur DRM au lancement de Gamescope** : installation de `gamescope` s'il est absent, ajout de l'utilisateur aux groupes `video` et `render` (accès `/dev/dri/card*`), suppression de `WAYLAND_DISPLAY` / `DISPLAY` de l'environnement de la session (Gamescope tentait une composition imbriquée) et attente de la fermeture effective de la session avant redémarrage du gestionnaire de connexion (le GPU restait occupé).
+- **Détection du gestionnaire de connexion** : `display-manager.service` est lu en premier (`systemctl show -p Id`). Cinnamon et Budgie démarrent souvent LightDM alors que `gdm.service` reste « enabled » : l'application redémarrait le mauvais service et la bascule ne se faisait jamais.
+- **Scripts de session** : plus de blocage si le guide `shahnawazshahin` est inaccessible (avertissement seulement) et les scripts fournis par l'application sont écrits après ceux du guide, donc prioritaires.
+- `APP_VERSION` passe à `0.7.1`, notes de version FR/EN de la boîte « À propos » mises à jour.
+
+### Ajouté
+- **Journal du mode Gaming** : nouvelle entrée dans la page « Gaming Mode » qui affiche `/var/log/ps5-manager/gaming-session.log` (commande lancée, code de sortie de Gamescope, erreurs DRM éventuelles). Trois libellés traduits dans les six langues (353 clés).
+
 ## [0.7] — 2026-11-25
 
 ### Ajouté
