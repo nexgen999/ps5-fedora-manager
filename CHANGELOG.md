@@ -34,6 +34,9 @@ Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 - Documentation [`dev_setup.md`](dev_setup.md) : configuration de référence, commandes exactes et correspondance avec les sections de l'application.
 
 ### Modifié
+- **Langues & clavier** : `gsettings org.gnome.system.locale` n'est appliqué que sous GNOME / Budgie, et la déconnexion proposée utilise la commande du bureau détecté (`gnome-session-quit`, `cinnamon-session-quit`, `qdbus … org.kde.Shutdown.logout`) avec repli `loginctl terminate-user` — plus de `gnome-session-quit` codé en dur.
+- **Couleur d'accentuation GNOME** : le groupe est masqué et le sondage dconf toutes les 3 s est désactivé hors GNOME.
+- **Kernel PS5** : section vérifiée sans aucune dépendance au bureau ni au gestionnaire de connexion (`dnf`/`rpm`, `depmod`, `dracut`, copie sur `/boot/efi`) — comportement identique sur les 4 environnements.
 - **Fenêtre de suivi du setup élargie** (1320 × 800 au lieu de 1120 × 740) et colonne de gauche plus large, pour une lecture plus confortable de la liste et du journal.
 - `APP_VERSION` passe à `0.5`, notes de version FR/EN de la boîte « À propos » mises à jour.
 

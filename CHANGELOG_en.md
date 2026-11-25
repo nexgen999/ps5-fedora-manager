@@ -36,6 +36,9 @@ French version: [CHANGELOG.md](CHANGELOG.md)
 - English versions of the documentation: [`CHANGELOG_en.md`](CHANGELOG_en.md) and [`dev_setup_en.md`](dev_setup_en.md).
 
 ### Changed
+- **Locale & keyboard**: `gsettings org.gnome.system.locale` is only applied on GNOME / Budgie, and the offered logout uses the detected desktop's command (`gnome-session-quit`, `cinnamon-session-quit`, `qdbus … org.kde.Shutdown.logout`) with a `loginctl terminate-user` fallback — no more hard-coded `gnome-session-quit`.
+- **GNOME accent colour**: the group is hidden and the 3-second dconf polling is disabled outside GNOME.
+- **PS5 kernel**: section audited with no desktop or display-manager dependency (`dnf`/`rpm`, `depmod`, `dracut`, copy to `/boot/efi`) — identical behaviour on all four environments.
 - **Wider setup progress window** (1320 × 800 instead of 1120 × 740) with a wider left column, for a more comfortable reading of the list and the log.
 - `APP_VERSION` bumped to `0.5`, FR/EN release notes of the “About” dialog updated.
 

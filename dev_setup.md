@@ -109,6 +109,10 @@ détecté de la même façon (`gdm.service`, `sddm.service`, `lightdm.service`).
 | Gestion mobile | GSConnect + Nautilus | KDE Connect + Dolphin | MTP / SSHFS + Nemo | MTP / SSHFS + Nautilus |
 | Imprimantes & scanners | CUPS + `system-config-printer` | CUPS + `print-manager` | CUPS + `system-config-printer` | CUPS + `system-config-printer` |
 | Gamescope / session Steam | GDM | SDDM | GDM ou LightDM | GDM ou LightDM |
+| Locale & clavier | `localectl` + AccountsService + `gsettings org.gnome.system.locale` | `localectl` + AccountsService (pas de `gsettings`) | `localectl` + AccountsService | `localectl` + AccountsService + `gsettings` |
+| Déconnexion après changement de langue | `gnome-session-quit --logout --force` | `qdbus6 org.kde.Shutdown /Shutdown org.kde.Shutdown.logout` | `cinnamon-session-quit --logout --force` | `gnome-session-quit --logout --force` |
+| Couleur d'accentuation | groupe affiché | masqué | masqué | masqué |
+| Kernel PS5 (installation, choix au démarrage, suppression) | identique partout : `dnf` / `rpm`, `depmod`, `dracut`, copie sur l'ESP `/boot/efi` | idem | idem | idem |
 
 Remarques :
 
@@ -126,6 +130,12 @@ Remarques :
   celle du bureau détecté (`gnome`, `plasma`, `cinnamon`, `budgie-desktop`) et
   non plus « gnome » en dur. Le facteur d'échelle 1.5 de l'écran de connexion
   n'est appliqué que sous GDM.
+- **Kernel PS5** : la section n'utilise que des outils système (`dnf` / `rpm`, `depmod`, `dracut`,
+  `/etc/kernel/postinst.d/zz-update-boot`, copie de `vmlinuz-*` / `initrd.img-*` vers
+  `/boot/efi/bzImage` et `initrd.img`) : aucune commande liée au bureau ou au gestionnaire
+  de connexion, donc comportement identique sur les quatre environnements.
+- La déconnexion après un changement de langue utilise la commande du bureau détecté et
+  retombe sur `loginctl terminate-user` si elle est absente.
 - Un bureau non identifié (`unknown`) applique les commandes GNOME par défaut ;
   les interrupteurs de veille apparaissent alors désactivés si `gsettings`
   n'est pas disponible.

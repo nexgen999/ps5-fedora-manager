@@ -110,6 +110,10 @@ Desktop`). The display manager is detected the same way (`gdm.service`,
 | Mobile management | GSConnect + Nautilus | KDE Connect + Dolphin | MTP / SSHFS + Nemo | MTP / SSHFS + Nautilus |
 | Printers & scanners | CUPS + `system-config-printer` | CUPS + `print-manager` | CUPS + `system-config-printer` | CUPS + `system-config-printer` |
 | Gamescope / Steam session | GDM | SDDM | GDM or LightDM | GDM or LightDM |
+| Locale & keyboard | `localectl` + AccountsService + `gsettings org.gnome.system.locale` | `localectl` + AccountsService (no `gsettings`) | `localectl` + AccountsService | `localectl` + AccountsService + `gsettings` |
+| Logout after a language change | `gnome-session-quit --logout --force` | `qdbus6 org.kde.Shutdown /Shutdown org.kde.Shutdown.logout` | `cinnamon-session-quit --logout --force` | `gnome-session-quit --logout --force` |
+| Accent colour | group shown | hidden | hidden | hidden |
+| PS5 kernel (install, boot choice, removal) | identical everywhere: `dnf` / `rpm`, `depmod`, `dracut`, copy to the ESP `/boot/efi` | same | same | same |
 
 Notes:
 
@@ -126,6 +130,12 @@ Notes:
   `/etc/lightdm/lightdm.conf`. The restored session is the detected desktop
   (`gnome`, `plasma`, `cinnamon`, `budgie-desktop`) instead of a hard-coded
   “gnome”. The 1.5 scaling factor of the login screen is only applied on GDM.
+- **PS5 kernel**: the section only uses system tools (`dnf` / `rpm`, `depmod`, `dracut`,
+  `/etc/kernel/postinst.d/zz-update-boot`, copying `vmlinuz-*` / `initrd.img-*` to
+  `/boot/efi/bzImage` and `initrd.img`): no desktop or display-manager command, so the
+  behaviour is identical on all four environments.
+- The logout offered after a language change uses the detected desktop's command and falls
+  back to `loginctl terminate-user` when it is missing.
 - An unidentified desktop (`unknown`) applies the GNOME commands by default;
   the power switches then appear disabled when `gsettings` is unavailable.
 

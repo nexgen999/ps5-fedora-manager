@@ -956,6 +956,19 @@ def _software_supported(item: Any) -> bool:
     return True
 
 
+def logout_command() -> list[str]:
+    """Commande de déconnexion du bureau courant (repli : loginctl)."""
+    if DESKTOP_ID == "kde":
+        tool = _desktop_tool("qdbus6", "qdbus")
+        if tool:
+            return [tool, "org.kde.Shutdown", "/Shutdown", "org.kde.Shutdown.logout"]
+    if DESKTOP_ID == "cinnamon" and shutil.which("cinnamon-session-quit"):
+        return ["cinnamon-session-quit", "--logout", "--force"]
+    if shutil.which("gnome-session-quit") and DESKTOP_ID in ("gnome", "budgie", "unknown"):
+        return ["gnome-session-quit", "--logout", "--force"]
+    return ["loginctl", "terminate-user", REAL_USER]
+
+
 def user_env() -> dict[str, str]:
     env = dict(os.environ)
     env["DISPLAY"] = os.environ.get("DISPLAY", ":0")
@@ -1107,8 +1120,10 @@ class SystemThemeSync:
             self.style_manager.props, "accent_color"
         ):
             self.style_manager.connect("notify::accent-color", lambda *_: self.refresh())
-        # Surveillance légère du dconf de REAL_USER (utile sous pkexec)
-        self._timer_id = GLib.timeout_add_seconds(3, self._poll_user_gsettings)
+        # Surveillance légère du dconf de REAL_USER (utile sous pkexec).
+        # Seul GNOME expose accent-color / color-scheme : inutile ailleurs.
+        if DESKTOP_ID == "gnome":
+            self._timer_id = GLib.timeout_add_seconds(3, self._poll_user_gsettings)
 
     def _read_gsetting(self, key: str) -> str:
         try:
@@ -1440,7 +1455,7 @@ STRINGS = {
         "lang_full_sub": "Applique la locale système, le clavier X11/console et le compte utilisateur",
         "lang_pick_locale": "Choisir la locale système",
         "lang_pick_kb": "Choisir la disposition clavier",
-        "lang_logout_confirm": "Langue (%s) et clavier (%s) appliqués.\nFermer la session GNOME maintenant pour appliquer les changements ?",
+        "lang_logout_confirm": "Langue (%s) et clavier (%s) appliqués.\nFermer la session %s maintenant pour appliquer les changements ?",
         # 3. Dépôts
         "repo_list": "Voir tous les dépôts (RPM + Flatpak)",
         "repo_list_sub": "dnf repolist --all et dépôts Flatpak système/utilisateur",
@@ -1826,7 +1841,7 @@ STRINGS = {
         "lang_full_sub": "Applies system locale, X11/console keymap and user account",
         "lang_pick_locale": "Choose system locale",
         "lang_pick_kb": "Choose keyboard layout",
-        "lang_logout_confirm": "Language (%s) and keyboard (%s) applied.\nLog out of GNOME now to apply changes?",
+        "lang_logout_confirm": "Language (%s) and keyboard (%s) applied.\nLog out of the %s session now to apply changes?",
         # 3. Repos
         "repo_list": "List all repositories (RPM + Flatpak)",
         "repo_list_sub": "dnf repolist --all and system/user Flatpak remotes",
@@ -4255,16 +4270,31 @@ def _push_full_lang_config(win: Ps5ManagerWindow) -> None:
                  "--method", "org.freedesktop.Accounts.User.SetLanguage", loc],
                 emit,
             )
-            win.run_cmd_pty(["gsettings", "set", "org.gnome.system.locale", "region", loc], emit, as_user=True)
+            if DESKTOP_ID in ("gnome", "budgie"):
+                win.run_cmd_pty(
+                    ["gsettings", "set", "org.gnome.system.locale", "region", loc],
+                    emit,
+                    as_user=True,
+                )
             win.run_cmd_pty(["localectl", "set-keymap", kb], emit)
             win.run_cmd_pty(["localectl", "set-x11-keymap", kb], emit)
             return True, f"{loc} / {kb}"
+        def _logout() -> None:
+            cmd = logout_command()
+            try:
+                if cmd[0] == "loginctl":
+                    subprocess.Popen(cmd)
+                else:
+                    subprocess.Popen(cmd, **user_subprocess_kwargs())
+            except OSError as exc:
+                win.show_info(T("lang_full"), str(exc))
+
         def _after(ok, _m):
             if ok:
                 win.show_confirm(
                     T("lang_full"),
-                    T("lang_logout_confirm") % (loc, kb),
-                    lambda: subprocess.Popen(["gnome-session-quit", "--logout", "--force"], **user_subprocess_kwargs()),
+                    T("lang_logout_confirm") % (loc, kb, DESKTOP_LABEL),
+                    _logout,
                     destructive=False,
                 )
         win.run_task(T("lang_full"), _task, _after)
@@ -5484,17 +5514,18 @@ def build_page_ui_lang(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None
         grp.add(r)
     page.add(grp)
 
-    g_accent = pref_group(
-        title=T("accent_label"),
-        description=f"{T('follow_gnome')} ({win.theme_sync.current_accent})",
-    )
-    info_row = plain_row(Adw.ActionRow,
-        title=T("follow_gnome"),
-        subtitle=f"org.gnome.desktop.interface accent-color → {win.theme_sync.current_accent}",
-    )
-    info_row.add_prefix(Gtk.Image.new_from_icon_name("preferences-color-symbolic"))
-    g_accent.add(info_row)
-    page.add(g_accent)
+    if DESKTOP_ID == "gnome":
+        g_accent = pref_group(
+            title=T("accent_label"),
+            description=f"{T('follow_gnome')} ({win.theme_sync.current_accent})",
+        )
+        info_row = plain_row(Adw.ActionRow,
+            title=T("follow_gnome"),
+            subtitle=f"org.gnome.desktop.interface accent-color → {win.theme_sync.current_accent}",
+        )
+        info_row.add_prefix(Gtk.Image.new_from_icon_name("preferences-color-symbolic"))
+        g_accent.add(info_row)
+        page.add(g_accent)
 
 
 # ------------------------------------------------------------------------------
