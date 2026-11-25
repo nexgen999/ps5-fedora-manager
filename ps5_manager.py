@@ -15,6 +15,7 @@ Interface native GTK4 + Libadwaita.
 
 from __future__ import annotations
 
+import base64
 import datetime
 import glob
 import json
@@ -40,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.7.1"
+APP_VERSION = "0.8"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -547,11 +548,7 @@ def _gaming_scaling_block() -> str:
 def _gaming_script(kind: str) -> str:
     """Rend le script Gamescope demande pour l'utilisateur courant."""
     text = GAMING_INSTALL_SCRIPT if kind == "install" else GAMING_UNINSTALL_SCRIPT
-    desk_name = (
-        f"Basculer Session ({DESKTOP_LABEL} / Steam)"
-        if UI_LANG == "fr"
-        else f"Switch Session ({DESKTOP_LABEL} / Steam)"
-    )
+    desk_name = T("switch_session") % DESKTOP_LABEL
     return (
         text.replace("__USER__", REAL_USER)
         .replace("__HOME__", REAL_HOME or f"/home/{REAL_USER}")
@@ -1568,6 +1565,30 @@ STRINGS = {
     "fr": {
         "app_title": "PS5 Fedora Manager",
         "search_placeholder": "Rechercher une option ou un logiciel…",
+        "sys_group_session": "Session",
+        "sys_group_software": "Logiciels",
+        "sys_group_app": "Application",
+        "sys_os": "Système d'exploitation",
+        "sys_kernel": "Noyau Linux",
+        "sys_arch": "Architecture",
+        "sys_dnf": "Gestionnaire de paquets",
+        "sys_desktop": "Environnement de bureau",
+        "sys_dm": "Gestionnaire de connexion",
+        "sys_session": "Session graphique",
+        "sys_user": "Utilisateur",
+        "sys_accent": "Couleur d'accentuation",
+        "sys_gamescope": "Gamescope",
+        "sys_steam": "Steam",
+        "sys_installed": "Installé",
+        "sys_version": "Version du manager",
+        "sys_file": "Fichier",
+        "sys_log": "Journal de session",
+        "sys_open": "Ouvrir",
+        "sys_copy": "Copier les informations",
+        "sys_copy_done": "Informations copiées",
+        "switch_session": "Basculer Session (%s / Steam)",
+        "podman_linger": "Activer le maintien de session Podman (%s)",
+        "podman_linger_sub": "loginctl enable-linger %s · démarre Open WebUI sans terminal",
         "system_info": "Système",
         "accent_label": "Couleur d'accentuation GNOME",
         "follow_gnome": "Synchronisée avec GNOME",
@@ -1984,6 +2005,30 @@ STRINGS = {
     "en": {
         "app_title": "PS5 Fedora Manager",
         "search_placeholder": "Search an option or software…",
+        "sys_group_session": "Session",
+        "sys_group_software": "Software",
+        "sys_group_app": "Application",
+        "sys_os": "Operating system",
+        "sys_kernel": "Linux kernel",
+        "sys_arch": "Architecture",
+        "sys_dnf": "Package manager",
+        "sys_desktop": "Desktop environment",
+        "sys_dm": "Display manager",
+        "sys_session": "Graphical session",
+        "sys_user": "User",
+        "sys_accent": "Accent colour",
+        "sys_gamescope": "Gamescope",
+        "sys_steam": "Steam",
+        "sys_installed": "Installed",
+        "sys_version": "Manager version",
+        "sys_file": "File",
+        "sys_log": "Session log",
+        "sys_open": "Open",
+        "sys_copy": "Copy the information",
+        "sys_copy_done": "Information copied",
+        "switch_session": "Switch Session (%s / Steam)",
+        "podman_linger": "Enable Podman session lingering (%s)",
+        "podman_linger_sub": "loginctl enable-linger %s · starts Open WebUI without a terminal",
         "system_info": "System",
         "accent_label": "GNOME Accent Color",
         "follow_gnome": "Synced with GNOME",
@@ -2414,6 +2459,30 @@ LANG_LABELS = {
 
 STRINGS['es'] = {'app_title': 'PS5 Fedora Manager',
  'search_placeholder': 'Buscar una opción o un programa…',
+ 'sys_group_session': 'Sesión',
+ 'sys_group_software': 'Software',
+ 'sys_group_app': 'Aplicación',
+ 'sys_os': 'Sistema operativo',
+ 'sys_kernel': 'Núcleo Linux',
+ 'sys_arch': 'Arquitectura',
+ 'sys_dnf': 'Gestor de paquetes',
+ 'sys_desktop': 'Entorno de escritorio',
+ 'sys_dm': 'Gestor de sesiones',
+ 'sys_session': 'Sesión gráfica',
+ 'sys_user': 'Usuario',
+ 'sys_accent': 'Color de acento',
+ 'sys_gamescope': 'Gamescope',
+ 'sys_steam': 'Steam',
+ 'sys_installed': 'Instalado',
+ 'sys_version': 'Versión del manager',
+ 'sys_file': 'Archivo',
+ 'sys_log': 'Registro de sesión',
+ 'sys_open': 'Abrir',
+ 'sys_copy': 'Copiar la información',
+ 'sys_copy_done': 'Información copiada',
+ 'switch_session': 'Cambiar de sesión (%s / Steam)',
+ 'podman_linger': 'Activar la persistencia de sesión de Podman (%s)',
+ 'podman_linger_sub': 'loginctl enable-linger %s · inicia Open WebUI sin terminal',
  'system_info': 'Sistema',
  'accent_label': 'Color de acento de GNOME',
  'follow_gnome': 'Sincronizado con GNOME',
@@ -2825,6 +2894,30 @@ STRINGS['es'] = {'app_title': 'PS5 Fedora Manager',
 
 STRINGS['it'] = {'app_title': 'PS5 Fedora Manager',
  'search_placeholder': "Cerca un'opzione o un programma…",
+ 'sys_group_session': 'Sessione',
+ 'sys_group_software': 'Software',
+ 'sys_group_app': 'Applicazione',
+ 'sys_os': 'Sistema operativo',
+ 'sys_kernel': 'Kernel Linux',
+ 'sys_arch': 'Architettura',
+ 'sys_dnf': 'Gestore dei pacchetti',
+ 'sys_desktop': 'Ambiente desktop',
+ 'sys_dm': 'Display manager',
+ 'sys_session': 'Sessione grafica',
+ 'sys_user': 'Utente',
+ 'sys_accent': 'Colore d\'accento',
+ 'sys_gamescope': 'Gamescope',
+ 'sys_steam': 'Steam',
+ 'sys_installed': 'Installato',
+ 'sys_version': 'Versione del manager',
+ 'sys_file': 'File',
+ 'sys_log': 'Log di sessione',
+ 'sys_open': 'Apri',
+ 'sys_copy': 'Copia le informazioni',
+ 'sys_copy_done': 'Informazioni copiate',
+ 'switch_session': 'Cambia sessione (%s / Steam)',
+ 'podman_linger': 'Attiva la persistenza di sessione Podman (%s)',
+ 'podman_linger_sub': 'loginctl enable-linger %s · avvia Open WebUI senza terminale',
  'system_info': 'Sistema',
  'accent_label': "Colore d'accento di GNOME",
  'follow_gnome': 'Sincronizzato con GNOME',
@@ -3232,6 +3325,30 @@ STRINGS['it'] = {'app_title': 'PS5 Fedora Manager',
 
 STRINGS['de'] = {'app_title': 'PS5 Fedora Manager',
  'search_placeholder': 'Option oder Programm suchen…',
+ 'sys_group_session': 'Sitzung',
+ 'sys_group_software': 'Software',
+ 'sys_group_app': 'Anwendung',
+ 'sys_os': 'Betriebssystem',
+ 'sys_kernel': 'Linux-Kernel',
+ 'sys_arch': 'Architektur',
+ 'sys_dnf': 'Paketmanager',
+ 'sys_desktop': 'Desktop-Umgebung',
+ 'sys_dm': 'Anmeldemanager',
+ 'sys_session': 'Grafische Sitzung',
+ 'sys_user': 'Benutzer',
+ 'sys_accent': 'Akzentfarbe',
+ 'sys_gamescope': 'Gamescope',
+ 'sys_steam': 'Steam',
+ 'sys_installed': 'Installiert',
+ 'sys_version': 'Manager-Version',
+ 'sys_file': 'Datei',
+ 'sys_log': 'Sitzungsprotokoll',
+ 'sys_open': 'Öffnen',
+ 'sys_copy': 'Informationen kopieren',
+ 'sys_copy_done': 'Informationen kopiert',
+ 'switch_session': 'Sitzung wechseln (%s / Steam)',
+ 'podman_linger': 'Podman-Sitzung dauerhaft aktivieren (%s)',
+ 'podman_linger_sub': 'loginctl enable-linger %s · startet Open WebUI ohne Terminal',
  'system_info': 'System',
  'accent_label': 'GNOME-Akzentfarbe',
  'follow_gnome': 'Mit GNOME synchronisiert',
@@ -3639,6 +3756,30 @@ STRINGS['de'] = {'app_title': 'PS5 Fedora Manager',
 
 STRINGS['pt'] = {'app_title': 'PS5 Fedora Manager',
  'search_placeholder': 'Pesquisar uma opção ou um programa…',
+ 'sys_group_session': 'Sessão',
+ 'sys_group_software': 'Software',
+ 'sys_group_app': 'Aplicação',
+ 'sys_os': 'Sistema operativo',
+ 'sys_kernel': 'Kernel Linux',
+ 'sys_arch': 'Arquitetura',
+ 'sys_dnf': 'Gerenciador de pacotes',
+ 'sys_desktop': 'Ambiente de desktop',
+ 'sys_dm': 'Gerenciador de sessão',
+ 'sys_session': 'Sessão gráfica',
+ 'sys_user': 'Usuário',
+ 'sys_accent': 'Cor de destaque',
+ 'sys_gamescope': 'Gamescope',
+ 'sys_steam': 'Steam',
+ 'sys_installed': 'Instalado',
+ 'sys_version': 'Versão do manager',
+ 'sys_file': 'Arquivo',
+ 'sys_log': 'Registro da sessão',
+ 'sys_open': 'Abrir',
+ 'sys_copy': 'Copiar as informações',
+ 'sys_copy_done': 'Informações copiadas',
+ 'switch_session': 'Alternar sessão (%s / Steam)',
+ 'podman_linger': 'Ativar a persistência de sessão do Podman (%s)',
+ 'podman_linger_sub': 'loginctl enable-linger %s · inicia o Open WebUI sem terminal',
  'system_info': 'Sistema',
  'accent_label': 'Cor de destaque do GNOME',
  'follow_gnome': 'Sincronizada com o GNOME',
@@ -5137,7 +5278,402 @@ SECTIONS = [
 # ------------------------------------------------------------------------------
 # Fenêtre principale (GNOME Settings / Libadwaita NavigationSplitView)
 # ------------------------------------------------------------------------------
-LSTRINGS: dict[str, dict[str, str]] = {}
+_L_TABLE = {
+    "Droits (root:root, 0755/0644, Polkit GUI, SELinux) appliqués.": (
+        "Permisos (root:root, 0755/0644, Polkit GUI, SELinux) aplicados.",
+        "Permessi (root:root, 0755/0644, Polkit GUI, SELinux) applicati.",
+        "Rechte (root:root, 0755/0644, Polkit GUI, SELinux) angewendet.",
+        "Permissões (root:root, 0755/0644, Polkit GUI, SELinux) aplicadas.",
+    ),
+    "Redémarrage automatique de PS5 Fedora Manager…": (
+        "Reinicio automático de PS5 Fedora Manager…",
+        "Riavvio automatico di PS5 Fedora Manager…",
+        "Automatischer Neustart von PS5 Fedora Manager…",
+        "Reinício automático do PS5 Fedora Manager…",
+    ),
+    "Ollama non détecté — installation avec pciutils…": (
+        "Ollama no detectado — instalando con pciutils…",
+        "Ollama non rilevato — installazione con pciutils…",
+        "Ollama nicht gefunden — Installation mit pciutils…",
+        "Ollama não detectado — instalando com pciutils…",
+    ),
+    "VSCodium (éditeur de code libre)": (
+        "VSCodium (editor de código libre)",
+        "VSCodium (editor di codice libero)",
+        "VSCodium (freier Code-Editor)",
+        "VSCodium (editor de código livre)",
+    ),
+    "Ollama non détecté sur ce système.": (
+        "Ollama no detectado en este sistema.",
+        "Ollama non rilevato su questo sistema.",
+        "Ollama wurde auf diesem System nicht gefunden.",
+        "Ollama não detectado neste sistema.",
+    ),
+    "Conteneur Podman open-webui non détecté.": (
+        "Contenedor Podman open-webui no detectado.",
+        "Contenitore Podman open-webui non rilevato.",
+        "Podman-Container open-webui nicht gefunden.",
+        "Contêiner Podman open-webui não detectado.",
+    ),
+    "Podman non installé.": (
+        "Podman no instalado.",
+        "Podman non installato.",
+        "Podman ist nicht installiert.",
+        "Podman não instalado.",
+    ),
+    "Démarrez d'abord le conteneur Open WebUI.": (
+        "Inicia primero el contenedor Open WebUI.",
+        "Avvia prima il contenitore Open WebUI.",
+        "Starte zuerst den Open-WebUI-Container.",
+        "Inicie primeiro o contêiner Open WebUI.",
+    ),
+    "Vérifie l'état exact de open-webui": (
+        "Comprueba el estado exacto de open-webui",
+        "Controlla lo stato esatto di open-webui",
+        "Prüft den genauen Status von open-webui",
+        "Verifica o estado exato do open-webui",
+    ),
+    "Affiche les 30 dernières lignes du conteneur open-webui": (
+        "Muestra las 30 últimas líneas del contenedor open-webui",
+        "Mostra le ultime 30 righe del contenitore open-webui",
+        "Zeigt die letzten 30 Zeilen des open-webui-Containers",
+        "Mostra as 30 últimas linhas do contêiner open-webui",
+    ),
+    "Affiche les modèles actuellement chargés en mémoire": (
+        "Muestra los modelos cargados actualmente en memoria",
+        "Mostra i modelli attualmente caricati in memoria",
+        "Zeigt die derzeit im Speicher geladenen Modelle",
+        "Mostra os modelos atualmente carregados na memória",
+    ),
+    "Diagnostic matériel IA (PS5)": (
+        "Diagnóstico de hardware de IA (PS5)",
+        "Diagnostica hardware IA (PS5)",
+        "KI-Hardware-Diagnose (PS5)",
+        "Diagnóstico de hardware de IA (PS5)",
+    ),
+    "Vérifie la mémoire libre avant d'exécuter un modèle 7B / 9B / 12B": (
+        "Comprueba la memoria libre antes de ejecutar un modelo 7B / 9B / 12B",
+        "Controlla la memoria libera prima di eseguire un modello 7B / 9B / 12B",
+        "Prüft den freien Speicher vor dem Start eines 7B-/9B-/12B-Modells",
+        "Verifica a memória livre antes de executar um modelo 7B / 9B / 12B",
+    ),
+    "podman image prune -f (libère l'espace après mise à jour Open WebUI)": (
+        "podman image prune -f (libera espacio tras actualizar Open WebUI)",
+        "podman image prune -f (libera spazio dopo l'aggiornamento di Open WebUI)",
+        "podman image prune -f (gibt Speicher nach dem Open-WebUI-Update frei)",
+        "podman image prune -f (libera espaço após atualizar o Open WebUI)",
+    ),
+    "Avertissement : impossible de télécharger open-webui.png (icône générique utilisée).": (
+        "Aviso: no se pudo descargar open-webui.png (se usa el icono genérico).",
+        "Avviso: impossibile scaricare open-webui.png (usata l'icona generica).",
+        "Warnung: open-webui.png konnte nicht geladen werden (allgemeines Symbol wird verwendet).",
+        "Aviso: não foi possível baixar open-webui.png (ícone genérico usado).",
+    ),
+    "Désinstaller Ollama": (
+        "Desinstalar Ollama",
+        "Disinstalla Ollama",
+        "Ollama deinstallieren",
+        "Desinstalar o Ollama",
+    ),
+    "Met à jour Ollama vers la dernière version officielle": (
+        "Actualiza Ollama a la última versión oficial",
+        "Aggiorna Ollama all'ultima versione ufficiale",
+        "Aktualisiert Ollama auf die neueste offizielle Version",
+        "Atualiza o Ollama para a última versão oficial",
+    ),
+    "Supprime le service et les binaires, conserve /usr/share/ollama": (
+        "Elimina el servicio y los binarios, conserva /usr/share/ollama",
+        "Rimuove il servizio e i binari, conserva /usr/share/ollama",
+        "Entfernt Dienst und Programme, /usr/share/ollama bleibt erhalten",
+        "Remove o serviço e os binários, mantém /usr/share/ollama",
+    ),
+    "Supprimer Ollama tout en conservant les modèles dans /usr/share/ollama ?": (
+        "¿Eliminar Ollama conservando los modelos en /usr/share/ollama?",
+        "Rimuovere Ollama conservando i modelli in /usr/share/ollama?",
+        "Ollama entfernen und die Modelle in /usr/share/ollama behalten?",
+        "Remover o Ollama mantendo os modelos em /usr/share/ollama?",
+    ),
+    "Désinstaller complètement (+ supprimer tous les modèles)": (
+        "Desinstalar por completo (+ eliminar todos los modelos)",
+        "Disinstalla completamente (+ elimina tutti i modelli)",
+        "Vollständig deinstallieren (+ alle Modelle löschen)",
+        "Desinstalar completamente (+ remover todos os modelos)",
+    ),
+    "Supprimer définitivement Ollama ET tous les modèles téléchargés (/usr/share/ollama) ?": (
+        "¿Eliminar definitivamente Ollama Y todos los modelos descargados (/usr/share/ollama)?",
+        "Rimuovere definitivamente Ollama E tutti i modelli scaricati (/usr/share/ollama)?",
+        "Ollama UND alle heruntergeladenen Modelle (/usr/share/ollama) endgültig löschen?",
+        "Remover definitivamente o Ollama E todos os modelos baixados (/usr/share/ollama)?",
+    ),
+    "Désinstaller Open WebUI": (
+        "Desinstalar Open WebUI",
+        "Disinstalla Open WebUI",
+        "Open WebUI deinstallieren",
+        "Desinstalar o Open WebUI",
+    ),
+    "Podman + conteneur open-webui + icône locale dans le menu GNOME": (
+        "Podman + contenedor open-webui + icono local en el menú GNOME",
+        "Podman + contenitore open-webui + icona locale nel menu GNOME",
+        "Podman + open-webui-Container + lokales Symbol im GNOME-Menü",
+        "Podman + contêiner open-webui + ícone local no menu GNOME",
+    ),
+    "podman pull + recréation (données conservées) + icône GNOME": (
+        "podman pull + recreación (datos conservados) + icono GNOME",
+        "podman pull + ricreazione (dati conservati) + icona GNOME",
+        "podman pull + Neuanlage (Daten bleiben erhalten) + GNOME-Symbol",
+        "podman pull + recriação (dados mantidos) + ícone GNOME",
+    ),
+    "Ouvrir dans le navigateur (http://127.0.0.1:8080)": (
+        "Abrir en el navegador (http://127.0.0.1:8080)",
+        "Apri nel browser (http://127.0.0.1:8080)",
+        "Im Browser öffnen (http://127.0.0.1:8080)",
+        "Abrir no navegador (http://127.0.0.1:8080)",
+    ),
+    "Démarre open-webui si arrêté puis ouvre la page web": (
+        "Inicia open-webui si está detenido y abre la página web",
+        "Avvia open-webui se fermo, poi apre la pagina web",
+        "Startet open-webui bei Bedarf und öffnet die Webseite",
+        "Inicia o open-webui se estiver parado e abre a página web",
+    ),
+    "Installer / mettre à jour l'icône GNOME (menu Applications)": (
+        "Instalar / actualizar el icono GNOME (menú Aplicaciones)",
+        "Installa / aggiorna l'icona GNOME (menu Applicazioni)",
+        "GNOME-Symbol installieren / aktualisieren (Anwendungsmenü)",
+        "Instalar / atualizar o ícone GNOME (menu Aplicativos)",
+    ),
+    "Télécharge open-webui.png dans /usr/share/pixmaps/ et crée open-webui.desktop": (
+        "Descarga open-webui.png en /usr/share/pixmaps/ y crea open-webui.desktop",
+        "Scarica open-webui.png in /usr/share/pixmaps/ e crea open-webui.desktop",
+        "Lädt open-webui.png nach /usr/share/pixmaps/ und erstellt open-webui.desktop",
+        "Baixa open-webui.png em /usr/share/pixmaps/ e cria open-webui.desktop",
+    ),
+    "Supprime conteneur + lanceur/icône GNOME (conserve les conversations)": (
+        "Elimina el contenedor + lanzador/icono GNOME (conserva las conversaciones)",
+        "Rimuove contenitore + lanciatore/icona GNOME (conserva le conversazioni)",
+        "Entfernt Container + GNOME-Starter/Symbol (Unterhaltungen bleiben erhalten)",
+        "Remove o contêiner + atalho/ícone GNOME (mantém as conversas)",
+    ),
+    "Supprimer le conteneur open-webui et son icône du menu GNOME en conservant vos données ?": (
+        "¿Eliminar el contenedor open-webui y su icono del menú GNOME conservando tus datos?",
+        "Rimuovere il contenitore open-webui e la sua icona dal menu GNOME conservando i dati?",
+        "open-webui-Container und sein Menüsymbol entfernen und die Daten behalten?",
+        "Remover o contêiner open-webui e seu ícone do menu GNOME mantendo os seus dados?",
+    ),
+    "Désinstaller complètement (conteneur + volume + image + icône)": (
+        "Desinstalar por completo (contenedor + volumen + imagen + icono)",
+        "Disinstalla completamente (contenitore + volume + immagine + icona)",
+        "Vollständig deinstallieren (Container + Volume + Image + Symbol)",
+        "Desinstalar completamente (contêiner + volume + imagem + ícone)",
+    ),
+    "Supprime aussi le volume open-webui et l'image": (
+        "Elimina también el volumen open-webui y la imagen",
+        "Rimuove anche il volume open-webui e l'immagine",
+        "Entfernt auch das open-webui-Volume und das Image",
+        "Remove também o volume open-webui e a imagem",
+    ),
+    "Supprimer le conteneur, l'icône, l'image ET toutes les conversations (volume open-webui) ?": (
+        "¿Eliminar el contenedor, el icono, la imagen Y todas las conversaciones (volumen open-webui)?",
+        "Rimuovere contenitore, icona, immagine E tutte le conversazioni (volume open-webui)?",
+        "Container, Symbol, Image UND alle Unterhaltungen (open-webui-Volume) löschen?",
+        "Remover o contêiner, o ícone, a imagem E todas as conversas (volume open-webui)?",
+    ),
+    "Désinstaller VSCodium": (
+        "Desinstalar VSCodium",
+        "Disinstalla VSCodium",
+        "VSCodium deinstallieren",
+        "Desinstalar o VSCodium",
+    ),
+    "Clé GPG + vscodium.repo + dnf install codium": (
+        "Clave GPG + vscodium.repo + dnf install codium",
+        "Chiave GPG + vscodium.repo + dnf install codium",
+        "GPG-Schlüssel + vscodium.repo + dnf install codium",
+        "Chave GPG + vscodium.repo + dnf install codium",
+    ),
+    "Ouvre codium sous votre session utilisateur": (
+        "Abre codium en tu sesión de usuario",
+        "Apre codium nella tua sessione utente",
+        "Öffnet codium in deiner Benutzersitzung",
+        "Abre o codium na sua sessão de usuário",
+    ),
+    "dnf remove -y codium + retrait dépôt": (
+        "dnf remove -y codium + eliminación del repositorio",
+        "dnf remove -y codium + rimozione del repository",
+        "dnf remove -y codium + Entfernen des Repositorys",
+        "dnf remove -y codium + remoção do repositório",
+    ),
+    "Supprimer VSCodium (codium) et son dépôt ?": (
+        "¿Eliminar VSCodium (codium) y su repositorio?",
+        "Rimuovere VSCodium (codium) e il suo repository?",
+        "VSCodium (codium) und sein Repository entfernen?",
+        "Remover o VSCodium (codium) e o seu repositório?",
+    ),
+    "Ollama n'est pas installé (sera installé au premier pull).": (
+        "Ollama no está instalado (se instalará en el primer pull).",
+        "Ollama non è installato (verrà installato al primo pull).",
+        "Ollama ist nicht installiert (wird beim ersten Pull installiert).",
+        "O Ollama não está instalado (será instalado no primeiro pull).",
+    ),
+    "Aucun modèle installé pour le moment.": (
+        "Todavía no hay ningún modelo instalado.",
+        "Nessun modello installato per ora.",
+        "Noch kein Modell installiert.",
+        "Nenhum modelo instalado por enquanto.",
+    ),
+    "ollama stop sur tous les modèles actifs": (
+        "ollama stop en todos los modelos activos",
+        "ollama stop su tutti i modelli attivi",
+        "ollama stop für alle aktiven Modelle",
+        "ollama stop em todos os modelos ativos",
+    ),
+    "Cliquez sur un modèle pour le télécharger, mettre à jour, stopper ou supprimer": (
+        "Haz clic en un modelo para descargarlo, actualizarlo, detenerlo o eliminarlo",
+        "Fai clic su un modello per scaricarlo, aggiornarlo, fermarlo o rimuoverlo",
+        "Klicke auf ein Modell, um es zu laden, zu aktualisieren, zu stoppen oder zu löschen",
+        "Clique num modelo para baixar, atualizar, parar ou remover",
+    ),
+    "Décharger de la RAM (ollama stop)": (
+        "Descargar de la RAM (ollama stop)",
+        "Scarica dalla RAM (ollama stop)",
+        "Aus dem Arbeitsspeicher entladen (ollama stop)",
+        "Descarregar da memória RAM (ollama stop)",
+    ),
+    "Afficher les détails du modèle (ollama show)": (
+        "Mostrar los detalles del modelo (ollama show)",
+        "Mostra i dettagli del modello (ollama show)",
+        "Modelldetails anzeigen (ollama show)",
+        "Mostrar os detalhes do modelo (ollama show)",
+    ),
+    "Architecture, quantification, paramètres et licence": (
+        "Arquitectura, cuantización, parámetros y licencia",
+        "Architettura, quantizzazione, parametri e licenza",
+        "Architektur, Quantisierung, Parameter und Lizenz",
+        "Arquitetura, quantização, parâmetros e licença",
+    ),
+    "Supprimer le modèle (stop auto + ollama rm)": (
+        "Eliminar el modelo (stop automático + ollama rm)",
+        "Rimuovi il modello (stop automatico + ollama rm)",
+        "Modell löschen (automatischer Stop + ollama rm)",
+        "Remover o modelo (paragem automática + ollama rm)",
+    ),
+    "Gestionnaire système, matériel et logiciels pour Fedora sur PS5.": (
+        "Gestor de sistema, hardware y software para Fedora en PS5.",
+        "Gestore di sistema, hardware e software per Fedora su PS5.",
+        "System-, Hardware- und Softwareverwaltung für Fedora auf der PS5.",
+        "Gerenciador de sistema, hardware e software para Fedora no PS5.",
+    ),
+    "Mise à jour terminée — redémarrage automatique…": (
+        "Actualización terminada — reiniciando automáticamente…",
+        "Aggiornamento completato — riavvio automatico…",
+        "Aktualisierung abgeschlossen — automatischer Neustart…",
+        "Atualização concluída — reiniciando automaticamente…",
+    ),
+    "Démarrer / arrêter le serveur IA (port 11434)": (
+        "Iniciar / detener el servidor de IA (puerto 11434)",
+        "Avvia / arresta il server IA (porta 11434)",
+        "KI-Server starten / stoppen (Port 11434)",
+        "Iniciar / parar o servidor de IA (porta 11434)",
+    ),
+    "Démarrage automatique Ollama au boot": (
+        "Inicio automático de Ollama al arrancar",
+        "Avvio automatico di Ollama all'avvio",
+        "Ollama automatisch beim Start laden",
+        "Início automático do Ollama na inicialização",
+    ),
+    "Tout démarrer (Ollama + Open WebUI)": (
+        "Iniciar todo (Ollama + Open WebUI)",
+        "Avvia tutto (Ollama + Open WebUI)",
+        "Alles starten (Ollama + Open WebUI)",
+        "Iniciar tudo (Ollama + Open WebUI)",
+    ),
+    "Tout arrêter (libérer la RAM)": (
+        "Detener todo (liberar la RAM)",
+        "Arresta tutto (libera la RAM)",
+        "Alles stoppen (Arbeitsspeicher freigeben)",
+        "Parar tudo (liberar a RAM)",
+    ),
+    "Ouvrir Open WebUI dans le navigateur": (
+        "Abrir Open WebUI en el navegador",
+        "Apri Open WebUI nel browser",
+        "Open WebUI im Browser öffnen",
+        "Abrir o Open WebUI no navegador",
+    ),
+    "État des conteneurs Podman (podman ps -a)": (
+        "Estado de los contenedores Podman (podman ps -a)",
+        "Stato dei contenitori Podman (podman ps -a)",
+        "Status der Podman-Container (podman ps -a)",
+        "Estado dos contêineres Podman (podman ps -a)",
+    ),
+    "Logs Open WebUI (podman logs --tail 30)": (
+        "Registros de Open WebUI (podman logs --tail 30)",
+        "Log di Open WebUI (podman logs --tail 30)",
+        "Open-WebUI-Protokolle (podman logs --tail 30)",
+        "Registros do Open WebUI (podman logs --tail 30)",
+    ),
+    "Gérer les modèles IA (catalogue & installés)": (
+        "Gestionar los modelos de IA (catálogo e instalados)",
+        "Gestisci i modelli IA (catalogo e installati)",
+        "KI-Modelle verwalten (Katalog & installiert)",
+        "Gerenciar os modelos de IA (catálogo e instalados)",
+    ),
+    "Voir les modèles installés (ollama list)": (
+        "Ver los modelos instalados (ollama list)",
+        "Vedi i modelli installati (ollama list)",
+        "Installierte Modelle anzeigen (ollama list)",
+        "Ver os modelos instalados (ollama list)",
+    ),
+    "Modèles actifs en RAM (ollama ps)": (
+        "Modelos activos en RAM (ollama ps)",
+        "Modelli attivi in RAM (ollama ps)",
+        "Aktive Modelle im Speicher (ollama ps)",
+        "Modelos ativos na RAM (ollama ps)",
+    ),
+    "Diagnostic RAM / GPU / Disque pour l'IA": (
+        "Diagnóstico de RAM / GPU / disco para la IA",
+        "Diagnostica RAM / GPU / disco per l'IA",
+        "RAM-/GPU-/Festplatten-Diagnose für KI",
+        "Diagnóstico de RAM / GPU / disco para a IA",
+    ),
+    "Nettoyer les anciennes images Podman": (
+        "Limpiar las imágenes Podman antiguas",
+        "Pulisci le vecchie immagini Podman",
+        "Alte Podman-Images bereinigen",
+        "Limpar as imagens Podman antigas",
+    ),
+    "Modèles installés sur le système": (
+        "Modelos instalados en el sistema",
+        "Modelli installati sul sistema",
+        "Auf dem System installierte Modelle",
+        "Modelos instalados no sistema",
+    ),
+    "Décharger tous les modèles de la RAM": (
+        "Descargar todos los modelos de la RAM",
+        "Scarica tutti i modelli dalla RAM",
+        "Alle Modelle aus dem Arbeitsspeicher entladen",
+        "Descarregar todos os modelos da RAM",
+    ),
+    "Catalogue des modèles recommandés": (
+        "Catálogo de modelos recomendados",
+        "Catalogo dei modelli consigliati",
+        "Katalog empfohlener Modelle",
+        "Catálogo de modelos recomendados",
+    ),
+    "Télécharger un autre modèle (nom personnalisé)": (
+        "Descargar otro modelo (nombre personalizado)",
+        "Scarica un altro modello (nome personalizzato)",
+        "Ein weiteres Modell laden (eigener Name)",
+        "Baixar outro modelo (nome personalizado)",
+    ),
+}
+
+
+# LSTRINGS[langue][texte français] : traductions des textes hors STRINGS
+# (page IA & Développeur, à propos). L'anglais sert de repli via _L().
+LSTRINGS: dict[str, dict[str, str]] = {
+    "es": {key: values[0] for key, values in _L_TABLE.items()},
+    "it": {key: values[1] for key, values in _L_TABLE.items()},
+    "de": {key: values[2] for key, values in _L_TABLE.items()},
+    "pt": {key: values[3] for key, values in _L_TABLE.items()},
+}
 
 
 def _L(fr: str, en: str) -> str:
@@ -5145,6 +5681,231 @@ def _L(fr: str, en: str) -> str:
     if UI_LANG == "fr":
         return fr
     return LSTRINGS.get(UI_LANG, {}).get(fr) or en
+
+
+# ------------------------------------------------------------------------------
+# Fenêtre « Système » : logos Fedora / bureau / Gamescope + informations
+# ------------------------------------------------------------------------------
+# Icônes PNG 96 px embarquées en base64 (sources : dossier icons/ du dépôt) :
+# l'application reste un fichier unique installé par curl, sans accès réseau.
+ICONS_B64: dict[str, str] = {
+    "fedora":
+        "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",
+    "gamescope":
+        "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",
+    "budgie":
+        "iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAXT0lEQVR42u1deXBcxZn/dfc75tLM6LQt2ZblQ7KxwSfGBrIsBFzJ5txAOEJgk9QmYQkkBJKwOQksyZINWVgSUhyVEHJscblCEhYCxiQYjG1sjDHCBz50Hx5Jo9Fozvf62D/ejCwfkmakkS3b+qpeSSXNvPf6+/V3dn9fA5M0SZM0SZM0SZM0SWcikYnwCoQASgGAGvgrpRRuj89V5C+ucru91UX+4ksN05zFdL3a0I05jOlTBt9FChGzeHqvbfGD3Eo3R6PhF1PJeGO0r7clmYilpBRHPpWQY555RgFAiPNopQ4zwO3x6cHistnBkrJLiwKll7tM97m6rvscZikolf28OuJ7h+9JQYgDqIMqYNvpWDqdfKu/r/eZSG/3+ki4a38iEbOHe4/TGoCjB2yablY2pXJB+ZSqL/j9JV80TJcPUJBCQkoJJQVXgCQABQEIoRQAHeL2UikpoYDsdwhlGqUUlDEAgG2lEtFI7yOhQ62/6g61706nk+JkAkFOvKpxBugPlHgrp9dcUV5eeYfp8dYoJSE4h5TSIoRIQGkjMDtXckAB4UopSik1GNNAKEU6lWjqCrXd1d7S8FS0Lxw7GaqJnKhZn2V8IFjqn1lTd2NZ+bQfMU2jgnMIIayM3tcKwPARAZFSckKIpJS6mKZBcIHuUPt3mhvff7Av0h09+p1PWQAGD8Lj8Rk1cxd+qWLajJ8zysC5DaVUihBinACmDwsGpdTQNB1SChzqaP5qw4HdDyfi/daJAIKMN/MJIZg5q3bVzJr5z5imq4pze2DQE8kdlFJalBJN0wxq26lDTQf3Xt7UsHdjdgzjBQIZT+b7igLuurOWP1BcWvGvgtsQQlgTjfHHA4IxZmiajt6e0K/37Hrrplh/X3K8QBg3CZhWNat23vylG3VdL+PcPtmqZhSGW1maprs4t8Lv79lxQUdr457xeBArtHsJALULllw1r27xq4DycM4tSqk5MYK+fIZDNCG4RRnzTZ028yZNM/b2dHfWHz3WCQFAVjwZ08iixat+MH3mnActK20Rh7RTNk1ACAMgOed2adnUq3y+ALq7OjZIKQsGAisU83XDpOcsu+Dh8ilVt9lWMkEpc51is344aWBCWAl/sPSyYHHZjO6u9ueE4KoQILBCMX/J8gufLC6tuM5OpxKEMs9plzQjVBfcSnh9gZUlpeVnhw61PVMIEMYsAUzTyJLlFz4eLC6/xrbSKUKZG6cpOSDwlMdbdHawuHTOoc6WZ6WUJwcAJ+lFsGjx6h+XVkz7im2lEqcz8weNWxPcTniLgsu9niIjdKh1/VikgI1F9dQuWPrZqhmz/zvDfA/OEMqqo0Cw9BKm6Qd6ujp2jhYEMlrmT6uaVbdw8Xl7bCudIISeMcwfTErJhG6Ynvfe2VLX0db4/miCNToa5nt9flftWUs2c9uyCKEunKFECHVx27JqFyzb5PX5Xdm0xbgBkHko5i9c9oimGUEp1ajucRoRlVJB07WS+QuXPTIaNcTynf0zZ9Wunl497wFuW6lMhHtGEyGESSFS3qLgcm5bL/ZFelrzAYLkw3yX26utPP+yDkJpkDgzn04wZgxczrLlkStcA8uVyC5xqkIl2KQCpJIy8uYb66alknGeqz1guQ4sk+O5OVhc/ikphEUI0SeMHqDOWjDnHMlkColkElbaAhcCQkgIIcA5h2XZSCZTSKZS4JyDEEDTGCgde0JASckNwyzSNC3cFWrfkqsUkFxnf1Gg2Hvuqg9GBeecnJiVq5wYr5RCPJ5wPLNpU1A7dzbq6uaiqnIqgkE/PB4PGGOwbRuxWBzRaD9aWtqx/2ADDjY0oaMjBJvbcLvcME3DWYcepVQoKS2madrWzev9/X298VykIOdEWXXNgm9QyqggQk4E5jPGkEgkAShccP65+MiHL8XypYsRDPpzvkcsFsfuPfvw6mub8PrGLWht64Db7YJpmhBCjEYHSkoZra5Z8I36HW/cOWYJOLywEvSsWPXBPkDRicL8SF8UZ82fhxtv+BxWrVx+WBkPmsFHqwFnrf3w/yg9PJS+viheePEVPPn0n9Da1g6/3z9aGyEBIrdtWR+IRSOJkaSA5aL7Z89deH2wpPyTQvD0yUwvZw1sX18Ul3/qo/jxXd/GrOoZRzCdUjpwDTbKhBDQDNOz/8syWEoFt9uFRQvn40NrLkYqlcbOd3eBUgbGWF4gKKXSuq4bABq7uzq2j2QLRrQ+hmHSeWcteRaEFBHn8+RkMV8phUQyiVtu+iJu/PLnoGkahJBgjA7yfvIHlFKSAULC43HjgvNXYubM6di4aSs459A0LWcQCCFUKaVcbs+Kzo6m+wXnalSBWHYw5VOmn+1yeWcoKa2TpX6yfE0kk/jOt76Ka6+5HELIzCIQLRjA2dkuhMCaSy/Cz+65A7quw7Z5PuBSKaXlcnuryiumLzqeKswJgCzg5VOqblBKSqXUSdP9lFJEo/247Ws34BMf+xA4FwOzfjwkjTEGzjmWLT0bd//wdggp8lVDVCkpK6ZO//JgXuatgtxurz6n9uwnlVJ6ZnnuhJOmMfRGovj89Vfj8/9yNTgX0LSxv4qUEtKJ1I5rsCml4JyjeuZ0MEbx+sYt8HjcOQFBCGFKSmKaroWhjpafcm7JUeWCiksr5hqG6ZKO+jk53k4kig9efCFu+rfPD+j7sWcxFSilYEcZ5OM9X0qJa6+5HGctqEUimQSlJFeALcNweYKlFXNHnYwLFpetUVBw9mqeaOZTJBJJzK6pxve+fUuGaWTMaiebsXxr+07ceffP8KN77kdDY8txQRhYctU0fPYzV8C2OEiOPgghRCooFJeUXzoqAChl8PtLrpBCAlBarvqzUHqYcwFd1/EfP7wd/qIijCbVezy1QwjBm9vexs1f/y6eeOpZeDxu1MyagWh//3Hvn422/+EDq1AzawZS6XSO76E0KST8RSVXDpfqGBIAj9fnNt3uZVIKEEJzAoBzXjCjG4vFcdstN6B23mwIIY4ImsZKT6/9C6QUKC8vRW+kD8//dT2eeOrZAZCOngxSSrhME6tXLUcqlc7pXQihmpQCptu1zOP1ufMGwOcPztA0w6Ok5LmKdkVFWQGMrobe3giuvuqT+PhH10AIAcYKa/8ppRBSwu12Y8Nrm3HLbd9Hb290YBxDJQxWrlgGpmnI1SFSUnJNMzw+f3B6/hLg8dVkikxkrirjYx9Zg6Ii3+jyKAA0xtDXF8WK5UvwtZu+CCllQWd+lj59+cegMQ3hcC/i8QRmzKjCP3/iw0Oq0azhnT27Gn6PAcFtEMoOByhDAQBIEMDj9tXk7YZW19R9xe3xrVZSKkIIHQkAy7bxzVtvRDKZxNa33oHP50U+WzYYY0gmk5g2bQruu/dOFPl8A95KoaPpqsqpWL70HEgpsWDBPHzz1htRVztnmOc56wimaWDd5n2I9HSC8jiUECBMGz4goJRywQ8d6mhel1c2VDOMGUqNnHgghEAIAZ/XiyKfF5+77iqsW78B0Wg/XC5XTtLAGEU6nYbb7cY9d38X5WWl4zb7syAsXbIIS5csOsY7GioSVwowdB1z1tyIcGUj9P79SLfXww7tGTbVqRRgGMasvFWQrpnVzkuNzAUhJIqLAzAMA8XFQdx1x7dAKUMymYKmacN6DZrGkEpZ0HUdP73nB6irnXOM0ZUKEDK77OT8rsYIgpQys1gjkctez+zzvCZAy2rhql4N6i4GlBzOEFOlFDTNyN8G6IY+Rzk3HxEApSQMXYfL5YKUEiuWLcb9996JsrIShMO94Jw7gQ9jR1yEEEQiUXi9btz307uwdPGiY4yuUgAlAKPOz+zvJAPMWAwxY86Vm6Q5D3Mjhfi7f0Tvc99Cat96YHjtTJ04whwyGNOGfkGtJNcFBQWAZCJKSp3ZtWzpOXjs0fvx+O+fwiuvvI5QV/cx6sjr9eAfLzofN93wBVRXT89EuuwY8d93yMIb+xPo7OMwNIKFVSb+odYLl04gMwCNNykpAcZQ2v8W+t98DCVlZSCmb1gJyALHNFaWNwCjk+3Ds0tKiZLiIL5+85fwheuvxq7d72P3nn3oj8VACcX0GZU4Z+ECzJkza8D/zqYZskWKtlB4dEMv/lofg8WVw2gFvPBuDGu3RXHLmlIsmGZCqREdkoKR29BAdBdANECOPe4ZMwBZO+3U9DqzRA2KIKVSCAT8WL1qBVavWnHc+CEL2uGI1VEzD7zcg+d3xlDqY3DrmfLRTMFwW6+NO57twr1XTsHMUv2ESUIqbWUSeIUpVyqIm0EIhW3ZsCz7iFw2IQQsA4SQzu6EwVfW+A02gDzD/PW74njpvTjKi9iRRlgCXCp4XRTRlMCvXusdLHzjTl1dPSAFRJoOnTfhkfxSxhH09UWHzrEfxwgPnvUKDpM1CuwPWXjo1TB8JoUYQsVyAfhMindb02gJ2yBkbEY51zxXT094YN9RzjkoIWJ5A2DZ1oFM/CVzSe3G40l0hrqGCeeH+r7DeAJn5u9sTeOOZ0OwbAVGRx6mJRTCcTHuMz8LQHdPGBpjuaYjJCEUtm3tzhsAYdtNTtAycjhLKYVlWWhtbc8JgAFfPmM8GQXiaYk/bO7DD/4YQiwtYWgkpxnNKFBkju9iXTZIC4cjaGxqhWEYOU0ypaQkhMDm6aa8jbBtpZsGJG1Elee84Lv1u/HRf7psxC9QcvgjHX0cG/cl8FJ9DE1hGz7TcWdHYj4lQNJWmD/VxKxyYyBeGA+SUoExggMHGxGJ9MHjceeWZslMMMuyGvMGIBqNrCurqPx6puvIiC9oGAbq39sL27ah60PvWkxaEm83p/BeWxp7OtJoDtuIpSVcOkXQwyCkGlG8CckMjCt8+lw/aEb/j58hdl5oy9a3YdkWvMST67ckCEF/X+9LeaugRKL/gFIZry8HEXW5DDQ0NmPP3gMDWzyOn/Ek8LkoDM0J2nRGwChB0pKIpSS4cJibjXiPvigBhFTojglcscKP82a7x90FZYzB5hybtmyDy3RBqdySjASgUEAyETuYtwTEopEWzq0EoblVvzjGxsbzf30ZZy+aP6SO1BnBOdNdOGe6U9fRGxfYF7LwbmsK73daaIvY6E9KpHlmd/PgaJsAGiUo9lBcc14AV54bGPcgTAgnKbhjRz0OHGiE1+vJOctLGNVsKx3rj/a25Q1AIh5LppPJ7R6f/0IhbD7SqpgQAl6vB+vWb8D1134aU6dWQCoFehzuSHU4x1PsZVhZ48bKGmfRKJIQ6OoXaAnbiKcdILhUMDUCUyOYGtAxt8KA300H1NH4ej/O9eyfX0A+BdpKSc6oriWs+NZkIpbKGwApBaLR8DO+QPBCIQjPJWrWNA2Rvj789vdP4fZv3gwpJMDIsEY4O8uVclRM0MMQ9DDMm2KM6EmNd+SbTYnv39+A1zZugdfrzWOxiXDGmNYfCT89nMQMq98jvd0vEaeYgeYmrgL+oiL8+fl1qN+1B4zREcV1sL7PApJ1U493DZaecU/AZX4+9rsnkUqlwVjuD83yLNLbtX7UqYhwT2i/ZaUS+bSYyeba773voYHURD6B2XAGOGuET0TiTQgJRine3Po21v/ttcxSa+4rfJRSI51OxXrDXQdHCQBBKhm3o329v2GaJnPdnCWlhNfjQX39bvzy4d84C+DihG8rKkDgBaRSadz380fA8lyZk06hhoxGeh5LJeN8OAeZDjcTASDU2fowIZTmszlLCIFAwI8/PLEW//fCy9A0VrAtKyeCREb3P/jQY9i37yDcbjfybUlACKFdobZHR3IU6HCzAAC6DrXWp1LxFuKoIZnPLPJ5vfjP/3oAmzZvg6Zp4FxM+JkvhIDGGJ5e+xc8+cyfEQj4893lIRljWiqVaAkdantvJBU8YoGGEFy53UXR4pLyT+RboJF12db/7XXMr5uLmTOrCr7JqpDpBkKcvNb/PvlH3Pc/D8PndY8GxLSm63p7W9OtXZ0tYyvQyH45nUrunVpZfTsh0JBnxM8Yg5AS615+FZWVUzBv7uyByhRCJkY7IWcd2slB/fyXv8ZDj/4WRT4vsuWs+aoeKZXYu+uta610io+5QoYQAiudsn3+APUHSi4WQqTykQKlFLTMOu+69RsgOMfy5YszxlmMqrKlkH6+U+TBcCjUhe//8Cf403MvIhjw5+29ZT6f0nVDDx1qu6u1ad/LuVRJslzVSDIZ31ZZNevfMxu1SD6SkF0zMA0DmzZvw7v1u7Ggbh5KSoozak5mIk5ywtSNk+F0Zv1LL/8d37vjJ9i9Zx+CAT9G2wNIKSVBCNlT/+bH0+mUlct4ci7UTqeSttvj7QsWl39ECDGqYj2lFDweNxqbWvDiS3+DZXPU1c6BaRoDG7ycXWiFB2JwZbxTqEfw/v6D+Mm9v8CvH38C3Obwej2j3lbp1AOYRmdr062tLQc25Fopf1JaFTBKwYVALBbH7JpqXHnFx/GhNRfD5/MOMGvwevFoAcluCsg+M0v7DzTg6bV/wYvr/o5EMjmwDXIMbQtG3aog55EdbtZRt7r2rKVv2FY6RQgZdauabJ1uKpVCOm2heuZ0XHbpRbj0kg9gzuxZxzIyqxbI0CUS2abbR9cAO+n1JLa/vRPPvfAytry5HbFYHD6fF4yNPVBUSqUMw3Tt3fX2+c2Nezfl0zeI5Ms0AFi28qLfBksqrrMta8ydcLPMSqfTSCZT8Pl8WHhWLc5buQxLFy/C7JpqeL2j6wcVCnVjz9792LzlLWzdvgPNzW1QUPBm2heMVt0crXp0wzAi4dDvtr/56vV5p17yZVa2YdOK1Zd0EBCPs0Np7NtbskAIIZBMOs00TNPE1KkVmF41DfPm1mDqlAqUl5UiECiC2+2CruuQUiGdTiORSKIn3Ivu7jAam5rR2NSK1rYOhHsjAwUWpmkMeD+FsucAuFIytm3TK5XxeDSdb9esCdmyLFs4J6WEbduwbBsis1SWrXY3DH2grte2OTjnA/uPKCHQNA2GoQ9sDh5LE44R3E5X/Tub6zrbm0bVsmzUTfv6o5EeTTMOlJZNvUoIK0EI1Qs4sIGBMMZgGgbcbhdcLhOGYcAw9AF1SDLMNk0Dppn9nAFd149oR1B4r0omDMPlbmrYe3Vzw94No23uPaa2leHuzp1eX8D0B0suEdwuKAhDuZBDMTSXzxTsfaRI6Kbb09nR/MM99VsfHEtn9TEXX3V3d7xSXFw+x+sLLBecp07lXtG5MV+mdMPlDveEHqvfsenWXBfoxwWArG7tCrX/KVhSttDr9Z8znpJw8pkvErrhckci3c/s3P769ZzbJ791cTZj2hVqXxsIllR5iwLnCXH6gaCUSOimy9Mb7np85/aN19m2JQtxqEPB2tcLwVWos/U5r8cvA8HSNZzbVr45owlKUimVNgyXu6uz7e6dOzbewm1n5hfCzhT0AAcpJQ51tryqafrektIpVymlSOZYKnZKcl5Ki1KqabqhNTfs/cyud7c+oDIpkkIZ+XE8wqSmbt78Ja+fHkeYvHNBR2vDxD7C5Ng4obenp6vjF16fv8JXFDxPKXlKSMPgWd/bc+jR+h2b1oS7OzvHK1V+oo6xWl1ds2CtYZrTJvYxVlTTNJ2m06m25oY9VzQ3vr/5lDzG6mgQgOMf5JYdNCbIQW5CCoTam29qOLDr0UQidmof5DYUEBPlKMNMmsNwjjLksss5yvCX0UhP/4lg/AkFIPuoow7z9FVOr7m8vKLyDtM9/od5KgVJCJGEEBfTNBBCkU7GG7pC7Xe2tzY8E+0Lxw8zHjitDvM8WhqyuRsgc5xtReWC8qnZ42xNH4ACHmdLNUoZKKMAyJl8nO3wQABDH+ic7ZaR7YauoI7bivDYA50VOLcTqVRqa39feG2kt2t9JNy174w+0Hlo1XSk2A8+0tzl9lYHAiVrdN2cpRlata655h5d/i8lj1i2dYBb/KBtpZv7o+GXksl4YzTa25KMx5IT9UjzSZqkSZqkSZqkSZqkM5P+H8F1lXVTZpRjAAAAAElFTkSuQmCC",
+    "cinnamon":
+        "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",
+    "kde":
+        "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",
+    "gnome":
+        "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",
+}
+
+SYSTEM_ICONS = {
+    "gnome": "gnome",
+    "kde": "kde",
+    "cinnamon": "cinnamon",
+    "budgie": "budgie",
+}
+
+
+def icon_texture(name: str) -> Any:
+    """Texture GDK d'une icône embarquée (None si les données sont refusées)."""
+    payload = ICONS_B64.get(name)
+    if not payload:
+        return None
+    try:
+        return Gdk.Texture.new_from_bytes(GLib.Bytes.new(base64.b64decode(payload)))
+    except (GLib.Error, ValueError, TypeError):
+        return None
+
+
+def _icon_image(name: str, size: int) -> Optional[Gtk.Image]:
+    """Image d'une icône embarquée, dimensionnée à `size` pixels."""
+    texture = icon_texture(name)
+    if texture is None:
+        return None
+    image = Gtk.Image.new_from_paintable(texture)
+    image.set_pixel_size(size)
+    return image
+
+
+class SystemInfoWindow(Adw.Window):
+    """Fenêtre « Système » : identité de la console, de la session et de l'application."""
+
+    def __init__(self, parent: "Ps5ManagerWindow", accent: str) -> None:
+        super().__init__(transient_for=parent, modal=True, title=T("system_info"))
+        self._parent = parent
+        self._copy_lines: list[str] = []
+        self.set_default_size(560, 680)
+
+        os_name, kernel = get_os_summary()
+        desktop_icon = SYSTEM_ICONS.get(DESKTOP_ID)
+
+        header = Adw.HeaderBar()
+        header.set_title_widget(
+            Adw.WindowTitle(title=T("system_info"), subtitle=APP_NAME)
+        )
+        copy_btn = Gtk.Button(icon_name="edit-copy-symbolic")
+        copy_btn.set_tooltip_text(T("sys_copy"))
+        copy_btn.add_css_class("flat")
+        copy_btn.connect("clicked", self._on_copy)
+        header.pack_start(copy_btn)
+
+        content = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=22)
+        content.set_margin_top(18)
+        content.set_margin_bottom(24)
+        content.set_margin_start(18)
+        content.set_margin_end(18)
+        content.append(self._hero(os_name, kernel, desktop_icon))
+
+        grp_system = pref_group(title=T("system_info"))
+        self._add_row(grp_system, T("sys_os"), os_name, "computer-symbolic")
+        self._add_row(
+            grp_system, T("sys_kernel"), kernel, "application-x-executable-symbolic"
+        )
+        self._add_row(
+            grp_system, T("sys_arch"), os.uname().machine,
+            "application-x-firmware-symbolic",
+        )
+        self._add_row(
+            grp_system, T("sys_dnf"), "DNF5" if IS_DNF5 else "DNF 4",
+            "package-x-generic-symbolic",
+        )
+        content.append(grp_system)
+
+        grp_session = pref_group(title=T("sys_group_session"))
+        desktop_row = self._add_row(grp_session, T("sys_desktop"), DESKTOP_LABEL)
+        desktop_image = _icon_image(desktop_icon, 22) if desktop_icon else None
+        if desktop_image is not None:
+            desktop_row.add_prefix(desktop_image)
+        else:
+            desktop_row.add_prefix(
+                Gtk.Image.new_from_icon_name("video-display-symbolic")
+            )
+        self._add_row(
+            grp_session, T("sys_dm"), DISPLAY_MANAGER_LABEL,
+            "preferences-system-symbolic",
+        )
+        self._add_row(grp_session, T("sys_session"), DESKTOP_SESSION, "system-run-symbolic")
+        self._add_row(
+            grp_session, T("sys_user"), f"{REAL_USER} (uid {REAL_UID})",
+            "system-users-symbolic",
+        )
+        self._add_row(
+            grp_session, T("sys_accent"), accent, "applications-graphics-symbolic"
+        )
+        content.append(grp_session)
+
+        grp_soft = pref_group(title=T("sys_group_software"))
+        gamescope_row = self._add_row(
+            grp_soft,
+            T("sys_gamescope"),
+            T("sys_installed") if shutil.which("gamescope") else T("not_installed"),
+        )
+        gamescope_image = _icon_image("gamescope", 22)
+        if gamescope_image is not None:
+            gamescope_row.add_prefix(gamescope_image)
+        else:
+            gamescope_row.add_prefix(
+                Gtk.Image.new_from_icon_name("applications-games-symbolic")
+            )
+        self._add_row(
+            grp_soft,
+            T("sys_steam"),
+            T("sys_installed") if shutil.which("steam") else T("not_installed"),
+            "applications-games-symbolic",
+        )
+        content.append(grp_soft)
+
+        grp_app = pref_group(title=T("sys_group_app"))
+        self._add_row(grp_app, T("sys_version"), APP_VERSION, "info-symbolic")
+        self._add_row(
+            grp_app, T("sys_file"), os.path.abspath(sys.argv[0]),
+            "text-x-generic-symbolic",
+        )
+        log_row = self._add_row(
+            grp_app, T("sys_log"), str(parent.logger.path),
+            "utilities-terminal-symbolic",
+        )
+        open_btn = Gtk.Button(icon_name="document-open-symbolic")
+        open_btn.set_tooltip_text(T("sys_open"))
+        open_btn.set_valign(Gtk.Align.CENTER)
+        open_btn.add_css_class("flat")
+        open_btn.connect("clicked", self._on_open_log)
+        log_row.add_suffix(open_btn)
+        content.append(grp_app)
+
+        scroll = Gtk.ScrolledWindow(hexpand=True, vexpand=True)
+        scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        scroll.set_child(
+            Adw.Clamp(maximum_size=560, tightening_threshold=420, child=content)
+        )
+
+        toolbar = Adw.ToolbarView()
+        toolbar.add_top_bar(header)
+        toolbar.set_content(scroll)
+        self.set_content(toolbar)
+
+    # ---- Construction ----
+    def _hero(
+        self, os_name: str, kernel: str, desktop_icon: Optional[str]
+    ) -> Gtk.Widget:
+        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=18)
+
+        logo = _icon_image("fedora", 72)
+        if logo is None:
+            logo = Gtk.Image.new_from_icon_name("computer-symbolic")
+            logo.set_pixel_size(48)
+        logo.set_valign(Gtk.Align.CENTER)
+        box.append(logo)
+
+        titles = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3)
+        titles.set_valign(Gtk.Align.CENTER)
+        titles.set_hexpand(True)
+        name = Gtk.Label(label=APP_NAME, xalign=0.0)
+        name.add_css_class("title-2")
+        subtitle = Gtk.Label(label=f"{os_name} · Linux {kernel}", xalign=0.0)
+        subtitle.add_css_class("dim-label")
+        subtitle.set_wrap(True)
+        titles.append(name)
+        titles.append(subtitle)
+        box.append(titles)
+
+        if desktop_icon:
+            badge = _icon_image(desktop_icon, 56)
+            if badge is not None:
+                badge.set_valign(Gtk.Align.CENTER)
+                badge.set_tooltip_text(DESKTOP_LABEL)
+                box.append(badge)
+        return box
+
+    def _add_row(
+        self,
+        group: Adw.PreferencesGroup,
+        label: str,
+        value: str,
+        icon: Optional[str] = None,
+    ) -> Adw.ActionRow:
+        row = plain_row(Adw.ActionRow, title=label, subtitle=value)
+        row.set_subtitle_selectable(True)
+        if icon:
+            row.add_prefix(Gtk.Image.new_from_icon_name(icon))
+        group.add(row)
+        self._copy_lines.append(f"{label} : {value}")
+        return row
+
+    # ---- Actions ----
+    def _on_copy(self, *_args: Any) -> None:
+        display = Gdk.Display.get_default()
+        if display is not None:
+            display.get_clipboard().set("\n".join(self._copy_lines))
+        self._parent.toast(T("sys_copy_done"))
+
+    def _on_open_log(self, *_args: Any) -> None:
+        self._parent.open_live_log(follow=False)
 
 
 class Ps5ManagerWindow(Adw.ApplicationWindow):
@@ -5651,18 +6412,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
 
     # ---- Actions menu global ----
     def _show_sysinfo(self) -> None:
-        os_name, k_ver = get_os_summary()
-        body = (
-            f"Version : {APP_VERSION}\n"
-            f"OS : {os_name}\n"
-            f"Kernel : {k_ver}\n"
-            f"User : {REAL_USER} (uid={REAL_UID})\n"
-            f"GNOME Accent : {self.theme_sync.current_accent}\n"
-            f"DNF5 : {'yes' if IS_DNF5 else 'no'}\n"
-            f"Fichier : {os.path.abspath(sys.argv[0])}\n"
-            f"Session log : {self.logger.path}"
-        )
-        self.show_info(T("system_info"), body)
+        SystemInfoWindow(self, self.theme_sync.current_accent).present()
 
     def _show_about(self) -> None:
         debug_info = (
@@ -5692,17 +6442,16 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
             website="https://github.com/nexgen999/ps5-fedora-manager",
             issue_url="https://github.com/nexgen999/ps5-fedora-manager/issues",
             comments=(
-                "Gestionnaire système, matériel et logiciels pour Fedora sur PS5."
-                if UI_LANG == "fr"
-                else "System, hardware and software manager for Fedora on PS5."
+                _L("Gestionnaire système, matériel et logiciels pour Fedora sur PS5.", "System, hardware and software manager for Fedora on PS5.")
             ),
             debug_info=debug_info,
             release_notes_version=APP_VERSION,
             release_notes=_safe_release_notes(
                 (
-                                        "<p>Nouveautés de la 0.7.1</p>"
-                    "<li>0.7.1 : mode Gaming (Gamescope) réparé — retour au bureau à la fermeture de Steam, plus de relance en boucle, accès DRM et journal de session</li>"
+                                        "<p>Nouveautés de la 0.8</p>"
                     "<ul>"
+                    "<li>0.8 : fenêtre « Système » repensée (logos Fedora, bureau et Gamescope, informations regroupées, copie en un clic) et traductions complétées en espagnol, italien, allemand et portugais</li>"
+                    "<li>0.7.1 : mode Gaming (Gamescope) réparé — retour au bureau à la fermeture de Steam, plus de relance en boucle, accès DRM et journal de session</li>"
                     "<li>0.7 : interface en 6 langues (français, anglais, espagnol, italien, allemand, portugais du Brésil)</li>"
                     "<li>0.6.1 : interfaces sans gel (Logithèque, Dépôts, IA), textes traduits et notes de version corrigées</li>"
                     "<li>Boîte de bienvenue au premier lancement : setup recommandé en 1 clic ou configuration manuelle</li>"
@@ -5715,9 +6464,10 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
                 )
                 if UI_LANG == "fr"
                 else (
-                                        "<p>What is new in 0.7.1</p>"
-                    "<li>0.7.1: Gaming Mode (Gamescope) fixed — closing Steam returns to the desktop, no more relaunch loop, DRM access and session log</li>"
+                                        "<p>What is new in 0.8</p>"
                     "<ul>"
+                    "<li>0.8: redesigned “System” window (Fedora, desktop and Gamescope logos, grouped information, one-click copy) and completed translations in Spanish, Italian, German and Portuguese</li>"
+                    "<li>0.7.1: Gaming Mode (Gamescope) fixed — closing Steam returns to the desktop, no more relaunch loop, DRM access and session log</li>"
                     "<li>0.7: interface in 6 languages (French, English, Spanish, Italian, German, Brazilian Portuguese)</li>"
                     "<li>0.6.1: no more UI freezes (app store, repositories, AI), translated texts and fixed release notes</li>"
                     "<li>First-launch welcome dialog: 1-click recommended setup or manual configuration</li>"
@@ -6247,9 +6997,7 @@ def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
             if not ok:
                 return
             win.toast(
-                "Mise à jour terminée — redémarrage automatique…"
-                if UI_LANG == "fr"
-                else "Update finished — restarting…"
+                _L("Mise à jour terminée — redémarrage automatique…", "Update finished — restarting…")
             )
 
             def _do_restart() -> bool:
@@ -8197,9 +8945,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     sw_ollama = plain_row(Adw.SwitchRow,
         title="Service Ollama (ollama.service)",
         subtitle=(
-            "Démarrer / arrêter le serveur IA (port 11434)"
-            if UI_LANG == "fr"
-            else "Start / stop local AI server (port 11434)"
+            _L("Démarrer / arrêter le serveur IA (port 11434)", "Start / stop local AI server (port 11434)")
         ),
     )
     sw_ollama.add_prefix(Gtk.Image.new_from_icon_name("system-run-symbolic"))
@@ -8236,7 +8982,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
     sw_boot = plain_row(Adw.SwitchRow,
         title=(
-            "Démarrage automatique Ollama au boot" if UI_LANG == "fr" else "Start Ollama automatically at boot"
+            _L("Démarrage automatique Ollama au boot", "Start Ollama automatically at boot")
         ),
         subtitle="systemctl enable / disable ollama",
     )
@@ -8342,7 +9088,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
     g_srv.add(
         win.row(
-            "Tout démarrer (Ollama + Open WebUI)" if UI_LANG == "fr" else "Start all (Ollama + Open WebUI)",
+            _L("Tout démarrer (Ollama + Open WebUI)", "Start all (Ollama + Open WebUI)"),
             "systemctl start ollama && podman start open-webui",
             "media-playback-start-symbolic",
             lambda *_: _start_all(),
@@ -8350,7 +9096,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     )
     g_srv.add(
         win.row(
-            "Tout arrêter (libérer la RAM)" if UI_LANG == "fr" else "Stop all (free RAM)",
+            _L("Tout arrêter (libérer la RAM)", "Stop all (free RAM)"),
             "podman stop open-webui && systemctl stop ollama",
             "media-playback-stop-symbolic",
             lambda *_: _stop_all(),
@@ -8416,7 +9162,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
     g_srv.add(
         win.row(
-            "Ouvrir Open WebUI dans le navigateur" if UI_LANG == "fr" else "Open Open WebUI in browser",
+            _L("Ouvrir Open WebUI dans le navigateur", "Open Open WebUI in browser"),
             "http://127.0.0.1:8080",
             "web-browser-symbolic",
             lambda *_: _open_webui_browser(),
@@ -8424,7 +9170,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     )
     g_srv.add(
         win.row(
-            "État des conteneurs Podman (podman ps -a)" if UI_LANG == "fr" else "Podman containers status (podman ps -a)",
+            _L("État des conteneurs Podman (podman ps -a)", "Podman containers status (podman ps -a)"),
             _L("Vérifie l'état exact de open-webui", "Check open-webui's exact state"),
             "view-list-symbolic",
             lambda *_: _show_podman_ps(),
@@ -8432,7 +9178,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     )
     g_srv.add(
         win.row(
-            "Logs Open WebUI (podman logs --tail 30)" if UI_LANG == "fr" else "Open WebUI logs (podman logs --tail 30)",
+            _L("Logs Open WebUI (podman logs --tail 30)", "Open WebUI logs (podman logs --tail 30)"),
             _L("Affiche les 30 dernières lignes du conteneur open-webui", "Show the last 30 lines of the open-webui container"),
             "utilities-terminal-symbolic",
             lambda *_: _show_webui_logs(),
@@ -8451,7 +9197,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         models_sub = "0 installé · qwen2.5-coder, deepseek, gemma4, mimo, nemotron…"
     g_mod.add(
         win.row(
-            "Gérer les modèles IA (catalogue & installés)" if UI_LANG == "fr" else "Manage AI models (catalog & installed)",
+            _L("Gérer les modèles IA (catalogue & installés)", "Manage AI models (catalog & installed)"),
             models_sub,
             "folder-download-symbolic",
             lambda *_: _push_ai_models(win),
@@ -8490,7 +9236,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
     g_mod.add(
         win.row(
-            "Voir les modèles installés (ollama list)" if UI_LANG == "fr" else "List installed models (ollama list)",
+            _L("Voir les modèles installés (ollama list)", "List installed models (ollama list)"),
             None,
             "view-list-symbolic",
             lambda *_: _show_ollama_list(),
@@ -8498,7 +9244,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     )
     g_mod.add(
         win.row(
-            "Modèles actifs en RAM (ollama ps)" if UI_LANG == "fr" else "Active models in RAM (ollama ps)",
+            _L("Modèles actifs en RAM (ollama ps)", "Active models in RAM (ollama ps)"),
             _L("Affiche les modèles actuellement chargés en mémoire", "Show the models currently loaded in memory"),
             "utilities-system-monitor-symbolic",
             lambda *_: _show_ollama_ps(),
@@ -8521,7 +9267,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
     g_ext.add(
         win.row(
-            "Diagnostic RAM / GPU / Disque pour l'IA" if UI_LANG == "fr" else "AI RAM / GPU / Disk diagnostic",
+            _L("Diagnostic RAM / GPU / Disque pour l'IA", "AI RAM / GPU / Disk diagnostic"),
             _L("Vérifie la mémoire libre avant d'exécuter un modèle 7B / 9B / 12B", "Check free memory before running a 7B / 9B / 12B model"),
             "applications-system-symbolic",
             lambda *_: _hw_ai_diag(),
@@ -8529,7 +9275,7 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     )
     g_ext.add(
         win.row(
-            "Nettoyer les anciennes images Podman" if UI_LANG == "fr" else "Prune unused Podman images",
+            _L("Nettoyer les anciennes images Podman", "Prune unused Podman images"),
             _L("podman image prune -f (libère l'espace après mise à jour Open WebUI)", "podman image prune -f (frees space after updating Open WebUI)"),
             "edit-clear-all-symbolic",
             lambda *_: win.run_task(
@@ -8541,8 +9287,8 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     if REAL_USER != "root":
         g_ext.add(
             win.row(
-                f"Activer le maintien de session Podman ({REAL_USER})" if UI_LANG == "fr" else f"Enable Podman user linger ({REAL_USER})",
-                f"loginctl enable-linger {REAL_USER} · démarre Open WebUI sans terminal",
+                T("podman_linger") % REAL_USER,
+                T("podman_linger_sub") % REAL_USER,
                 "user-available-symbolic",
                 lambda *_: win.run_task(
                     "loginctl enable-linger",
@@ -8907,7 +9653,7 @@ def _push_ai_models(win: Ps5ManagerWindow) -> None:
 
     # 1) Modèles déjà installés sur le système (incluant modèles personnalisés)
     g_inst = pref_group(
-        title="Modèles installés sur le système" if UI_LANG == "fr" else "Installed models on system",
+        title=_L("Modèles installés sur le système", "Installed models on system"),
         description=f"{len(installed)} modèle(s) · {len(running)} actif(s) en RAM",
     )
     if not _ollama_installed():
@@ -8937,7 +9683,7 @@ def _push_ai_models(win: Ps5ManagerWindow) -> None:
 
         g_inst.add(
             win.row(
-                "Décharger tous les modèles de la RAM" if UI_LANG == "fr" else "Unload all models from RAM",
+                _L("Décharger tous les modèles de la RAM", "Unload all models from RAM"),
                 _L("ollama stop sur tous les modèles actifs", "ollama stop on all active models"),
                 "media-playback-stop-symbolic",
                 lambda *_: _stop_all_models(),
@@ -8947,7 +9693,7 @@ def _push_ai_models(win: Ps5ManagerWindow) -> None:
 
     # 2) Catalogue rapide des modèles demandés
     g_cat = pref_group(
-        title="Catalogue des modèles recommandés" if UI_LANG == "fr" else "Recommended models catalog",
+        title=_L("Catalogue des modèles recommandés", "Recommended models catalog"),
         description=_L("Cliquez sur un modèle pour le télécharger, mettre à jour, stopper ou supprimer", "Click a model to download, update, stop or remove it"),
     )
     for model_id, desc_fr, desc_en in AI_MODELS_CATALOG:
@@ -8977,7 +9723,7 @@ def _push_ai_models(win: Ps5ManagerWindow) -> None:
 
     g_cat.add(
         win.row(
-            "Télécharger un autre modèle (nom personnalisé)" if UI_LANG == "fr" else "Pull a custom model",
+            _L("Télécharger un autre modèle (nom personnalisé)", "Pull a custom model"),
             "ollama pull <nom_du_modele>",
             "list-add-symbolic",
             lambda *_: _pull_custom(),

@@ -7,6 +7,19 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.8] — 2026-11-25
+
+### Added
+- **Fully redesigned “System” window**: header with the Fedora logo, the application name and the detected desktop's logo (GNOME, KDE Plasma, Cinnamon, Budgie), then four readable Adwaita groups — *System* (OS, kernel, architecture, package manager), *Session* (desktop, display manager, graphical session, user, accent colour), *Software* (Gamescope, Steam) and *Application* (version, file, session log with a direct open button).
+- **Icons imported into the repository**: the `icons/` folder holds the 96 px PNGs (Fedora, Gamescope, Budgie, Cinnamon, KDE, GNOME); they are also embedded as base64 in `ps5_manager.py` so a `curl` install stays a single file with no network access. Monochrome logos sit on a dark badge so they stay readable on light and dark themes.
+- **One-click copy**: a header button copies every piece of information (handy when filing a bug report).
+- **Completed translations**: the 64 texts that did not go through `STRINGS` (AI & Developer page, about) are translated into Spanish, Italian, German and Portuguese through `LSTRINGS`; the 18 `... if UI_LANG == "fr" else ...` ternaries are converted to `_L()` and two computed labels (session shortcut, Podman session lingering) now use `STRINGS`. Every `T()` key is covered: **377 keys × 6 languages, none missing**.
+
+### Changed
+- `_show_sysinfo()` opens the `SystemInfoWindow` (Adw.Window) instead of a plain-text dialog.
+- `_L(fr, en)` relies on an `_L_TABLE` table and the `LSTRINGS` dictionaries (es, it, de, pt).
+- `APP_VERSION` bumped to `0.8`, FR/EN release notes of the “About” dialog updated.
+
 ## [0.7.1] — 2026-11-25
 
 ### Fixed

@@ -6,6 +6,19 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.8] — 2026-11-25
+
+### Ajouté
+- **Fenêtre « Système » entièrement repensée** : en-tête avec le logo Fedora, le nom de l'application et le logo du bureau détecté (GNOME, KDE Plasma, Cinnamon, Budgie), puis quatre groupes Adwaita lisibles — *Système* (OS, noyau, architecture, gestionnaire de paquets), *Session* (bureau, gestionnaire de connexion, session graphique, utilisateur, couleur d'accentuation), *Logiciels* (Gamescope, Steam) et *Application* (version, fichier, journal de session avec ouverture directe).
+- **Icônes importées dans le dépôt** : le dossier `icons/` contient les PNG 96 px (Fedora, Gamescope, Budgie, Cinnamon, KDE, GNOME) ; ils sont aussi embarqués en base64 dans `ps5_manager.py` pour que l'installation par `curl` reste un fichier unique, sans accès réseau. Les logos monochromes sont posés sur une pastille sombre afin de rester lisibles sur les thèmes clair et sombre.
+- **Copie en un clic** : un bouton dans l'en-tête copie toutes les informations (utile pour joindre un rapport de bug).
+- **Traductions complétées** : les 64 textes qui ne passaient pas par `STRINGS` (page « IA & Développeur », à propos) sont traduits en espagnol, italien, allemand et portugais via `LSTRINGS` ; les 18 ternaires `... if UI_LANG == "fr" else ...` sont convertis en `_L()` et deux libellés calculés (raccourci de session, maintien de session Podman) passent par `STRINGS`. Toutes les clés `T()` sont couvertes : **377 clés × 6 langues, aucune manquante**.
+
+### Modifié
+- `_show_sysinfo()` ouvre la fenêtre `SystemInfoWindow` (Adw.Window) au lieu d'une boîte de dialogue en texte brut.
+- `_L(fr, en)` s'appuie sur une table `_L_TABLE` et les dictionnaires `LSTRINGS` (es, it, de, pt).
+- `APP_VERSION` passe à `0.8`, notes de version FR/EN de la boîte « À propos » mises à jour.
+
 ## [0.7.1] — 2026-11-25
 
 ### Corrigé
