@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.11.0"
+APP_VERSION = "0.12.0"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1119,16 +1119,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.11.0",
-    "en": "What is new in 0.11.0",
-    "es": "Novedades de la 0.11.0",
-    "it": "Novità della 0.11.0",
-    "de": "Neu in 0.11.0",
-    "pt": "Novidades da 0.11.0",
+    "fr": "Nouveautés de la 0.12.0",
+    "en": "What is new in 0.12.0",
+    "es": "Novedades de la 0.12.0",
+    "it": "Novità della 0.12.0",
+    "de": "Neu in 0.12.0",
+    "pt": "Novidades da 0.12.0",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.12 : section « Installation facile » — profils LAMP, LEMP, Code &amp; outils et Conteneurs, avec choix des composants, configuration (ServerName, dossier web, base de données) et la même fenêtre de progression que le setup 1 clic, qui reste inchangé",
         "0.11 : section « Serveur web » — Apache, Nginx, PHP + handler FastCGI, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, pare-feu et OpenSSH, chacun avec installation, mise à jour et désinstallation",
         "0.10 : page « Développement » (composants, outils en ligne de commande, applications) avec installation, mise à jour et désinstallation par entrée — dont Docker, KVM/QEMU, GitHub Desktop et un Forgejo local",
         "0.9.1 : Freebuff (agent de code IA) dans la page IA &amp; Développeur — installation, mise à jour et désinstallation via npm, lancement dans un terminal",
@@ -1145,6 +1146,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.12: “Easy setup” section — LAMP, LEMP, Code &amp; tools and Containers profiles, with component selection, configuration (ServerName, web root, database) and the same progress window as the 1-click setup, which stays unchanged",
         "0.11: “Web server” section — Apache, Nginx, PHP + FastCGI handler, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, firewall and OpenSSH, each with install, update and uninstall",
         "0.10: “Development” page (components, command-line tools, applications) with per-entry install, update and uninstall — including Docker, KVM/QEMU, GitHub Desktop and a local Forgejo",
         "0.9.1: Freebuff (AI coding agent) on the AI &amp; Developer page — npm install, update and uninstall, launch in a terminal",
@@ -1161,6 +1163,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.12 : sección «Instalación fácil» — perfiles LAMP, LEMP, Código y herramientas y Contenedores, con selección de componentes, configuración (ServerName, carpeta web, base de datos) y la misma ventana de progreso que la configuración en 1 clic, que no cambia",
         "0.11 : sección «Servidor web» — Apache, Nginx, PHP + handler FastCGI, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, cortafuegos y OpenSSH, con instalación, actualización y desinstalación",
         "0.10 : página «Desarrollo» (componentes, herramientas de línea de comandos, aplicaciones) con instalación, actualización y desinstalación por entrada — incluidos Docker, KVM/QEMU, GitHub Desktop y un Forgejo local",
         "0.9.1 : Freebuff (agente de código IA) en la página IA y Desarrollo — instalación, actualización y desinstalación con npm, inicio en una terminal",
@@ -1177,6 +1180,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.12 : sezione «Installazione facile» — profili LAMP, LEMP, Codice e strumenti e Contenitori, con scelta dei componenti, configurazione (ServerName, cartella web, database) e la stessa finestra di avanzamento della configurazione in 1 clic, che resta invariata",
         "0.11 : sezione «Server web» — Apache, Nginx, PHP + handler FastCGI, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, firewall e OpenSSH, con installazione, aggiornamento e disinstallazione",
         "0.10 : pagina «Sviluppo» (componenti, strumenti da riga di comando, applicazioni) con installazione, aggiornamento e disinstallazione per voce — inclusi Docker, KVM/QEMU, GitHub Desktop e un Forgejo locale",
         "0.9.1 : Freebuff (agente di codice IA) nella pagina IA e Sviluppo — installazione, aggiornamento e disinstallazione con npm, avvio in un terminale",
@@ -1193,6 +1197,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.12 : Abschnitt „Einfache Installation“ – Profile LAMP, LEMP, Code &amp; Werkzeuge und Container mit Komponentenauswahl, Konfiguration (ServerName, Webverzeichnis, Datenbank) und demselben Fortschrittsfenster wie das 1-Klick-Setup, das unverändert bleibt",
         "0.11 : Abschnitt „Webserver“ – Apache, Nginx, PHP + FastCGI-Handler, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, Firewall und OpenSSH, jeweils mit Installation, Aktualisierung und Deinstallation",
         "0.10 : Seite „Entwicklung“ (Komponenten, Kommandozeilen-Werkzeuge, Anwendungen) mit Installation, Aktualisierung und Deinstallation pro Eintrag – inklusive Docker, KVM/QEMU, GitHub Desktop und einem lokalen Forgejo",
         "0.9.1 : Freebuff (KI-Coding-Agent) auf der Seite „KI &amp; Entwickler“ – npm-Installation, -Aktualisierung und -Deinstallation, Start in einem Terminal",
@@ -1209,6 +1214,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.12 : secção «Instalação fácil» — perfis LAMP, LEMP, Código e ferramentas e Contêineres, com escolha de componentes, configuração (ServerName, pasta web, base de dados) e a mesma janela de progresso da configuração em 1 clique, que se mantém igual",
         "0.11 : secção «Servidor web» — Apache, Nginx, PHP + handler FastCGI, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, firewall e OpenSSH, com instalação, atualização e desinstalação",
         "0.10 : página «Desenvolvimento» (componentes, ferramentas de linha de comando, aplicativos) com instalação, atualização e desinstalação por entrada — incluindo Docker, KVM/QEMU, GitHub Desktop e um Forgejo local",
         "0.9.1 : Freebuff (agente de código IA) na página IA e Programador — instalação, atualização e desinstalação com npm, arranque num terminal",
@@ -1973,6 +1979,7 @@ STRINGS = {
         "sec_aidev": "IA & Développeur",
         "sec_dev": "Développement",
         "sec_web": "Serveur web",
+        "sec_easy": "Installation facile",
         "sec_deps": "Dépendances Supplémentaires",
         "sec_gaming": "Gaming Mode",
         "sec_fix": "Divers Fix",
@@ -2420,6 +2427,7 @@ STRINGS = {
         "sec_aidev": "AI & Developer",
         "sec_dev": "Development",
         "sec_web": "Web server",
+        "sec_easy": "Easy setup",
         "sec_deps": "Additional Dependencies",
         "sec_gaming": "Gaming Mode",
         "sec_fix": "Misc Fixes",
@@ -2880,6 +2888,7 @@ STRINGS['es'] = {'app_title': 'PS5 Fedora Manager',
  'sec_aidev': 'IA y Desarrollo',
  'sec_dev': 'Desarrollo',
  'sec_web': 'Servidor web',
+ 'sec_easy': 'Instalación fácil',
  'sec_deps': 'Dependencias adicionales',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Arreglos varios',
@@ -3322,6 +3331,7 @@ STRINGS['it'] = {'app_title': 'PS5 Fedora Manager',
  'sec_aidev': 'IA e Sviluppo',
  'sec_dev': 'Sviluppo',
  'sec_web': 'Server web',
+ 'sec_easy': 'Installazione facile',
  'sec_deps': 'Dipendenze aggiuntive',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Correzioni varie',
@@ -3760,6 +3770,7 @@ STRINGS['de'] = {'app_title': 'PS5 Fedora Manager',
  'sec_aidev': 'KI & Entwicklung',
  'sec_dev': 'Entwicklung',
  'sec_web': 'Webserver',
+ 'sec_easy': 'Einfache Installation',
  'sec_deps': 'Zusätzliche Abhängigkeiten',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Diverse Korrekturen',
@@ -4198,6 +4209,7 @@ STRINGS['pt'] = {'app_title': 'PS5 Fedora Manager',
  'sec_aidev': 'IA e Desenvolvimento',
  'sec_dev': 'Desenvolvimento',
  'sec_web': 'Servidor web',
+ 'sec_easy': 'Instalação fácil',
  'sec_deps': 'Dependências adicionais',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Correções diversas',
@@ -5657,6 +5669,7 @@ SECTIONS = [
     ("aidev", "applications-development-symbolic", "sec_aidev", 1),
     ("dev", "applications-engineering-symbolic", "sec_dev", 1),
     ("websrv", "network-server-symbolic", "sec_web", 1),
+    ("easy", "preferences-other-symbolic", "sec_easy", 1),
     ("deps", "application-x-addon-symbolic", "sec_deps", 1),
     ("gaming", "input-gaming-symbolic", "sec_gaming", 1),
     ("features", "application-x-executable-symbolic", "sec_features", 1),
@@ -6521,6 +6534,156 @@ _L_TABLE = {
         "Necessario per accedere al server da un'altra macchina della rete.",
         "Nötig, um den Server von einem anderen Rechner im Netzwerk zu erreichen.",
         "Necessário para aceder ao servidor a partir de outra máquina da rede.",
+    ),
+    "Serveur web LAMP": (
+        "Servidor web LAMP",
+        "Server web LAMP",
+        "LAMP-Webserver",
+        "Servidor web LAMP",
+    ),
+    "Serveur web LEMP": (
+        "Servidor web LEMP",
+        "Server web LEMP",
+        "LEMP-Webserver",
+        "Servidor web LEMP",
+    ),
+    "Code & outils": (
+        "Código y herramientas",
+        "Codice e strumenti",
+        "Code & Werkzeuge",
+        "Código e ferramentas",
+    ),
+    "Conteneurs & services": (
+        "Contenedores y servicios",
+        "Contenitori e servizi",
+        "Container & Dienste",
+        "Contêineres e serviços",
+    ),
+    "Apache + PHP + MariaDB + phpMyAdmin, prêt à héberger un site": (
+        "Apache + PHP + MariaDB + phpMyAdmin, listo para alojar un sitio",
+        "Apache + PHP + MariaDB + phpMyAdmin, pronto per ospitare un sito",
+        "Apache + PHP + MariaDB + phpMyAdmin, bereit für eine Website",
+        "Apache + PHP + MariaDB + phpMyAdmin, pronto para alojar um site",
+    ),
+    "Nginx + PHP-FPM + MariaDB, la variante légère": (
+        "Nginx + PHP-FPM + MariaDB, la variante ligera",
+        "Nginx + PHP-FPM + MariaDB, la variante leggera",
+        "Nginx + PHP-FPM + MariaDB, die schlanke Variante",
+        "Nginx + PHP-FPM + MariaDB, a variante leve",
+    ),
+    "Compilation, Python + GTK4, outils CLI, qualité et debug": (
+        "Compilación, Python + GTK4, herramientas CLI, calidad y depuración",
+        "Compilazione, Python + GTK4, strumenti CLI, qualità e debug",
+        "Kompilierung, Python + GTK4, CLI-Werkzeuge, Qualität und Debug",
+        "Compilação, Python + GTK4, ferramentas CLI, qualidade e depuração",
+    ),
+    "Podman, Docker, Forgejo local, Cockpit, pare-feu et SSH": (
+        "Podman, Docker, Forgejo local, Cockpit, cortafuegos y SSH",
+        "Podman, Docker, Forgejo locale, Cockpit, firewall e SSH",
+        "Podman, Docker, lokales Forgejo, Cockpit, Firewall und SSH",
+        "Podman, Docker, Forgejo local, Cockpit, firewall e SSH",
+    ),
+    "Composants à installer": (
+        "Componentes a instalar",
+        "Componenti da installare",
+        "Zu installierende Komponenten",
+        "Componentes a instalar",
+    ),
+    "Décoche ce dont tu n'as pas besoin — rien n'est obligatoire.": (
+        "Desmarca lo que no necesites: nada es obligatorio.",
+        "Deseleziona ciò che non ti serve: nulla è obbligatorio.",
+        "Abwählen, was nicht gebraucht wird – nichts ist Pflicht.",
+        "Desmarca o que não precisas: nada é obrigatório.",
+    ),
+    "Configuration": (
+        "Configuración",
+        "Configurazione",
+        "Konfiguration",
+        "Configuração",
+    ),
+    "Bon à savoir": (
+        "Bueno saberlo",
+        "Buono a sapersi",
+        "Gut zu wissen",
+        "Bom saber",
+    ),
+    "Utilisé pour l'hôte virtuel et la base de données.": (
+        "Se usa para el host virtual y la base de datos.",
+        "Usato per l'host virtuale e il database.",
+        "Wird für virtuellen Host und Datenbank verwendet.",
+        "Usado para o host virtual e a base de dados.",
+    ),
+    "Installer la sélection": (
+        "Instalar la selección",
+        "Installa la selezione",
+        "Auswahl installieren",
+        "Instalar a seleção",
+    ),
+    "Aucun composant sélectionné.": (
+        "Ningún componente seleccionado.",
+        "Nessun componente selezionato.",
+        "Keine Komponente ausgewählt.",
+        "Nenhum componente selecionado.",
+    ),
+    "Configuration du serveur": (
+        "Configuración del servidor",
+        "Configurazione del server",
+        "Serverkonfiguration",
+        "Configuração do servidor",
+    ),
+    "Nom du serveur (ServerName)": (
+        "Nombre del servidor (ServerName)",
+        "Nome del server (ServerName)",
+        "Servername (ServerName)",
+        "Nome do servidor (ServerName)",
+    ),
+    "Dossier web (DocumentRoot)": (
+        "Carpeta web (DocumentRoot)",
+        "Cartella web (DocumentRoot)",
+        "Webverzeichnis (DocumentRoot)",
+        "Pasta web (DocumentRoot)",
+    ),
+    "Mot de passe root MariaDB/MySQL (facultatif)": (
+        "Contraseña root de MariaDB/MySQL (opcional)",
+        "Password root MariaDB/MySQL (facoltativa)",
+        "MariaDB/MySQL-root-Passwort (optional)",
+        "Palavra-passe root do MariaDB/MySQL (opcional)",
+    ),
+    "Base de données à créer (facultatif)": (
+        "Base de datos a crear (opcional)",
+        "Database da creare (facoltativo)",
+        "Anzulegende Datenbank (optional)",
+        "Base de dados a criar (opcional)",
+    ),
+    "Utilisateur de la base (facultatif)": (
+        "Usuario de la base (opcional)",
+        "Utente del database (facoltativo)",
+        "Datenbankbenutzer (optional)",
+        "Utilizador da base de dados (opcional)",
+    ),
+    "Mot de passe de la base (facultatif)": (
+        "Contraseña de la base (opcional)",
+        "Password del database (facoltativa)",
+        "Datenbank-Passwort (optional)",
+        "Palavra-passe da base de dados (opcional)",
+    ),
+    "Le setup 1 clic d'origine (menu ⋮) reste inchangé.": (
+        "La configuración en 1 clic original (menú ⋮) no cambia.",
+        "La configurazione in 1 clic originale (menu ⋮) resta invariata.",
+        "Das ursprüngliche 1-Klick-Setup (Menü ⋮) bleibt unverändert.",
+        "A configuração em 1 clique original (menu ⋮) mantém-se igual.",
+    ),
+    "Les profils peuvent être relancés : ce qui est déjà installé est simplement mis à jour.": (
+        "Los perfiles se pueden relanzar: lo ya instalado solo se actualiza.",
+        "I profili possono essere rilanciati: ciò che è già installato viene solo aggiornato.",
+        "Profile lassen sich erneut starten: bereits Installiertes wird nur aktualisiert.",
+        "Os perfis podem ser relançados: o que já está instalado é apenas atualizado.",
+    ),
+    "Choisis un profil, ajuste les composants et la configuration, puis lance l'installation.": (
+        "Elige un perfil, ajusta los componentes y la configuración, y lanza la instalación.",
+        "Scegli un profilo, regola componenti e configurazione, poi avvia l'installazione.",
+        "Profil wählen, Komponenten und Konfiguration anpassen, dann Installation starten.",
+        "Escolhe um perfil, ajusta os componentes e a configuração e inicia a instalação.",
     ),
 }
 
@@ -12165,12 +12328,552 @@ def build_page_web(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     )
 
 
+# ------------------------------------------------------------------------------
+# Installation facile : profils pré-configurés (assistant + progression)
+# Le setup 1 clic d'origine (_build_setup_plan / start_recommended_setup) n'est
+# pas modifié : ces profils réutilisent son moteur d'étapes et sa fenêtre.
+# ------------------------------------------------------------------------------
+EASY_FIELDS: dict[str, dict[str, Any]] = {
+    "server_name": {
+        "fr": "Nom du serveur (ServerName)",
+        "en": "Server name (ServerName)",
+        "default": "localhost",
+        "sanitize": "host",
+    },
+    "docroot": {
+        "fr": "Dossier web (DocumentRoot)",
+        "en": "Web root (DocumentRoot)",
+        "default": "/var/www/html",
+        "sanitize": "path",
+    },
+    "db_root_password": {
+        "fr": "Mot de passe root MariaDB/MySQL (facultatif)",
+        "en": "MariaDB/MySQL root password (optional)",
+        "default": "",
+        "secret": True,
+    },
+    "db_name": {
+        "fr": "Base de données à créer (facultatif)",
+        "en": "Database to create (optional)",
+        "default": "app",
+    },
+    "db_user": {
+        "fr": "Utilisateur de la base (facultatif)",
+        "en": "Database user (optional)",
+        "default": "appuser",
+    },
+    "db_password": {
+        "fr": "Mot de passe de la base (facultatif)",
+        "en": "Database password (optional)",
+        "default": "",
+        "secret": True,
+    },
+}
+
+WEB_FIELDS = ("server_name", "docroot", "db_root_password", "db_name", "db_user", "db_password")
+
+EASY_PROFILES: tuple[dict[str, Any], ...] = (
+    {
+        "key": "lamp",
+        "title_fr": "Serveur web LAMP",
+        "title_en": "LAMP web server",
+        "sub_fr": "Apache + PHP + MariaDB + phpMyAdmin, prêt à héberger un site",
+        "sub_en": "Apache + PHP + MariaDB + phpMyAdmin, ready to host a site",
+        "icon": "network-server-symbolic",
+        "entries": (
+            "apache", "php", "php-handler", "mariadb", "phpmyadmin", "adminer",
+            "cockpit", "certbot", "firewall-web", "openssh",
+        ),
+        "defaults": ("apache", "php", "php-handler", "mariadb", "phpmyadmin", "firewall-web"),
+        "fields": WEB_FIELDS,
+        "config": "apache",
+    },
+    {
+        "key": "lemp",
+        "title_fr": "Serveur web LEMP",
+        "title_en": "LEMP web server",
+        "sub_fr": "Nginx + PHP-FPM + MariaDB, la variante légère",
+        "sub_en": "Nginx + PHP-FPM + MariaDB, the lightweight variant",
+        "icon": "network-server-symbolic",
+        "entries": (
+            "nginx", "php", "php-handler", "mariadb", "phpmyadmin", "adminer",
+            "cockpit", "certbot", "firewall-web", "openssh",
+        ),
+        "defaults": ("nginx", "php", "php-handler", "mariadb", "phpmyadmin", "firewall-web"),
+        "fields": WEB_FIELDS,
+        "config": "nginx",
+    },
+    {
+        "key": "code",
+        "title_fr": "Code & outils",
+        "title_en": "Code & tools",
+        "sub_fr": "Compilation, Python + GTK4, outils CLI, qualité et debug",
+        "sub_en": "Build tools, Python + GTK4, CLI tools, quality and debug",
+        "icon": "applications-engineering-symbolic",
+        "entries": (
+            "build", "python-gtk", "cli-search", "git-tools", "terminal", "diag",
+            "python-quality", "debug", "node", "rust", "docker", "virt",
+            "github-desktop", "editors", "sqlite",
+        ),
+        "defaults": (
+            "build", "python-gtk", "cli-search", "git-tools", "terminal", "diag",
+            "python-quality",
+        ),
+        "fields": (),
+        "config": "",
+    },
+    {
+        "key": "services",
+        "title_fr": "Conteneurs & services",
+        "title_en": "Containers & services",
+        "sub_fr": "Podman, Docker, Forgejo local, Cockpit, pare-feu et SSH",
+        "sub_en": "Podman, Docker, local Forgejo, Cockpit, firewall and SSH",
+        "icon": "application-x-executable-symbolic",
+        "entries": ("containers", "docker", "forgejo", "cockpit", "firewall-web", "openssh"),
+        "defaults": ("containers", "forgejo", "firewall-web"),
+        "fields": (),
+        "config": "",
+    },
+)
+
+
+def _catalog_entry(key: str) -> Optional[dict[str, Any]]:
+    for entry in (*DEV_CATALOG, *WEB_CATALOG):
+        if entry["key"] == key:
+            return entry
+    return None
+
+
+def _easy_host(value: str) -> str:
+    cleaned = re.sub(r"[^A-Za-z0-9.-]", "", value or "")
+    return cleaned or "localhost"
+
+
+def _easy_path(value: str) -> str:
+    cleaned = re.sub(r"[^A-Za-z0-9/._-]", "", value or "")
+    if not cleaned.startswith("/"):
+        cleaned = "/" + cleaned
+    return cleaned or "/var/www/html"
+
+
+def _easy_ident(value: str) -> str:
+    return re.sub(r"[^A-Za-z0-9_]", "", value or "")
+
+
+def _sql_literal(value: str) -> str:
+    """Échappe une valeur pour un littéral SQL entre apostrophes."""
+    cleaned = (value or "").replace("\r", " ").replace("\n", " ").strip()
+    return cleaned.replace("\\", "\\\\").replace("'", "''")
+
+
+def _easy_web_config(kind: str, server: str, docroot: str) -> str:
+    """Hôte virtuel Apache ou Nginx + page de test PHP."""
+    if kind == "apache":
+        vhost = "\n".join([
+            "cat > /etc/httpd/conf.d/ps5-easy.conf <<'CONF'",
+            "<VirtualHost *:80>",
+            f"    ServerName {server}",
+            f'    DocumentRoot "{docroot}"',
+            f'    <Directory "{docroot}">',
+            "        AllowOverride All",
+            "        Require all granted",
+            "    </Directory>",
+            "    ErrorLog /var/log/httpd/ps5-easy-error.log",
+            "    CustomLog /var/log/httpd/ps5-easy-access.log combined",
+            "</VirtualHost>",
+            "CONF",
+            "if httpd -t >/dev/null 2>&1; then",
+            "  systemctl reload httpd 2>/dev/null || systemctl restart httpd 2>/dev/null || true",
+            f'  echo "Apache : hôte virtuel prêt (http://{server})"',
+            "else",
+            '  echo "Apache : configuration refusée par httpd -t (voir /etc/httpd/conf.d/ps5-easy.conf)"',
+            "fi",
+        ])
+    else:
+        vhost = "\n".join([
+            "mkdir -p /etc/nginx/conf.d",
+            "cat > /etc/nginx/conf.d/ps5-easy.conf <<'CONF'",
+            "server {",
+            "    listen 80;",
+            f"    server_name {server};",
+            f'    root "{docroot}";',
+            "    index index.php index.html;",
+            "    location / { try_files $uri $uri/ =404; }",
+            "}",
+            "CONF",
+            "if nginx -t >/dev/null 2>&1; then",
+            "  systemctl reload nginx 2>/dev/null || systemctl restart nginx 2>/dev/null || true",
+            f'  echo "Nginx : hôte virtuel prêt (http://{server})"',
+            "else",
+            '  echo "Nginx : configuration refusée par nginx -t (voir /etc/nginx/conf.d/ps5-easy.conf)"',
+            "fi",
+        ])
+    return vhost
+
+
+def _easy_db_sql(root_pw: str, db_name: str, db_user: str, db_pass: str) -> tuple[str, str]:
+    """Retourne (SQL MariaDB, SQL MySQL) pour le mot de passe root et la base."""
+    mariadb: list[str] = []
+    mysql: list[str] = []
+    if root_pw:
+        mariadb.append(
+            "ALTER USER 'root'@'localhost' IDENTIFIED VIA unix_socket "
+            f"OR mysql_native_password USING PASSWORD('{root_pw}');"
+        )
+        mysql.append(
+            f"ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY '{root_pw}';"
+        )
+    if db_name:
+        for statements in (mariadb, mysql):
+            statements.append(
+                f"CREATE DATABASE IF NOT EXISTS `{db_name}` "
+                "CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+            )
+        if db_user:
+            grant = f"GRANT ALL PRIVILEGES ON `{db_name}`.* TO '{db_user}'@'localhost';"
+            if db_pass:
+                mariadb.insert(
+                    -1,
+                    f"CREATE USER IF NOT EXISTS '{db_user}'@'localhost' "
+                    f"IDENTIFIED BY '{db_pass}';",
+                )
+                mysql.insert(
+                    -1,
+                    f"CREATE USER IF NOT EXISTS '{db_user}'@'localhost' "
+                    f"IDENTIFIED BY '{db_pass}';",
+                )
+            else:
+                mariadb.insert(-1, f"CREATE USER IF NOT EXISTS '{db_user}'@'localhost';")
+                mysql.insert(-1, f"CREATE USER IF NOT EXISTS '{db_user}'@'localhost';")
+            mariadb.append(grant)
+            mysql.append(grant)
+    if mariadb:
+        mariadb.append("FLUSH PRIVILEGES;")
+    if mysql:
+        mysql.append("FLUSH PRIVILEGES;")
+    return "\n".join(mariadb), "\n".join(mysql)
+
+
+def _easy_config_script(
+    profile: dict[str, Any], selected: tuple[str, ...], values: dict[str, str]
+) -> str:
+    """Script de configuration du profil (hôte virtuel + base de données)."""
+    kind = profile.get("config") or ""
+    if not kind:
+        return ""
+    server = _easy_host(values.get("server_name", "localhost"))
+    docroot = _easy_path(values.get("docroot", "/var/www/html"))
+    lines = [
+        f'mkdir -p "{docroot}"',
+        _easy_web_config(kind, server, docroot),
+        f'cat > "{docroot}/index.php" <<\'PHP\'',
+        '<?php echo "PS5 Fedora Manager : PHP fonctionne.\\n";',
+        "PHP",
+    ]
+    lines.append(
+        'if command -v semanage >/dev/null 2>&1 && command -v restorecon >/dev/null 2>&1; then\n'
+        f'  semanage fcontext -a -t httpd_sys_content_t "{docroot}(/.*)?" 2>/dev/null || true\n'
+        f'  restorecon -R "{docroot}" 2>/dev/null || true\n'
+        "fi"
+    )
+    lines.append("setsebool -P httpd_can_network_connect_db on 2>/dev/null || true")
+
+    mariadb_sql, mysql_sql = _easy_db_sql(
+        _sql_literal(values.get("db_root_password", "")),
+        _easy_ident(values.get("db_name", "")),
+        _easy_ident(values.get("db_user", "")),
+        _sql_literal(values.get("db_password", "")),
+    )
+    want_db = (
+        ("mariadb" in selected or "mysql" in selected)
+        and bool(mariadb_sql or mysql_sql)
+    )
+    if want_db and mariadb_sql:
+        lines.extend([
+            'if systemctl is-active --quiet mariadb 2>/dev/null; then',
+            "  cat > /tmp/ps5-easy-db.sql <<'SQL'",
+            mariadb_sql,
+            "SQL",
+            "  if mariadb -u root < /tmp/ps5-easy-db.sql; then",
+            '    echo "MariaDB : configuration appliquée"',
+            "  else",
+            '    echo "MariaDB : configuration refusée (mot de passe root déjà défini ?)"',
+            "  fi",
+            "  rm -f /tmp/ps5-easy-db.sql",
+            "fi",
+        ])
+    if want_db and mysql_sql:
+        lines.extend([
+            'if systemctl is-active --quiet mysqld 2>/dev/null; then',
+            "  cat > /tmp/ps5-easy-db.sql <<'SQL'",
+            mysql_sql,
+            "SQL",
+            "  if mysql -u root < /tmp/ps5-easy-db.sql; then",
+            '    echo "MySQL : configuration appliquée"',
+            "  else",
+            '    echo "MySQL : configuration refusée (mot de passe root déjà défini ?)"',
+            "  fi",
+            "  rm -f /tmp/ps5-easy-db.sql",
+            "fi",
+        ])
+    return "\n".join(lines) + "\n"
+
+
+def _build_easy_plan(
+    win: Ps5ManagerWindow,
+    profile: dict[str, Any],
+    selected: tuple[str, ...],
+    values: dict[str, str],
+) -> list[SetupStep]:
+    """Transforme un profil en étapes exécutées par la fenêtre de progression."""
+    steps: list[SetupStep] = []
+    for key in profile["entries"]:
+        if key not in selected:
+            continue
+        entry = _catalog_entry(key)
+        if entry is None or entry["panel"] is not None:
+            continue
+        label = _L(entry["title_fr"], entry["title_en"])
+
+        def _runner(emit, e=entry):
+            ok, _msg = _dev_execute(win, e, "install", emit)
+            return ok
+
+        steps.append(SetupStep(label, [(label, _runner)]))
+    config = _easy_config_script(profile, selected, values)
+    if config:
+        label = _L("Configuration du serveur", "Server configuration")
+        steps.append(
+            SetupStep(
+                label,
+                [(label, lambda emit, script=config: win.run_cmd_pty(script, emit) == 0)],
+            )
+        )
+    return steps
+
+
+class EasySetupWindow(SetupWindow):
+    """Même fenêtre de progression que le setup 1 clic, sans redémarrage proposé."""
+
+    def __init__(
+        self, win: "Ps5ManagerWindow", plan: list[SetupStep], title: str, section: str
+    ) -> None:
+        self._easy_title = title
+        self._easy_section = section
+        super().__init__(win, plan)
+        self.title_widget.set_title(title)
+        self.connect("destroy", self._forget_window)
+
+    def _forget_window(self, *_args) -> None:
+        setattr(self.win, "easy_setup_window", None)
+
+    def _finish(self) -> bool:
+        self._running = False
+        if self._flush_id is not None:
+            GLib.source_remove(self._flush_id)
+            self._flush_id = None
+        self._flush()
+        self.title_widget.set_subtitle(T("setup_finished"))
+        self.progress.set_fraction(1.0)
+        self.progress.set_text(T("setup_summary") % (self._done_count, self._fail_count))
+        self.close_btn.set_sensitive(True)
+        self.win.busy = False
+        self.win.busy_spinner.stop()
+        _dev_invalidate()
+        self.close()
+        try:
+            self.win._select_section(self._easy_section)
+        except Exception:  # noqa: BLE001 - la page se reconstruira au prochain affichage
+            pass
+        if self._fail_count:
+            self.win.show_info(
+                self._easy_title, T("setup_summary") % (self._done_count, self._fail_count)
+            )
+        else:
+            self.win.toast(f"{self._easy_title} — {T('done')}")
+        return False
+
+    def _on_close_request(self, *_args) -> bool:
+        return bool(self._running)
+
+
+class EasySetupConfigWindow(Adw.Window):
+    """Assistant : choix des composants, réglages, puis lancement."""
+
+    def __init__(self, win: "Ps5ManagerWindow", profile: dict[str, Any]) -> None:
+        title = _L(profile["title_fr"], profile["title_en"])
+        super().__init__(
+            transient_for=win, title=title, default_width=820, default_height=820
+        )
+        self.win = win
+        self.profile = profile
+        self.switches: dict[str, Adw.SwitchRow] = {}
+        self.fields: dict[str, Any] = {}
+
+        header = Adw.HeaderBar()
+        header.set_title_widget(
+            Adw.WindowTitle(title=title, subtitle=_L(profile["sub_fr"], profile["sub_en"]))
+        )
+
+        page = Adw.PreferencesPage()
+        grp_comp = pref_group(
+            title=_L("Composants à installer", "Components to install"),
+            description=_L(
+                "Décoche ce dont tu n'as pas besoin — rien n'est obligatoire.",
+                "Uncheck what you don't need — nothing is mandatory.",
+            ),
+        )
+        for key in profile["entries"]:
+            entry = _catalog_entry(key)
+            if entry is None:
+                continue
+            row = plain_row(
+                Adw.SwitchRow,
+                title=_L(entry["title_fr"], entry["title_en"]),
+                subtitle=entry["sub"],
+            )
+            done, total = _dev_state(entry)
+            if total and done == total:
+                row.set_subtitle(f"{entry['sub']} · {T('installed_rpm')}")
+            row.set_active(key in profile["defaults"])
+            self.switches[key] = row
+            grp_comp.add(row)
+        page.add(grp_comp)
+
+        if profile["fields"]:
+            grp_cfg = pref_group(
+                title=_L("Configuration", "Configuration"),
+                description=_L(
+                    "Utilisé pour l'hôte virtuel et la base de données.",
+                    "Used for the virtual host and the database.",
+                ),
+            )
+            for fkey in profile["fields"]:
+                spec = EASY_FIELDS[fkey]
+                label = _L(spec["fr"], spec["en"])
+                password_row = getattr(Adw, "PasswordEntryRow", None)
+                if spec.get("secret") and password_row is not None:
+                    row = plain_row(password_row, title=label)
+                else:
+                    row = plain_row(Adw.EntryRow, title=label)
+                row.set_text(spec.get("default", ""))
+                self.fields[fkey] = row
+                grp_cfg.add(row)
+            page.add(grp_cfg)
+
+        cancel_btn = Gtk.Button(label=T("cancel"))
+        cancel_btn.connect("clicked", lambda *_: self.close())
+        start_btn = Gtk.Button(label=_L("Installer la sélection", "Install selection"))
+        start_btn.add_css_class("suggested-action")
+        start_btn.connect("clicked", lambda *_: self._start())
+
+        bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        bottom.set_halign(Gtk.Align.END)
+        bottom.set_margin_top(10)
+        bottom.set_margin_bottom(10)
+        bottom.set_margin_start(12)
+        bottom.set_margin_end(12)
+        bottom.append(cancel_btn)
+        bottom.append(start_btn)
+
+        toolbar = Adw.ToolbarView()
+        toolbar.add_top_bar(header)
+        toolbar.set_content(page)
+        toolbar.add_bottom_bar(bottom)
+        self.set_content(toolbar)
+
+    def _start(self) -> None:
+        selected = tuple(key for key, row in self.switches.items() if row.get_active())
+        if not selected:
+            self.win.show_info(
+                _L(self.profile["title_fr"], self.profile["title_en"]),
+                _L("Aucun composant sélectionné.", "No component selected."),
+            )
+            return
+        values = {key: row.get_text() for key, row in self.fields.items()}
+        self.close()
+        _start_easy_setup(self.win, self.profile, selected, values)
+
+
+def _start_easy_setup(
+    win: "Ps5ManagerWindow",
+    profile: dict[str, Any],
+    selected: tuple[str, ...],
+    values: dict[str, str],
+) -> None:
+    if win.busy:
+        win.toast(T("busy"))
+        return
+    existing = getattr(win, "easy_setup_window", None)
+    if existing is not None:
+        existing.present()
+        return
+    plan = _build_easy_plan(win, profile, selected, values)
+    if not plan:
+        win.show_info(
+            _L(profile["title_fr"], profile["title_en"]),
+            _L("Aucun composant sélectionné.", "No component selected."),
+        )
+        return
+    win.busy = True
+    win.busy_spinner.start()
+    window = EasySetupWindow(
+        win, plan, _L(profile["title_fr"], profile["title_en"]), "easy"
+    )
+    setattr(win, "easy_setup_window", window)
+    window.present()
+    window.start()
+
+
+def build_page_easy(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
+    grp = pref_group(
+        title=T("sec_easy"),
+        description=_L(
+            "Choisis un profil, ajuste les composants et la configuration, puis lance l'installation.",
+            "Pick a profile, adjust components and configuration, then start the install.",
+        ),
+    )
+    for profile in EASY_PROFILES:
+        title = _L(profile["title_fr"], profile["title_en"])
+        grp.add(
+            win.row(
+                title,
+                _L(profile["sub_fr"], profile["sub_en"]),
+                profile["icon"],
+                lambda *_, p=profile: EasySetupConfigWindow(win, p).present(),
+            )
+        )
+    page.add(grp)
+
+    info = pref_group(title=_L("Bon à savoir", "Good to know"), description="")
+    info.add(
+        plain_row(
+            Adw.ActionRow,
+            title=_L(
+                "Le setup 1 clic d'origine (menu ⋮) reste inchangé.",
+                "The original 1-click setup (⋮ menu) is unchanged.",
+            ),
+        )
+    )
+    info.add(
+        plain_row(
+            Adw.ActionRow,
+            title=_L(
+                "Les profils peuvent être relancés : ce qui est déjà installé est simplement mis à jour.",
+                "Profiles can be run again: what is already installed is only updated.",
+            ),
+        )
+    )
+    page.add(info)
+
+
 PAGE_BUILDERS = {
     "logs": build_page_logs,
     "library": build_page_library,
     "aidev": build_page_aidev,
     "dev": build_page_dev,
     "websrv": build_page_web,
+    "easy": build_page_easy,
     "deps": build_page_deps,
     "gaming": build_page_gaming,
     "features": build_page_features,

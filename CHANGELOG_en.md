@@ -7,6 +7,21 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.12.0] — 2026-11-26
+
+### Added
+- **“Easy setup” section**: four pre-configured profiles reusing the “Development” and “Web server” catalogues.
+  - **LAMP web server**: Apache, PHP + FastCGI handler, MariaDB, phpMyAdmin, firewall (optional: Adminer, Cockpit, Certbot, OpenSSH).
+  - **LEMP web server**: the same stack with Nginx.
+  - **Code & tools**: build tools, Python + GTK4, search/Git/terminal/diagnostics/quality (optional: debug, Node, Rust, Docker, KVM, GitHub Desktop, editors, SQLite).
+  - **Containers & services**: Podman, local Forgejo, firewall (optional: Docker, Cockpit, OpenSSH).
+- **Configuration window** (`EasySetupConfigWindow`): one switch per component (already-installed ones flagged), and for the web profiles the ServerName, DocumentRoot, MariaDB/MySQL root password, database and user to create (sensitive fields masked).
+- **Progress window identical to the 1-click setup** (`EasySetupWindow`, a `SetupWindow` subclass): same live-checked steps, same log, same progress bar — without the reboot prompt. The **original 1-click setup is left untouched**.
+- **Generated server configuration**: Apache or Nginx virtual host (`httpd -t` / `nginx -t` before reload), a test `index.php`, SELinux context, `httpd_can_network_connect_db`, and database/user creation with an optional root password (MariaDB via socket, MySQL with `caching_sha2_password`), all SQL values escaped.
+
+### Changed
+- `APP_VERSION` bumped to `0.12.0`, FR/EN release notes of the “About” dialog updated.
+
 ## [0.11.0] — 2026-11-26
 
 ### Added

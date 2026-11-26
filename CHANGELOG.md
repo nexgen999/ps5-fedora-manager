@@ -6,6 +6,21 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.12.0] — 2026-11-26
+
+### Ajouté
+- **Section « Installation facile »** : quatre profils pré-configurés qui réutilisent le catalogue des pages « Développement » et « Serveur web ».
+  - **Serveur web LAMP** : Apache, PHP + handler FastCGI, MariaDB, phpMyAdmin, pare-feu (au choix : Adminer, Cockpit, Certbot, OpenSSH).
+  - **Serveur web LEMP** : la même pile avec Nginx.
+  - **Code & outils** : compilation, Python + GTK4, recherche/Git/terminal/diagnostic/qualité (au choix : debug, Node, Rust, Docker, KVM, GitHub Desktop, éditeurs, SQLite).
+  - **Conteneurs & services** : Podman, Forgejo local, pare-feu (au choix : Docker, Cockpit, OpenSSH).
+- **Fenêtre de configuration** (`EasySetupConfigWindow`) : un interrupteur par composant (déjà installé signalé), et pour les profils web les champs ServerName, DocumentRoot, mot de passe root MariaDB/MySQL, base et utilisateur à créer (champs sensibles masqués).
+- **Fenêtre de progression identique au setup 1 clic** (`EasySetupWindow`, sous-classe de `SetupWindow`) : mêmes étapes cochées en direct, même journal, même barre de progression — sans proposition de redémarrage. Le **setup 1 clic d'origine reste totalement inchangé**.
+- **Configuration serveur générée** : hôte virtuel Apache ou Nginx (test `httpd -t` / `nginx -t` avant rechargement, sauvegarde possible), page `index.php` de test, contexte SELinux, `httpd_can_network_connect_db`, et création de la base/utilisateur avec mot de passe root facultatif (MariaDB via socket, MySQL en `caching_sha2_password`), valeurs SQL échappées.
+
+### Modifié
+- `APP_VERSION` passe à `0.12.0`, notes de version FR/EN de la boîte « À propos » mises à jour.
+
 ## [0.11.0] — 2026-11-26
 
 ### Ajouté
