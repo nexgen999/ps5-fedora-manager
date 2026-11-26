@@ -7,6 +7,15 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.9.1] — 2026-11-26
+
+### Added
+- **Freebuff (AI coding agent)** on the “AI & Developer” page, below VSCodium: install (`npm install -g freebuff`, installing Node.js + npm when missing), update (`npm install -g freebuff@latest`), uninstall (`npm uninstall -g freebuff`) and launch in a terminal in the user session. The global npm package version is read from disk and shown in the subtitle; labels translated in all six languages.
+
+### Changed
+- `APP_VERSION` bumped to `0.9.1`, FR/EN release notes of the “About” dialog updated.
+- “AI & Developer” page subtitle: Ollama, Open WebUI, VSCodium, Freebuff and local AI models.
+
 ## [0.9.0] — 2026-11-25
 
 ### Added

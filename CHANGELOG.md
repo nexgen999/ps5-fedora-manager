@@ -6,6 +6,15 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.9.1] — 2026-11-26
+
+### Ajouté
+- **Freebuff (agent de code IA)** dans la page « IA & Développeur », sous VSCodium : installation (`npm install -g freebuff`, avec Node.js + npm installés s'ils manquent), mise à jour (`npm install -g freebuff@latest`), désinstallation (`npm uninstall -g freebuff`) et lancement dans un terminal sous la session utilisateur. La version du paquet npm global est lue sur disque et affichée en sous-titre ; libellés traduits dans les six langues.
+
+### Modifié
+- `APP_VERSION` passe à `0.9.1`, notes de version FR/EN de la boîte « À propos » mises à jour.
+- Sous-titre de la page « IA & Développeur » : Ollama, Open WebUI, VSCodium, Freebuff et modèles IA locaux.
+
 ## [0.9.0] — 2026-11-25
 
 ### Ajouté

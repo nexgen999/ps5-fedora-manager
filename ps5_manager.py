@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.9.0"
+APP_VERSION = "0.9.1"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1119,16 +1119,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.8.2",
-    "en": "What is new in 0.8.2",
-    "es": "Novedades de la 0.8.2",
-    "it": "Novità della 0.8.2",
-    "de": "Neu in 0.8.2",
-    "pt": "Novidades da 0.8.2",
+    "fr": "Nouveautés de la 0.9.1",
+    "en": "What is new in 0.9.1",
+    "es": "Novedades de la 0.9.1",
+    "it": "Novità della 0.9.1",
+    "de": "Neu in 0.9.1",
+    "pt": "Novidades da 0.9.1",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.9.1 : Freebuff (agent de code IA) dans la page IA &amp; Développeur — installation, mise à jour et désinstallation via npm, lancement dans un terminal",
         "0.8.2 : boîte « À propos » entièrement traduite (notes de version, informations de débogage) et menu principal vérifié dans les six langues",
         "0.8.1 : le raccourci « Basculer Session » et la session Steam utilisent l'icône Gamescope (Steam Deck) fournie, installée dans le thème d'icônes",
         "0.8 : fenêtre « Système » repensée (logos Fedora, bureau et Gamescope, informations regroupées, copie en un clic) et traductions complétées en espagnol, italien, allemand et portugais",
@@ -1142,6 +1143,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.9.1: Freebuff (AI coding agent) on the AI &amp; Developer page — npm install, update and uninstall, launch in a terminal",
         "0.8.2: fully translated “About” dialog (release notes, debug information) and main menu checked in all six languages",
         "0.8.1: the “Switch Session” shortcut and the Steam session now use the provided Gamescope (Steam Deck) icon, installed in the icon theme",
         "0.8: redesigned “System” window (Fedora, desktop and Gamescope logos, grouped information, one-click copy) and completed translations in Spanish, Italian, German and Portuguese",
@@ -1155,6 +1157,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.9.1 : Freebuff (agente de código IA) en la página IA y Desarrollo — instalación, actualización y desinstalación con npm, inicio en una terminal",
         "0.8.2 : diálogo «Acerca de» totalmente traducido (notas de versión, información de depuración) y menú principal revisado en los seis idiomas",
         "0.8.1 : el atajo «Cambiar de sesión» y la sesión Steam usan el icono Gamescope (Steam Deck) proporcionado, instalado en el tema de iconos",
         "0.8 : ventana «Sistema» rediseñada (logos de Fedora, escritorio y Gamescope, información agrupada, copia con un clic) y traducciones completadas en español, italiano, alemán y portugués",
@@ -1168,6 +1171,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.9.1 : Freebuff (agente di codice IA) nella pagina IA e Sviluppo — installazione, aggiornamento e disinstallazione con npm, avvio in un terminale",
         "0.8.2 : finestra «Informazioni su» completamente tradotta (note di versione, informazioni di debug) e menu principale verificato nelle sei lingue",
         "0.8.1 : il collegamento «Cambia sessione» e la sessione Steam usano l'icona Gamescope (Steam Deck) fornita, installata nel tema delle icone",
         "0.8 : finestra «Sistema» ridisegnata (logo Fedora, desktop e Gamescope, informazioni raggruppate, copia con un clic) e traduzioni completate in spagnolo, italiano, tedesco e portoghese",
@@ -1181,6 +1185,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.9.1 : Freebuff (KI-Coding-Agent) auf der Seite „KI &amp; Entwickler“ – npm-Installation, -Aktualisierung und -Deinstallation, Start in einem Terminal",
         "0.8.2 : Dialog „Info über“ vollständig übersetzt (Versionshinweise, Debug-Informationen) und Hauptmenü in allen sechs Sprachen geprüft",
         "0.8.1 : Die Verknüpfung „Sitzung wechseln“ und die Steam-Sitzung verwenden das mitgelieferte Gamescope-Symbol (Steam Deck), installiert im Icon-Theme",
         "0.8 : „System“-Fenster neu gestaltet (Fedora-, Desktop- und Gamescope-Logos, gruppierte Informationen, Kopieren mit einem Klick) und Übersetzungen für Spanisch, Italienisch, Deutsch und Portugiesisch vervollständigt",
@@ -1194,6 +1199,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.9.1 : Freebuff (agente de código IA) na página IA e Programador — instalação, atualização e desinstalação com npm, arranque num terminal",
         "0.8.2 : caixa «Sobre» totalmente traduzida (notas de versão, informações de depuração) e menu principal verificado nos seis idiomas",
         "0.8.1 : o atalho «Alternar sessão» e a sessão Steam usam o ícone Gamescope (Steam Deck) fornecido, instalado no tema de ícones",
         "0.8 : janela «Sistema» redesenhada (logos do Fedora, da área de trabalho e do Gamescope, informações agrupadas, cópia com um clique) e traduções concluídas em espanhol, italiano, alemão e português",
@@ -2338,7 +2344,7 @@ STRINGS = {
         "fr_label": "Français",
         "en_label": "English",
         # 15. IA & Développeur
-        "aidev_open_sub": "Ollama, Open WebUI (Podman), VSCodium et modèles IA locaux",
+        "aidev_open_sub": "Ollama, Open WebUI (Podman), VSCodium, Freebuff et modèles IA locaux",
         "aidev_stack": "Outils & Applications IA / Dev",
         "aidev_stack_sub": "Installation, mise à jour et désinstallation des briques locales",
         "aidev_services": "Contrôle des services IA",
@@ -2783,7 +2789,7 @@ STRINGS = {
         "fr_label": "Français",
         "en_label": "English",
         # 15. AI & Developer
-        "aidev_open_sub": "Ollama, Open WebUI (Podman), VSCodium and local AI models",
+        "aidev_open_sub": "Ollama, Open WebUI (Podman), VSCodium, Freebuff and local AI models",
         "aidev_stack": "AI & Developer Stack",
         "aidev_stack_sub": "Install, update and uninstall local AI and coding tools",
         "aidev_services": "AI Services Control",
@@ -3237,7 +3243,7 @@ STRINGS['es'] = {'app_title': 'PS5 Fedora Manager',
  'ui_lang_sub': 'Cambio inmediato y guardado en /etc/ps5-manager/language',
  'fr_label': 'Français',
  'en_label': 'English',
- 'aidev_open_sub': 'Ollama, Open WebUI (Podman), VSCodium y modelos de IA locales',
+ 'aidev_open_sub': 'Ollama, Open WebUI (Podman), VSCodium, Freebuff y modelos de IA locales',
  'aidev_stack': 'Herramientas y aplicaciones IA / Dev',
  'aidev_stack_sub': 'Instalación, actualización y desinstalación de los componentes locales',
  'aidev_services': 'Control de los servicios de IA',
@@ -3673,7 +3679,7 @@ STRINGS['it'] = {'app_title': 'PS5 Fedora Manager',
  'ui_lang_sub': 'Cambio immediato e salvato in /etc/ps5-manager/language',
  'fr_label': 'Français',
  'en_label': 'English',
- 'aidev_open_sub': 'Ollama, Open WebUI (Podman), VSCodium e modelli IA locali',
+ 'aidev_open_sub': 'Ollama, Open WebUI (Podman), VSCodium, Freebuff e modelli IA locali',
  'aidev_stack': 'Strumenti e applicazioni IA / Dev',
  'aidev_stack_sub': 'Installazione, aggiornamento e disinstallazione dei componenti locali',
  'aidev_services': 'Controllo dei servizi IA',
@@ -4109,7 +4115,7 @@ STRINGS['de'] = {'app_title': 'PS5 Fedora Manager',
  'ui_lang_sub': 'Sofortige Änderung, gespeichert in /etc/ps5-manager/language',
  'fr_label': 'Français',
  'en_label': 'English',
- 'aidev_open_sub': 'Ollama, Open WebUI (Podman), VSCodium und lokale KI-Modelle',
+ 'aidev_open_sub': 'Ollama, Open WebUI (Podman), VSCodium, Freebuff und lokale KI-Modelle',
  'aidev_stack': 'KI- und Entwicklerwerkzeuge',
  'aidev_stack_sub': 'Installation, Aktualisierung und Deinstallation der lokalen Bausteine',
  'aidev_services': 'KI-Dienste steuern',
@@ -4544,7 +4550,7 @@ STRINGS['pt'] = {'app_title': 'PS5 Fedora Manager',
  'ui_lang_sub': 'Mudança imediata e salva em /etc/ps5-manager/language',
  'fr_label': 'Français',
  'en_label': 'English',
- 'aidev_open_sub': 'Ollama, Open WebUI (Podman), VSCodium e modelos de IA locais',
+ 'aidev_open_sub': 'Ollama, Open WebUI (Podman), VSCodium, Freebuff e modelos de IA locais',
  'aidev_stack': 'Ferramentas e aplicativos de IA / Dev',
  'aidev_stack_sub': 'Instalação, atualização e desinstalação dos componentes locais',
  'aidev_services': 'Controle dos serviços de IA',
@@ -6051,6 +6057,90 @@ _L_TABLE = {
         "Scarica un altro modello (nome personalizzato)",
         "Ein weiteres Modell laden (eigener Name)",
         "Baixar outro modelo (nome personalizado)",
+    ),
+    "Freebuff (agent de code IA)": (
+        "Freebuff (agente de código IA)",
+        "Freebuff (agente di codice IA)",
+        "Freebuff (KI-Coding-Agent)",
+        "Freebuff (agente de código IA)",
+    ),
+    "Non installé · npm install -g freebuff": (
+        "No instalado · npm install -g freebuff",
+        "Non installato · npm install -g freebuff",
+        "Nicht installiert · npm install -g freebuff",
+        "Não instalado · npm install -g freebuff",
+    ),
+    "Installé (binaire détecté)": (
+        "Instalado (binario detectado)",
+        "Installato (binario rilevato)",
+        "Installiert (Binärdatei gefunden)",
+        "Instalado (binário detetado)",
+    ),
+    "npm install -g freebuff (Node.js + npm installés si absents)": (
+        "npm install -g freebuff (Node.js y npm instalados si faltan)",
+        "npm install -g freebuff (Node.js e npm installati se assenti)",
+        "npm install -g freebuff (Node.js und npm bei Bedarf installiert)",
+        "npm install -g freebuff (Node.js e npm instalados se ausentes)",
+    ),
+    "Lancer Freebuff dans un terminal": (
+        "Iniciar Freebuff en una terminal",
+        "Avvia Freebuff in un terminale",
+        "Freebuff in einem Terminal starten",
+        "Iniciar o Freebuff num terminal",
+    ),
+    "Ouvre freebuff dans un terminal sous votre session utilisateur": (
+        "Abre freebuff en una terminal en tu sesión de usuario",
+        "Apre freebuff in un terminale nella tua sessione utente",
+        "Öffnet freebuff in einem Terminal Ihrer Benutzersitzung",
+        "Abre o freebuff num terminal na sua sessão de utilizador",
+    ),
+    "Désinstaller Freebuff": (
+        "Desinstalar Freebuff",
+        "Disinstalla Freebuff",
+        "Freebuff deinstallieren",
+        "Desinstalar o Freebuff",
+    ),
+    "Supprimer Freebuff (npm uninstall -g freebuff) ?": (
+        "¿Eliminar Freebuff (npm uninstall -g freebuff)?",
+        "Rimuovere Freebuff (npm uninstall -g freebuff)?",
+        "Freebuff entfernen (npm uninstall -g freebuff)?",
+        "Remover o Freebuff (npm uninstall -g freebuff)?",
+    ),
+    "Installer Freebuff": (
+        "Instalar Freebuff",
+        "Installa Freebuff",
+        "Freebuff installieren",
+        "Instalar o Freebuff",
+    ),
+    "Mettre à jour Freebuff": (
+        "Actualizar Freebuff",
+        "Aggiorna Freebuff",
+        "Freebuff aktualisieren",
+        "Atualizar o Freebuff",
+    ),
+    "Node.js et npm sont requis pour Freebuff : installation…": (
+        "Node.js y npm son necesarios para Freebuff: instalando…",
+        "Node.js e npm sono necessari per Freebuff: installazione…",
+        "Node.js und npm werden für Freebuff benötigt – Installation…",
+        "Node.js e npm são necessários para o Freebuff: a instalar…",
+    ),
+    "Node.js et npm sont requis pour Freebuff.": (
+        "Node.js y npm son necesarios para Freebuff.",
+        "Node.js e npm sono necessari per Freebuff.",
+        "Node.js und npm werden für Freebuff benötigt.",
+        "Node.js e npm são necessários para o Freebuff.",
+    ),
+    "npm est introuvable : Freebuff n'a pas été installé par npm.": (
+        "npm no encontrado: Freebuff no se instaló con npm.",
+        "npm non trovato: Freebuff non è stato installato con npm.",
+        "npm nicht gefunden: Freebuff wurde nicht mit npm installiert.",
+        "npm não encontrado: o Freebuff não foi instalado com npm.",
+    ),
+    "Terminal introuvable : lance « freebuff » depuis un terminal.": (
+        "Terminal no encontrada: ejecuta «freebuff» desde una terminal.",
+        "Terminale non trovato: avvia «freebuff» da un terminale.",
+        "Kein Terminal gefunden: starte „freebuff“ in einem Terminal.",
+        "Terminal não encontrado: execute «freebuff» num terminal.",
     ),
 }
 
@@ -9282,6 +9372,98 @@ def _vscodium_installed() -> bool:
     return subprocess.run(["rpm", "-q", "codium"], capture_output=True).returncode == 0
 
 
+FREEBUFF_PACKAGE = "freebuff"
+# Terminaux essayés pour « Lancer Freebuff » (l'agent est une TUI : il lui faut
+# un vrai terminal, pas le journal de l'application).
+FREEBUFF_TERMINALS: tuple[tuple[str, list[str]], ...] = (
+    ("ptyxis", ["--"]),
+    ("kgx", ["--"]),
+    ("gnome-terminal", ["--"]),
+    ("konsole", ["-e"]),
+    ("xfce4-terminal", ["-x"]),
+    ("mate-terminal", ["-x"]),
+    ("tilix", ["-e"]),
+    ("xterm", ["-e"]),
+)
+
+
+def _npm_bin() -> Optional[str]:
+    found = shutil.which("npm")
+    if found and os.access(found, os.X_OK):
+        return found
+    for cand in ("/usr/local/bin/npm", "/usr/bin/npm", "/bin/npm"):
+        if os.path.isfile(cand) and os.access(cand, os.X_OK):
+            return cand
+    return None
+
+
+def _freebuff_bin() -> Optional[str]:
+    found = shutil.which("freebuff")
+    if found and os.access(found, os.X_OK):
+        return found
+    candidates = ["/usr/local/bin/freebuff", "/usr/bin/freebuff"]
+    if REAL_HOME:
+        candidates.append(os.path.join(REAL_HOME, ".npm-global", "bin", "freebuff"))
+        candidates.append(os.path.join(REAL_HOME, ".local", "bin", "freebuff"))
+    for cand in candidates:
+        if os.path.isfile(cand) and os.access(cand, os.X_OK):
+            return cand
+    return None
+
+
+def _freebuff_version() -> str:
+    """Version du paquet npm global freebuff (chaîne vide s'il est absent)."""
+    roots: list[str] = []
+    prefix = os.environ.get("npm_config_prefix", "").strip()
+    if prefix:
+        roots.append(os.path.join(prefix, "lib", "node_modules"))
+    roots.extend(["/usr/local/lib/node_modules", "/usr/lib/node_modules"])
+    if REAL_HOME:
+        roots.append(os.path.join(REAL_HOME, ".npm-global", "lib", "node_modules"))
+        roots.append(os.path.join(REAL_HOME, ".local", "lib", "node_modules"))
+    for root in roots:
+        pkg = os.path.join(root, FREEBUFF_PACKAGE, "package.json")
+        if not os.path.isfile(pkg):
+            continue
+        try:
+            with open(pkg, encoding="utf-8") as fh:
+                return str(json.load(fh).get("version") or "")
+        except (OSError, ValueError):
+            continue
+    return ""
+
+
+def _freebuff_installed() -> bool:
+    return bool(_freebuff_version()) or _freebuff_bin() is not None
+
+
+def _ensure_npm_ready(win: Ps5ManagerWindow, emit: Callable[[str], None]) -> bool:
+    if _npm_bin():
+        return True
+    emit(_L("Node.js et npm sont requis pour Freebuff : installation…",
+            "Node.js and npm are required for Freebuff: installing…"))
+    if win.run_cmd_pty(["dnf", "install", "-y", "nodejs", "npm"], emit) != 0:
+        return False
+    return _npm_bin() is not None
+
+
+def _launch_freebuff() -> bool:
+    """Ouvre freebuff dans le premier terminal disponible de la session."""
+    for name, extra in FREEBUFF_TERMINALS:
+        path = shutil.which(name)
+        if not path:
+            continue
+        try:
+            subprocess.Popen(
+                [path, *extra, "bash", "-lc", 'cd "$HOME" && freebuff'],
+                **user_subprocess_kwargs(),
+            )
+            return True
+        except OSError:
+            continue
+    return False
+
+
 def _ensure_vscodium_repo(win: Ps5ManagerWindow, emit: Callable[[str], None]) -> bool:
     rc = win.run_cmd_pty(["rpmkeys", "--import", VSCODIUM_GPG], emit)
     if rc != 0:
@@ -9421,6 +9603,8 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     ai_state = _aidev_state(win)
     webui_st, webui_owner = ai_state["webui"]
     codium_ok = _vscodium_installed()
+    freebuff_ok = _freebuff_installed()
+    freebuff_ver = _freebuff_version() if freebuff_ok else ""
     installed_models = ai_state["models"]
 
     # 1) Outils & Applications IA / Dev
@@ -9468,6 +9652,22 @@ def build_page_aidev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
             T("installed_rpm") if codium_ok else f"{T('not_installed')} · dépôt officiel RPM",
             "applications-development-symbolic",
             lambda *_: _push_vscodium_actions(win),
+        )
+    )
+
+    if freebuff_ver:
+        freebuff_sub = f"{freebuff_ver} · npm (global)"
+    elif freebuff_ok:
+        freebuff_sub = _L("Installé (binaire détecté)", "Installed (binary found)")
+    else:
+        freebuff_sub = _L("Non installé · npm install -g freebuff",
+                          "Not installed · npm install -g freebuff")
+    g_tools.add(
+        win.row(
+            _L("Freebuff (agent de code IA)", "Freebuff (AI coding agent)"),
+            freebuff_sub,
+            "utilities-terminal-symbolic",
+            lambda *_: _push_freebuff_actions(win),
         )
     )
     page.add(g_tools)
@@ -10176,6 +10376,112 @@ def _push_vscodium_actions(win: Ps5ManagerWindow) -> None:
     tb.add_top_bar(hb)
     tb.set_content(sub)
     win.nav.push(Adw.NavigationPage(child=tb, title="VSCodium"))
+
+
+def _push_freebuff_actions(win: Ps5ManagerWindow) -> None:
+    version = _freebuff_version()
+    installed = _freebuff_installed()
+    if version:
+        desc = f"{version} · npm (global)"
+    elif installed:
+        desc = _L("Installé (binaire détecté)", "Installed (binary found)")
+    else:
+        desc = T("not_installed")
+    sub = Adw.PreferencesPage()
+    grp = pref_group(title="Freebuff", description=desc)
+
+    def _install():
+        def _task(emit):
+            if not _ensure_npm_ready(win, emit):
+                return False, _L("Node.js et npm sont requis pour Freebuff.",
+                                 "Node.js and npm are required for Freebuff.")
+            npm = _npm_bin() or "npm"
+            rc = win.run_cmd_pty([npm, "install", "-g", FREEBUFF_PACKAGE], emit)
+            return rc == 0, T("done") if rc == 0 else T("failed") % rc
+        win.run_task(_L("Installer Freebuff", "Install Freebuff"), _task,
+                     lambda *_: (win.nav.pop(), win._select_section("aidev")))
+
+    def _update():
+        def _task(emit):
+            if not _ensure_npm_ready(win, emit):
+                return False, _L("Node.js et npm sont requis pour Freebuff.",
+                                 "Node.js and npm are required for Freebuff.")
+            npm = _npm_bin() or "npm"
+            rc = win.run_cmd_pty([npm, "install", "-g", f"{FREEBUFF_PACKAGE}@latest"], emit)
+            return rc == 0, T("done") if rc == 0 else T("failed") % rc
+        win.run_task(_L("Mettre à jour Freebuff", "Update Freebuff"), _task,
+                     lambda *_: (win.nav.pop(), win._select_section("aidev")))
+
+    def _remove():
+        def _task(emit):
+            npm = _npm_bin()
+            if not npm:
+                return False, _L("npm est introuvable : Freebuff n'a pas été installé par npm.",
+                                 "npm not found: Freebuff was not installed with npm.")
+            rc = win.run_cmd_pty([npm, "uninstall", "-g", FREEBUFF_PACKAGE], emit)
+            return rc == 0, T("done") if rc == 0 else T("failed") % rc
+        win.run_task(_L("Désinstaller Freebuff", "Uninstall Freebuff"), _task,
+                     lambda *_: (win.nav.pop(), win._select_section("aidev")))
+
+    def _launch():
+        if not _launch_freebuff():
+            win.show_info("Freebuff", _L(
+                "Terminal introuvable : lance « freebuff » depuis un terminal.",
+                "No terminal found: run “freebuff” from a terminal.",
+            ))
+
+    grp.add(
+        win.row(
+            T("install"),
+            _L("npm install -g freebuff (Node.js + npm installés si absents)",
+               "npm install -g freebuff (Node.js + npm installed if missing)"),
+            "system-software-install-symbolic",
+            lambda *_: _install(),
+        )
+    )
+    grp.add(
+        win.row(
+            T("update"),
+            "npm install -g freebuff@latest",
+            "software-update-available-symbolic",
+            lambda *_: _update() if _freebuff_installed() else win.show_info("Freebuff", T("not_installed")),
+        )
+    )
+    if installed:
+        grp.add(
+            win.row(
+                _L("Lancer Freebuff dans un terminal", "Launch Freebuff in a terminal"),
+                _L("Ouvre freebuff dans un terminal sous votre session utilisateur",
+                   "Opens freebuff in a terminal in your user session"),
+                "utilities-terminal-symbolic",
+                lambda *_: _launch(),
+            )
+        )
+    grp.add(
+        win.row(
+            T("remove"),
+            "npm uninstall -g freebuff",
+            "user-trash-symbolic",
+            lambda *_: (
+                win.show_confirm(
+                    _L("Désinstaller Freebuff", "Uninstall Freebuff"),
+                    _L("Supprimer Freebuff (npm uninstall -g freebuff) ?",
+                       "Remove Freebuff (npm uninstall -g freebuff)?"),
+                    _remove,
+                )
+                if _freebuff_installed()
+                else win.show_info("Freebuff", T("not_installed"))
+            ),
+        )
+    )
+
+    sub.add(grp)
+    tb = Adw.ToolbarView()
+    hb = Adw.HeaderBar()
+    hb.set_title_widget(Adw.WindowTitle(title="Freebuff"))
+    tb.add_top_bar(hb)
+    tb.set_content(sub)
+    win.nav.push(Adw.NavigationPage(child=tb, title="Freebuff"))
 
 
 def _push_ai_models(win: Ps5ManagerWindow) -> None:
