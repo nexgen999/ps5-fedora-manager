@@ -7,6 +7,18 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.14.0] — 2026-11-26
+
+### Added
+- **Status badges** in the *Development* and *Web server* catalogues as well as the *Easy setup* profiles: **● Installed** (green), **◐ 2/3** (partial), **○ Not installed** (grey), with a tooltip; the state comes from real detection (grouped `rpm -q`, dedicated commands).
+- **“Services” section**: one switch per systemd unit (`httpd`, `nginx`, `php-fpm`, `mariadb`, `mysqld`, `docker`, `podman.socket`, `forgejo`, `firewalld`, `sshd`, `cockpit.socket`, `bluetooth`, `cups`, `avahi-daemon`, `ModemManager`). The switch starts (`enable --now`) or stops (`disable --now`) the service, rolling back automatically when the action is refused.
+- **“Turn off unneeded daemons” shortcut**: disables Bluetooth, CUPS, Avahi and ModemManager behind one confirmation, then reloads the page.
+- **`doc/` documentation** in French and English: bilingual index, easy setup, web server, development, services, Gamescope, Freebuff, reset — commands, written files, troubleshooting.
+
+### Changed
+- `SECTIONS` and `PAGE_BUILDERS` now include the `services` section; `sec_services` translated in 6 languages.
+- `README.md` points to `doc/`.
+
 ## [0.13.0] — 2026-11-26
 
 ### Added

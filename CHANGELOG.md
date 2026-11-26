@@ -6,6 +6,18 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.14.0] — 2026-11-26
+
+### Ajouté
+- **Pastilles d'état** dans les catalogues *Développement* et *Serveur web* comme sur les profils d'*Installation facile* : **● Installé** (vert), **◐ 2/3** (partiel), **○ Non installé** (gris), avec infobulle ; l'état vient de la détection réelle (`rpm -q` groupé, commandes dédiées).
+- **Section « Services »** : un interrupteur par unité systemd (`httpd`, `nginx`, `php-fpm`, `mariadb`, `mysqld`, `docker`, `podman.socket`, `forgejo`, `firewalld`, `sshd`, `cockpit.socket`, `bluetooth`, `cups`, `avahi-daemon`, `ModemManager`). L'interrupteur allume (`enable --now`) ou éteint (`disable --now`) le service, avec retour arrière automatique si l'action est refusée.
+- **Raccourci « Couper les daemons inutiles »** : désactive Bluetooth, CUPS, Avahi et ModemManager en une confirmation, puis recharge la page.
+- **Documentation** `doc/` en français et en anglais : index bilingue, installation facile, serveur web, développement, services, Gamescope, Freebuff, réinitialisation — commandes, fichiers écrits, dépannage.
+
+### Modifié
+- `SECTIONS` et `PAGE_BUILDERS` accueillent la section `services` ; `sec_services` traduit en 6 langues.
+- Le `README.md` renvoie vers `doc/`.
+
 ## [0.13.0] — 2026-11-26
 
 ### Ajouté

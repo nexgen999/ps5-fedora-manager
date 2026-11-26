@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.13.0"
+APP_VERSION = "0.14.0"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1119,16 +1119,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.13.0",
-    "en": "What is new in 0.13.0",
-    "es": "Novedades de la 0.13.0",
-    "it": "Novità della 0.13.0",
-    "de": "Neu in 0.13.0",
-    "pt": "Novidades da 0.13.0",
+    "fr": "Nouveautés de la 0.14.0",
+    "en": "What is new in 0.14.0",
+    "es": "Novedades de la 0.14.0",
+    "it": "Novità della 0.14.0",
+    "de": "Neu in 0.14.0",
+    "pt": "Novidades da 0.14.0",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.14 : pastilles d'état (installé / partiel / absent) sur les catalogues et les profils, nouvelle section « Services » avec interrupteurs on/off systemd et raccourci pour couper bluetooth, CUPS, Avahi et ModemManager, et une documentation FR/EN complète dans le dossier doc/",
         "0.13 : six profils d'installation (dont WordPress et tout-en-un), quinze options de configuration (port HTTP, mémoire et envoi PHP, fuseau, certificat Let's Encrypt, port et compte admin Forgejo) et un outil de réinitialisation qui désinstalle les composants et efface les configurations du manager",
         "0.12 : section « Installation facile » — profils LAMP, LEMP, Code &amp; outils et Conteneurs, avec choix des composants, configuration (ServerName, dossier web, base de données) et la même fenêtre de progression que le setup 1 clic, qui reste inchangé",
         "0.11 : section « Serveur web » — Apache, Nginx, PHP + handler FastCGI, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, pare-feu et OpenSSH, chacun avec installation, mise à jour et désinstallation",
@@ -1147,6 +1148,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.14: status badges (installed / partial / missing) on the catalogues and profiles, a new “Services” section with systemd on/off switches and a shortcut to turn off bluetooth, CUPS, Avahi and ModemManager, and complete FR/EN documentation in the doc/ folder",
         "0.13: six setup profiles (including WordPress and all-in-one), fifteen configuration options (HTTP port, PHP memory and upload size, timezone, Let's Encrypt certificate, Forgejo port and admin account) and a reset tool that uninstalls components and clears the manager's configuration files",
         "0.12: “Easy setup” section — LAMP, LEMP, Code &amp; tools and Containers profiles, with component selection, configuration (ServerName, web root, database) and the same progress window as the 1-click setup, which stays unchanged",
         "0.11: “Web server” section — Apache, Nginx, PHP + FastCGI handler, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, firewall and OpenSSH, each with install, update and uninstall",
@@ -1165,6 +1167,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.14 : indicadores de estado (instalado / parcial / ausente) en los catálogos y perfiles, nueva sección «Servicios» con interruptores on/off de systemd y un atajo para apagar bluetooth, CUPS, Avahi y ModemManager, y documentación completa FR/EN en la carpeta doc/",
         "0.13 : seis perfiles de instalación (incluidos WordPress y todo en uno), quince opciones de configuración (puerto HTTP, memoria y subida PHP, zona horaria, certificado Let's Encrypt, puerto y cuenta admin de Forgejo) y una herramienta de restablecimiento que desinstala componentes y borra las configuraciones del gestor",
         "0.12 : sección «Instalación fácil» — perfiles LAMP, LEMP, Código y herramientas y Contenedores, con selección de componentes, configuración (ServerName, carpeta web, base de datos) y la misma ventana de progreso que la configuración en 1 clic, que no cambia",
         "0.11 : sección «Servidor web» — Apache, Nginx, PHP + handler FastCGI, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, cortafuegos y OpenSSH, con instalación, actualización y desinstalación",
@@ -1183,6 +1186,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.14 : indicatori di stato (installato / parziale / assente) nei cataloghi e nei profili, nuova sezione «Servizi» con interruttori on/off systemd e una scorciatoia per spegnere bluetooth, CUPS, Avahi e ModemManager, e documentazione completa FR/EN nella cartella doc/",
         "0.13 : sei profili di installazione (inclusi WordPress e tutto in uno), quindici opzioni di configurazione (porta HTTP, memoria e upload PHP, fuso orario, certificato Let's Encrypt, porta e account admin Forgejo) e uno strumento di ripristino che disinstalla i componenti e cancella le configurazioni del gestore",
         "0.12 : sezione «Installazione facile» — profili LAMP, LEMP, Codice e strumenti e Contenitori, con scelta dei componenti, configurazione (ServerName, cartella web, database) e la stessa finestra di avanzamento della configurazione in 1 clic, che resta invariata",
         "0.11 : sezione «Server web» — Apache, Nginx, PHP + handler FastCGI, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, firewall e OpenSSH, con installazione, aggiornamento e disinstallazione",
@@ -1201,6 +1205,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.14 : Statusanzeigen (installiert / teilweise / fehlend) in den Katalogen und Profilen, neuer Abschnitt „Dienste“ mit systemd-Ein/Aus-Schaltern und einer Abkürzung zum Abschalten von Bluetooth, CUPS, Avahi und ModemManager sowie vollständige FR/EN-Dokumentation im Ordner doc/",
         "0.13 : sechs Installationsprofile (darunter WordPress und Alles-in-einem), fünfzehn Konfigurationsoptionen (HTTP-Port, PHP-Speicher und Upload-Größe, Zeitzone, Let's-Encrypt-Zertifikat, Forgejo-Port und Admin-Konto) und ein Zurücksetzen-Werkzeug, das Komponenten deinstalliert und die Konfigurationsdateien des Managers entfernt",
         "0.12 : Abschnitt „Einfache Installation“ – Profile LAMP, LEMP, Code &amp; Werkzeuge und Container mit Komponentenauswahl, Konfiguration (ServerName, Webverzeichnis, Datenbank) und demselben Fortschrittsfenster wie das 1-Klick-Setup, das unverändert bleibt",
         "0.11 : Abschnitt „Webserver“ – Apache, Nginx, PHP + FastCGI-Handler, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, Firewall und OpenSSH, jeweils mit Installation, Aktualisierung und Deinstallation",
@@ -1219,6 +1224,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.14 : indicadores de estado (instalado / parcial / ausente) nos catálogos e perfis, nova secção «Serviços» com interruptores on/off do systemd e um atalho para desligar bluetooth, CUPS, Avahi e ModemManager, e documentação completa FR/EN na pasta doc/",
         "0.13 : seis perfis de instalação (incluindo WordPress e tudo-em-um), quinze opções de configuração (porta HTTP, memória e upload PHP, fuso horário, certificado Let's Encrypt, porta e conta admin do Forgejo) e uma ferramenta de reposição que desinstala componentes e apaga as configurações do gestor",
         "0.12 : secção «Instalação fácil» — perfis LAMP, LEMP, Código e ferramentas e Contêineres, com escolha de componentes, configuração (ServerName, pasta web, base de dados) e a mesma janela de progresso da configuração em 1 clique, que se mantém igual",
         "0.11 : secção «Servidor web» — Apache, Nginx, PHP + handler FastCGI, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, firewall e OpenSSH, com instalação, atualização e desinstalação",
@@ -1986,6 +1992,7 @@ STRINGS = {
         "sec_dev": "Développement",
         "sec_web": "Serveur web",
         "sec_easy": "Installation facile",
+        "sec_services": "Services (marche/arrêt)",
         "sec_deps": "Dépendances Supplémentaires",
         "sec_gaming": "Gaming Mode",
         "sec_fix": "Divers Fix",
@@ -2434,6 +2441,7 @@ STRINGS = {
         "sec_dev": "Development",
         "sec_web": "Web server",
         "sec_easy": "Easy setup",
+        "sec_services": "Services (on/off)",
         "sec_deps": "Additional Dependencies",
         "sec_gaming": "Gaming Mode",
         "sec_fix": "Misc Fixes",
@@ -2895,6 +2903,7 @@ STRINGS['es'] = {'app_title': 'PS5 Fedora Manager',
  'sec_dev': 'Desarrollo',
  'sec_web': 'Servidor web',
  'sec_easy': 'Instalación fácil',
+ 'sec_services': 'Servicios (encendido/apagado)',
  'sec_deps': 'Dependencias adicionales',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Arreglos varios',
@@ -3338,6 +3347,7 @@ STRINGS['it'] = {'app_title': 'PS5 Fedora Manager',
  'sec_dev': 'Sviluppo',
  'sec_web': 'Server web',
  'sec_easy': 'Installazione facile',
+ 'sec_services': 'Servizi (on/off)',
  'sec_deps': 'Dipendenze aggiuntive',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Correzioni varie',
@@ -3777,6 +3787,7 @@ STRINGS['de'] = {'app_title': 'PS5 Fedora Manager',
  'sec_dev': 'Entwicklung',
  'sec_web': 'Webserver',
  'sec_easy': 'Einfache Installation',
+ 'sec_services': 'Dienste (ein/aus)',
  'sec_deps': 'Zusätzliche Abhängigkeiten',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Diverse Korrekturen',
@@ -4216,6 +4227,7 @@ STRINGS['pt'] = {'app_title': 'PS5 Fedora Manager',
  'sec_dev': 'Desenvolvimento',
  'sec_web': 'Servidor web',
  'sec_easy': 'Instalação fácil',
+ 'sec_services': 'Serviços (ligar/desligar)',
  'sec_deps': 'Dependências adicionais',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Correções diversas',
@@ -5676,6 +5688,7 @@ SECTIONS = [
     ("dev", "applications-engineering-symbolic", "sec_dev", 1),
     ("websrv", "network-server-symbolic", "sec_web", 1),
     ("easy", "preferences-other-symbolic", "sec_easy", 1),
+    ("services", "system-run-symbolic", "sec_services", 1),
     ("deps", "application-x-addon-symbolic", "sec_deps", 1),
     ("gaming", "input-gaming-symbolic", "sec_gaming", 1),
     ("features", "application-x-executable-symbolic", "sec_features", 1),
@@ -6894,6 +6907,102 @@ _L_TABLE = {
         "Ripristino completato.",
         "Zurücksetzen abgeschlossen.",
         "Reinício concluído.",
+    ),
+    "Services (marche/arrêt)": (
+        "Servicios (encendido/apagado)",
+        "Servizi (on/off)",
+        "Dienste (ein/aus)",
+        "Serviços (ligar/desligar)",
+    ),
+    "Serveurs web & bases de données": (
+        "Servidores web y bases de datos",
+        "Server web e database",
+        "Webserver & Datenbanken",
+        "Servidores web e bases de dados",
+    ),
+    "Conteneurs & forges": (
+        "Contenedores y forjas",
+        "Contenitori e forge",
+        "Container & Forges",
+        "Contêineres e forjas",
+    ),
+    "Système & accès distant": (
+        "Sistema y acceso remoto",
+        "Sistema e accesso remoto",
+        "System & Fernzugriff",
+        "Sistema e acesso remoto",
+    ),
+    "À couper pour gagner en performance": (
+        "Para apagar y ganar rendimiento",
+        "Da spegnere per guadagnare prestazioni",
+        "Zum Abschalten für mehr Leistung",
+        "Para desligar e ganhar desempenho",
+    ),
+    "Actif · activé au démarrage": (
+        "Activo · habilitado al arranque",
+        "Attivo · abilitato all'avvio",
+        "Aktiv · beim Start aktiviert",
+        "Ativo · ativado no arranque",
+    ),
+    "Arrêté · désactivé": (
+        "Detenido · deshabilitado",
+        "Fermato · disabilitato",
+        "Gestoppt · deaktiviert",
+        "Parado · desativado",
+    ),
+    "Activé au démarrage mais arrêté": (
+        "Habilitado al arranque pero detenido",
+        "Abilitato all'avvio ma fermo",
+        "Beim Start aktiviert, aber gestoppt",
+        "Ativado no arranque mas parado",
+    ),
+    "Installé": (
+        "Instalado",
+        "Installato",
+        "Installiert",
+        "Instalado",
+    ),
+    "Non installé": (
+        "No instalado",
+        "Non installato",
+        "Nicht installiert",
+        "Não instalado",
+    ),
+    "Couper les daemons inutiles": (
+        "Apagar los daemons innecesarios",
+        "Spegni i daemon inutili",
+        "Unnötige Daemons abschalten",
+        "Desligar os daemons desnecessários",
+    ),
+    "Bluetooth, CUPS, Avahi et ModemManager — réversible à tout moment": (
+        "Bluetooth, CUPS, Avahi y ModemManager — reversible en cualquier momento",
+        "Bluetooth, CUPS, Avahi e ModemManager — reversibile in qualsiasi momento",
+        "Bluetooth, CUPS, Avahi und ModemManager — jederzeit umkehrbar",
+        "Bluetooth, CUPS, Avahi e ModemManager — reversível a qualquer momento",
+    ),
+    "Les services restent installés : rallumer l'interrupteur suffit à les relancer.": (
+        "Los servicios siguen instalados: basta con volver a encender el interruptor.",
+        "I servizi restano installati: basta riaccendere l'interruttore.",
+        "Die Dienste bleiben installiert: ein erneutes Einschalten genügt.",
+        "Os serviços continuam instalados: basta voltar a ligar o interruptor.",
+    ),
+    "Services installés sur ce système": (
+        "Servicios instalados en este sistema",
+        "Servizi installati su questo sistema",
+        "Auf diesem System installierte Dienste",
+        "Serviços instalados neste sistema",
+    ),
+    "Service non installé sur ce système.": (
+        "Servicio no instalado en este sistema.",
+        "Servizio non installato su questo sistema.",
+        "Dienst auf diesem System nicht installiert.",
+        "Serviço não instalado neste sistema.",
+    ),
+    "Unité systemd introuvable : le composant n'est pas installé.": (
+        "Unidad systemd no encontrada: el componente no está instalado.",
+        "Unità systemd non trovata: il componente non è installato.",
+        "systemd-Unit nicht gefunden: die Komponente ist nicht installiert.",
+        "Unidade systemd não encontrada: o componente não está instalado.",
     ),
 }
 
@@ -12468,6 +12577,43 @@ def _push_dev_entry(
     win.nav.push(Adw.NavigationPage(child=tb, title=title))
 
 
+def _status_badge(done: int, total: int) -> Optional[Gtk.Widget]:
+    """Pastille d'état : ● Installé (vert), ◐ partiel, ○ Non installé (gris)."""
+    if total <= 0:
+        return None
+    if done >= total:
+        text = "● " + _L("Installé", "Installed")
+        css = "success"
+        tip = T("installed_rpm")
+    elif done:
+        text = f"◐ {done}/{total}"
+        css = "warning"
+        tip = f"{done}/{total}"
+    else:
+        text = "○ " + _L("Non installé", "Not installed")
+        css = "dim-label"
+        tip = T("not_installed")
+    badge = Gtk.Label(label=text)
+    badge.add_css_class("caption")
+    badge.add_css_class(css)
+    badge.set_tooltip_text(tip)
+    badge.set_valign(Gtk.Align.CENTER)
+    return badge
+
+
+def _profile_state(profile: dict[str, Any]) -> tuple[int, int]:
+    """Composants installés / total pour un profil d'installation facile."""
+    done = total = 0
+    for key in profile["defaults"]:
+        entry = _catalog_entry(key)
+        if entry is None or entry["panel"] is not None:
+            continue
+        d, t = _dev_state(entry)
+        done += d
+        total += t
+    return done, total
+
+
 def _build_catalog_page(
     win: Ps5ManagerWindow,
     page: Adw.PreferencesPage,
@@ -12489,14 +12635,18 @@ def _build_catalog_page(
                 callback = (lambda *_, p=panel: p(win))
             else:
                 callback = (lambda *_, e=entry: _push_dev_entry(win, e, section))
-            grp.add(
-                win.row(
-                    _L(entry["title_fr"], entry["title_en"]),
-                    subtitle,
-                    entry["icon"],
-                    callback,
-                )
+            row = win.row(
+                _L(entry["title_fr"], entry["title_en"]),
+                subtitle,
+                entry["icon"],
+                callback,
+                suffix_icon=None,
             )
+            badge = _status_badge(done, total)
+            if badge is not None:
+                row.add_suffix(badge)
+            row.add_suffix(Gtk.Image.new_from_icon_name("go-next-symbolic"))
+            grp.add(row)
         page.add(grp)
     intro = pref_group(
         title=_L("À propos de cette page", "About this page"),
@@ -13467,6 +13617,239 @@ def _push_easy_reset(win: "Ps5ManagerWindow") -> None:
     win.nav.push(Adw.NavigationPage(child=toolbar, title=_L("Réinitialiser", "Reset")))
 
 
+# ------------------------------------------------------------------------------
+# Services : interrupteurs on/off (systemd) pour couper ce qui tourne pour rien
+# ------------------------------------------------------------------------------
+SERVICE_GROUPS: tuple[tuple[str, str, str], ...] = (
+    ("web", "Serveurs web & bases de données", "Web servers & databases"),
+    ("containers", "Conteneurs & forges", "Containers & forges"),
+    ("system", "Système & accès distant", "System & remote access"),
+    ("optional", "À couper pour gagner en performance", "Safe to turn off for performance"),
+)
+
+SERVICE_CATALOG: tuple[dict[str, Any], ...] = (
+    {
+        "unit": "httpd", "group": "web",
+        "fr": "Apache (httpd)", "en": "Apache (httpd)",
+        "fr_sub": "Serveur web Apache", "en_sub": "Apache web server",
+    },
+    {
+        "unit": "nginx", "group": "web",
+        "fr": "Nginx", "en": "Nginx",
+        "fr_sub": "Serveur web Nginx", "en_sub": "Nginx web server",
+    },
+    {
+        "unit": "php-fpm", "group": "web",
+        "fr": "PHP-FPM", "en": "PHP-FPM",
+        "fr_sub": "Gestionnaire PHP", "en_sub": "PHP process manager",
+    },
+    {
+        "unit": "mariadb", "group": "web",
+        "fr": "MariaDB", "en": "MariaDB",
+        "fr_sub": "Base de données MariaDB", "en_sub": "MariaDB database",
+    },
+    {
+        "unit": "mysqld", "group": "web",
+        "fr": "MySQL", "en": "MySQL",
+        "fr_sub": "Base de données MySQL", "en_sub": "MySQL database",
+    },
+    {
+        "unit": "docker", "group": "containers",
+        "fr": "Docker", "en": "Docker",
+        "fr_sub": "Moteur Docker (conteneurs)", "en_sub": "Docker engine (containers)",
+    },
+    {
+        "unit": "podman.socket", "group": "containers",
+        "fr": "Podman (socket)", "en": "Podman (socket)",
+        "fr_sub": "API Podman pour les outils sans root", "en_sub": "Podman API for rootless tools",
+    },
+    {
+        "unit": "forgejo", "group": "containers",
+        "fr": "Forgejo", "en": "Forgejo",
+        "fr_sub": "Serveur Git local", "en_sub": "Local Git server",
+    },
+    {
+        "unit": "firewalld", "group": "system",
+        "fr": "Pare-feu (firewalld)", "en": "Firewall (firewalld)",
+        "fr_sub": "Filtrage réseau", "en_sub": "Network filtering",
+    },
+    {
+        "unit": "sshd", "group": "system",
+        "fr": "OpenSSH (sshd)", "en": "OpenSSH (sshd)",
+        "fr_sub": "Accès distant", "en_sub": "Remote access",
+    },
+    {
+        "unit": "cockpit.socket", "group": "system",
+        "fr": "Cockpit", "en": "Cockpit",
+        "fr_sub": "Panneau d'administration web (port 9090)", "en_sub": "Web admin panel (port 9090)",
+    },
+    {
+        "unit": "bluetooth", "group": "optional",
+        "fr": "Bluetooth", "en": "Bluetooth",
+        "fr_sub": "Inutile sur une console de jeu", "en_sub": "Not needed on a gaming console",
+    },
+    {
+        "unit": "cups", "group": "optional",
+        "fr": "Impression (CUPS)", "en": "Printing (CUPS)",
+        "fr_sub": "Service d'impression", "en_sub": "Print service",
+    },
+    {
+        "unit": "avahi-daemon", "group": "optional",
+        "fr": "Découverte réseau (Avahi)", "en": "Network discovery (Avahi)",
+        "fr_sub": "mDNS/Bonjour", "en_sub": "mDNS/Bonjour",
+    },
+    {
+        "unit": "ModemManager", "group": "optional",
+        "fr": "ModemManager", "en": "ModemManager",
+        "fr_sub": "Modems mobiles", "en_sub": "Mobile modems",
+    },
+)
+
+OPTIONAL_UNITS = ("bluetooth", "cups", "avahi-daemon", "ModemManager")
+
+
+def _service_state(unit: str) -> tuple[bool, bool, bool]:
+    """(existe, actif, activé au démarrage) pour une unité systemd."""
+    try:
+        res = subprocess.run(
+            ["systemctl", "show", "-p", "LoadState", "-p", "ActiveState",
+             "-p", "UnitFileState", unit],
+            capture_output=True, text=True, timeout=3,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return False, False, False
+    values: dict[str, str] = {}
+    for line in res.stdout.splitlines():
+        if "=" in line:
+            key, value = line.split("=", 1)
+            values[key] = value
+    exists = values.get("LoadState", "") not in ("", "not-found")
+    active = values.get("ActiveState", "") == "active"
+    enabled = values.get("UnitFileState", "") in (
+        "enabled", "enabled-runtime", "static", "indirect", "alias",
+    )
+    return exists, active, enabled
+
+
+def _service_subtitle(exists: bool, active: bool, enabled: bool) -> str:
+    if not exists:
+        return _L("Service non installé sur ce système.", "Service not installed on this system.")
+    if active and enabled:
+        return _L("Actif · activé au démarrage", "Running · enabled at boot")
+    if active:
+        return _L("Actif", "Running")
+    if enabled:
+        return _L("Activé au démarrage mais arrêté", "Enabled at boot but stopped")
+    return _L("Arrêté · désactivé", "Stopped · disabled")
+
+
+def build_page_services(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
+    """Interrupteurs on/off pour les services systemd, avec état réel."""
+    states = {item["unit"]: _service_state(item["unit"]) for item in SERVICE_CATALOG}
+    guarded: set[str] = set()
+
+    for gid, gfr, gen in SERVICE_GROUPS:
+        items = [item for item in SERVICE_CATALOG
+                 if item["group"] == gid and states[item["unit"]][0]]
+        if not items:
+            continue
+        grp = pref_group(title=_L(gfr, gen), description="")
+        for item in items:
+            unit = item["unit"]
+            _exists, active, enabled = states[unit]
+            row = plain_row(
+                Adw.SwitchRow,
+                title=_L(item["fr"], item["en"]),
+                subtitle=_service_subtitle(_exists, active, enabled),
+            )
+            row.set_active(active)
+
+            def _on_toggle(sw, _pspec, u=unit, was=active):
+                if u in guarded:
+                    return
+                want = sw.get_active()
+                if want == was:
+                    return
+                action = "enable" if want else "disable"
+                label = f"{'Activer' if want else 'Désactiver'} {u}"
+
+                def _done(ok: bool, msg: str) -> None:
+                    if ok:
+                        win.toast(f"{u} · {T('done')}")
+                        return
+                    guarded.add(u)
+                    sw.set_active(was)
+                    guarded.discard(u)
+                    win.toast(f"{u} · {msg}")
+
+                win.run_task(
+                    label,
+                    lambda emit, a=action: (
+                        win.run_cmd_pty(["systemctl", a, "--now", u], emit) == 0,
+                        T("done"),
+                    ),
+                    _done,
+                )
+
+            row.connect("notify::active", _on_toggle)
+            grp.add(row)
+        page.add(grp)
+
+    actions = pref_group(
+        title=_L("Raccourcis", "Shortcuts"),
+        description=_L(
+            "Les services restent installés : rallumer l'interrupteur suffit à les relancer.",
+            "Services stay installed: switching them back on is enough to restart them.",
+        ),
+    )
+    optimise = Gtk.Button(label=_L("Couper les daemons inutiles", "Turn off unneeded daemons"))
+    optimise.add_css_class("destructive-action")
+    optimise.set_halign(Gtk.Align.START)
+    optimise.set_margin_top(6)
+    optimise.set_margin_bottom(6)
+
+    def _optimise() -> None:
+        units = [unit for unit in OPTIONAL_UNITS if _service_state(unit)[0]]
+        if not units:
+            win.show_info(
+                _L("Couper les daemons inutiles", "Turn off unneeded daemons"),
+                _L("Aucun de ces services n'est installé.", "None of these services is installed."),
+            )
+            return
+        cmd = " ; ".join(f"systemctl disable --now {unit}" for unit in units)
+
+        def _done(ok: bool, msg: str) -> None:
+            if ok:
+                win._select_section("services")
+            else:
+                win.toast(msg)
+
+        win.run_task(
+            "systemctl disable --now " + " ".join(units),
+            lambda emit: (win.run_cmd_pty(cmd, emit) == 0, T("done")),
+            _done,
+        )
+
+    optimise.connect("clicked", lambda *_: win.show_confirm(
+        _L("Couper les daemons inutiles", "Turn off unneeded daemons"),
+        _L("Bluetooth, CUPS, Avahi et ModemManager — réversible à tout moment",
+           "Bluetooth, CUPS, Avahi and ModemManager — reversible at any time"),
+        _optimise,
+        destructive=False,
+    ))
+    actions.add(optimise)
+
+    note = plain_row(
+        Adw.ActionRow,
+        title=_L(
+            "Un service coupé ne consomme plus de mémoire ni de CPU, mais reste installé.",
+            "A stopped service no longer uses memory or CPU, but stays installed.",
+        ),
+    )
+    actions.add(note)
+    page.add(actions)
+
+
 def build_page_easy(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     grp = pref_group(
         title=T("sec_easy"),
@@ -13477,14 +13860,19 @@ def build_page_easy(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     )
     for profile in EASY_PROFILES:
         title = _L(profile["title_fr"], profile["title_en"])
-        grp.add(
-            win.row(
-                title,
-                _L(profile["sub_fr"], profile["sub_en"]),
-                profile["icon"],
-                lambda *_, p=profile: EasySetupConfigWindow(win, p).present(),
-            )
+        row = win.row(
+            title,
+            _L(profile["sub_fr"], profile["sub_en"]),
+            profile["icon"],
+            lambda *_, p=profile: EasySetupConfigWindow(win, p).present(),
+            suffix_icon=None,
         )
+        p_done, p_total = _profile_state(profile)
+        badge = _status_badge(p_done, p_total)
+        if badge is not None:
+            row.add_suffix(badge)
+        row.add_suffix(Gtk.Image.new_from_icon_name("go-next-symbolic"))
+        grp.add(row)
     page.add(grp)
 
     reset = pref_group(
@@ -13573,6 +13961,7 @@ PAGE_BUILDERS = {
     "dev": build_page_dev,
     "websrv": build_page_web,
     "easy": build_page_easy,
+    "services": build_page_services,
     "deps": build_page_deps,
     "gaming": build_page_gaming,
     "features": build_page_features,

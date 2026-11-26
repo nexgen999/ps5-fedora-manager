@@ -44,6 +44,12 @@ Gestionnaire système, matériel et logiciel conçu pour **Fedora Linux (41 à 4
 
 ---
 
+## Documentation
+
+Un dossier [`doc/`](doc/README.md) regroupe la documentation détaillée des fonctions récentes — installation facile, serveur web, page Développement, services on/off, Gamescope, Freebuff, réinitialisation — en **français** ([doc/fr](doc/fr/README.md)) et en **anglais** ([doc/en](doc/en/README.md)), avec les commandes et les fichiers de configuration de chaque partie.
+
+---
+
 ## Prérequis
 
 * **Fedora Linux 41 à 45** (Workstation ; GNOME, KDE Plasma, Cinnamon ou Budgie) sur architecture `x86_64`
