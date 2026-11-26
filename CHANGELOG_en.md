@@ -7,6 +7,19 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.13.0] — 2026-11-26
+
+### Added
+- **Two new profiles** in “Easy setup”: **WordPress** (Apache, PHP, MariaDB, phpMyAdmin, then WordPress download and a complete `wp-config.php` with a random salt) and **All-in-one** (development tools, containers, Cockpit, firewall).
+- **Fifteen configuration options** instead of six: HTTP port (Apache/Nginx virtual host and firewall opening), `memory_limit`, `upload_max_filesize`/`post_max_size`, `date.timezone` (`/etc/php.d/99-ps5-easy.ini`), **Let's Encrypt** domain + e-mail (automatic certificate and HTTPS redirect), Forgejo port and **admin account creation**.
+- **MySQL** offered next to MariaDB in the web profiles, with the same database steps.
+- **Reset tool** in the section: a page listing the components actually installed (one switch each), a “remove configuration files created by the manager” option (`ps5-easy.conf`, `99-ps5-easy.ini`, `adminer.php`, docker/webmin repos), a “clear the DNF cache” option, and a confirmed uninstall that leaves a clean base.
+- Component or selection uninstall, using the **same progress window** as the install (one `dnf remove` step per component).
+
+### Fixed
+- `_easy_path` now normalises paths (`..` removed): a typed DocumentRoot can no longer escape the intended tree.
+- `wp-config.php` is generated in one go (no more fragile `sed` on a password containing an apostrophe or backslash).
+
 ## [0.12.0] — 2026-11-26
 
 ### Added

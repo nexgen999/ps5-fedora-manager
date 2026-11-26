@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.12.0"
+APP_VERSION = "0.13.0"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1119,16 +1119,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.12.0",
-    "en": "What is new in 0.12.0",
-    "es": "Novedades de la 0.12.0",
-    "it": "Novità della 0.12.0",
-    "de": "Neu in 0.12.0",
-    "pt": "Novidades da 0.12.0",
+    "fr": "Nouveautés de la 0.13.0",
+    "en": "What is new in 0.13.0",
+    "es": "Novedades de la 0.13.0",
+    "it": "Novità della 0.13.0",
+    "de": "Neu in 0.13.0",
+    "pt": "Novidades da 0.13.0",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.13 : six profils d'installation (dont WordPress et tout-en-un), quinze options de configuration (port HTTP, mémoire et envoi PHP, fuseau, certificat Let's Encrypt, port et compte admin Forgejo) et un outil de réinitialisation qui désinstalle les composants et efface les configurations du manager",
         "0.12 : section « Installation facile » — profils LAMP, LEMP, Code &amp; outils et Conteneurs, avec choix des composants, configuration (ServerName, dossier web, base de données) et la même fenêtre de progression que le setup 1 clic, qui reste inchangé",
         "0.11 : section « Serveur web » — Apache, Nginx, PHP + handler FastCGI, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, pare-feu et OpenSSH, chacun avec installation, mise à jour et désinstallation",
         "0.10 : page « Développement » (composants, outils en ligne de commande, applications) avec installation, mise à jour et désinstallation par entrée — dont Docker, KVM/QEMU, GitHub Desktop et un Forgejo local",
@@ -1146,6 +1147,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.13: six setup profiles (including WordPress and all-in-one), fifteen configuration options (HTTP port, PHP memory and upload size, timezone, Let's Encrypt certificate, Forgejo port and admin account) and a reset tool that uninstalls components and clears the manager's configuration files",
         "0.12: “Easy setup” section — LAMP, LEMP, Code &amp; tools and Containers profiles, with component selection, configuration (ServerName, web root, database) and the same progress window as the 1-click setup, which stays unchanged",
         "0.11: “Web server” section — Apache, Nginx, PHP + FastCGI handler, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, firewall and OpenSSH, each with install, update and uninstall",
         "0.10: “Development” page (components, command-line tools, applications) with per-entry install, update and uninstall — including Docker, KVM/QEMU, GitHub Desktop and a local Forgejo",
@@ -1163,6 +1165,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.13 : seis perfiles de instalación (incluidos WordPress y todo en uno), quince opciones de configuración (puerto HTTP, memoria y subida PHP, zona horaria, certificado Let's Encrypt, puerto y cuenta admin de Forgejo) y una herramienta de restablecimiento que desinstala componentes y borra las configuraciones del gestor",
         "0.12 : sección «Instalación fácil» — perfiles LAMP, LEMP, Código y herramientas y Contenedores, con selección de componentes, configuración (ServerName, carpeta web, base de datos) y la misma ventana de progreso que la configuración en 1 clic, que no cambia",
         "0.11 : sección «Servidor web» — Apache, Nginx, PHP + handler FastCGI, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, cortafuegos y OpenSSH, con instalación, actualización y desinstalación",
         "0.10 : página «Desarrollo» (componentes, herramientas de línea de comandos, aplicaciones) con instalación, actualización y desinstalación por entrada — incluidos Docker, KVM/QEMU, GitHub Desktop y un Forgejo local",
@@ -1180,6 +1183,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.13 : sei profili di installazione (inclusi WordPress e tutto in uno), quindici opzioni di configurazione (porta HTTP, memoria e upload PHP, fuso orario, certificato Let's Encrypt, porta e account admin Forgejo) e uno strumento di ripristino che disinstalla i componenti e cancella le configurazioni del gestore",
         "0.12 : sezione «Installazione facile» — profili LAMP, LEMP, Codice e strumenti e Contenitori, con scelta dei componenti, configurazione (ServerName, cartella web, database) e la stessa finestra di avanzamento della configurazione in 1 clic, che resta invariata",
         "0.11 : sezione «Server web» — Apache, Nginx, PHP + handler FastCGI, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, firewall e OpenSSH, con installazione, aggiornamento e disinstallazione",
         "0.10 : pagina «Sviluppo» (componenti, strumenti da riga di comando, applicazioni) con installazione, aggiornamento e disinstallazione per voce — inclusi Docker, KVM/QEMU, GitHub Desktop e un Forgejo locale",
@@ -1197,6 +1201,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.13 : sechs Installationsprofile (darunter WordPress und Alles-in-einem), fünfzehn Konfigurationsoptionen (HTTP-Port, PHP-Speicher und Upload-Größe, Zeitzone, Let's-Encrypt-Zertifikat, Forgejo-Port und Admin-Konto) und ein Zurücksetzen-Werkzeug, das Komponenten deinstalliert und die Konfigurationsdateien des Managers entfernt",
         "0.12 : Abschnitt „Einfache Installation“ – Profile LAMP, LEMP, Code &amp; Werkzeuge und Container mit Komponentenauswahl, Konfiguration (ServerName, Webverzeichnis, Datenbank) und demselben Fortschrittsfenster wie das 1-Klick-Setup, das unverändert bleibt",
         "0.11 : Abschnitt „Webserver“ – Apache, Nginx, PHP + FastCGI-Handler, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, Firewall und OpenSSH, jeweils mit Installation, Aktualisierung und Deinstallation",
         "0.10 : Seite „Entwicklung“ (Komponenten, Kommandozeilen-Werkzeuge, Anwendungen) mit Installation, Aktualisierung und Deinstallation pro Eintrag – inklusive Docker, KVM/QEMU, GitHub Desktop und einem lokalen Forgejo",
@@ -1214,6 +1219,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.13 : seis perfis de instalação (incluindo WordPress e tudo-em-um), quinze opções de configuração (porta HTTP, memória e upload PHP, fuso horário, certificado Let's Encrypt, porta e conta admin do Forgejo) e uma ferramenta de reposição que desinstala componentes e apaga as configurações do gestor",
         "0.12 : secção «Instalação fácil» — perfis LAMP, LEMP, Código e ferramentas e Contêineres, com escolha de componentes, configuração (ServerName, pasta web, base de dados) e a mesma janela de progresso da configuração em 1 clique, que se mantém igual",
         "0.11 : secção «Servidor web» — Apache, Nginx, PHP + handler FastCGI, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, firewall e OpenSSH, com instalação, atualização e desinstalação",
         "0.10 : página «Desenvolvimento» (componentes, ferramentas de linha de comando, aplicativos) com instalação, atualização e desinstalação por entrada — incluindo Docker, KVM/QEMU, GitHub Desktop e um Forgejo local",
@@ -6684,6 +6690,210 @@ _L_TABLE = {
         "Scegli un profilo, regola componenti e configurazione, poi avvia l'installazione.",
         "Profil wählen, Komponenten und Konfiguration anpassen, dann Installation starten.",
         "Escolhe um perfil, ajusta os componentes e a configuração e inicia a instalação.",
+    ),
+    "WordPress (CMS prêt à l'emploi)": (
+        "WordPress (CMS listo para usar)",
+        "WordPress (CMS pronto all'uso)",
+        "WordPress (fertiges CMS)",
+        "WordPress (CMS pronto a usar)",
+    ),
+    "Tout-en-un (dev + web + services)": (
+        "Todo en uno (dev + web + servicios)",
+        "Tutto in uno (dev + web + servizi)",
+        "Alles-in-einem (Dev + Web + Dienste)",
+        "Tudo-em-um (dev + web + serviços)",
+    ),
+    "Apache + PHP + MariaDB + WordPress + phpMyAdmin, prêt à configurer": (
+        "Apache + PHP + MariaDB + WordPress + phpMyAdmin, listo para configurar",
+        "Apache + PHP + MariaDB + WordPress + phpMyAdmin, pronto da configurare",
+        "Apache + PHP + MariaDB + WordPress + phpMyAdmin, bereit zum Einrichten",
+        "Apache + PHP + MariaDB + WordPress + phpMyAdmin, pronto a configurar",
+    ),
+    "Le poste complet : code, conteneurs et panneaux d'administration": (
+        "El equipo completo: código, contenedores y paneles de administración",
+        "La postazione completa: codice, contenitori e pannelli di amministrazione",
+        "Die komplette Workstation: Code, Container und Verwaltungsoberflächen",
+        "A estação completa: código, contêineres e painéis de administração",
+    ),
+    "Port HTTP": (
+        "Puerto HTTP",
+        "Porta HTTP",
+        "HTTP-Port",
+        "Porta HTTP",
+    ),
+    "Mémoire PHP (memory_limit)": (
+        "Memoria PHP (memory_limit)",
+        "Memoria PHP (memory_limit)",
+        "PHP-Speicher (memory_limit)",
+        "Memória PHP (memory_limit)",
+    ),
+    "Taille d'envoi PHP (upload_max_filesize)": (
+        "Tamaño de subida PHP (upload_max_filesize)",
+        "Dimensione upload PHP (upload_max_filesize)",
+        "PHP-Uploadgröße (upload_max_filesize)",
+        "Tamanho de upload PHP (upload_max_filesize)",
+    ),
+    "Fuseau horaire PHP (date.timezone)": (
+        "Zona horaria PHP (date.timezone)",
+        "Fuso orario PHP (date.timezone)",
+        "PHP-Zeitzone (date.timezone)",
+        "Fuso horário PHP (date.timezone)",
+    ),
+    "Domaine pour HTTPS (facultatif)": (
+        "Dominio para HTTPS (opcional)",
+        "Dominio per HTTPS (facoltativo)",
+        "Domain für HTTPS (optional)",
+        "Domínio para HTTPS (opcional)",
+    ),
+    "E-mail Let's Encrypt (facultatif)": (
+        "Correo Let's Encrypt (opcional)",
+        "E-mail Let's Encrypt (facoltativa)",
+        "Let's-Encrypt-E-Mail (optional)",
+        "E-mail Let's Encrypt (opcional)",
+    ),
+    "Port Forgejo": (
+        "Puerto Forgejo",
+        "Porta Forgejo",
+        "Forgejo-Port",
+        "Porta Forgejo",
+    ),
+    "Compte admin Forgejo (facultatif)": (
+        "Cuenta admin de Forgejo (opcional)",
+        "Account admin Forgejo (facoltativo)",
+        "Forgejo-Admin-Konto (optional)",
+        "Conta admin do Forgejo (opcional)",
+    ),
+    "Mot de passe admin Forgejo": (
+        "Contraseña admin de Forgejo",
+        "Password admin Forgejo",
+        "Forgejo-Admin-Passwort",
+        "Palavra-passe admin do Forgejo",
+    ),
+    "Configuration PHP": (
+        "Configuración PHP",
+        "Configurazione PHP",
+        "PHP-Konfiguration",
+        "Configuração PHP",
+    ),
+    "Hôte virtuel": (
+        "Host virtual",
+        "Host virtuale",
+        "Virtueller Host",
+        "Host virtual",
+    ),
+    "Base de données": (
+        "Base de datos",
+        "Database",
+        "Datenbank",
+        "Base de dados",
+    ),
+    "Certificat HTTPS (Let's Encrypt)": (
+        "Certificado HTTPS (Let's Encrypt)",
+        "Certificato HTTPS (Let's Encrypt)",
+        "HTTPS-Zertifikat (Let's Encrypt)",
+        "Certificado HTTPS (Let's Encrypt)",
+    ),
+    "WordPress": (
+        "WordPress",
+        "WordPress",
+        "WordPress",
+        "WordPress",
+    ),
+    "Forgejo (port et compte admin)": (
+        "Forgejo (puerto y cuenta admin)",
+        "Forgejo (porta e account admin)",
+        "Forgejo (Port und Admin-Konto)",
+        "Forgejo (porta e conta admin)",
+    ),
+    "Réinitialiser": (
+        "Restablecer",
+        "Ripristina",
+        "Zurücksetzen",
+        "Reiniciar",
+    ),
+    "Désinstaller des composants…": (
+        "Desinstalar componentes…",
+        "Disinstalla componenti…",
+        "Komponenten deinstallieren…",
+        "Desinstalar componentes…",
+    ),
+    "Composants installés": (
+        "Componentes instalados",
+        "Componenti installati",
+        "Installierte Komponenten",
+        "Componentes instalados",
+    ),
+    "Options de nettoyage": (
+        "Opciones de limpieza",
+        "Opzioni di pulizia",
+        "Bereinigungsoptionen",
+        "Opções de limpeza",
+    ),
+    "Supprimer les fichiers de configuration créés par le manager": (
+        "Eliminar los archivos de configuración creados por el gestor",
+        "Rimuovi i file di configurazione creati dal gestore",
+        "Vom Manager erstellte Konfigurationsdateien entfernen",
+        "Remover os ficheiros de configuração criados pelo gestor",
+    ),
+    "Vider le cache DNF": (
+        "Vaciar la caché DNF",
+        "Svuota la cache DNF",
+        "DNF-Cache leeren",
+        "Limpar a cache DNF",
+    ),
+    "Désinstaller la sélection": (
+        "Desinstalar la selección",
+        "Disinstalla la selezione",
+        "Auswahl deinstallieren",
+        "Desinstalar a seleção",
+    ),
+    "Aucun composant installé à désinstaller.": (
+        "Ningún componente instalado para desinstalar.",
+        "Nessun componente installato da disinstallare.",
+        "Keine installierten Komponenten zum Deinstallieren.",
+        "Nenhum componente instalado para desinstalar.",
+    ),
+    "Action irréversible : paquets retirés, configurations supprimées.": (
+        "Acción irreversible: paquetes eliminados, configuraciones borradas.",
+        "Azione irreversibile: pacchetti rimossi, configurazioni eliminate.",
+        "Nicht rückgängig zu machen: Pakete entfernt, Konfigurationen gelöscht.",
+        "Ação irreversível: pacotes removidos, configurações apagadas.",
+    ),
+    "Supprimer les composants sélectionnés ?": (
+        "¿Eliminar los componentes seleccionados?",
+        "Rimuovere i componenti selezionati?",
+        "Ausgewählte Komponenten entfernen?",
+        "Remover os componentes selecionados?",
+    ),
+    "Nettoyer les fichiers du manager": (
+        "Limpiar los archivos del gestor",
+        "Pulisci i file del gestore",
+        "Dateien des Managers bereinigen",
+        "Limpar os ficheiros do gestor",
+    ),
+    "Fichiers de configuration du manager supprimés.": (
+        "Archivos de configuración del gestor eliminados.",
+        "File di configurazione del gestore rimossi.",
+        "Konfigurationsdateien des Managers entfernt.",
+        "Ficheiros de configuração do gestor removidos.",
+    ),
+    "Purger le cache DNF (dnf clean all)": (
+        "Purgar la caché DNF (dnf clean all)",
+        "Pulisci la cache DNF (dnf clean all)",
+        "DNF-Cache leeren (dnf clean all)",
+        "Limpar a cache DNF (dnf clean all)",
+    ),
+    "Rien à nettoyer.": (
+        "Nada que limpiar.",
+        "Niente da pulire.",
+        "Nichts zu bereinigen.",
+        "Nada a limpar.",
+    ),
+    "Réinitialisation terminée.": (
+        "Restablecimiento terminado.",
+        "Ripristino completato.",
+        "Zurücksetzen abgeschlossen.",
+        "Reinício concluído.",
     ),
 }
 
@@ -12338,13 +12548,31 @@ EASY_FIELDS: dict[str, dict[str, Any]] = {
         "fr": "Nom du serveur (ServerName)",
         "en": "Server name (ServerName)",
         "default": "localhost",
-        "sanitize": "host",
+    },
+    "http_port": {
+        "fr": "Port HTTP",
+        "en": "HTTP port",
+        "default": "80",
     },
     "docroot": {
         "fr": "Dossier web (DocumentRoot)",
         "en": "Web root (DocumentRoot)",
         "default": "/var/www/html",
-        "sanitize": "path",
+    },
+    "php_memory": {
+        "fr": "Mémoire PHP (memory_limit)",
+        "en": "PHP memory (memory_limit)",
+        "default": "256M",
+    },
+    "php_upload": {
+        "fr": "Taille d'envoi PHP (upload_max_filesize)",
+        "en": "PHP upload size (upload_max_filesize)",
+        "default": "64M",
+    },
+    "php_tz": {
+        "fr": "Fuseau horaire PHP (date.timezone)",
+        "en": "PHP timezone (date.timezone)",
+        "default": "Europe/Paris",
     },
     "db_root_password": {
         "fr": "Mot de passe root MariaDB/MySQL (facultatif)",
@@ -12368,9 +12596,54 @@ EASY_FIELDS: dict[str, dict[str, Any]] = {
         "default": "",
         "secret": True,
     },
+    "certbot_domain": {
+        "fr": "Domaine pour HTTPS (facultatif)",
+        "en": "Domain for HTTPS (optional)",
+        "default": "",
+    },
+    "certbot_email": {
+        "fr": "E-mail Let's Encrypt (facultatif)",
+        "en": "Let's Encrypt email (optional)",
+        "default": "",
+    },
+    "forgejo_port": {
+        "fr": "Port Forgejo",
+        "en": "Forgejo port",
+        "default": "3000",
+    },
+    "forgejo_admin_user": {
+        "fr": "Compte admin Forgejo (facultatif)",
+        "en": "Forgejo admin account (optional)",
+        "default": "",
+    },
+    "forgejo_admin_password": {
+        "fr": "Mot de passe admin Forgejo",
+        "en": "Forgejo admin password",
+        "default": "",
+        "secret": True,
+    },
 }
 
-WEB_FIELDS = ("server_name", "docroot", "db_root_password", "db_name", "db_user", "db_password")
+WEB_FIELDS = (
+    "server_name", "http_port", "docroot",
+    "php_memory", "php_upload", "php_tz",
+    "db_root_password", "db_name", "db_user", "db_password",
+    "certbot_domain", "certbot_email",
+)
+SERVICES_FIELDS = ("forgejo_port", "forgejo_admin_user", "forgejo_admin_password")
+CODE_DEFAULTS = (
+    "build", "python-gtk", "cli-search", "git-tools", "terminal", "diag",
+    "python-quality",
+)
+CODE_OPTIONS = (
+    "build", "python-gtk", "cli-search", "git-tools", "terminal", "diag",
+    "python-quality", "debug", "data", "automation", "node", "rust", "docker",
+    "virt", "github-desktop", "editors", "sqlite",
+)
+WEB_OPTIONS = (
+    "apache", "nginx", "php", "php-handler", "mariadb", "mysql",
+    "phpmyadmin", "adminer", "cockpit", "certbot", "firewall-web", "openssh",
+)
 
 EASY_PROFILES: tuple[dict[str, Any], ...] = (
     {
@@ -12380,11 +12653,10 @@ EASY_PROFILES: tuple[dict[str, Any], ...] = (
         "sub_fr": "Apache + PHP + MariaDB + phpMyAdmin, prêt à héberger un site",
         "sub_en": "Apache + PHP + MariaDB + phpMyAdmin, ready to host a site",
         "icon": "network-server-symbolic",
-        "entries": (
-            "apache", "php", "php-handler", "mariadb", "phpmyadmin", "adminer",
-            "cockpit", "certbot", "firewall-web", "openssh",
+        "entries": WEB_OPTIONS,
+        "defaults": (
+            "apache", "php", "php-handler", "mariadb", "phpmyadmin", "firewall-web",
         ),
-        "defaults": ("apache", "php", "php-handler", "mariadb", "phpmyadmin", "firewall-web"),
         "fields": WEB_FIELDS,
         "config": "apache",
     },
@@ -12395,13 +12667,28 @@ EASY_PROFILES: tuple[dict[str, Any], ...] = (
         "sub_fr": "Nginx + PHP-FPM + MariaDB, la variante légère",
         "sub_en": "Nginx + PHP-FPM + MariaDB, the lightweight variant",
         "icon": "network-server-symbolic",
-        "entries": (
-            "nginx", "php", "php-handler", "mariadb", "phpmyadmin", "adminer",
-            "cockpit", "certbot", "firewall-web", "openssh",
+        "entries": WEB_OPTIONS,
+        "defaults": (
+            "nginx", "php", "php-handler", "mariadb", "phpmyadmin", "firewall-web",
         ),
-        "defaults": ("nginx", "php", "php-handler", "mariadb", "phpmyadmin", "firewall-web"),
         "fields": WEB_FIELDS,
         "config": "nginx",
+    },
+    {
+        "key": "wordpress",
+        "title_fr": "WordPress (CMS prêt à l'emploi)",
+        "title_en": "WordPress (ready-to-use CMS)",
+        "sub_fr": "Apache + PHP + MariaDB + WordPress + phpMyAdmin, prêt à configurer",
+        "sub_en": "Apache + PHP + MariaDB + WordPress + phpMyAdmin, ready to configure",
+        "icon": "web-browser-symbolic",
+        "entries": WEB_OPTIONS,
+        "defaults": (
+            "apache", "php", "php-handler", "mariadb", "phpmyadmin", "firewall-web",
+            "certbot",
+        ),
+        "fields": WEB_FIELDS,
+        "config": "apache",
+        "wordpress": True,
     },
     {
         "key": "code",
@@ -12410,15 +12697,8 @@ EASY_PROFILES: tuple[dict[str, Any], ...] = (
         "sub_fr": "Compilation, Python + GTK4, outils CLI, qualité et debug",
         "sub_en": "Build tools, Python + GTK4, CLI tools, quality and debug",
         "icon": "applications-engineering-symbolic",
-        "entries": (
-            "build", "python-gtk", "cli-search", "git-tools", "terminal", "diag",
-            "python-quality", "debug", "node", "rust", "docker", "virt",
-            "github-desktop", "editors", "sqlite",
-        ),
-        "defaults": (
-            "build", "python-gtk", "cli-search", "git-tools", "terminal", "diag",
-            "python-quality",
-        ),
+        "entries": CODE_OPTIONS,
+        "defaults": CODE_DEFAULTS,
         "fields": (),
         "config": "",
     },
@@ -12430,7 +12710,24 @@ EASY_PROFILES: tuple[dict[str, Any], ...] = (
         "sub_en": "Podman, Docker, local Forgejo, Cockpit, firewall and SSH",
         "icon": "application-x-executable-symbolic",
         "entries": ("containers", "docker", "forgejo", "cockpit", "firewall-web", "openssh"),
-        "defaults": ("containers", "forgejo", "firewall-web"),
+        "defaults": ("containers", "forgejo", "firewall-web", "cockpit"),
+        "fields": SERVICES_FIELDS,
+        "config": "",
+        "forgejo": True,
+    },
+    {
+        "key": "allinone",
+        "title_fr": "Tout-en-un (dev + web + services)",
+        "title_en": "All-in-one (dev + web + services)",
+        "sub_fr": "Le poste complet : code, conteneurs et panneaux d'administration",
+        "sub_en": "The complete workstation: code, containers and admin panels",
+        "icon": "applications-system-symbolic",
+        "entries": tuple(dict.fromkeys(
+            CODE_OPTIONS + ("containers", "docker", "forgejo", "cockpit", "firewall-web", "openssh")
+        )),
+        "defaults": tuple(dict.fromkeys(
+            CODE_DEFAULTS + ("containers", "cockpit", "firewall-web")
+        )),
         "fields": (),
         "config": "",
     },
@@ -12453,11 +12750,35 @@ def _easy_path(value: str) -> str:
     cleaned = re.sub(r"[^A-Za-z0-9/._-]", "", value or "")
     if not cleaned.startswith("/"):
         cleaned = "/" + cleaned
-    return cleaned or "/var/www/html"
+    cleaned = os.path.normpath(cleaned)
+    return cleaned if cleaned.startswith("/") and cleaned != "/" else "/var/www/html"
 
 
 def _easy_ident(value: str) -> str:
     return re.sub(r"[^A-Za-z0-9_]", "", value or "")
+
+
+def _easy_port(value: str, default: int) -> int:
+    match = re.search(r"[0-9]{2,5}", value or "")
+    if not match:
+        return default
+    port = int(match.group(0))
+    return port if 1 <= port <= 65535 else default
+
+
+def _easy_size(value: str, default: str) -> str:
+    cleaned = (value or "").strip().upper()
+    return cleaned if re.fullmatch(r"[0-9]{1,6}[KMG]?", cleaned) else default
+
+
+def _easy_tz(value: str) -> str:
+    cleaned = (value or "").strip()
+    return cleaned if re.fullmatch(r"[A-Za-z0-9/_+-]{1,64}", cleaned) else "Europe/Paris"
+
+
+def _easy_email(value: str) -> str:
+    cleaned = (value or "").strip()
+    return cleaned if re.fullmatch(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", cleaned) else ""
 
 
 def _sql_literal(value: str) -> str:
@@ -12466,12 +12787,35 @@ def _sql_literal(value: str) -> str:
     return cleaned.replace("\\", "\\\\").replace("'", "''")
 
 
-def _easy_web_config(kind: str, server: str, docroot: str) -> str:
-    """Hôte virtuel Apache ou Nginx + page de test PHP."""
+def _php_single(value: str) -> str:
+    """Échappe une valeur pour une chaîne PHP entre apostrophes."""
+    return (value or "").replace("\\", "\\\\").replace("'", "\\'")
+
+
+def _sed_value(value: str) -> str:
+    """Échappe une valeur pour un remplacement sed (délimiteur « | »)."""
+    return (
+        (value or "")
+        .replace("\\", "\\\\")
+        .replace("&", "\\&")
+        .replace("|", "\\|")
+        .replace('"', '\\"')
+    )
+
+
+def _easy_web_config(kind: str, server: str, port: int, docroot: str) -> str:
+    """Hôte virtuel Apache ou Nginx sur le port demandé."""
+    firewall = ""
+    if port != 80:
+        firewall = (
+            f"firewall-cmd --permanent --add-port={port}/tcp >/dev/null 2>&1 || true\n"
+            "firewall-cmd --reload >/dev/null 2>&1 || true\n"
+        )
     if kind == "apache":
-        vhost = "\n".join([
+        listen = f"Listen {port}\n" if port != 80 else ""
+        body = "\n".join([
             "cat > /etc/httpd/conf.d/ps5-easy.conf <<'CONF'",
-            "<VirtualHost *:80>",
+            f"{listen}<VirtualHost *:{port}>",
             f"    ServerName {server}",
             f'    DocumentRoot "{docroot}"',
             f'    <Directory "{docroot}">',
@@ -12484,31 +12828,48 @@ def _easy_web_config(kind: str, server: str, docroot: str) -> str:
             "CONF",
             "if httpd -t >/dev/null 2>&1; then",
             "  systemctl reload httpd 2>/dev/null || systemctl restart httpd 2>/dev/null || true",
-            f'  echo "Apache : hôte virtuel prêt (http://{server})"',
+            f'  echo "Apache : hôte virtuel prêt (http://{server}:{port})"',
             "else",
             '  echo "Apache : configuration refusée par httpd -t (voir /etc/httpd/conf.d/ps5-easy.conf)"',
             "fi",
         ])
     else:
-        vhost = "\n".join([
+        body = "\n".join([
             "mkdir -p /etc/nginx/conf.d",
             "cat > /etc/nginx/conf.d/ps5-easy.conf <<'CONF'",
             "server {",
-            "    listen 80;",
+            f"    listen {port};",
             f"    server_name {server};",
             f'    root "{docroot}";',
             "    index index.php index.html;",
             "    location / { try_files $uri $uri/ =404; }",
+            "    client_max_body_size 64m;",
             "}",
             "CONF",
             "if nginx -t >/dev/null 2>&1; then",
             "  systemctl reload nginx 2>/dev/null || systemctl restart nginx 2>/dev/null || true",
-            f'  echo "Nginx : hôte virtuel prêt (http://{server})"',
+            f'  echo "Nginx : hôte virtuel prêt (http://{server}:{port})"',
             "else",
             '  echo "Nginx : configuration refusée par nginx -t (voir /etc/nginx/conf.d/ps5-easy.conf)"',
             "fi",
         ])
-    return vhost
+    return firewall + body
+
+
+def _easy_php_script(memory: str, upload: str, tz: str) -> str:
+    return "\n".join([
+        "mkdir -p /etc/php.d",
+        "cat > /etc/php.d/99-ps5-easy.ini <<'INI'",
+        "; PS5 Fedora Manager : réglages PHP",
+        f"memory_limit = {memory}",
+        f"upload_max_filesize = {upload}",
+        f"post_max_size = {upload}",
+        "max_execution_time = 300",
+        f"date.timezone = {tz}",
+        "INI",
+        "systemctl try-restart php-fpm 2>/dev/null || true",
+        "php -v 2>/dev/null | head -n 1 || true",
+    ])
 
 
 def _easy_db_sql(root_pw: str, db_name: str, db_user: str, db_pass: str) -> tuple[str, str]:
@@ -12530,23 +12891,15 @@ def _easy_db_sql(root_pw: str, db_name: str, db_user: str, db_pass: str) -> tupl
                 "CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
             )
         if db_user:
-            grant = f"GRANT ALL PRIVILEGES ON `{db_name}`.* TO '{db_user}'@'localhost';"
-            if db_pass:
-                mariadb.insert(
-                    -1,
-                    f"CREATE USER IF NOT EXISTS '{db_user}'@'localhost' "
-                    f"IDENTIFIED BY '{db_pass}';",
+            user_sql = (
+                f"CREATE USER IF NOT EXISTS '{db_user}'@'localhost' "
+                + (f"IDENTIFIED BY '{db_pass}';" if db_pass else ";")
+            )
+            for statements in (mariadb, mysql):
+                statements.insert(-1, user_sql)
+                statements.append(
+                    f"GRANT ALL PRIVILEGES ON `{db_name}`.* TO '{db_user}'@'localhost';"
                 )
-                mysql.insert(
-                    -1,
-                    f"CREATE USER IF NOT EXISTS '{db_user}'@'localhost' "
-                    f"IDENTIFIED BY '{db_pass}';",
-                )
-            else:
-                mariadb.insert(-1, f"CREATE USER IF NOT EXISTS '{db_user}'@'localhost';")
-                mysql.insert(-1, f"CREATE USER IF NOT EXISTS '{db_user}'@'localhost';")
-            mariadb.append(grant)
-            mysql.append(grant)
     if mariadb:
         mariadb.append("FLUSH PRIVILEGES;")
     if mysql:
@@ -12554,41 +12907,17 @@ def _easy_db_sql(root_pw: str, db_name: str, db_user: str, db_pass: str) -> tupl
     return "\n".join(mariadb), "\n".join(mysql)
 
 
-def _easy_config_script(
-    profile: dict[str, Any], selected: tuple[str, ...], values: dict[str, str]
-) -> str:
-    """Script de configuration du profil (hôte virtuel + base de données)."""
-    kind = profile.get("config") or ""
-    if not kind:
+def _easy_db_script(selected: tuple[str, ...], values: dict[str, str]) -> str:
+    if "mariadb" not in selected and "mysql" not in selected:
         return ""
-    server = _easy_host(values.get("server_name", "localhost"))
-    docroot = _easy_path(values.get("docroot", "/var/www/html"))
-    lines = [
-        f'mkdir -p "{docroot}"',
-        _easy_web_config(kind, server, docroot),
-        f'cat > "{docroot}/index.php" <<\'PHP\'',
-        '<?php echo "PS5 Fedora Manager : PHP fonctionne.\\n";',
-        "PHP",
-    ]
-    lines.append(
-        'if command -v semanage >/dev/null 2>&1 && command -v restorecon >/dev/null 2>&1; then\n'
-        f'  semanage fcontext -a -t httpd_sys_content_t "{docroot}(/.*)?" 2>/dev/null || true\n'
-        f'  restorecon -R "{docroot}" 2>/dev/null || true\n'
-        "fi"
-    )
-    lines.append("setsebool -P httpd_can_network_connect_db on 2>/dev/null || true")
-
     mariadb_sql, mysql_sql = _easy_db_sql(
         _sql_literal(values.get("db_root_password", "")),
         _easy_ident(values.get("db_name", "")),
         _easy_ident(values.get("db_user", "")),
         _sql_literal(values.get("db_password", "")),
     )
-    want_db = (
-        ("mariadb" in selected or "mysql" in selected)
-        and bool(mariadb_sql or mysql_sql)
-    )
-    if want_db and mariadb_sql:
+    lines: list[str] = []
+    if "mariadb" in selected and mariadb_sql:
         lines.extend([
             'if systemctl is-active --quiet mariadb 2>/dev/null; then',
             "  cat > /tmp/ps5-easy-db.sql <<'SQL'",
@@ -12602,7 +12931,7 @@ def _easy_config_script(
             "  rm -f /tmp/ps5-easy-db.sql",
             "fi",
         ])
-    if want_db and mysql_sql:
+    if "mysql" in selected and mysql_sql:
         lines.extend([
             'if systemctl is-active --quiet mysqld 2>/dev/null; then',
             "  cat > /tmp/ps5-easy-db.sql <<'SQL'",
@@ -12616,7 +12945,164 @@ def _easy_config_script(
             "  rm -f /tmp/ps5-easy-db.sql",
             "fi",
         ])
-    return "\n".join(lines) + "\n"
+    return "\n".join(lines)
+
+
+def _easy_certbot_script(kind: str, domain: str, email: str) -> str:
+    if not domain or not email:
+        return ""
+    return "\n".join([
+        "if command -v certbot >/dev/null 2>&1; then",
+        f"  certbot --{kind} -d {domain} --non-interactive --agree-tos -m {email} --redirect",
+        "else",
+        '  echo "Certbot absent : HTTPS non configuré"',
+        "fi",
+    ])
+
+
+def _easy_wordpress_script(docroot: str, db_name: str, db_user: str, db_pass: str) -> str:
+    """Télécharge WordPress et écrit un wp-config.php complet (sel aléatoire)."""
+    php_db = _php_single(db_name)
+    php_user = _php_single(db_user)
+    php_pass = _php_single(db_pass)
+    config = "\n".join([
+        "<?php",
+        "// PS5 Fedora Manager : configuration WordPress générée.",
+        f"define( 'DB_NAME', '{php_db}' );",
+        f"define( 'DB_USER', '{php_user}' );",
+        f"define( 'DB_PASSWORD', '{php_pass}' );",
+        "define( 'DB_HOST', '127.0.0.1' );",
+        "define( 'DB_CHARSET', 'utf8mb4' );",
+        "define( 'DB_COLLATE', '' );",
+        "",
+        "define( 'AUTH_KEY',         '__SALT__1' );",
+        "define( 'SECURE_AUTH_KEY',  '__SALT__2' );",
+        "define( 'LOGGED_IN_KEY',    '__SALT__3' );",
+        "define( 'NONCE_KEY',        '__SALT__4' );",
+        "define( 'AUTH_SALT',        '__SALT__5' );",
+        "define( 'SECURE_AUTH_SALT', '__SALT__6' );",
+        "define( 'LOGGED_IN_SALT',   '__SALT__7' );",
+        "define( 'NONCE_SALT',       '__SALT__8' );",
+        "",
+        "$table_prefix = 'wp_';",
+        "define( 'WP_DEBUG', false );",
+        "",
+        "if ( ! defined( 'ABSPATH' ) ) {",
+        "    define( 'ABSPATH', __DIR__ . '/' );",
+        "}",
+        "require_once ABSPATH . 'wp-settings.php';",
+    ])
+    return "\n".join([
+        f'DOCROOT="{docroot}"',
+        'mkdir -p "$DOCROOT"',
+        "if command -v curl >/dev/null 2>&1; then",
+        "  rm -rf /tmp/wordpress /tmp/wordpress.tar.gz",
+        "  curl -fsSL -o /tmp/wordpress.tar.gz https://wordpress.org/latest.tar.gz",
+        "  tar -xzf /tmp/wordpress.tar.gz -C /tmp",
+        '  cp -a /tmp/wordpress/. "$DOCROOT"/',
+        "  rm -rf /tmp/wordpress /tmp/wordpress.tar.gz",
+        f'  if [ ! -f "$DOCROOT/wp-config.php" ]; then',
+        '    cat > "$DOCROOT/wp-config.php" <<\'PHP\'',
+        config,
+        "PHP",
+        '    SALT=$(openssl rand -hex 32 2>/dev/null || date +%s)',
+        '    sed -i "s|__SALT__|$SALT|g" "$DOCROOT/wp-config.php"',
+        "  fi",
+        '  chown -R apache:apache "$DOCROOT" 2>/dev/null || chown -R nginx:nginx "$DOCROOT" 2>/dev/null || true',
+        '  chmod -R 755 "$DOCROOT"',
+        '  echo "WordPress installé dans $DOCROOT"',
+        "else",
+        '  echo "curl absent : WordPress non téléchargé"',
+        "fi",
+    ])
+
+
+def _easy_forgejo_script(port: int, admin: str, password: str) -> str:
+    lines = [
+        f"PORT={port}",
+        "if [ -f /etc/forgejo/app.ini ]; then",
+        '  sed -i "s/^HTTP_PORT = .*/HTTP_PORT = $PORT/" /etc/forgejo/app.ini',
+        "  systemctl restart forgejo 2>/dev/null || true",
+        '  echo "Forgejo : port mis à jour"',
+        "fi",
+    ]
+    if admin and password:
+        php_admin = admin.replace("'", "")
+        lines.extend([
+            "if [ -x /usr/local/bin/forgejo ]; then",
+            "  sleep 2",
+            '  su -s /bin/bash forgejo -c "/usr/local/bin/forgejo admin user create '
+            f"--admin --username '{php_admin}' --password '{password.replace(chr(39), '')}' "
+            f"--email '{php_admin}@localhost' --must-change-password=false "
+            '--config /etc/forgejo/app.ini" 2>/dev/null '
+            '|| echo "Forgejo : compte admin déjà présent ou création refusée"',
+            "fi",
+        ])
+    return "\n".join(lines)
+
+
+def _easy_config_steps(
+    profile: dict[str, Any], selected: tuple[str, ...], values: dict[str, str]
+) -> list[tuple[str, str]]:
+    """Étapes de configuration d'un profil, dans l'ordre d'exécution."""
+    kind = profile.get("config") or ""
+    server = _easy_host(values.get("server_name", "localhost"))
+    port = _easy_port(values.get("http_port", "80"), 80)
+    docroot = _easy_path(values.get("docroot", "/var/www/html"))
+    steps: list[tuple[str, str]] = []
+    if kind in ("apache", "nginx"):
+        php_script = _easy_php_script(
+            _easy_size(values.get("php_memory", "256M"), "256M"),
+            _easy_size(values.get("php_upload", "64M"), "64M"),
+            _easy_tz(values.get("php_tz", "")),
+        )
+        if "php" in selected:
+            steps.append((_L("Configuration PHP", "PHP configuration"), php_script))
+        vhost = _easy_web_config(kind, server, port, docroot)
+        vhost += (
+            f'\ncat > "{docroot}/index.php" <<\'PHP\'\n'
+            '<?php echo "PS5 Fedora Manager : PHP fonctionne.\\n";\n'
+            "PHP\n"
+            'if [ -f "' + docroot + '/index.php" ]; then chmod 644 "' + docroot + '/index.php"; fi\n'
+        )
+        vhost += (
+            "if command -v semanage >/dev/null 2>&1 && command -v restorecon >/dev/null 2>&1; then\n"
+            f'  semanage fcontext -a -t httpd_sys_content_t "{docroot}(/.*)?" 2>/dev/null || true\n'
+            f'  restorecon -R "{docroot}" 2>/dev/null || true\n'
+            "fi\n"
+            "setsebool -P httpd_can_network_connect_db on 2>/dev/null || true"
+        )
+        steps.append((_L("Hôte virtuel", "Virtual host"), vhost))
+        db_script = _easy_db_script(selected, values)
+        if db_script:
+            steps.append((_L("Base de données", "Database"), db_script))
+        tls = _easy_certbot_script(
+            kind,
+            _easy_host(values.get("certbot_domain", "")),
+            _easy_email(values.get("certbot_email", "")),
+        )
+        if tls and "certbot" in selected:
+            steps.append((_L("Certificat HTTPS (Let's Encrypt)", "HTTPS certificate (Let's Encrypt)"), tls))
+        if profile.get("wordpress"):
+            steps.append((
+                "WordPress",
+                _easy_wordpress_script(
+                    docroot,
+                    _easy_ident(values.get("db_name", "")) or "app",
+                    _easy_ident(values.get("db_user", "")) or "appuser",
+                    values.get("db_password", ""),
+                ),
+            ))
+    if profile.get("forgejo") and "forgejo" in selected:
+        steps.append((
+            _L("Forgejo (port et compte admin)", "Forgejo (port and admin account)"),
+            _easy_forgejo_script(
+                _easy_port(values.get("forgejo_port", "3000"), 3000),
+                _easy_ident(values.get("forgejo_admin_user", "")),
+                values.get("forgejo_admin_password", ""),
+            ),
+        ))
+    return steps
 
 
 def _build_easy_plan(
@@ -12640,16 +13126,72 @@ def _build_easy_plan(
             return ok
 
         steps.append(SetupStep(label, [(label, _runner)]))
-    config = _easy_config_script(profile, selected, values)
-    if config:
-        label = _L("Configuration du serveur", "Server configuration")
+    for label, script in _easy_config_steps(profile, selected, values):
         steps.append(
             SetupStep(
                 label,
-                [(label, lambda emit, script=config: win.run_cmd_pty(script, emit) == 0)],
+                [(label, lambda emit, s=script: win.run_cmd_pty(s, emit) == 0)],
             )
         )
     return steps
+
+
+def _easy_remove_plan(win: Ps5ManagerWindow, keys: tuple[str, ...]) -> list[SetupStep]:
+    """Étapes de désinstallation pour les composants choisis."""
+    steps: list[SetupStep] = []
+    for key in keys:
+        entry = _catalog_entry(key)
+        if entry is None or entry["panel"] is not None:
+            continue
+        label = _L(entry["title_fr"], entry["title_en"])
+
+        def _runner(emit, e=entry):
+            ok, _msg = _dev_execute(win, e, "remove", emit)
+            return ok
+
+        steps.append(SetupStep(label, [(label, _runner)]))
+    return steps
+
+
+def _easy_cleanup_script() -> str:
+    """Supprime les fichiers de configuration écrits par l'application."""
+    return r"""rm -f /etc/httpd/conf.d/ps5-easy.conf
+rm -f /etc/nginx/conf.d/ps5-easy.conf
+rm -f /etc/php.d/99-ps5-easy.ini
+rm -f /var/www/html/adminer.php
+rm -f /etc/yum.repos.d/webmin.repo
+if ! rpm -q docker-ce >/dev/null 2>&1; then rm -f /etc/yum.repos.d/docker-ce.repo; fi
+rm -f /tmp/ps5-easy-db.sql
+systemctl daemon-reload 2>/dev/null || true
+if command -v httpd >/dev/null 2>&1 && httpd -t >/dev/null 2>&1; then
+  systemctl reload httpd 2>/dev/null || true
+fi
+if command -v nginx >/dev/null 2>&1 && nginx -t >/dev/null 2>&1; then
+  systemctl reload nginx 2>/dev/null || true
+fi
+echo "Fichiers de configuration du manager supprimés."
+"""
+
+
+def _run_easy_steps(
+    win: Ps5ManagerWindow,
+    title: str,
+    steps: list[SetupStep],
+    back_to: str = "easy",
+) -> None:
+    if not steps:
+        win.show_info(title, _L("Aucun composant installé à désinstaller.",
+                                "No installed component to uninstall."))
+        return
+    if win.busy:
+        win.toast(T("busy"))
+        return
+    win.busy = True
+    win.busy_spinner.start()
+    window = EasySetupWindow(win, steps, title, back_to)
+    setattr(win, "easy_setup_window", window)
+    window.present()
+    window.start()
 
 
 class EasySetupWindow(SetupWindow):
@@ -12825,6 +13367,106 @@ def _start_easy_setup(
     window.start()
 
 
+def _push_easy_reset(win: "Ps5ManagerWindow") -> None:
+    """Page de désinstallation : composants installés + options de nettoyage."""
+    installed: list[tuple[str, dict[str, Any]]] = []
+    for entry in (*DEV_CATALOG, *WEB_CATALOG):
+        if entry["panel"] is not None:
+            continue
+        done, total = _dev_state(entry)
+        if total and done == total:
+            installed.append((entry["key"], entry))
+
+    sub_page = Adw.PreferencesPage()
+    grp = pref_group(
+        title=_L("Réinitialiser", "Reset"),
+        description=_L(
+            "Action irréversible : paquets retirés, configurations supprimées.",
+            "This cannot be undone: packages removed, configurations deleted.",
+        ),
+    )
+    switches: dict[str, Adw.SwitchRow] = {}
+    if installed:
+        for key, entry in installed:
+            row = plain_row(
+                Adw.SwitchRow,
+                title=_L(entry["title_fr"], entry["title_en"]),
+                subtitle=entry["sub"],
+            )
+            row.set_active(True)
+            switches[key] = row
+            grp.add(row)
+    else:
+        grp.add(
+            plain_row(
+                Adw.ActionRow,
+                title=_L("Aucun composant installé à désinstaller.",
+                         "No installed component to uninstall."),
+            )
+        )
+
+    grp_opt = pref_group(title=_L("Options de nettoyage", "Cleanup options"), description="")
+    sw_config = plain_row(
+        Adw.SwitchRow,
+        title=_L(
+            "Supprimer les fichiers de configuration créés par le manager",
+            "Remove configuration files created by the manager",
+        ),
+        subtitle="/etc/httpd/conf.d/ps5-easy.conf · /etc/nginx/conf.d/ps5-easy.conf · /etc/php.d/99-ps5-easy.ini",
+    )
+    sw_config.set_active(True)
+    grp_opt.add(sw_config)
+    sw_dnf = plain_row(
+        Adw.SwitchRow,
+        title=_L("Vider le cache DNF", "Clear the DNF cache"),
+        subtitle="dnf clean all",
+    )
+    sw_dnf.set_active(True)
+    grp_opt.add(sw_dnf)
+
+    def _do_reset():
+        keys = tuple(key for key, row in switches.items() if row.get_active())
+        steps = _easy_remove_plan(win, keys)
+        if sw_config.get_active():
+            label = _L("Nettoyer les fichiers du manager", "Clean the manager's files")
+            steps.append(
+                SetupStep(label, [(label, lambda emit: win.run_cmd_pty(_easy_cleanup_script(), emit) == 0)])
+            )
+        if sw_dnf.get_active():
+            label = _L("Purger le cache DNF (dnf clean all)", "Clear the DNF cache (dnf clean all)")
+            steps.append(SetupStep(label, [(label, lambda emit: win.run_cmd_pty(["dnf", "clean", "all"], emit) == 0)]))
+        if not steps:
+            win.show_info(_L("Réinitialiser", "Reset"), _L("Rien à nettoyer.", "Nothing to clean."))
+            return
+        win.nav.pop()
+        _run_easy_steps(win, _L("Réinitialiser", "Reset"), steps)
+
+    if installed:
+        grp.add(
+            win.row(
+                _L("Désinstaller la sélection", "Uninstall selection"),
+                _L("Action irréversible : paquets retirés, configurations supprimées.",
+                   "This cannot be undone: packages removed, configurations deleted."),
+                "user-trash-symbolic",
+                lambda *_: win.show_confirm(
+                    _L("Réinitialiser", "Reset"),
+                    _L("Supprimer les composants sélectionnés ?",
+                       "Remove the selected components?"),
+                    _do_reset,
+                ),
+            )
+        )
+    sub_page.add(grp)
+    sub_page.add(grp_opt)
+
+    toolbar = Adw.ToolbarView()
+    header = Adw.HeaderBar()
+    header.set_title_widget(Adw.WindowTitle(title=_L("Réinitialiser", "Reset")))
+    toolbar.add_top_bar(header)
+    toolbar.set_content(sub_page)
+    win.nav.push(Adw.NavigationPage(child=toolbar, title=_L("Réinitialiser", "Reset")))
+
+
 def build_page_easy(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     grp = pref_group(
         title=T("sec_easy"),
@@ -12844,6 +13486,63 @@ def build_page_easy(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
             )
         )
     page.add(grp)
+
+    reset = pref_group(
+        title=_L("Réinitialiser", "Reset"),
+        description=_L(
+            "Désinstaller les composants installés et repartir d'une base propre.",
+            "Uninstall installed components and start from a clean base.",
+        ),
+    )
+    reset.add(
+        win.row(
+            _L("Désinstaller des composants…", "Uninstall components…"),
+            _L("Choisis ce qui doit être retiré, puis nettoie les fichiers du manager.",
+               "Pick what should be removed, then clean the manager's files."),
+            "user-trash-symbolic",
+            lambda *_: _push_easy_reset(win),
+        )
+    )
+    reset.add(
+        win.row(
+            _L("Nettoyer les fichiers du manager", "Clean the manager's files"),
+            "/etc/httpd/conf.d/ps5-easy.conf · 99-ps5-easy.ini · repos docker/webmin",
+            "edit-clear-symbolic",
+            lambda *_: win.show_confirm(
+                _L("Nettoyer les fichiers du manager", "Clean the manager's files"),
+                _L("Supprimer les configurations écrites par l'application ?",
+                   "Remove the configuration files written by the application?"),
+                lambda: _run_easy_steps(
+                    win,
+                    _L("Nettoyer les fichiers du manager", "Clean the manager's files"),
+                    [
+                        SetupStep(
+                            _L("Fichiers de configuration du manager supprimés.",
+                               "Configuration files removed."),
+                            [(
+                                _L("Fichiers de configuration du manager supprimés.",
+                                   "Configuration files removed."),
+                                lambda emit: win.run_cmd_pty(_easy_cleanup_script(), emit) == 0,
+                            )],
+                        )
+                    ],
+                ),
+            ),
+        )
+    )
+    reset.add(
+        win.row(
+            _L("Purger le cache DNF (dnf clean all)", "Clear the DNF cache (dnf clean all)"),
+            "Libère de l'espace disque, sans rien désinstaller",
+            "edit-clear-symbolic",
+            lambda *_: win.run_task(
+                _L("Purger le cache DNF (dnf clean all)", "Clear the DNF cache (dnf clean all)"),
+                lambda emit: (win.run_cmd_pty(["dnf", "clean", "all"], emit) == 0, T("done")),
+                lambda *_: None,
+            ),
+        )
+    )
+    page.add(reset)
 
     info = pref_group(title=_L("Bon à savoir", "Good to know"), description="")
     info.add(

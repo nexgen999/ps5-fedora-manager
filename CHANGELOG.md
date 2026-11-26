@@ -6,6 +6,19 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.13.0] — 2026-11-26
+
+### Ajouté
+- **Deux profils supplémentaires** dans « Installation facile » : **WordPress** (Apache, PHP, MariaDB, phpMyAdmin puis téléchargement de WordPress et génération d'un `wp-config.php` complet, sel aléatoire inclus) et **Tout-en-un** (outils de développement, conteneurs, Cockpit, pare-feu).
+- **Quinze options de configuration** au lieu de six : port HTTP (hôte virtuel Apache/Nginx et ouverture du pare-feu), `memory_limit`, `upload_max_filesize`/`post_max_size`, `date.timezone` (fichier `/etc/php.d/99-ps5-easy.ini`), domaine + e-mail **Let's Encrypt** (émission et redirection HTTPS automatiques), port Forgejo et **création du compte administrateur** Forgejo.
+- **MySQL** proposé à côté de MariaDB dans les profils web, avec les mêmes étapes de base de données.
+- **Outil de réinitialisation** dans la section : page listant les composants réellement installés (interrupteur par composant), option « supprimer les fichiers de configuration créés par le manager » (`ps5-easy.conf`, `99-ps5-easy.ini`, `adminer.php`, dépôts docker/webmin), option « vider le cache DNF », et désinstallation confirmée qui repart d'une base propre.
+- Désinstallation d'un profil ou d'une sélection, avec la **même fenêtre de progression** que l'installation (étapes `dnf remove` par composant).
+
+### Corrigé
+- `_easy_path` normalise désormais les chemins (`..` supprimés) : un DocumentRoot saisi ne peut plus sortir de l'arborescence prévue.
+- `wp-config.php` est généré en une fois (plus de `sed` fragile sur un mot de passe contenant apostrophe ou antislash).
+
 ## [0.12.0] — 2026-11-26
 
 ### Ajouté
