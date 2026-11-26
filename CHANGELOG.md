@@ -6,6 +6,20 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.10.0] — 2026-11-26
+
+### Ajouté
+- **Page « Développement »** (nouvelle section, juste après « IA & Développeur »), organisée en trois catégories :
+  - **Composants (socle système)** : compilation (gcc, g++, cmake, meson, ninja, autotools, rpmdevtools), Python + GTK4/Libadwaita (gtk4-devel, libadwaita-devel, blueprint-compiler, appstream), conteneurs (Podman, Distrobox, Toolbox), Docker Engine + Compose, virtualisation KVM/QEMU (virt-manager, GNOME Boxes, OVMF, swtpm), Node.js/npm, Rust.
+  - **Outils en ligne de commande** : recherche (ripgrep, fd, bat, eza, fzf, zoxide), Git & plateformes (gh, glab, lazygit, git-delta, git-lfs), terminal (tmux, zellij), diagnostic système (btop, ncdu, duf, fastfetch, hyperfine, lsof, strace, sysstat, perf), debug et profilage (gdb, lldb, valgrind, heaptrack, sysprof), qualité Python (uv, ruff, mypy, pre-commit), JSON/HTTP (jq, yq, httpie), automatisation (just, direnv, shellcheck, shfmt).
+  - **Applications graphiques** : VSCodium (renvoie vers son panneau existant), GitHub Desktop (Flatpak Flathub), Forgejo en serveur Git local (binaire officiel, service systemd, SQLite, `http://localhost:3000`), éditeurs terminal (Neovim, Helix), SQLite Browser.
+- Chaque entrée affiche son état (`installés/total` ou installé/absent) et propose **installer**, **mettre à jour**, **lancer** (quand pertinent) et **désinstaller** avec confirmation.
+- Détection groupée en une seule requête `rpm` (cache 30 s) pour ne pas figer l'interface, et scripts dédiés pour Docker (dépôt docker-ce + compose/buildx), Forgejo (téléchargement Codeberg + unité `forgejo.service`, données dans `/var/lib/forgejo`) et GitHub Desktop.
+
+### Modifié
+- `APP_VERSION` passe à `0.10.0`, notes de version FR/EN de la boîte « À propos » mises à jour.
+- `_launch_in_terminal()` mutualise le lancement d'une commande dans un terminal (utilisé par Freebuff, Neovim et les autres outils).
+
 ## [0.9.1] — 2026-11-26
 
 ### Ajouté

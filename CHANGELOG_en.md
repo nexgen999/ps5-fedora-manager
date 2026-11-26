@@ -7,6 +7,20 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.10.0] — 2026-11-26
+
+### Added
+- **“Development” page** (new section, right after “AI & Developer”), organised in three categories:
+  - **Components (system base)**: build tools (gcc, g++, cmake, meson, ninja, autotools, rpmdevtools), Python + GTK4/Libadwaita (gtk4-devel, libadwaita-devel, blueprint-compiler, appstream), containers (Podman, Distrobox, Toolbox), Docker Engine + Compose, KVM/QEMU virtualization (virt-manager, GNOME Boxes, OVMF, swtpm), Node.js/npm, Rust.
+  - **Command-line tools**: search (ripgrep, fd, bat, eza, fzf, zoxide), Git & platforms (gh, glab, lazygit, git-delta, git-lfs), terminal (tmux, zellij), system diagnostics (btop, ncdu, duf, fastfetch, hyperfine, lsof, strace, sysstat, perf), debug and profiling (gdb, lldb, valgrind, heaptrack, sysprof), Python quality (uv, ruff, mypy, pre-commit), JSON/HTTP (jq, yq, httpie), automation (just, direnv, shellcheck, shfmt).
+  - **Graphical applications**: VSCodium (points to its existing panel), GitHub Desktop (Flathub Flatpak), Forgejo as a local Git server (official binary, systemd service, SQLite, `http://localhost:3000`), terminal editors (Neovim, Helix), SQLite Browser.
+- Every entry shows its state (`installed/total` or installed/missing) and offers **install**, **update**, **launch** (where it makes sense) and **uninstall** with confirmation.
+- State detection is batched in a single `rpm` query (30 s cache) so the UI never freezes, with dedicated scripts for Docker (docker-ce repo + compose/buildx), Forgejo (Codeberg download + `forgejo.service` unit, data in `/var/lib/forgejo`) and GitHub Desktop.
+
+### Changed
+- `APP_VERSION` bumped to `0.10.0`, FR/EN release notes of the “About” dialog updated.
+- `_launch_in_terminal()` centralises running a command in a terminal (used by Freebuff, Neovim and the other tools).
+
 ## [0.9.1] — 2026-11-26
 
 ### Added

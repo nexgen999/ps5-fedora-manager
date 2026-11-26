@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.9.1"
+APP_VERSION = "0.10.0"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1119,16 +1119,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.9.1",
-    "en": "What is new in 0.9.1",
-    "es": "Novedades de la 0.9.1",
-    "it": "Novità della 0.9.1",
-    "de": "Neu in 0.9.1",
-    "pt": "Novidades da 0.9.1",
+    "fr": "Nouveautés de la 0.10.0",
+    "en": "What is new in 0.10.0",
+    "es": "Novedades de la 0.10.0",
+    "it": "Novità della 0.10.0",
+    "de": "Neu in 0.10.0",
+    "pt": "Novidades da 0.10.0",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.10 : page « Développement » (composants, outils en ligne de commande, applications) avec installation, mise à jour et désinstallation par entrée — dont Docker, KVM/QEMU, GitHub Desktop et un Forgejo local",
         "0.9.1 : Freebuff (agent de code IA) dans la page IA &amp; Développeur — installation, mise à jour et désinstallation via npm, lancement dans un terminal",
         "0.8.2 : boîte « À propos » entièrement traduite (notes de version, informations de débogage) et menu principal vérifié dans les six langues",
         "0.8.1 : le raccourci « Basculer Session » et la session Steam utilisent l'icône Gamescope (Steam Deck) fournie, installée dans le thème d'icônes",
@@ -1143,6 +1144,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.10: “Development” page (components, command-line tools, applications) with per-entry install, update and uninstall — including Docker, KVM/QEMU, GitHub Desktop and a local Forgejo",
         "0.9.1: Freebuff (AI coding agent) on the AI &amp; Developer page — npm install, update and uninstall, launch in a terminal",
         "0.8.2: fully translated “About” dialog (release notes, debug information) and main menu checked in all six languages",
         "0.8.1: the “Switch Session” shortcut and the Steam session now use the provided Gamescope (Steam Deck) icon, installed in the icon theme",
@@ -1157,6 +1159,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.10 : página «Desarrollo» (componentes, herramientas de línea de comandos, aplicaciones) con instalación, actualización y desinstalación por entrada — incluidos Docker, KVM/QEMU, GitHub Desktop y un Forgejo local",
         "0.9.1 : Freebuff (agente de código IA) en la página IA y Desarrollo — instalación, actualización y desinstalación con npm, inicio en una terminal",
         "0.8.2 : diálogo «Acerca de» totalmente traducido (notas de versión, información de depuración) y menú principal revisado en los seis idiomas",
         "0.8.1 : el atajo «Cambiar de sesión» y la sesión Steam usan el icono Gamescope (Steam Deck) proporcionado, instalado en el tema de iconos",
@@ -1171,6 +1174,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.10 : pagina «Sviluppo» (componenti, strumenti da riga di comando, applicazioni) con installazione, aggiornamento e disinstallazione per voce — inclusi Docker, KVM/QEMU, GitHub Desktop e un Forgejo locale",
         "0.9.1 : Freebuff (agente di codice IA) nella pagina IA e Sviluppo — installazione, aggiornamento e disinstallazione con npm, avvio in un terminale",
         "0.8.2 : finestra «Informazioni su» completamente tradotta (note di versione, informazioni di debug) e menu principale verificato nelle sei lingue",
         "0.8.1 : il collegamento «Cambia sessione» e la sessione Steam usano l'icona Gamescope (Steam Deck) fornita, installata nel tema delle icone",
@@ -1185,6 +1189,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.10 : Seite „Entwicklung“ (Komponenten, Kommandozeilen-Werkzeuge, Anwendungen) mit Installation, Aktualisierung und Deinstallation pro Eintrag – inklusive Docker, KVM/QEMU, GitHub Desktop und einem lokalen Forgejo",
         "0.9.1 : Freebuff (KI-Coding-Agent) auf der Seite „KI &amp; Entwickler“ – npm-Installation, -Aktualisierung und -Deinstallation, Start in einem Terminal",
         "0.8.2 : Dialog „Info über“ vollständig übersetzt (Versionshinweise, Debug-Informationen) und Hauptmenü in allen sechs Sprachen geprüft",
         "0.8.1 : Die Verknüpfung „Sitzung wechseln“ und die Steam-Sitzung verwenden das mitgelieferte Gamescope-Symbol (Steam Deck), installiert im Icon-Theme",
@@ -1199,6 +1204,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.10 : página «Desenvolvimento» (componentes, ferramentas de linha de comando, aplicativos) com instalação, atualização e desinstalação por entrada — incluindo Docker, KVM/QEMU, GitHub Desktop e um Forgejo local",
         "0.9.1 : Freebuff (agente de código IA) na página IA e Programador — instalação, atualização e desinstalação com npm, arranque num terminal",
         "0.8.2 : caixa «Sobre» totalmente traduzida (notas de versão, informações de depuração) e menu principal verificado nos seis idiomas",
         "0.8.1 : o atalho «Alternar sessão» e a sessão Steam usam o ícone Gamescope (Steam Deck) fornecido, instalado no tema de ícones",
@@ -1959,6 +1965,7 @@ STRINGS = {
         "sec_logs": "Journal / Logs",
         "sec_library": "Logithèque",
         "sec_aidev": "IA & Développeur",
+        "sec_dev": "Développement",
         "sec_deps": "Dépendances Supplémentaires",
         "sec_gaming": "Gaming Mode",
         "sec_fix": "Divers Fix",
@@ -2404,6 +2411,7 @@ STRINGS = {
         "sec_logs": "Logs",
         "sec_library": "Software library",
         "sec_aidev": "AI & Developer",
+        "sec_dev": "Development",
         "sec_deps": "Additional Dependencies",
         "sec_gaming": "Gaming Mode",
         "sec_fix": "Misc Fixes",
@@ -2862,6 +2870,7 @@ STRINGS['es'] = {'app_title': 'PS5 Fedora Manager',
  'sec_logs': 'Registro / Logs',
  'sec_library': 'Tienda de aplicaciones',
  'sec_aidev': 'IA y Desarrollo',
+ 'sec_dev': 'Desarrollo',
  'sec_deps': 'Dependencias adicionales',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Arreglos varios',
@@ -3302,6 +3311,7 @@ STRINGS['it'] = {'app_title': 'PS5 Fedora Manager',
  'sec_logs': 'Registro / Log',
  'sec_library': 'App store',
  'sec_aidev': 'IA e Sviluppo',
+ 'sec_dev': 'Sviluppo',
  'sec_deps': 'Dipendenze aggiuntive',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Correzioni varie',
@@ -3738,6 +3748,7 @@ STRINGS['de'] = {'app_title': 'PS5 Fedora Manager',
  'sec_logs': 'Protokoll / Logs',
  'sec_library': 'App-Store',
  'sec_aidev': 'KI & Entwicklung',
+ 'sec_dev': 'Entwicklung',
  'sec_deps': 'Zusätzliche Abhängigkeiten',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Diverse Korrekturen',
@@ -4174,6 +4185,7 @@ STRINGS['pt'] = {'app_title': 'PS5 Fedora Manager',
  'sec_logs': 'Registro / Logs',
  'sec_library': 'Loja de aplicativos',
  'sec_aidev': 'IA e Desenvolvimento',
+ 'sec_dev': 'Desenvolvimento',
  'sec_deps': 'Dependências adicionais',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Correções diversas',
@@ -5631,6 +5643,7 @@ SECTIONS = [
     ("logs", "utilities-terminal-symbolic", "sec_logs", 1),
     ("library", "system-software-install-symbolic", "sec_library", 1),
     ("aidev", "applications-development-symbolic", "sec_aidev", 1),
+    ("dev", "applications-engineering-symbolic", "sec_dev", 1),
     ("deps", "application-x-addon-symbolic", "sec_deps", 1),
     ("gaming", "input-gaming-symbolic", "sec_gaming", 1),
     ("features", "application-x-executable-symbolic", "sec_features", 1),
@@ -6141,6 +6154,186 @@ _L_TABLE = {
         "Terminale non trovato: avvia «freebuff» da un terminale.",
         "Kein Terminal gefunden: starte „freebuff“ in einem Terminal.",
         "Terminal não encontrado: execute «freebuff» num terminal.",
+    ),
+    "Composants (socle système)": (
+        "Componentes (base del sistema)",
+        "Componenti (base di sistema)",
+        "Komponenten (Systembasis)",
+        "Componentes (base do sistema)",
+    ),
+    "Outils en ligne de commande": (
+        "Herramientas de línea de comandos",
+        "Strumenti da riga di comando",
+        "Kommandozeilen-Werkzeuge",
+        "Ferramentas de linha de comando",
+    ),
+    "Applications graphiques": (
+        "Aplicaciones gráficas",
+        "Applicazioni grafiche",
+        "Grafische Anwendungen",
+        "Aplicativos gráficos",
+    ),
+    "Installation, mise à jour et désinstallation par catégorie — tout est optionnel.": (
+        "Instalación, actualización y desinstalación por categoría: todo es opcional.",
+        "Installazione, aggiornamento e disinstallazione per categoria: tutto è opzionale.",
+        "Installation, Aktualisierung und Deinstallation nach Kategorie – alles ist optional.",
+        "Instalação, atualização e desinstalação por categoria: tudo é opcional.",
+    ),
+    "Socle de compilation": (
+        "Base de compilación",
+        "Base di compilazione",
+        "Build-Grundlage",
+        "Base de compilação",
+    ),
+    "Conteneurs (Podman, Distrobox, Toolbox)": (
+        "Contenedores (Podman, Distrobox, Toolbox)",
+        "Contenitori (Podman, Distrobox, Toolbox)",
+        "Container (Podman, Distrobox, Toolbox)",
+        "Contêineres (Podman, Distrobox, Toolbox)",
+    ),
+    "Virtualisation KVM / QEMU": (
+        "Virtualización KVM / QEMU",
+        "Virtualizzazione KVM / QEMU",
+        "Virtualisierung KVM / QEMU",
+        "Virtualização KVM / QEMU",
+    ),
+    "Recherche & navigation": (
+        "Búsqueda y navegación",
+        "Ricerca e navigazione",
+        "Suche & Navigation",
+        "Pesquisa e navegação",
+    ),
+    "Git & plateformes (GitHub, GitLab)": (
+        "Git y plataformas (GitHub, GitLab)",
+        "Git e piattaforme (GitHub, GitLab)",
+        "Git & Plattformen (GitHub, GitLab)",
+        "Git e plataformas (GitHub, GitLab)",
+    ),
+    "Diagnostic système": (
+        "Diagnóstico del sistema",
+        "Diagnostica di sistema",
+        "Systemdiagnose",
+        "Diagnóstico do sistema",
+    ),
+    "Debug & profilage": (
+        "Depuración y perfilado",
+        "Debug e profilazione",
+        "Debug & Profiling",
+        "Depuração e perfilagem",
+    ),
+    "Qualité Python (uv, ruff, mypy)": (
+        "Calidad Python (uv, ruff, mypy)",
+        "Qualità Python (uv, ruff, mypy)",
+        "Python-Qualität (uv, ruff, mypy)",
+        "Qualidade Python (uv, ruff, mypy)",
+    ),
+    "Automatisation (just, direnv, shellcheck)": (
+        "Automatización (just, direnv, shellcheck)",
+        "Automazione (just, direnv, shellcheck)",
+        "Automatisierung (just, direnv, shellcheck)",
+        "Automação (just, direnv, shellcheck)",
+    ),
+    "Forgejo (serveur Git local)": (
+        "Forgejo (servidor Git local)",
+        "Forgejo (server Git locale)",
+        "Forgejo (lokaler Git-Server)",
+        "Forgejo (servidor Git local)",
+    ),
+    "Éditeurs terminal (Neovim, Helix)": (
+        "Editores de terminal (Neovim, Helix)",
+        "Editor da terminale (Neovim, Helix)",
+        "Terminal-Editoren (Neovim, Helix)",
+        "Editores de terminal (Neovim, Helix)",
+    ),
+    "Bases de données (SQLite)": (
+        "Bases de datos (SQLite)",
+        "Database (SQLite)",
+        "Datenbanken (SQLite)",
+        "Bases de dados (SQLite)",
+    ),
+    "script d'installation intégré": (
+        "script de instalación integrado",
+        "script di installazione integrato",
+        "integriertes Installationsskript",
+        "script de instalação integrado",
+    ),
+    "script de mise à jour intégré": (
+        "script de actualización integrado",
+        "script di aggiornamento integrato",
+        "integriertes Aktualisierungsskript",
+        "script de atualização integrado",
+    ),
+    "script de désinstallation intégré": (
+        "script de desinstalación integrado",
+        "script di disinstallazione integrato",
+        "integriertes Deinstallationsskript",
+        "script de desinstalação integrado",
+    ),
+    "Déconnecte-toi puis reconnecte-toi pour activer les groupes docker, libvirt et kvm.": (
+        "Cierra la sesión y vuelve a entrar para activar los grupos docker, libvirt y kvm.",
+        "Esci e rientra per attivare i gruppi docker, libvirt e kvm.",
+        "Melde dich ab und wieder an, um die Gruppen docker, libvirt und kvm zu aktivieren.",
+        "Termina e volta a iniciar sessão para ativar os grupos docker, libvirt e kvm.",
+    ),
+    "Désinstallation : les données restent dans /var/lib/forgejo.": (
+        "Desinstalación: los datos permanecen en /var/lib/forgejo.",
+        "Disinstallazione: i dati restano in /var/lib/forgejo.",
+        "Deinstallation: die Daten bleiben in /var/lib/forgejo.",
+        "Desinstalação: os dados permanecem em /var/lib/forgejo.",
+    ),
+    "Rien à faire pour cette entrée.": (
+        "Nada que hacer para esta entrada.",
+        "Niente da fare per questa voce.",
+        "Für diesen Eintrag gibt es nichts zu tun.",
+        "Nada a fazer para esta entrada.",
+    ),
+    "Installer": (
+        "Instalar",
+        "Installa",
+        "Installieren",
+        "Instalar",
+    ),
+    "Mettre à jour": (
+        "Actualizar",
+        "Aggiorna",
+        "Aktualisieren",
+        "Atualizar",
+    ),
+    "Désinstaller": (
+        "Desinstalar",
+        "Disinstalla",
+        "Deinstallieren",
+        "Desinstalar",
+    ),
+    "Lancer": (
+        "Iniciar",
+        "Avvia",
+        "Starten",
+        "Iniciar",
+    ),
+    "Supprimer": (
+        "Eliminar",
+        "Rimuovi",
+        "Entfernen",
+        "Remover",
+    ),
+    "Lancement impossible : commande ou terminal introuvable.": (
+        "No se puede iniciar: comando o terminal no encontrado.",
+        "Avvio impossibile: comando o terminale non trovato.",
+        "Start nicht möglich: Befehl oder Terminal nicht gefunden.",
+        "Não é possível iniciar: comando ou terminal não encontrado.",
+    ),
+    "À propos de cette page": (
+        "Acerca de esta página",
+        "Informazioni su questa pagina",
+        "Über diese Seite",
+        "Sobre esta página",
+    ),
+    "Les groupes docker, libvirt et kvm ne s'appliquent qu'après une reconnexion.": (
+        "Los grupos docker, libvirt y kvm solo se aplican tras volver a iniciar sesión.",
+        "I gruppi docker, libvirt e kvm si applicano solo dopo un nuovo accesso.",
+        "Die Gruppen docker, libvirt und kvm gelten erst nach einer neuen Anmeldung.",
+        "Os grupos docker, libvirt e kvm só se aplicam após nova sessão.",
     ),
 }
 
@@ -9449,19 +9642,7 @@ def _ensure_npm_ready(win: Ps5ManagerWindow, emit: Callable[[str], None]) -> boo
 
 def _launch_freebuff() -> bool:
     """Ouvre freebuff dans le premier terminal disponible de la session."""
-    for name, extra in FREEBUFF_TERMINALS:
-        path = shutil.which(name)
-        if not path:
-            continue
-        try:
-            subprocess.Popen(
-                [path, *extra, "bash", "-lc", 'cd "$HOME" && freebuff'],
-                **user_subprocess_kwargs(),
-            )
-            return True
-        except OSError:
-            continue
-    return False
+    return _launch_in_terminal("freebuff")
 
 
 def _ensure_vscodium_repo(win: Ps5ManagerWindow, emit: Callable[[str], None]) -> bool:
@@ -10681,10 +10862,700 @@ def _push_model_actions(win: Ps5ManagerWindow, model_name: str) -> None:
     win.nav.push(Adw.NavigationPage(child=tb, title=model_name))
 
 
+# ------------------------------------------------------------------------------
+# Page « Développement » : environnement complet, par catégorie
+# (composants système → outils CLI → applications graphiques)
+# ------------------------------------------------------------------------------
+DEV_GROUPS: tuple[tuple[str, str, str], ...] = (
+    ("components", "Composants (socle système)", "Components (system base)"),
+    ("tools", "Outils en ligne de commande", "Command-line tools"),
+    ("apps", "Applications graphiques", "Graphical applications"),
+)
+
+GH_DESKTOP_FLATPAK = "io.github.shiftey.Desktop"
+FORGEJO_BIN = "/usr/local/bin/forgejo"
+FORGEJO_UNIT = "/etc/systemd/system/forgejo.service"
+FORGEJO_DATA = "/var/lib/forgejo"
+FORGEJO_URL = "http://localhost:3000"
+
+
+def _forgejo_download() -> str:
+    """Bloc shell partagé : télécharge la dernière version de Forgejo."""
+    return r"""API="https://codeberg.org/api/v1/repos/forgejo/forgejo/releases/latest"
+TAG=$(curl -fsSL "$API" 2>/dev/null | grep -o '"tag_name":"v[^"]*"' | head -n 1 | cut -d'"' -f4)
+if [ -z "${TAG:-}" ]; then
+  TAG=$(curl -fsSL "https://code.forgejo.org/api/v1/repos/forgejo/forgejo/releases/latest" 2>/dev/null \
+    | grep -o '"tag_name":"v[^"]*"' | head -n 1 | cut -d'"' -f4)
+fi
+[ -n "${TAG:-}" ] || { echo "Forgejo : impossible de joindre Codeberg"; exit 1; }
+VER="${TAG#v}"
+case "$(uname -m)" in
+  x86_64) ARCH=amd64 ;;
+  aarch64) ARCH=arm64 ;;
+  *) echo "Forgejo : architecture non gérée ($(uname -m))"; exit 1 ;;
+esac
+URL="https://codeberg.org/forgejo/forgejo/releases/download/v${VER}/forgejo-${VER}-linux-${ARCH}"
+echo "Forgejo ${VER} (${ARCH}) : $URL"
+curl -fsSL -o /tmp/forgejo.download "$URL" || \
+  curl -fsSL -o /tmp/forgejo.download \
+    "https://code.forgejo.org/forgejo/forgejo/releases/download/v${VER}/forgejo-${VER}-linux-${ARCH}"
+chmod 755 /tmp/forgejo.download
+"""
+
+
+FORGEJO_CONF = r"""APP_NAME = Forgejo (local)
+RUN_USER = forgejo
+WORK_PATH = /var/lib/forgejo
+RUN_MODE = prod
+
+[server]
+PROTOCOL = http
+HTTP_ADDR = 127.0.0.1
+HTTP_PORT = 3000
+ROOT_URL = http://localhost:3000/
+DISABLE_SSH = true
+OFFLINE_MODE = true
+
+[database]
+DB_TYPE = sqlite3
+PATH = /var/lib/forgejo/data/forgejo.db
+
+[repository]
+ROOT = /var/lib/forgejo/gitea-repositories
+
+[service]
+DISABLE_REGISTRATION = false
+REQUIRE_SIGNIN_VIEW = false
+"""
+
+FORGEJO_UNIT_FILE = r"""[Unit]
+Description=Forgejo (serveur Git local, PS5 Fedora Manager)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=forgejo
+Group=forgejo
+WorkingDirectory=/var/lib/forgejo
+Environment=USER=forgejo HOME=/var/lib/forgejo GITEA_WORK_DIR=/var/lib/forgejo
+ExecStart=/usr/local/bin/forgejo web --config /etc/forgejo/app.ini
+Restart=on-failure
+RestartSec=3
+LimitNOFILE=524288
+
+[Install]
+WantedBy=multi-user.target
+"""
+
+FORGEJO_INSTALL = (
+    "set -e\n"
+    "command -v curl >/dev/null 2>&1 || dnf install -y curl\n"
+    + _forgejo_download()
+    + r"""install -o root -g root -m 0755 /tmp/forgejo.download /usr/local/bin/forgejo
+rm -f /tmp/forgejo.download
+getent group forgejo >/dev/null 2>&1 || groupadd --system forgejo
+id forgejo >/dev/null 2>&1 || useradd --system --gid forgejo --home-dir /var/lib/forgejo --shell /usr/sbin/nologin forgejo
+mkdir -p /var/lib/forgejo/data /etc/forgejo
+cat > /etc/forgejo/app.ini <<'INI'
+__FORGEJO_CONF__INI
+cat > /etc/systemd/system/forgejo.service <<'UNIT'
+__FORGEJO_UNIT__UNIT
+chown -R forgejo:forgejo /var/lib/forgejo
+systemctl daemon-reload
+systemctl enable --now forgejo
+sleep 2
+systemctl is-active --quiet forgejo || { echo "Forgejo n'a pas démarré : journalctl -u forgejo -n 30"; exit 1; }
+echo "Forgejo actif sur __FORGEJO_URL__"
+"""
+).replace("__FORGEJO_CONF__", FORGEJO_CONF).replace("__FORGEJO_UNIT__", FORGEJO_UNIT_FILE).replace(
+    "__FORGEJO_URL__", FORGEJO_URL
+)
+
+FORGEJO_UPDATE = (
+    "set -e\n"
+    + _forgejo_download()
+    + r"""systemctl stop forgejo 2>/dev/null || true
+install -o root -g root -m 0755 /tmp/forgejo.download /usr/local/bin/forgejo
+rm -f /tmp/forgejo.download
+systemctl start forgejo
+systemctl is-active --quiet forgejo || { echo "Forgejo n'a pas redémarré : journalctl -u forgejo -n 30"; exit 1; }
+echo "Forgejo mis à jour"
+"""
+)
+
+FORGEJO_REMOVE = r"""systemctl disable --now forgejo 2>/dev/null || true
+rm -f /etc/systemd/system/forgejo.service
+systemctl daemon-reload
+rm -f /usr/local/bin/forgejo
+echo "Forgejo désinstallé : les données restent dans /var/lib/forgejo"
+"""
+
+DOCKER_INSTALL = r"""set -e
+command -v curl >/dev/null 2>&1 || dnf install -y curl
+if dnf config-manager addrepo --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo 2>/dev/null; then
+  echo "dépôt docker-ce ajouté"
+else
+  dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+fi
+dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+systemctl enable --now docker
+usermod -aG docker __USER__ 2>/dev/null || true
+docker --version
+"""
+
+DOCKER_UPDATE = (
+    "dnf upgrade -y --refresh docker-ce docker-ce-cli containerd.io "
+    "docker-buildx-plugin docker-compose-plugin"
+)
+
+DOCKER_REMOVE = r"""systemctl disable --now docker 2>/dev/null || true
+dnf remove -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin || true
+rm -f /etc/yum.repos.d/docker-ce.repo
+echo "Docker Engine retiré : les données restent dans /var/lib/docker"
+"""
+
+GH_DESKTOP_INSTALL = r"""command -v flatpak >/dev/null 2>&1 || dnf install -y flatpak
+flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+flatpak install -y flathub __GH_DESKTOP__
+"""
+
+
+def _dev_rpm_ok(name: str) -> bool:
+    return subprocess.run(["rpm", "-q", name], capture_output=True).returncode == 0
+
+
+def _docker_installed() -> bool:
+    return _dev_rpm_ok("docker-ce")
+
+
+def _forgejo_installed() -> bool:
+    return os.path.isfile(FORGEJO_BIN)
+
+
+def _flatpak_app_installed(app_id: str) -> bool:
+    if not shutil.which("flatpak"):
+        return False
+    try:
+        res = subprocess.run(["flatpak", "info", app_id], capture_output=True, timeout=20)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return res.returncode == 0
+
+
+def _dev_spawn(cmd: list[str]) -> bool:
+    try:
+        subprocess.Popen(cmd, **user_subprocess_kwargs())
+        return True
+    except OSError:
+        return False
+
+
+def _launch_in_terminal(command: str) -> bool:
+    """Lance une commande interactive dans le premier terminal disponible."""
+    for name, extra in FREEBUFF_TERMINALS:
+        path = shutil.which(name)
+        if not path:
+            continue
+        try:
+            subprocess.Popen(
+                [path, *extra, "bash", "-lc", f'cd "$HOME" && {command}'],
+                **user_subprocess_kwargs(),
+            )
+            return True
+        except OSError:
+            continue
+    return False
+
+
+def _dev_entry(
+    key: str,
+    group: str,
+    title_fr: str,
+    title_en: str,
+    sub: str,
+    icon: str,
+    packages: tuple[str, ...] = (),
+    install: tuple[str, ...] = (),
+    update: tuple[str, ...] = (),
+    remove: tuple[str, ...] = (),
+    check: Optional[Callable[[], bool]] = None,
+    panel: Optional[Callable] = None,
+    launch: Optional[Callable[[], bool]] = None,
+    launch_fr: str = "",
+    launch_en: str = "",
+    note_fr: str = "",
+    note_en: str = "",
+    install_desc: str = "",
+    update_desc: str = "",
+    remove_desc: str = "",
+) -> dict[str, Any]:
+    return {
+        "key": key,
+        "group": group,
+        "title_fr": title_fr,
+        "title_en": title_en,
+        "sub": sub,
+        "icon": icon,
+        "packages": packages,
+        "install": install,
+        "update": update,
+        "remove": remove,
+        "check": check,
+        "panel": panel,
+        "launch": launch,
+        "launch_fr": launch_fr,
+        "launch_en": launch_en,
+        "note_fr": note_fr,
+        "note_en": note_en,
+        "install_desc": install_desc,
+        "update_desc": update_desc,
+        "remove_desc": remove_desc,
+    }
+
+
+DEV_CATALOG: tuple[dict[str, Any], ...] = (
+    # ---- Composants ---------------------------------------------------------
+    _dev_entry(
+        "build", "components",
+        "Socle de compilation", "Build essentials",
+        "gcc, g++, make, cmake, meson, ninja, autotools, rpmdevtools",
+        "applications-engineering-symbolic",
+        packages=(
+            "git", "gcc", "gcc-c++", "make", "cmake", "meson", "ninja-build",
+            "pkgconf-pkg-config", "autoconf", "automake", "libtool", "patch",
+            "rpmdevtools", "rpmlint",
+        ),
+    ),
+    _dev_entry(
+        "python-gtk", "components",
+        "Python + GTK4 / Libadwaita", "Python + GTK4 / Libadwaita",
+        "python3-devel, gtk4-devel, libadwaita-devel, blueprint-compiler",
+        "text-x-python-symbolic",
+        packages=(
+            "python3-devel", "python3-pip", "python3-virtualenv", "python3-pytest",
+            "gobject-introspection-devel", "gtk4-devel", "libadwaita-devel",
+            "libsecret-devel", "blueprint-compiler", "desktop-file-utils",
+            "appstream", "gtk4-devel-tools", "devhelp",
+        ),
+    ),
+    _dev_entry(
+        "containers", "components",
+        "Conteneurs (Podman, Distrobox, Toolbox)", "Containers (Podman, Distrobox, Toolbox)",
+        "podman, podman-docker, buildah, skopeo, distrobox, toolbox",
+        "application-x-executable-symbolic",
+        packages=(
+            "podman", "podman-docker", "buildah", "skopeo", "distrobox", "toolbox",
+        ),
+    ),
+    _dev_entry(
+        "docker", "components",
+        "Docker Engine + Compose", "Docker Engine + Compose",
+        "dépôt docker-ce, docker-ce, containerd, compose-plugin, buildx",
+        "application-x-executable-symbolic",
+        check=_docker_installed,
+        install=(DOCKER_INSTALL,),
+        update=(DOCKER_UPDATE,),
+        remove=(DOCKER_REMOVE,),
+        install_desc="dépôt docker-ce + docker-ce + compose/buildx",
+        update_desc=DOCKER_UPDATE,
+        remove_desc="systemctl disable docker + dnf remove docker-ce",
+        note_fr="Déconnecte-toi puis reconnecte-toi pour activer les groupes docker, libvirt et kvm.",
+        note_en="Log out and back in to enable the docker, libvirt and kvm groups.",
+    ),
+    _dev_entry(
+        "virt", "components",
+        "Virtualisation KVM / QEMU", "KVM / QEMU virtualization",
+        "qemu-kvm, libvirt, virt-manager, GNOME Boxes, OVMF, swtpm",
+        "computer-symbolic",
+        packages=(
+            "qemu-kvm", "libvirt", "virt-install", "virt-manager", "virt-viewer",
+            "gnome-boxes", "edk2-ovmf", "swtpm", "swtpm-tools",
+        ),
+        install=(
+            "systemctl enable --now libvirtd 2>/dev/null || "
+            "systemctl enable --now virtqemud.socket virtnetworkd.socket",
+            "usermod -aG libvirt,kvm __USER__ 2>/dev/null || true",
+        ),
+        note_fr="Déconnecte-toi puis reconnecte-toi pour activer les groupes docker, libvirt et kvm.",
+        note_en="Log out and back in to enable the docker, libvirt and kvm groups.",
+    ),
+    _dev_entry(
+        "node", "components",
+        "Node.js / npm", "Node.js / npm",
+        "nodejs, npm (+ corepack pour pnpm/yarn)",
+        "text-x-script-symbolic",
+        packages=("nodejs", "npm"),
+        install=("command -v corepack >/dev/null 2>&1 && corepack enable || true",),
+    ),
+    _dev_entry(
+        "rust", "components",
+        "Rust / Cargo", "Rust / Cargo",
+        "rust, cargo, rustfmt, clippy",
+        "text-x-script-symbolic",
+        packages=("rust", "cargo", "rustfmt", "clippy"),
+    ),
+    # ---- Outils -------------------------------------------------------------
+    _dev_entry(
+        "cli-search", "tools",
+        "Recherche & navigation", "Search & navigation",
+        "ripgrep, fd-find, bat, eza, fzf, zoxide",
+        "system-search-symbolic",
+        packages=("ripgrep", "fd-find", "bat", "eza", "fzf", "zoxide"),
+    ),
+    _dev_entry(
+        "git-tools", "tools",
+        "Git & plateformes (GitHub, GitLab)", "Git & platforms (GitHub, GitLab)",
+        "gh, glab, lazygit, git-delta, git-lfs",
+        "folder-git-symbolic",
+        packages=("gh", "glab", "lazygit", "git-delta", "git-lfs"),
+        install=(
+            "git config --system core.pager delta 2>/dev/null || true",
+            "git config --system interactive.diffFilter 'delta --color-only' 2>/dev/null || true",
+        ),
+    ),
+    _dev_entry(
+        "terminal", "tools",
+        "Terminal (tmux, zellij)", "Terminal (tmux, zellij)",
+        "tmux + zellij (COPR varlad/zellij)",
+        "utilities-terminal-symbolic",
+        packages=("tmux",),
+        install=("dnf copr enable -y varlad/zellij && dnf install -y zellij",),
+        remove=("dnf remove -y zellij 2>/dev/null || true", "dnf copr remove -y varlad/zellij 2>/dev/null || true"),
+    ),
+    _dev_entry(
+        "diag", "tools",
+        "Diagnostic système", "System diagnostics",
+        "btop, ncdu, duf, fastfetch, hyperfine, lsof, strace, ltrace, sysstat, perf",
+        "utilities-system-monitor-symbolic",
+        packages=(
+            "btop", "ncdu", "duf", "fastfetch", "hyperfine", "lsof", "strace",
+            "ltrace", "sysstat", "perf",
+        ),
+    ),
+    _dev_entry(
+        "debug", "tools",
+        "Debug & profilage", "Debug & profiling",
+        "gdb, lldb, valgrind, heaptrack, sysprof",
+        "applications-utilities-symbolic",
+        packages=("gdb", "lldb", "valgrind", "heaptrack", "sysprof"),
+    ),
+    _dev_entry(
+        "python-quality", "tools",
+        "Qualité Python (uv, ruff, mypy)", "Python quality (uv, ruff, mypy)",
+        "ruff, mypy, pre-commit, pytest (+ uv si absent des dépôts)",
+        "text-x-python-symbolic",
+        packages=("ruff", "mypy", "pre-commit", "python3-pytest"),
+        install=(
+            "dnf install -y uv || curl -LsSf https://astral.sh/uv/install.sh | sh",
+        ),
+    ),
+    _dev_entry(
+        "data", "tools",
+        "JSON & HTTP (jq, yq, httpie)", "JSON & HTTP (jq, yq, httpie)",
+        "jq, yq, httpie",
+        "text-x-generic-symbolic",
+        packages=("jq", "yq", "httpie"),
+    ),
+    _dev_entry(
+        "automation", "tools",
+        "Automatisation (just, direnv, shellcheck)", "Automation (just, direnv, shellcheck)",
+        "just, direnv, shellcheck, shfmt",
+        "view-refresh-symbolic",
+        packages=("just", "direnv", "shellcheck"),
+        install=("dnf install -y shfmt || dnf install -y golang-github-mvdan-sh 2>/dev/null || true",),
+    ),
+    # ---- Applications -------------------------------------------------------
+    _dev_entry(
+        "vscodium", "apps",
+        "VSCodium", "VSCodium",
+        "éditeur de code libre (dépôt officiel VSCodium)",
+        "applications-development-symbolic",
+        check=_vscodium_installed,
+        panel=_push_vscodium_actions,
+    ),
+    _dev_entry(
+        "github-desktop", "apps",
+        "GitHub Desktop", "GitHub Desktop",
+        "Flatpak io.github.shiftey.Desktop (fork Linux communautaire)",
+        "folder-git-symbolic",
+        check=lambda: _flatpak_app_installed(GH_DESKTOP_FLATPAK),
+        install=(GH_DESKTOP_INSTALL.replace("__GH_DESKTOP__", GH_DESKTOP_FLATPAK),),
+        update=(f"flatpak update -y {GH_DESKTOP_FLATPAK}",),
+        remove=(f"flatpak uninstall -y {GH_DESKTOP_FLATPAK}",),
+        launch=lambda: _dev_spawn(["flatpak", "run", GH_DESKTOP_FLATPAK]),
+        launch_fr="Ouvre GitHub Desktop (Flatpak) sous votre session",
+        launch_en="Opens GitHub Desktop (Flatpak) in your session",
+        install_desc="flatpak install flathub io.github.shiftey.Desktop",
+        update_desc=f"flatpak update {GH_DESKTOP_FLATPAK}",
+        remove_desc=f"flatpak uninstall {GH_DESKTOP_FLATPAK}",
+    ),
+    _dev_entry(
+        "forgejo", "apps",
+        "Forgejo (serveur Git local)", "Forgejo (local Git server)",
+        "service systemd + binaire officiel + SQLite, http://localhost:3000",
+        "network-server-symbolic",
+        check=_forgejo_installed,
+        install=(FORGEJO_INSTALL,),
+        update=(FORGEJO_UPDATE,),
+        remove=(FORGEJO_REMOVE,),
+        launch=lambda: (open_uri(FORGEJO_URL), True)[1],
+        launch_fr="Ouvre Forgejo dans le navigateur (http://localhost:3000)",
+        launch_en="Opens Forgejo in the browser (http://localhost:3000)",
+        install_desc="forgejo-*-linux-amd64 + unité systemd forgejo.service",
+        update_desc="téléchargement de la dernière version + systemctl restart forgejo",
+        remove_desc="systemctl disable forgejo + suppression du binaire",
+        note_fr="Désinstallation : les données restent dans /var/lib/forgejo.",
+        note_en="Uninstall: the data stays in /var/lib/forgejo.",
+    ),
+    _dev_entry(
+        "editors", "apps",
+        "Éditeurs terminal (Neovim, Helix)", "Terminal editors (Neovim, Helix)",
+        "neovim, helix",
+        "utilities-terminal-symbolic",
+        packages=("neovim", "helix"),
+        launch=lambda: _launch_in_terminal("nvim"),
+        launch_fr="Ouvre Neovim dans un terminal",
+        launch_en="Opens Neovim in a terminal",
+    ),
+    _dev_entry(
+        "sqlite", "apps",
+        "Bases de données (SQLite)", "Databases (SQLite)",
+        "sqlite, sqlitebrowser",
+        "drive-harddisk-symbolic",
+        packages=("sqlite", "sqlitebrowser"),
+        launch=lambda: _dev_spawn(["sqlitebrowser"]),
+        launch_fr="Ouvre SQLite Browser",
+        launch_en="Opens SQLite Browser",
+    ),
+)
+
+_DEV_PKG_CACHE: dict[str, bool] = {}
+_DEV_PKG_CACHE_AT = 0.0
+_DEV_CACHE_TTL = 30.0
+
+
+def _dev_invalidate() -> None:
+    global _DEV_PKG_CACHE_AT
+    _DEV_PKG_CACHE_AT = 0.0
+
+
+def _dev_installed_packages() -> set[str]:
+    """Paquets RPM installés parmi ceux du catalogue (une seule requête rpm)."""
+    global _DEV_PKG_CACHE_AT
+    fresh = _DEV_PKG_CACHE and (time.monotonic() - _DEV_PKG_CACHE_AT) < _DEV_CACHE_TTL
+    if fresh:
+        return {name for name, ok in _DEV_PKG_CACHE.items() if ok}
+    wanted = sorted({pkg for entry in DEV_CATALOG for pkg in entry["packages"]})
+    installed: set[str] = set()
+    if wanted:
+        try:
+            res = subprocess.run(
+                ["rpm", "-q", "--queryformat", "%{NAME}\n", *wanted],
+                capture_output=True, text=True, timeout=20,
+            )
+            installed = {line.strip() for line in (res.stdout or "").splitlines() if line.strip()}
+        except (OSError, subprocess.SubprocessError):
+            installed = set()
+    _DEV_PKG_CACHE.clear()
+    _DEV_PKG_CACHE.update({pkg: pkg in installed for pkg in wanted})
+    _DEV_PKG_CACHE_AT = time.monotonic()
+    return installed
+
+
+def _dev_state(entry: dict[str, Any]) -> tuple[int, int]:
+    check = entry["check"]
+    if check is not None:
+        try:
+            return (1 if check() else 0), 1
+        except Exception:  # noqa: BLE001 - une détection ne doit jamais bloquer la page
+            return 0, 1
+    packages = entry["packages"]
+    if not packages:
+        return 0, 0
+    installed = _dev_installed_packages()
+    return sum(1 for pkg in packages if pkg in installed), len(packages)
+
+
+def _dev_desc(entry: dict[str, Any], action: str) -> str:
+    override = entry.get(f"{action}_desc") or ""
+    if override:
+        return override
+    packages = entry["packages"]
+    if packages:
+        return ", ".join(packages)
+    generic = {
+        "install": ("script d'installation intégré", "built-in install script"),
+        "update": ("script de mise à jour intégré", "built-in update script"),
+        "remove": ("script de désinstallation intégré", "built-in removal script"),
+    }[action]
+    return _L(*generic)
+
+
+def _dev_execute(
+    win: Ps5ManagerWindow, entry: dict[str, Any], action: str, emit: Callable[[str], None]
+) -> tuple[bool, str]:
+    """Exécute install / update / remove d'une entrée du catalogue."""
+    codes: list[int] = []
+    packages = list(entry["packages"])
+    if packages:
+        if action == "install":
+            cmd = ["dnf", "install", "-y", *packages]
+        elif action == "update":
+            cmd = ["dnf", "upgrade", "-y", "--refresh", *packages]
+        else:
+            cmd = ["dnf", "remove", "-y", *packages]
+        codes.append(win.run_cmd_pty(cmd, emit))
+    for step in entry[action]:
+        codes.append(win.run_cmd_pty(step.replace("__USER__", REAL_USER), emit))
+    if not codes:
+        return False, _L("Rien à faire pour cette entrée.", "Nothing to do for this entry.")
+    failed = [code for code in codes if code != 0]
+    if failed:
+        return False, T("failed") % failed[0]
+    return True, T("done")
+
+
+def _push_dev_entry(win: Ps5ManagerWindow, entry: dict[str, Any]) -> None:
+    done, total = _dev_state(entry)
+    title = _L(entry["title_fr"], entry["title_en"])
+    if total > 1:
+        status = f"{done}/{total} · {entry['sub']}"
+    elif done:
+        status = f"{T('installed_rpm')} · {entry['sub']}"
+    else:
+        status = f"{T('not_installed')} · {entry['sub']}"
+    sub = Adw.PreferencesPage()
+    grp = pref_group(title=title, description=status)
+
+    def _run(action: str) -> None:
+        label = {
+            "install": (_L("Installer", "Install") + f" {title}"),
+            "update": (_L("Mettre à jour", "Update") + f" {title}"),
+            "remove": (_L("Désinstaller", "Uninstall") + f" {title}"),
+        }[action]
+
+        def _task(emit):
+            return _dev_execute(win, entry, action, emit)
+
+        def _after(*_):
+            _dev_invalidate()
+            win.nav.pop()
+            win._select_section("dev")
+
+        win.run_task(label, _task, _after)
+
+    grp.add(
+        win.row(
+            T("install"),
+            _dev_desc(entry, "install"),
+            "system-software-install-symbolic",
+            lambda *_: _run("install"),
+        )
+    )
+    grp.add(
+        win.row(
+            T("update"),
+            _dev_desc(entry, "update"),
+            "software-update-available-symbolic",
+            lambda *_: (
+                _run("update") if _dev_state(entry)[0] else win.show_info(title, T("not_installed"))
+            ),
+        )
+    )
+    launch = entry["launch"]
+    if launch is not None and done:
+        launch_desc = _L(entry["launch_fr"], entry["launch_en"]) if entry["launch_fr"] else ""
+
+        def _do_launch():
+            if not launch():
+                win.show_info(title, _L(
+                    "Lancement impossible : commande ou terminal introuvable.",
+                    "Cannot launch: command or terminal not found.",
+                ))
+
+        grp.add(
+            win.row(
+                _L("Lancer", "Launch") + f" {title}",
+                launch_desc,
+                "media-playback-start-symbolic",
+                lambda *_: _do_launch(),
+            )
+        )
+    grp.add(
+        win.row(
+            T("remove"),
+            _dev_desc(entry, "remove"),
+            "user-trash-symbolic",
+            lambda *_: (
+                win.show_confirm(
+                    _L("Désinstaller", "Uninstall") + f" {title}",
+                    _L("Supprimer", "Remove") + f" {title} ?",
+                    lambda: _run("remove"),
+                )
+                if _dev_state(entry)[0]
+                else win.show_info(title, T("not_installed"))
+            ),
+        )
+    )
+    if entry["note_fr"]:
+        grp.add(plain_row(Adw.ActionRow, title=_L(entry["note_fr"], entry["note_en"])))
+
+    sub.add(grp)
+    tb = Adw.ToolbarView()
+    hb = Adw.HeaderBar()
+    hb.set_title_widget(Adw.WindowTitle(title=title))
+    tb.add_top_bar(hb)
+    tb.set_content(sub)
+    win.nav.push(Adw.NavigationPage(child=tb, title=title))
+
+
+def build_page_dev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
+    for gid, gfr, gen in DEV_GROUPS:
+        grp = pref_group(title=_L(gfr, gen), description="")
+        for entry in DEV_CATALOG:
+            if entry["group"] != gid:
+                continue
+            done, total = _dev_state(entry)
+            subtitle = f"{done}/{total} · {entry['sub']}" if total else entry["sub"]
+            panel = entry["panel"]
+            if panel is not None:
+                callback = (lambda *_, p=panel: p(win))
+            else:
+                callback = (lambda *_, e=entry: _push_dev_entry(win, e))
+            grp.add(
+                win.row(
+                    _L(entry["title_fr"], entry["title_en"]),
+                    subtitle,
+                    entry["icon"],
+                    callback,
+                )
+            )
+        page.add(grp)
+    intro = pref_group(
+        title=_L("À propos de cette page", "About this page"),
+        description=_L(
+            "Installation, mise à jour et désinstallation par catégorie — tout est optionnel.",
+            "Install, update and uninstall by category — everything is optional.",
+        ),
+    )
+    intro.add(
+        plain_row(
+            Adw.ActionRow,
+            title=_L(
+                "Les groupes docker, libvirt et kvm ne s'appliquent qu'après une reconnexion.",
+                "The docker, libvirt and kvm groups only apply after signing in again.",
+            ),
+        )
+    )
+    page.add(intro)
+
+
 PAGE_BUILDERS = {
     "logs": build_page_logs,
     "library": build_page_library,
     "aidev": build_page_aidev,
+    "dev": build_page_dev,
     "deps": build_page_deps,
     "gaming": build_page_gaming,
     "features": build_page_features,
