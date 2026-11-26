@@ -6,6 +6,20 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.11.0] — 2026-11-26
+
+### Ajouté
+- **Section « Serveur web »** (juste après « Développement »), en trois catégories :
+  - **Serveurs & langages** : Apache (httpd, mod_ssl), Nginx, PHP 8 + extensions (FPM, mysqlnd, pdo, gd, mbstring, xml, opcache, zip, intl), **PHP ↔ Apache / Nginx** (écrit le handler FastCGI vers `/run/php-fpm/www.sock`, teste `httpd -t` / `nginx -t` avant de recharger), MariaDB, MySQL community, Certbot (Let's Encrypt).
+  - **Panneaux & bases de données** : Cockpit (+ paquets, stockage, réseau, Podman, machines virtuelles), phpMyAdmin, Adminer (un seul fichier PHP), Webmin (dépôt officiel).
+  - **Réseau & accès** : pare-feu web (http/https), serveur OpenSSH.
+- Chaque entrée suit le même modèle : état réel, **installer**, **mettre à jour**, **lancer** (navigateur pour les panneaux, `http://localhost` pour les serveurs) et **désinstaller**, avec notes utiles (port 80 partagé Apache/Nginx, durcissement MariaDB/MySQL, phpMyAdmin limité à localhost, ports Cockpit/Webmin).
+- Les services sont activés et démarrés (`systemctl enable --now`), le pare-feu est ouvert pour http/https/cockpit, et les échecs de configuration sont signalés sans casser le serveur en place (test de configuration avant rechargement).
+
+### Modifié
+- Le rendu des catalogues est mutualisé (`_build_catalog_page`) entre « Développement » et « Serveur web » ; `_push_dev_entry` revient désormais sur la section d'origine.
+- `APP_VERSION` passe à `0.11.0`, notes de version FR/EN de la boîte « À propos » mises à jour.
+
 ## [0.10.0] — 2026-11-26
 
 ### Ajouté

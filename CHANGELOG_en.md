@@ -7,6 +7,20 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.11.0] — 2026-11-26
+
+### Added
+- **“Web server” section** (right after “Development”), in three categories:
+  - **Servers & languages**: Apache (httpd, mod_ssl), Nginx, PHP 8 + extensions (FPM, mysqlnd, pdo, gd, mbstring, xml, opcache, zip, intl), **PHP ↔ Apache / Nginx** (writes the FastCGI handler to `/run/php-fpm/www.sock`, runs `httpd -t` / `nginx -t` before reloading), MariaDB, MySQL community, Certbot (Let's Encrypt).
+  - **Panels & databases**: Cockpit (+ packages, storage, network, Podman, virtual machines), phpMyAdmin, Adminer (a single PHP file), Webmin (official repository).
+  - **Network & access**: web firewall (http/https), OpenSSH server.
+- Every entry follows the same model: real state, **install**, **update**, **launch** (browser for panels, `http://localhost` for servers) and **uninstall**, with useful notes (Apache/Nginx sharing port 80, MariaDB/MySQL hardening, phpMyAdmin limited to localhost, Cockpit/Webmin ports).
+- Services are enabled and started (`systemctl enable --now`), the firewall is opened for http/https/cockpit, and configuration failures are reported without breaking the running server (config test before reload).
+
+### Changed
+- Catalogue rendering is shared (`_build_catalog_page`) between “Development” and “Web server”; `_push_dev_entry` now returns to its originating section.
+- `APP_VERSION` bumped to `0.11.0`, FR/EN release notes of the “About” dialog updated.
+
 ## [0.10.0] — 2026-11-26
 
 ### Added

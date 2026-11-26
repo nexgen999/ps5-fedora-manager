@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.10.0"
+APP_VERSION = "0.11.0"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1119,16 +1119,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.10.0",
-    "en": "What is new in 0.10.0",
-    "es": "Novedades de la 0.10.0",
-    "it": "Novità della 0.10.0",
-    "de": "Neu in 0.10.0",
-    "pt": "Novidades da 0.10.0",
+    "fr": "Nouveautés de la 0.11.0",
+    "en": "What is new in 0.11.0",
+    "es": "Novedades de la 0.11.0",
+    "it": "Novità della 0.11.0",
+    "de": "Neu in 0.11.0",
+    "pt": "Novidades da 0.11.0",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.11 : section « Serveur web » — Apache, Nginx, PHP + handler FastCGI, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, pare-feu et OpenSSH, chacun avec installation, mise à jour et désinstallation",
         "0.10 : page « Développement » (composants, outils en ligne de commande, applications) avec installation, mise à jour et désinstallation par entrée — dont Docker, KVM/QEMU, GitHub Desktop et un Forgejo local",
         "0.9.1 : Freebuff (agent de code IA) dans la page IA &amp; Développeur — installation, mise à jour et désinstallation via npm, lancement dans un terminal",
         "0.8.2 : boîte « À propos » entièrement traduite (notes de version, informations de débogage) et menu principal vérifié dans les six langues",
@@ -1144,6 +1145,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.11: “Web server” section — Apache, Nginx, PHP + FastCGI handler, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, firewall and OpenSSH, each with install, update and uninstall",
         "0.10: “Development” page (components, command-line tools, applications) with per-entry install, update and uninstall — including Docker, KVM/QEMU, GitHub Desktop and a local Forgejo",
         "0.9.1: Freebuff (AI coding agent) on the AI &amp; Developer page — npm install, update and uninstall, launch in a terminal",
         "0.8.2: fully translated “About” dialog (release notes, debug information) and main menu checked in all six languages",
@@ -1159,6 +1161,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.11 : sección «Servidor web» — Apache, Nginx, PHP + handler FastCGI, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, cortafuegos y OpenSSH, con instalación, actualización y desinstalación",
         "0.10 : página «Desarrollo» (componentes, herramientas de línea de comandos, aplicaciones) con instalación, actualización y desinstalación por entrada — incluidos Docker, KVM/QEMU, GitHub Desktop y un Forgejo local",
         "0.9.1 : Freebuff (agente de código IA) en la página IA y Desarrollo — instalación, actualización y desinstalación con npm, inicio en una terminal",
         "0.8.2 : diálogo «Acerca de» totalmente traducido (notas de versión, información de depuración) y menú principal revisado en los seis idiomas",
@@ -1174,6 +1177,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.11 : sezione «Server web» — Apache, Nginx, PHP + handler FastCGI, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, firewall e OpenSSH, con installazione, aggiornamento e disinstallazione",
         "0.10 : pagina «Sviluppo» (componenti, strumenti da riga di comando, applicazioni) con installazione, aggiornamento e disinstallazione per voce — inclusi Docker, KVM/QEMU, GitHub Desktop e un Forgejo locale",
         "0.9.1 : Freebuff (agente di codice IA) nella pagina IA e Sviluppo — installazione, aggiornamento e disinstallazione con npm, avvio in un terminale",
         "0.8.2 : finestra «Informazioni su» completamente tradotta (note di versione, informazioni di debug) e menu principale verificato nelle sei lingue",
@@ -1189,6 +1193,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.11 : Abschnitt „Webserver“ – Apache, Nginx, PHP + FastCGI-Handler, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, Firewall und OpenSSH, jeweils mit Installation, Aktualisierung und Deinstallation",
         "0.10 : Seite „Entwicklung“ (Komponenten, Kommandozeilen-Werkzeuge, Anwendungen) mit Installation, Aktualisierung und Deinstallation pro Eintrag – inklusive Docker, KVM/QEMU, GitHub Desktop und einem lokalen Forgejo",
         "0.9.1 : Freebuff (KI-Coding-Agent) auf der Seite „KI &amp; Entwickler“ – npm-Installation, -Aktualisierung und -Deinstallation, Start in einem Terminal",
         "0.8.2 : Dialog „Info über“ vollständig übersetzt (Versionshinweise, Debug-Informationen) und Hauptmenü in allen sechs Sprachen geprüft",
@@ -1204,6 +1209,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.11 : secção «Servidor web» — Apache, Nginx, PHP + handler FastCGI, MariaDB, MySQL, Certbot, Cockpit, phpMyAdmin, Adminer, Webmin, firewall e OpenSSH, com instalação, atualização e desinstalação",
         "0.10 : página «Desenvolvimento» (componentes, ferramentas de linha de comando, aplicativos) com instalação, atualização e desinstalação por entrada — incluindo Docker, KVM/QEMU, GitHub Desktop e um Forgejo local",
         "0.9.1 : Freebuff (agente de código IA) na página IA e Programador — instalação, atualização e desinstalação com npm, arranque num terminal",
         "0.8.2 : caixa «Sobre» totalmente traduzida (notas de versão, informações de depuração) e menu principal verificado nos seis idiomas",
@@ -1966,6 +1972,7 @@ STRINGS = {
         "sec_library": "Logithèque",
         "sec_aidev": "IA & Développeur",
         "sec_dev": "Développement",
+        "sec_web": "Serveur web",
         "sec_deps": "Dépendances Supplémentaires",
         "sec_gaming": "Gaming Mode",
         "sec_fix": "Divers Fix",
@@ -2412,6 +2419,7 @@ STRINGS = {
         "sec_library": "Software library",
         "sec_aidev": "AI & Developer",
         "sec_dev": "Development",
+        "sec_web": "Web server",
         "sec_deps": "Additional Dependencies",
         "sec_gaming": "Gaming Mode",
         "sec_fix": "Misc Fixes",
@@ -2871,6 +2879,7 @@ STRINGS['es'] = {'app_title': 'PS5 Fedora Manager',
  'sec_library': 'Tienda de aplicaciones',
  'sec_aidev': 'IA y Desarrollo',
  'sec_dev': 'Desarrollo',
+ 'sec_web': 'Servidor web',
  'sec_deps': 'Dependencias adicionales',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Arreglos varios',
@@ -3312,6 +3321,7 @@ STRINGS['it'] = {'app_title': 'PS5 Fedora Manager',
  'sec_library': 'App store',
  'sec_aidev': 'IA e Sviluppo',
  'sec_dev': 'Sviluppo',
+ 'sec_web': 'Server web',
  'sec_deps': 'Dipendenze aggiuntive',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Correzioni varie',
@@ -3749,6 +3759,7 @@ STRINGS['de'] = {'app_title': 'PS5 Fedora Manager',
  'sec_library': 'App-Store',
  'sec_aidev': 'KI & Entwicklung',
  'sec_dev': 'Entwicklung',
+ 'sec_web': 'Webserver',
  'sec_deps': 'Zusätzliche Abhängigkeiten',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Diverse Korrekturen',
@@ -4186,6 +4197,7 @@ STRINGS['pt'] = {'app_title': 'PS5 Fedora Manager',
  'sec_library': 'Loja de aplicativos',
  'sec_aidev': 'IA e Desenvolvimento',
  'sec_dev': 'Desenvolvimento',
+ 'sec_web': 'Servidor web',
  'sec_deps': 'Dependências adicionais',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Correções diversas',
@@ -5644,6 +5656,7 @@ SECTIONS = [
     ("library", "system-software-install-symbolic", "sec_library", 1),
     ("aidev", "applications-development-symbolic", "sec_aidev", 1),
     ("dev", "applications-engineering-symbolic", "sec_dev", 1),
+    ("websrv", "network-server-symbolic", "sec_web", 1),
     ("deps", "application-x-addon-symbolic", "sec_deps", 1),
     ("gaming", "input-gaming-symbolic", "sec_gaming", 1),
     ("features", "application-x-executable-symbolic", "sec_features", 1),
@@ -6334,6 +6347,180 @@ _L_TABLE = {
         "I gruppi docker, libvirt e kvm si applicano solo dopo un nuovo accesso.",
         "Die Gruppen docker, libvirt und kvm gelten erst nach einer neuen Anmeldung.",
         "Os grupos docker, libvirt e kvm só se aplicam após nova sessão.",
+    ),
+    "Serveurs & langages": (
+        "Servidores y lenguajes",
+        "Server e linguaggi",
+        "Server & Sprachen",
+        "Servidores e linguagens",
+    ),
+    "Panneaux & bases de données": (
+        "Paneles y bases de datos",
+        "Pannelli e database",
+        "Panels & Datenbanken",
+        "Painéis e bases de dados",
+    ),
+    "Réseau & accès": (
+        "Red y acceso",
+        "Rete e accesso",
+        "Netzwerk & Zugriff",
+        "Rede e acesso",
+    ),
+    "PHP 8 + extensions": (
+        "PHP 8 + extensiones",
+        "PHP 8 + estensioni",
+        "PHP 8 + Erweiterungen",
+        "PHP 8 + extensões",
+    ),
+    "Panneau web Cockpit": (
+        "Panel web Cockpit",
+        "Pannello web Cockpit",
+        "Cockpit-Weboberfläche",
+        "Painel web Cockpit",
+    ),
+    "Pare-feu web (80 / 443 / 9090)": (
+        "Cortafuegos web (80 / 443 / 9090)",
+        "Firewall web (80 / 443 / 9090)",
+        "Web-Firewall (80 / 443 / 9090)",
+        "Firewall web (80 / 443 / 9090)",
+    ),
+    "Serveur OpenSSH (accès distant)": (
+        "Servidor OpenSSH (acceso remoto)",
+        "Server OpenSSH (accesso remoto)",
+        "OpenSSH-Server (Fernzugriff)",
+        "Servidor OpenSSH (acesso remoto)",
+    ),
+    "Apache et Nginx ne peuvent pas écouter le port 80 en même temps : garde un seul serveur actif.": (
+        "Apache y Nginx no pueden escuchar el puerto 80 a la vez: mantén un solo servidor activo.",
+        "Apache e Nginx non possono ascoltare la porta 80 contemporaneamente: tieni un solo server attivo.",
+        "Apache und Nginx können nicht gleichzeitig auf Port 80 lauschen: lass nur einen Server aktiv.",
+        "O Apache e o Nginx não podem escutar a porta 80 ao mesmo tempo: mantém apenas um servidor ativo.",
+    ),
+    "Apache : page par défaut sur http://localhost après activation du service.": (
+        "Apache: página por defecto en http://localhost tras activar el servicio.",
+        "Apache: pagina predefinita su http://localhost dopo l'attivazione del servizio.",
+        "Apache: Standardseite unter http://localhost nach dem Start des Dienstes.",
+        "Apache: página predefinida em http://localhost após ativar o serviço.",
+    ),
+    "Nginx : page par défaut sur http://localhost après activation du service.": (
+        "Nginx: página por defecto en http://localhost tras activar el servicio.",
+        "Nginx: pagina predefinita su http://localhost dopo l'attivazione del servizio.",
+        "Nginx: Standardseite unter http://localhost nach dem Start des Dienstes.",
+        "Nginx: página predefinida em http://localhost após ativar o serviço.",
+    ),
+    "MariaDB : lance « mariadb-secure-installation » pour durcir le serveur ; root se connecte en local via socket.": (
+        "MariaDB: ejecuta «mariadb-secure-installation» para asegurar el servidor; root se conecta en local por socket.",
+        "MariaDB: esegui «mariadb-secure-installation» per proteggere il server; root si connette in locale via socket.",
+        "MariaDB: „mariadb-secure-installation“ ausführen, um den Server abzusichern; root verbindet sich lokal über den Socket.",
+        "MariaDB: executa «mariadb-secure-installation» para proteger o servidor; o root liga-se localmente pelo socket.",
+    ),
+    "MySQL community : lance « mysql_secure_installation » après l'installation.": (
+        "MySQL community: ejecuta «mysql_secure_installation» tras la instalación.",
+        "MySQL community: esegui «mysql_secure_installation» dopo l'installazione.",
+        "MySQL community: nach der Installation „mysql_secure_installation“ ausführen.",
+        "MySQL community: executa «mysql_secure_installation» após a instalação.",
+    ),
+    "PHP-FPM : socket /run/php-fpm/www.sock ; l'entrée « PHP ↔ Apache / Nginx » ajoute le handler FastCGI.": (
+        "PHP-FPM: socket /run/php-fpm/www.sock; la entrada «PHP ↔ Apache / Nginx» añade el handler FastCGI.",
+        "PHP-FPM: socket /run/php-fpm/www.sock; la voce «PHP ↔ Apache / Nginx» aggiunge l'handler FastCGI.",
+        "PHP-FPM: Socket /run/php-fpm/www.sock; der Eintrag „PHP ↔ Apache / Nginx“ fügt den FastCGI-Handler hinzu.",
+        "PHP-FPM: socket /run/php-fpm/www.sock; a entrada «PHP ↔ Apache / Nginx» adiciona o handler FastCGI.",
+    ),
+    "Cockpit : https://localhost:9090 (comptes système, port 9090 ouvert dans le pare-feu).": (
+        "Cockpit: https://localhost:9090 (cuentas del sistema, puerto 9090 abierto en el cortafuegos).",
+        "Cockpit: https://localhost:9090 (account di sistema, porta 9090 aperta nel firewall).",
+        "Cockpit: https://localhost:9090 (Systemkonten, Port 9090 in der Firewall geöffnet).",
+        "Cockpit: https://localhost:9090 (contas do sistema, porta 9090 aberta na firewall).",
+    ),
+    "phpMyAdmin est limité à localhost par défaut (/etc/httpd/conf.d/phpMyAdmin.conf).": (
+        "phpMyAdmin está limitado a localhost por defecto (/etc/httpd/conf.d/phpMyAdmin.conf).",
+        "phpMyAdmin è limitato a localhost per impostazione predefinita (/etc/httpd/conf.d/phpMyAdmin.conf).",
+        "phpMyAdmin ist standardmäßig auf localhost beschränkt (/etc/httpd/conf.d/phpMyAdmin.conf).",
+        "O phpMyAdmin está limitado a localhost por predefinição (/etc/httpd/conf.d/phpMyAdmin.conf).",
+    ),
+    "Adminer : un seul fichier PHP dans /var/www/html/adminer.php.": (
+        "Adminer: un solo archivo PHP en /var/www/html/adminer.php.",
+        "Adminer: un solo file PHP in /var/www/html/adminer.php.",
+        "Adminer: eine einzelne PHP-Datei unter /var/www/html/adminer.php.",
+        "Adminer: um único ficheiro PHP em /var/www/html/adminer.php.",
+    ),
+    "Webmin écoute sur https://localhost:10000 ; crée un compte depuis l'interface.": (
+        "Webmin escucha en https://localhost:10000; crea una cuenta desde la interfaz.",
+        "Webmin ascolta su https://localhost:10000; crea un account dall'interfaccia.",
+        "Webmin lauscht auf https://localhost:10000; Konto in der Oberfläche anlegen.",
+        "O Webmin escuta em https://localhost:10000; cria uma conta na interface.",
+    ),
+    "OpenSSH : sshd écoute sur le port 22 ; ouvre-le dans le pare-feu si nécessaire.": (
+        "OpenSSH: sshd escucha en el puerto 22; ábrelo en el cortafuegos si hace falta.",
+        "OpenSSH: sshd ascolta sulla porta 22; aprila nel firewall se necessario.",
+        "OpenSSH: sshd lauscht auf Port 22; bei Bedarf in der Firewall öffnen.",
+        "OpenSSH: o sshd escuta na porta 22; abre-a na firewall se necessário.",
+    ),
+    "Certbot : « certbot --apache » ou « certbot --nginx » une fois le domaine pointé.": (
+        "Certbot: «certbot --apache» o «certbot --nginx» una vez apuntado el dominio.",
+        "Certbot: «certbot --apache» o «certbot --nginx» una volta puntato il dominio.",
+        "Certbot: „certbot --apache“ oder „certbot --nginx“, sobald die Domain zeigt.",
+        "Certbot: «certbot --apache» ou «certbot --nginx» depois de apontar o domínio.",
+    ),
+    "Ouvre GitHub Desktop (Flatpak) sous votre session": (
+        "Abre GitHub Desktop (Flatpak) en tu sesión",
+        "Apre GitHub Desktop (Flatpak) nella tua sessione",
+        "Öffnet GitHub Desktop (Flatpak) in Ihrer Sitzung",
+        "Abre o GitHub Desktop (Flatpak) na sua sessão",
+    ),
+    "Ouvre Neovim dans un terminal": (
+        "Abre Neovim en una terminal",
+        "Apre Neovim in un terminale",
+        "Öffnet Neovim in einem Terminal",
+        "Abre o Neovim num terminal",
+    ),
+    "Ouvre SQLite Browser": (
+        "Abre SQLite Browser",
+        "Apre SQLite Browser",
+        "Öffnet SQLite Browser",
+        "Abre o SQLite Browser",
+    ),
+    "Ouvre Forgejo dans le navigateur (http://localhost:3000)": (
+        "Abre Forgejo en el navegador (http://localhost:3000)",
+        "Apre Forgejo nel browser (http://localhost:3000)",
+        "Öffnet Forgejo im Browser (http://localhost:3000)",
+        "Abre o Forgejo no navegador (http://localhost:3000)",
+    ),
+    "Ouvre http://localhost dans le navigateur": (
+        "Abre http://localhost en el navegador",
+        "Apre http://localhost nel browser",
+        "Öffnet http://localhost im Browser",
+        "Abre http://localhost no navegador",
+    ),
+    "Ouvre Cockpit (https://localhost:9090)": (
+        "Abre Cockpit (https://localhost:9090)",
+        "Apre Cockpit (https://localhost:9090)",
+        "Öffnet Cockpit (https://localhost:9090)",
+        "Abre o Cockpit (https://localhost:9090)",
+    ),
+    "Ouvre http://localhost/phpMyAdmin": (
+        "Abre http://localhost/phpMyAdmin",
+        "Apre http://localhost/phpMyAdmin",
+        "Öffnet http://localhost/phpMyAdmin",
+        "Abre http://localhost/phpMyAdmin",
+    ),
+    "Ouvre http://localhost/adminer.php": (
+        "Abre http://localhost/adminer.php",
+        "Apre http://localhost/adminer.php",
+        "Öffnet http://localhost/adminer.php",
+        "Abre http://localhost/adminer.php",
+    ),
+    "Ouvre Webmin (https://localhost:10000)": (
+        "Abre Webmin (https://localhost:10000)",
+        "Apre Webmin (https://localhost:10000)",
+        "Öffnet Webmin (https://localhost:10000)",
+        "Abre o Webmin (https://localhost:10000)",
+    ),
+    "Nécessaire pour accéder au serveur depuis une autre machine du réseau.": (
+        "Necesario para acceder al servidor desde otra máquina de la red.",
+        "Necessario per accedere al server da un'altra macchina della rete.",
+        "Nötig, um den Server von einem anderen Rechner im Netzwerk zu erreichen.",
+        "Necessário para aceder ao servidor a partir de outra máquina da rede.",
     ),
 }
 
@@ -11330,6 +11517,400 @@ DEV_CATALOG: tuple[dict[str, Any], ...] = (
     ),
 )
 
+WEB_GROUPS: tuple[tuple[str, str, str], ...] = (
+    ("servers", "Serveurs & langages", "Servers & languages"),
+    ("panels", "Panneaux & bases de données", "Panels & databases"),
+    ("network", "Réseau & accès", "Network & access"),
+)
+
+PHP_PACKAGES = (
+    "php", "php-cli", "php-fpm", "php-mysqlnd", "php-pdo", "php-gd",
+    "php-mbstring", "php-xml", "php-opcache", "php-zip", "php-intl",
+)
+
+APACHE_INSTALL = r"""set -e
+dnf install -y httpd httpd-tools mod_ssl
+systemctl enable --now httpd
+firewall-cmd --permanent --add-service=http --add-service=https >/dev/null 2>&1 || true
+firewall-cmd --reload >/dev/null 2>&1 || true
+httpd -t
+echo "Apache actif : http://localhost"
+"""
+
+APACHE_UPDATE = "dnf upgrade -y --refresh httpd httpd-tools mod_ssl && systemctl reload httpd 2>/dev/null || true"
+
+APACHE_REMOVE = r"""systemctl disable --now httpd 2>/dev/null || true
+dnf remove -y httpd httpd-tools mod_ssl || true
+echo "Apache retiré (configuration conservée en .rpmsave dans /etc/httpd)"
+"""
+
+NGINX_INSTALL = r"""set -e
+dnf install -y nginx
+systemctl enable --now nginx
+firewall-cmd --permanent --add-service=http --add-service=https >/dev/null 2>&1 || true
+firewall-cmd --reload >/dev/null 2>&1 || true
+nginx -t
+echo "Nginx actif : http://localhost"
+"""
+
+NGINX_UPDATE = "dnf upgrade -y --refresh nginx && systemctl reload nginx 2>/dev/null || true"
+
+NGINX_REMOVE = r"""systemctl disable --now nginx 2>/dev/null || true
+dnf remove -y nginx || true
+echo "Nginx retiré"
+"""
+
+PHP_INSTALL = r"""set -e
+dnf install -y __PHP_PACKAGES__
+systemctl enable --now php-fpm
+php -v | head -n 1
+"""
+
+PHP_REMOVE = r"""systemctl disable --now php-fpm 2>/dev/null || true
+dnf remove -y __PHP_PACKAGES__ || true
+"""
+
+PHP_WEB_HANDLER = r"""set -e
+SOCK=/run/php-fpm/www.sock
+CHANGED=0
+mkdir -p /run/php-fpm
+[ -S "$SOCK" ] || systemctl enable --now php-fpm >/dev/null 2>&1 || true
+if [ -f /etc/httpd/conf/httpd.conf ]; then
+  cp -f /etc/httpd/conf.d/php-fpm.conf /etc/httpd/conf.d/php-fpm.conf.bak-ps5 2>/dev/null || true
+  cat > /etc/httpd/conf.d/php-fpm.conf <<'CONF'
+# PHP via PHP-FPM (PS5 Fedora Manager)
+<FilesMatch \.php$>
+  SetHandler "proxy:unix:/run/php-fpm/www.sock|fcgi://localhost/"
+</FilesMatch>
+DirectoryIndex index.php index.html
+CONF
+  if httpd -t >/dev/null 2>&1; then
+    systemctl reload httpd 2>/dev/null || true
+    CHANGED=1
+    echo "Apache : handler PHP-FPM ajouté"
+  else
+    echo "Apache : configuration invalide, httpd NON rechargé (voir httpd -t)"
+  fi
+fi
+if [ -f /etc/nginx/nginx.conf ]; then
+  mkdir -p /etc/nginx/default.d
+  cp -f /etc/nginx/default.d/php-fpm.conf /etc/nginx/default.d/php-fpm.conf.bak-ps5 2>/dev/null || true
+  cat > /etc/nginx/default.d/php-fpm.conf <<'CONF'
+# PHP via PHP-FPM (PS5 Fedora Manager)
+index index.php index.html;
+location ~ \.php$ {
+    root /usr/share/nginx/html;
+    fastcgi_pass unix:/run/php-fpm/www.sock;
+    include fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+}
+CONF
+  if nginx -t >/dev/null 2>&1; then
+    systemctl reload nginx 2>/dev/null || true
+    CHANGED=1
+    echo "Nginx : handler PHP-FPM ajouté"
+  else
+    echo "Nginx : configuration invalide, nginx NON rechargé (voir nginx -t)"
+  fi
+fi
+[ "$CHANGED" -eq 1 ] || { echo "Ni Apache ni Nginx installé : installe d'abord un serveur"; exit 1; }
+"""
+
+PHP_WEB_REMOVE = r"""rm -f /etc/httpd/conf.d/php-fpm.conf /etc/nginx/default.d/php-fpm.conf
+httpd -t >/dev/null 2>&1 && systemctl reload httpd 2>/dev/null || true
+nginx -t >/dev/null 2>&1 && systemctl reload nginx 2>/dev/null || true
+echo "Handler FastCGI retiré"
+"""
+
+MARIADB_INSTALL = r"""set -e
+dnf install -y mariadb-server
+systemctl enable --now mariadb
+systemctl is-active --quiet mariadb
+echo "MariaDB actif : root local via socket (mariadb-secure-installation pour le durcir)"
+"""
+
+MYSQL_INSTALL = r"""set -e
+dnf install -y community-mysql-server
+systemctl enable --now mysqld
+systemctl is-active --quiet mysqld
+echo "MySQL actif : root local via socket (mysql_secure_installation pour le durcir)"
+"""
+
+COCKPIT_INSTALL = r"""set -e
+dnf install -y cockpit cockpit-packagekit cockpit-storaged cockpit-networkmanager \
+  cockpit-files cockpit-podman cockpit-machines
+systemctl enable --now cockpit.socket
+firewall-cmd --permanent --add-service=cockpit >/dev/null 2>&1 || true
+firewall-cmd --reload >/dev/null 2>&1 || true
+echo "Cockpit actif : https://localhost:9090"
+"""
+
+COCKPIT_REMOVE = r"""systemctl disable --now cockpit.socket 2>/dev/null || true
+dnf remove -y cockpit cockpit-packagekit cockpit-storaged cockpit-networkmanager \
+  cockpit-files cockpit-podman cockpit-machines || true
+"""
+
+PHPMYADMIN_INSTALL = r"""set -e
+dnf install -y httpd phpMyAdmin
+systemctl enable --now httpd
+systemctl restart httpd
+echo "phpMyAdmin : http://localhost/phpMyAdmin"
+"""
+
+ADMINER_INSTALL = r"""set -e
+dnf install -y httpd
+systemctl enable --now httpd
+curl -fsSL -o /var/www/html/adminer.php https://www.adminer.org/latest.php
+chmod 644 /var/www/html/adminer.php
+echo "Adminer : http://localhost/adminer.php"
+"""
+
+ADMINER_REMOVE = r"""rm -f /var/www/html/adminer.php
+echo "Adminer retiré"
+"""
+
+WEBMIN_INSTALL = r"""set -e
+rpm --import https://download.webmin.com/jcameron-key.asc
+cat > /etc/yum.repos.d/webmin.repo <<'REPO'
+[Webmin]
+name=Webmin Distribution Neutral
+baseurl=https://download.webmin.com/download/yum
+enabled=1
+gpgkey=https://download.webmin.com/jcameron-key.asc
+gpgcheck=1
+REPO
+dnf install -y webmin
+systemctl enable --now webmin
+echo "Webmin actif : https://localhost:10000"
+"""
+
+WEBMIN_REMOVE = r"""systemctl disable --now webmin 2>/dev/null || true
+dnf remove -y webmin || true
+rm -f /etc/yum.repos.d/webmin.repo
+"""
+
+FIREWALL_HTTP = (
+    "firewall-cmd --permanent --add-service=http --add-service=https "
+    "&& firewall-cmd --reload && firewall-cmd --list-services"
+)
+
+FIREWALL_HTTP_REMOVE = (
+    "firewall-cmd --permanent --remove-service=http --remove-service=https "
+    "2>/dev/null || true; firewall-cmd --reload || true"
+)
+
+
+def _firewall_http_ok() -> bool:
+    if not shutil.which("firewall-cmd"):
+        return False
+    try:
+        res = subprocess.run(
+            ["firewall-cmd", "--query-service=http"], capture_output=True, timeout=10
+        )
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return res.returncode == 0
+
+
+def _adminer_installed() -> bool:
+    return os.path.isfile("/var/www/html/adminer.php")
+
+
+WEB_CATALOG: tuple[dict[str, Any], ...] = (
+    _dev_entry(
+        "apache", "servers",
+        "Apache (httpd)", "Apache (httpd)",
+        "httpd, httpd-tools, mod_ssl + service + pare-feu 80/443",
+        "network-server-symbolic",
+        check=lambda: _dev_rpm_ok("httpd"),
+        install=(APACHE_INSTALL,),
+        update=(APACHE_UPDATE,),
+        remove=(APACHE_REMOVE,),
+        launch=lambda: (open_uri("http://localhost"), True)[1],
+        launch_fr="Ouvre http://localhost dans le navigateur",
+        launch_en="Opens http://localhost in the browser",
+        install_desc="dnf install httpd httpd-tools mod_ssl + systemctl enable --now httpd",
+        update_desc=APACHE_UPDATE,
+        remove_desc="systemctl disable httpd + dnf remove httpd",
+        note_fr="Apache : page par défaut sur http://localhost après activation du service.",
+        note_en="Apache: default page on http://localhost once the service is running.",
+    ),
+    _dev_entry(
+        "nginx", "servers",
+        "Nginx", "Nginx",
+        "nginx (LEMP) + service + pare-feu 80/443",
+        "network-server-symbolic",
+        check=lambda: _dev_rpm_ok("nginx"),
+        install=(NGINX_INSTALL,),
+        update=(NGINX_UPDATE,),
+        remove=(NGINX_REMOVE,),
+        launch=lambda: (open_uri("http://localhost"), True)[1],
+        launch_fr="Ouvre http://localhost dans le navigateur",
+        launch_en="Opens http://localhost in the browser",
+        install_desc="dnf install nginx + systemctl enable --now nginx",
+        update_desc=NGINX_UPDATE,
+        remove_desc="systemctl disable nginx + dnf remove nginx",
+        note_fr="Nginx : page par défaut sur http://localhost après activation du service.",
+        note_en="Nginx: default page on http://localhost once the service is running.",
+    ),
+    _dev_entry(
+        "php", "servers",
+        "PHP 8 + extensions", "PHP 8 + extensions",
+        "php, php-fpm, mysqlnd, pdo, gd, mbstring, xml, opcache, zip, intl",
+        "text-x-script-symbolic",
+        packages=PHP_PACKAGES,
+        install=(PHP_INSTALL.replace("__PHP_PACKAGES__", " ".join(PHP_PACKAGES)),),
+        remove=(PHP_REMOVE.replace("__PHP_PACKAGES__", " ".join(PHP_PACKAGES)),),
+        note_fr="PHP-FPM : socket /run/php-fpm/www.sock ; l'entrée « PHP ↔ Apache / Nginx » ajoute le handler FastCGI.",
+        note_en="PHP-FPM: socket /run/php-fpm/www.sock; the “PHP ↔ Apache / Nginx” entry adds the FastCGI handler.",
+    ),
+    _dev_entry(
+        "php-handler", "servers",
+        "PHP ↔ Apache / Nginx (FastCGI)", "PHP ↔ Apache / Nginx (FastCGI)",
+        "handler FastCGI vers /run/php-fpm/www.sock + test de configuration",
+        "text-x-script-symbolic",
+        check=lambda: _dev_rpm_ok("php-fpm"),
+        install=(PHP_WEB_HANDLER,),
+        update=(PHP_WEB_HANDLER,),
+        remove=(PHP_WEB_REMOVE,),
+        install_desc="conf.d/php-fpm.conf (Apache) + default.d/php-fpm.conf (Nginx)",
+        update_desc="réécrit les deux fichiers puis teste httpd -t / nginx -t",
+        remove_desc="supprime les deux fichiers puis recharge les serveurs",
+    ),
+    _dev_entry(
+        "mariadb", "servers",
+        "MariaDB", "MariaDB",
+        "mariadb-server + service (root local via socket)",
+        "drive-harddisk-symbolic",
+        check=lambda: _dev_rpm_ok("mariadb-server"),
+        install=(MARIADB_INSTALL,),
+        remove=("systemctl disable --now mariadb 2>/dev/null || true", "dnf remove -y mariadb-server || true"),
+        install_desc="dnf install mariadb-server + systemctl enable --now mariadb",
+        remove_desc="systemctl disable mariadb + dnf remove mariadb-server",
+        note_fr="MariaDB : lance « mariadb-secure-installation » pour durcir le serveur ; root se connecte en local via socket.",
+        note_en="MariaDB: run “mariadb-secure-installation” to harden the server; root connects locally over the socket.",
+    ),
+    _dev_entry(
+        "mysql", "servers",
+        "MySQL (community)", "MySQL (community)",
+        "community-mysql-server + service (root local via socket)",
+        "drive-harddisk-symbolic",
+        check=lambda: _dev_rpm_ok("community-mysql-server"),
+        install=(MYSQL_INSTALL,),
+        remove=("systemctl disable --now mysqld 2>/dev/null || true", "dnf remove -y community-mysql-server || true"),
+        install_desc="dnf install community-mysql-server + systemctl enable --now mysqld",
+        remove_desc="systemctl disable mysqld + dnf remove community-mysql-server",
+        note_fr="MySQL community : lance « mysql_secure_installation » après l'installation.",
+        note_en="MySQL community: run “mysql_secure_installation” after installing.",
+    ),
+    _dev_entry(
+        "certbot", "servers",
+        "Certbot (HTTPS Let's Encrypt)", "Certbot (HTTPS Let's Encrypt)",
+        "certbot + plugins apache/nginx (certificats gratuits)",
+        "security-high-symbolic",
+        packages=("certbot", "python3-certbot-apache", "python3-certbot-nginx"),
+        note_fr="Certbot : « certbot --apache » ou « certbot --nginx » une fois le domaine pointé.",
+        note_en="Certbot: “certbot --apache” or “certbot --nginx” once the domain points here.",
+    ),
+    _dev_entry(
+        "cockpit", "panels",
+        "Panneau web Cockpit", "Cockpit web panel",
+        "cockpit + modules (paquets, stockage, réseau, Podman, VM), port 9090",
+        "preferences-system-symbolic",
+        check=lambda: _dev_rpm_ok("cockpit"),
+        install=(COCKPIT_INSTALL,),
+        update=("dnf upgrade -y --refresh cockpit cockpit-podman cockpit-machines",),
+        remove=(COCKPIT_REMOVE,),
+        launch=lambda: (open_uri("https://localhost:9090"), True)[1],
+        launch_fr="Ouvre Cockpit (https://localhost:9090)",
+        launch_en="Opens Cockpit (https://localhost:9090)",
+        install_desc="cockpit + modules + systemctl enable --now cockpit.socket",
+        update_desc="dnf upgrade cockpit cockpit-podman cockpit-machines",
+        remove_desc="systemctl disable cockpit.socket + dnf remove cockpit*",
+        note_fr="Cockpit : https://localhost:9090 (comptes système, port 9090 ouvert dans le pare-feu).",
+        note_en="Cockpit: https://localhost:9090 (system accounts, port 9090 opened in the firewall).",
+    ),
+    _dev_entry(
+        "phpmyadmin", "panels",
+        "phpMyAdmin", "phpMyAdmin",
+        "interface web MySQL/MariaDB (/phpMyAdmin), accès localhost",
+        "web-browser-symbolic",
+        check=lambda: _dev_rpm_ok("phpMyAdmin"),
+        install=(PHPMYADMIN_INSTALL,),
+        remove=("dnf remove -y phpMyAdmin || true",),
+        launch=lambda: (open_uri("http://localhost/phpMyAdmin"), True)[1],
+        launch_fr="Ouvre http://localhost/phpMyAdmin",
+        launch_en="Opens http://localhost/phpMyAdmin",
+        install_desc="dnf install phpMyAdmin + httpd + systemctl restart httpd",
+        remove_desc="dnf remove phpMyAdmin",
+        note_fr="phpMyAdmin est limité à localhost par défaut (/etc/httpd/conf.d/phpMyAdmin.conf).",
+        note_en="phpMyAdmin is restricted to localhost by default (/etc/httpd/conf.d/phpMyAdmin.conf).",
+    ),
+    _dev_entry(
+        "adminer", "panels",
+        "Adminer", "Adminer",
+        "un seul fichier PHP : /var/www/html/adminer.php",
+        "web-browser-symbolic",
+        check=_adminer_installed,
+        install=(ADMINER_INSTALL,),
+        update=(ADMINER_INSTALL,),
+        remove=(ADMINER_REMOVE,),
+        launch=lambda: (open_uri("http://localhost/adminer.php"), True)[1],
+        launch_fr="Ouvre http://localhost/adminer.php",
+        launch_en="Opens http://localhost/adminer.php",
+        install_desc="curl https://www.adminer.org/latest.php → /var/www/html",
+        update_desc="re-télécharge la dernière version",
+        remove_desc="supprime /var/www/html/adminer.php",
+        note_fr="Adminer : un seul fichier PHP dans /var/www/html/adminer.php.",
+        note_en="Adminer: a single PHP file in /var/www/html/adminer.php.",
+    ),
+    _dev_entry(
+        "webmin", "panels",
+        "Webmin", "Webmin",
+        "panneau d'administration complet (dépôt officiel), port 10000",
+        "preferences-system-symbolic",
+        check=lambda: _dev_rpm_ok("webmin"),
+        install=(WEBMIN_INSTALL,),
+        update=("dnf upgrade -y --refresh webmin && systemctl restart webmin",),
+        remove=(WEBMIN_REMOVE,),
+        launch=lambda: (open_uri("https://localhost:10000"), True)[1],
+        launch_fr="Ouvre Webmin (https://localhost:10000)",
+        launch_en="Opens Webmin (https://localhost:10000)",
+        install_desc="dépôt webmin + dnf install webmin + systemctl enable --now webmin",
+        update_desc="dnf upgrade webmin + systemctl restart webmin",
+        remove_desc="systemctl disable webmin + dnf remove webmin + dépôt retiré",
+        note_fr="Webmin écoute sur https://localhost:10000 ; crée un compte depuis l'interface.",
+        note_en="Webmin listens on https://localhost:10000; create an account from its interface.",
+    ),
+    _dev_entry(
+        "firewall-web", "network",
+        "Pare-feu web (80 / 443 / 9090)", "Web firewall (80 / 443 / 9090)",
+        "firewalld : ouvre http, https et console Cockpit",
+        "security-medium-symbolic",
+        check=_firewall_http_ok,
+        install=(FIREWALL_HTTP,),
+        update=(FIREWALL_HTTP,),
+        remove=(FIREWALL_HTTP_REMOVE,),
+        install_desc="firewall-cmd --add-service=http --add-service=https",
+        update_desc="réapplique les services http/https",
+        remove_desc="retire http et https de la zone par défaut",
+        note_fr="Nécessaire pour accéder au serveur depuis une autre machine du réseau.",
+        note_en="Required to reach the server from another machine on the network.",
+    ),
+    _dev_entry(
+        "openssh", "network",
+        "Serveur OpenSSH (accès distant)", "OpenSSH server (remote access)",
+        "openssh-server + service (port 22)",
+        "utilities-terminal-symbolic",
+        packages=("openssh-server",),
+        install=("systemctl enable --now sshd",),
+        remove=("systemctl disable --now sshd 2>/dev/null || true",),
+        note_fr="OpenSSH : sshd écoute sur le port 22 ; ouvre-le dans le pare-feu si nécessaire.",
+        note_en="OpenSSH: sshd listens on port 22; open it in the firewall when needed.",
+    ),
+)
+
+
 _DEV_PKG_CACHE: dict[str, bool] = {}
 _DEV_PKG_CACHE_AT = 0.0
 _DEV_CACHE_TTL = 30.0
@@ -11346,7 +11927,9 @@ def _dev_installed_packages() -> set[str]:
     fresh = _DEV_PKG_CACHE and (time.monotonic() - _DEV_PKG_CACHE_AT) < _DEV_CACHE_TTL
     if fresh:
         return {name for name, ok in _DEV_PKG_CACHE.items() if ok}
-    wanted = sorted({pkg for entry in DEV_CATALOG for pkg in entry["packages"]})
+    wanted = sorted(
+        {pkg for entry in (*DEV_CATALOG, *WEB_CATALOG) for pkg in entry["packages"]}
+    )
     installed: set[str] = set()
     if wanted:
         try:
@@ -11416,7 +11999,9 @@ def _dev_execute(
     return True, T("done")
 
 
-def _push_dev_entry(win: Ps5ManagerWindow, entry: dict[str, Any]) -> None:
+def _push_dev_entry(
+    win: Ps5ManagerWindow, entry: dict[str, Any], section: str = "dev"
+) -> None:
     done, total = _dev_state(entry)
     title = _L(entry["title_fr"], entry["title_en"])
     if total > 1:
@@ -11441,7 +12026,7 @@ def _push_dev_entry(win: Ps5ManagerWindow, entry: dict[str, Any]) -> None:
         def _after(*_):
             _dev_invalidate()
             win.nav.pop()
-            win._select_section("dev")
+            win._select_section(section)
 
         win.run_task(label, _task, _after)
 
@@ -11510,10 +12095,18 @@ def _push_dev_entry(win: Ps5ManagerWindow, entry: dict[str, Any]) -> None:
     win.nav.push(Adw.NavigationPage(child=tb, title=title))
 
 
-def build_page_dev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
-    for gid, gfr, gen in DEV_GROUPS:
+def _build_catalog_page(
+    win: Ps5ManagerWindow,
+    page: Adw.PreferencesPage,
+    groups: tuple[tuple[str, str, str], ...],
+    catalog: tuple[dict[str, Any], ...],
+    section: str,
+    notes: tuple[tuple[str, str], ...] = (),
+) -> None:
+    """Rend un catalogue (page Développement ou Serveur web)."""
+    for gid, gfr, gen in groups:
         grp = pref_group(title=_L(gfr, gen), description="")
-        for entry in DEV_CATALOG:
+        for entry in catalog:
             if entry["group"] != gid:
                 continue
             done, total = _dev_state(entry)
@@ -11522,7 +12115,7 @@ def build_page_dev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
             if panel is not None:
                 callback = (lambda *_, p=panel: p(win))
             else:
-                callback = (lambda *_, e=entry: _push_dev_entry(win, e))
+                callback = (lambda *_, e=entry: _push_dev_entry(win, e, section))
             grp.add(
                 win.row(
                     _L(entry["title_fr"], entry["title_en"]),
@@ -11539,16 +12132,37 @@ def build_page_dev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
             "Install, update and uninstall by category — everything is optional.",
         ),
     )
-    intro.add(
-        plain_row(
-            Adw.ActionRow,
-            title=_L(
+    for note_fr, note_en in notes:
+        intro.add(plain_row(Adw.ActionRow, title=_L(note_fr, note_en)))
+    page.add(intro)
+
+
+def build_page_dev(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
+    _build_catalog_page(
+        win, page, DEV_GROUPS, DEV_CATALOG, "dev",
+        notes=(
+            (
                 "Les groupes docker, libvirt et kvm ne s'appliquent qu'après une reconnexion.",
                 "The docker, libvirt and kvm groups only apply after signing in again.",
             ),
-        )
+        ),
     )
-    page.add(intro)
+
+
+def build_page_web(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
+    _build_catalog_page(
+        win, page, WEB_GROUPS, WEB_CATALOG, "websrv",
+        notes=(
+            (
+                "Apache et Nginx ne peuvent pas écouter le port 80 en même temps : garde un seul serveur actif.",
+                "Apache and Nginx cannot listen on port 80 at the same time: keep a single server running.",
+            ),
+            (
+                "Les groupes docker, libvirt et kvm ne s'appliquent qu'après une reconnexion.",
+                "The docker, libvirt and kvm groups only apply after signing in again.",
+            ),
+        ),
+    )
 
 
 PAGE_BUILDERS = {
@@ -11556,6 +12170,7 @@ PAGE_BUILDERS = {
     "library": build_page_library,
     "aidev": build_page_aidev,
     "dev": build_page_dev,
+    "websrv": build_page_web,
     "deps": build_page_deps,
     "gaming": build_page_gaming,
     "features": build_page_features,
