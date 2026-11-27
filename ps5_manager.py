@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.11"
+APP_VERSION = "0.15.12"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1133,6 +1133,7 @@ _RELEASE_NOTES_TITLE = {
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15.12 : nouvelle option « Installer et essayer la version bêta » dans la mise à jour du manager — elle récupère la bêta du dépôt et la lance en tant qu'utilisateur, sans toucher à la version stable",
         "0.15.11 : traductions complètes de la page Services et de la réinitialisation (7 textes qui restaient en anglais) et lien « Historique complet » dans À propos",
         "0.15.10 : fenêtre « À propos » repensée — 900 × 740 px au lieu de la colonne étroite d'Adw.AboutDialog, avec le logo, les liens (site web, problèmes), les informations techniques et les nouveautés dans une carte lisible",
         "0.15.9 : les notes de version échappent le « & » : la fenêtre « Quoi de neuf » s'affiche à nouveau au lieu de signaler « Impossible d'analyser les notes de version »",
@@ -1164,6 +1165,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15.12: new “Install and try the beta release” option in the manager update page — it fetches the beta from the repository and launches it as your user, without touching the stable version",
         "0.15.11: full translations for the Services page and the reset section (7 texts that stayed English) and a “Full changelog” link in About",
         "0.15.10: redesigned “About” window — 900 × 740 px instead of Adw.AboutDialog’s narrow column, with the logo, links (website, issues), technical information and the release notes in a readable card",
         "0.15.9: release notes now escape “&”: the “What’s new” window displays again instead of reporting “Unable to parse release notes”",
@@ -1195,6 +1197,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15.12 : nueva opción «Instalar y probar la versión beta» en la actualización del gestor — descarga la beta del repositorio y la inicia como tu usuario, sin tocar la versión estable",
         "0.15.11 : traducciones completas de la página Servicios y de la reinicialización (7 textos que seguían en inglés) y enlace «Historial completo» en Acerca de",
         "0.15.10 : ventana «Acerca de» rediseñada — 900 × 740 px en lugar de la columna estrecha de Adw.AboutDialog, con el logotipo, los enlaces (sitio web, problemas), la información técnica y las novedades en una tarjeta legible",
         "0.15.9 : las notas de versión escapan el «&»: la ventana «Novedades» vuelve a mostrarse en lugar de indicar «No se pueden analizar las notas de versión»",
@@ -1226,6 +1229,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15.12 : nuova opzione «Installa e prova la versione beta» nell'aggiornamento del gestore — scarica la beta dal repository e la avvia come utente, senza toccare la versione stabile",
         "0.15.11 : traduzioni complete della pagina Servizi e della reimpostazione (7 testi rimasti in inglese) e link «Cronologia completa» in Informazioni",
         "0.15.10 : finestra «Informazioni» ridisegnata — 900 × 740 px al posto della colonna stretta di Adw.AboutDialog, con logo, link (sito web, problemi), informazioni tecniche e novità in una scheda leggibile",
         "0.15.9 : le note di versione proteggono la «&»: la finestra «Novità» torna a mostrarsi invece di segnalare «Impossibile analizzare le note di versione»",
@@ -1257,6 +1261,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15.12 : neue Option „Beta-Version installieren und ausprobieren“ in der Manager-Aktualisierung – lädt die Beta aus dem Repository und startet sie als Benutzer, ohne die stabile Version anzutasten",
         "0.15.11 : vollständige Übersetzungen für die Dienste-Seite und das Zurücksetzen (7 Texte waren noch englisch) und ein Link „Vollständiger Verlauf“ im Über-Fenster",
         "0.15.10 : „Über“-Fenster neu gestaltet – 900 × 740 px statt der schmalen Spalte von Adw.AboutDialog, mit Logo, Links (Webseite, Probleme), technischen Informationen und den Versionshinweisen in einer gut lesbaren Karte",
         "0.15.9 : die Versionshinweise maskieren jetzt das „&“: das Fenster „Neu“ erscheint wieder, statt „Versionshinweise konnten nicht gelesen werden“ zu melden",
@@ -1288,6 +1293,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15.12 : nova opção «Instalar e experimentar a versão beta» na atualização do gestor — obtém a beta do repositório e inicia-a como utilizador, sem tocar na versão estável",
         "0.15.11 : traduções completas da página Serviços e da reposição (7 textos que ficavam em inglês) e ligação «Histórico completo» em Sobre",
         "0.15.10 : janela «Sobre» redesenhada — 900 × 740 px em vez da coluna estreita do Adw.AboutDialog, com o logótipo, as ligações (site, problemas), as informações técnicas e as novidades num cartão legível",
         "0.15.9 : as notas de versão escapam o «&»: a janela «Novidades» volta a aparecer em vez de indicar «Não é possível analisar as notas de versão»",
@@ -8925,6 +8931,130 @@ def install_update(expected: str, timeout: float = 60.0) -> bool:
             pass
 
 
+# ------------------------------------------------------------------------------
+# Édition bêta : elle vit dans beta/ au même endroit que la stable. L'option
+# « Installer et essayer » récupère la bêta par git puis la lance en tant
+# qu'utilisateur réel : la bêta n'a jamais besoin de root, la stable reste
+# lancée et intacte.
+# ------------------------------------------------------------------------------
+BETA_DIR = os.path.join(INSTALL_DIR, "beta")
+
+BETA_STRINGS: dict[str, dict[str, str]] = {
+    "fr": {
+        "group": "Version bêta",
+        "install": "Installer et essayer la version bêta",
+        "install_sub": "Récupère la dernière bêta depuis le dépôt, puis la lance",
+        "installed": "Bêta %s installée — relance cette option pour la mettre à jour",
+        "missing": "Version bêta absente du dépôt — réessaie la mise à jour",
+        "launch": "Lancer la version bêta",
+        "launch_sub": "Édition modulaire : 107 greffons, 6 langues, pages Noyau, Dépôts et Comptes",
+        "launched": "Version bêta lancée — la version stable reste intacte",
+        "root": "La bêta ne peut pas être lancée en root",
+    },
+    "en": {
+        "group": "Beta release",
+        "install": "Install and try the beta release",
+        "install_sub": "Fetches the latest beta from the repository, then launches it",
+        "installed": "Beta %s installed — run this option again to update it",
+        "missing": "Beta missing from the repository — retry the update",
+        "launch": "Launch the beta release",
+        "launch_sub": "Modular edition: 107 addons, 6 languages, Kernel, Repositories and Accounts pages",
+        "launched": "Beta launched — the stable version is untouched",
+        "root": "The beta cannot run as root",
+    },
+    "es": {
+        "group": "Versión beta",
+        "install": "Instalar y probar la versión beta",
+        "install_sub": "Descarga la última beta del repositorio y la inicia",
+        "installed": "Beta %s instalada — vuelve a pulsar para actualizarla",
+        "missing": "La beta no está en el repositorio — reintenta la actualización",
+        "launch": "Iniciar la versión beta",
+        "launch_sub": "Edición modular: 107 complementos, 6 idiomas, páginas Núcleo, Repositorios y Cuentas",
+        "launched": "Beta iniciada — la versión estable sigue intacta",
+        "root": "La beta no puede ejecutarse como root",
+    },
+    "it": {
+        "group": "Versione beta",
+        "install": "Installa e prova la versione beta",
+        "install_sub": "Scarica l'ultima beta dal repository e la avvia",
+        "installed": "Beta %s installata — ripeti per aggiornarla",
+        "missing": "Beta assente nel repository — riprova l'aggiornamento",
+        "launch": "Avvia la versione beta",
+        "launch_sub": "Edizione modulare: 107 plugin, 6 lingue, pagine Kernel, Repository e Account",
+        "launched": "Beta avviata — la versione stabile resta intatta",
+        "root": "La beta non può essere avviata come root",
+    },
+    "de": {
+        "group": "Beta-Version",
+        "install": "Beta-Version installieren und ausprobieren",
+        "install_sub": "Holt die neueste Beta aus dem Repository und startet sie",
+        "installed": "Beta %s installiert – erneut ausführen, um sie zu aktualisieren",
+        "missing": "Beta fehlt im Repository – Aktualisierung erneut versuchen",
+        "launch": "Beta-Version starten",
+        "launch_sub": "Modulare Ausgabe: 107 Erweiterungen, 6 Sprachen, Seiten Kernel, Paketquellen und Konten",
+        "launched": "Beta gestartet – die stabile Version bleibt unverändert",
+        "root": "Die Beta kann nicht als root gestartet werden",
+    },
+    "pt": {
+        "group": "Versão beta",
+        "install": "Instalar e experimentar a versão beta",
+        "install_sub": "Obtém a beta mais recente do repositório e inicia-a",
+        "installed": "Beta %s instalada — repete para a atualizar",
+        "missing": "Beta ausente do repositório — tenta novamente a atualização",
+        "launch": "Iniciar a versão beta",
+        "launch_sub": "Edição modular: 107 extensões, 6 idiomas, páginas Núcleo, Repositórios e Contas",
+        "launched": "Beta iniciada — a versão estável fica intacta",
+        "root": "A beta não pode ser executada como root",
+    },
+}
+
+
+def _bt(key: str) -> str:
+    """Texte de la section bêta dans la langue de l'interface."""
+    table = BETA_STRINGS.get(UI_LANG, BETA_STRINGS["en"])
+    return table.get(key, BETA_STRINGS["en"].get(key, key))
+
+
+def beta_version() -> str:
+    """Version inscrite dans beta/VERSION, chaîne vide si la bêta est absente."""
+    try:
+        with open(os.path.join(BETA_DIR, "VERSION"), encoding="utf-8") as handle:
+            return handle.read().strip()
+    except OSError:
+        return ""
+
+
+def beta_present() -> bool:
+    return os.path.isfile(os.path.join(BETA_DIR, "run.py"))
+
+
+def launch_beta() -> bool:
+    """Démarre beta/run.py en tant qu'utilisateur réel, sans bloquer l'interface."""
+    entry = os.path.join(BETA_DIR, "run.py")
+    if not os.path.isfile(entry) or REAL_USER == "root":
+        return False
+    log_path = os.path.join(tempfile.gettempdir(), "ps5-manager-beta.log")
+    try:
+        log = open(log_path, "ab")
+    except OSError:
+        log = subprocess.DEVNULL  # type: ignore[assignment]
+    try:
+        subprocess.Popen(
+            [sys.executable, entry],
+            stdin=subprocess.DEVNULL,
+            stdout=log,
+            stderr=log,
+            start_new_session=True,
+            **user_subprocess_kwargs(),
+        )
+    except OSError:
+        return False
+    finally:
+        if log is not subprocess.DEVNULL:
+            log.close()  # type: ignore[union-attr]
+    return True
+
+
 def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     grp = pref_group(title=T("mgr_title"))
 
@@ -9048,6 +9178,55 @@ def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         )
     )
     page.add(grp)
+
+    # ---- Version bêta : installation et lancement depuis la même page ----
+    beta_grp = pref_group(title=_bt("group"))
+    installed_version = beta_version() if beta_present() else ""
+
+    def _install_beta():
+        def _task(emit):
+            if os.path.isdir(os.path.join(INSTALL_DIR, ".git")):
+                rc = win.run_cmd_pty(["git", "-C", INSTALL_DIR, "fetch", "--all", "--prune"], emit)
+                if rc == 0:
+                    rc = win.run_cmd_pty(["git", "-C", INSTALL_DIR, "reset", "--hard", "origin/main"], emit)
+            else:
+                os.makedirs(INSTALL_DIR, mode=0o755, exist_ok=True)
+                rc = win.run_cmd_pty(["git", "clone", REPO_URL, INSTALL_DIR], emit)
+            if rc != 0:
+                return False, T("failed") % rc
+            if not beta_present():
+                return False, _bt("missing")
+            version = beta_version() or "beta"
+            emit(_bt("installed") % version)
+            if not launch_beta():
+                return False, _bt("root")
+            return True, _bt("launched")
+
+        win.run_task(T("mgr_update"), _task, lambda _ok, msg: win.toast(msg))
+
+    def _run_beta():
+        if not beta_present():
+            win.toast(_bt("missing"))
+            return
+        win.toast(_bt("launched") if launch_beta() else _bt("root"))
+
+    beta_grp.add(
+        win.row(
+            _bt("install"),
+            (_bt("installed") % installed_version) if installed_version else _bt("install_sub"),
+            "system-software-install-symbolic",
+            lambda *_: _install_beta(),
+        )
+    )
+    beta_grp.add(
+        win.row(
+            _bt("launch"),
+            _bt("launch_sub"),
+            "media-playback-start-symbolic",
+            lambda *_: _run_beta(),
+        )
+    )
+    page.add(beta_grp)
 
 
 def build_page_lang(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:

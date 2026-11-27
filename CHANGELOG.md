@@ -6,6 +6,27 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.12] — 2026-11-27
+
+### Ajouté
+- **Essayer la bêta depuis la version stable.** La page « Mise à jour du
+  manager » contient un nouveau groupe « Version bêta » :
+  - « Installer et essayer la version bêta » : récupère `origin/main` dans
+    `/opt/ps5-manager` (`fetch` + `reset --hard`, ou `git clone` pour une
+    installation historique), vérifie que `beta/run.py` est là, puis lance
+    l'édition bêta **en tant qu'utilisateur réel** (`subprocess.Popen` avec
+    `user`/`group`/`env` de la session, `start_new_session`) ;
+  - « Lancer la version bêta » : relance simplement l'édition bêta installée.
+
+  Le sous-titre de la première ligne affiche la version bêta détectée
+  (`beta/VERSION`). La stable continue de tourner : la bêta ouvre sa propre
+  fenêtre, sans droits root. La sortie de la bêta est écrite dans
+  `/tmp/ps5-manager-beta.log`.
+
+### Traductions
+- Nouveaux textes de la section bêta en fr, en, es, it, de et pt, plus une
+  entrée dans les notes de version des six langues.
+
 ## [0.15.11] — 2026-11-27
 
 ### Corrigé

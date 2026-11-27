@@ -7,6 +7,26 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.12] — 2026-11-27
+
+### Added
+- **Try the beta from the stable release.** The “Manager update” page now has a
+  “Beta release” group:
+  - “Install and try the beta release”: fetches `origin/main` into
+    `/opt/ps5-manager` (`fetch` + `reset --hard`, or `git clone` for legacy
+    installs), checks that `beta/run.py` exists, then launches the beta edition
+    **as the real user** (`subprocess.Popen` with the session's
+    `user`/`group`/`env`, `start_new_session`);
+  - “Launch the beta release”: simply reopens the installed beta edition.
+
+  The first row's subtitle shows the detected beta version (`beta/VERSION`).
+  The stable keeps running: the beta opens its own window, without root. The
+  beta's output goes to `/tmp/ps5-manager-beta.log`.
+
+### Translations
+- New beta-section texts in fr, en, es, it, de and pt, plus a release-note
+  entry in all six languages.
+
 ## [0.15.11] — 2026-11-27
 
 ### Fixed
