@@ -77,41 +77,39 @@ def read_state(unit: str) -> ServiceState:
     return ServiceState(present, enabled, static, detail)
 
 
-class ServiceRow(Adw.SwitchRow):
-    def __init__(self, win, unit: str) -> None:
-        super().__init__()
-        self.win = win
-        self.unit = unit
-        self._busy = False
-        self._desired = False
-        self.set_title(unit.removesuffix(".service").removesuffix(".socket"))
-        self.set_use_markup(False)
-        self.set_activatable(False)
+def service_row(win, unit: str) -> Adw.SwitchRow:
+    """Ligne d'interrupteur systemd.
 
-        state = read_state(unit)
-        self.set_subtitle(f"{unit} · {state.detail}")
-        if not state.present:
-            self.set_subtitle(f"{unit} · {tr('services.absent')}")
-            self.set_sensitive(False)
-            return
-        if state.static:
-            self.set_subtitle(f"{unit} · {tr('services.static')}")
-            self.set_sensitive(False)
-            self.set_active(state.enabled)
-            return
+    `Adw.SwitchRow` est un type final : on compose une ligne au lieu d'en
+    dériver une classe (PyGObject refuse la sous-classe depuis GTK 4.22).
+    """
+    row = Adw.SwitchRow()
+    row.set_title(unit.removesuffix(".service").removesuffix(".socket"))
+    row.set_use_markup(False)
+    row.set_activatable(False)
 
-        self.set_active(state.enabled)
-        self.connect("notify::active", self._on_toggle)
+    state = read_state(unit)
+    if not state.present:
+        row.set_subtitle(f"{unit} · {tr('services.absent')}")
+        row.set_sensitive(False)
+        return row
+    if state.static:
+        row.set_subtitle(f"{unit} · {tr('services.static')}")
+        row.set_sensitive(False)
+        row.set_active(state.enabled)
+        return row
 
-    def _on_toggle(self, row, _pspec) -> None:
-        if self._busy:
+    row.set_subtitle(f"{unit} · {state.detail}")
+    row.set_active(state.enabled)
+    busy = {"value": False}
+
+    def _on_toggle(_row, _pspec) -> None:
+        if busy["value"]:
             return
         wanted = row.get_active()
-        self._desired = wanted
-        self._busy = True
-        self.set_sensitive(False)
-        self.set_subtitle(f"{self.unit} · …")
-        unit = self.unit
+        busy["value"] = True
+        row.set_sensitive(False)
+        row.set_subtitle(f"{unit} · …")
 
         def _apply() -> tuple[bool, str, bool]:
             action = "enable" if wanted else "disable"
@@ -125,26 +123,29 @@ class ServiceRow(Adw.SwitchRow):
             return False, f"{tr('common.failed', code=code)} · {out[:200]}", False
 
         def _done(ok: bool, message: str, cancelled: bool) -> None:
-            self.set_sensitive(True)
-            self._busy = False
+            row.set_sensitive(True)
+            busy["value"] = False
             if not ok:
                 # Annulation polkit : on remet l'interrupteur sans rien signaler.
-                self._busy = True
-                self.set_active(not self._desired)
-                self._busy = False
-                state = read_state(self.unit)
-                self.set_subtitle(f"{self.unit} · {state.detail}")
+                busy["value"] = True
+                row.set_active(not wanted)
+                busy["value"] = False
+                fresh = read_state(unit)
+                row.set_subtitle(f"{unit} · {fresh.detail}")
                 if not cancelled:
-                    self.win.toast(message)
+                    win.toast(message)
                 return
-            state = read_state(self.unit)
-            self.set_subtitle(f"{self.unit} · {state.detail}")
-            self.win.toast(
-                f"{self.unit} · "
-                + tr("services.enable" if state.enabled else "services.disable")
+            fresh = read_state(unit)
+            row.set_subtitle(f"{unit} · {fresh.detail}")
+            win.toast(
+                f"{unit} · "
+                + tr("services.enable" if fresh.enabled else "services.disable")
             )
 
-        self.win.run_background(_apply, _done)
+        win.run_background(_apply, _done)
+
+    row.connect("notify::active", _on_toggle)
+    return row
 
 
 def build(win) -> Gtk.Widget:
@@ -153,7 +154,7 @@ def build(win) -> Gtk.Widget:
         title=tr("services.title"), description=tr("services.subtitle")
     )
     for unit in SERVICES:
-        group.add(ServiceRow(win, unit))
+        group.add(service_row(win, unit))
     note: Optional[Adw.ActionRow] = plain_row(
         title="systemctl enable/disable --now",
         subtitle=tr("services.subtitle"),

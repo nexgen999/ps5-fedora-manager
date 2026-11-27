@@ -45,43 +45,13 @@ def repositories() -> list[tuple[str, str, bool]]:
     return repos
 
 
-class ReposPage(Adw.PreferencesPage):
-    def __init__(self, win) -> None:
-        super().__init__()
-        self.win = win
-        self.group = Adw.PreferencesGroup(title=tr("repos.group"))
-        self.add(self.group)
+def build(win) -> Adw.PreferencesPage:
+    """Construit la page (fonction : `Adw.PreferencesPage` est un type final)."""
+    page = Adw.PreferencesPage()
+    group = Adw.PreferencesGroup(title=tr("repos.group"))
+    page.add(group)
 
-        actions = Adw.PreferencesGroup()
-        refresh = plain_row(title=tr("repos.refresh"), subtitle="dnf makecache")
-        refresh.set_activatable(True)
-        refresh.connect("activated", lambda *_: self._refresh())
-        actions.add(refresh)
-
-        add = plain_row(title=tr("repos.add"), subtitle=f"{REPO_DIR}/*.repo")
-        add.set_activatable(True)
-        add.connect("activated", lambda *_: self._choose())
-        actions.add(add)
-        self.add(actions)
-
-        self._fill()
-        append_section_groups(self, win, "repos")
-
-    def _fill(self) -> None:
-        repos = repositories()
-        if not repos:
-            self.group.add(plain_row(title=tr("repos.empty")))
-            return
-        for repo_id, name, enabled in repos:
-            row = Adw.SwitchRow()
-            row.set_title(repo_id)
-            row.set_subtitle(name)
-            row.set_use_markup(False)
-            row.set_active(enabled)
-            row.connect("notify::active", self._on_toggle, repo_id)
-            self.group.add(row)
-
-    def _on_toggle(self, row, _pspec, repo_id: str) -> None:
+    def _on_toggle(row, _pspec, repo_id: str) -> None:
         wanted = "1" if row.get_active() else "0"
         row.set_sensitive(False)
 
@@ -97,9 +67,9 @@ class ReposPage(Adw.PreferencesPage):
                 return False, tr("common.failed", code=code)
             return True, tr("common.done")
 
-        self.win.run_background(_task, lambda ok, msg: row.set_sensitive(True))
+        win.run_background(_task, lambda ok, msg: row.set_sensitive(True))
 
-    def _refresh(self) -> None:
+    def _refresh() -> None:
         def _task(emit) -> tuple[bool, str]:
             emit("dnf makecache")
             code, out = run_command(
@@ -110,12 +80,27 @@ class ReposPage(Adw.PreferencesPage):
                 return False, tr("common.failed", code=code)
             return True, tr("common.done")
 
-        self.win.run_task(tr("repos.refresh"), _task)
+        win.run_task(tr("repos.refresh"), _task)
 
-    def _choose(self) -> None:
+    def _add(source: Path) -> None:
+        def _task(emit) -> tuple[bool, str]:
+            target = REPO_DIR / source.name
+            emit(f"{source} → {target}")
+            code, out = run_command(
+                ["pkexec", "install", "-m", "0644", str(source), str(target)],
+                timeout=60,
+            )
+            if code != 0:
+                emit(out)
+                return False, tr("common.failed", code=code)
+            return True, tr("common.done")
+
+        win.run_task(tr("repos.add"), _task)
+
+    def _choose() -> None:
         dialog = Gtk.FileChooserNative(
             title=tr("repos.add"),
-            transient_for=self.win,
+            transient_for=win,
             action=Gtk.FileChooserAction.OPEN,
         )
         filter_repo = Gtk.FileFilter()
@@ -129,24 +114,37 @@ class ReposPage(Adw.PreferencesPage):
             selected = native.get_file()
             path = Path(selected.get_path() or "") if selected else None
             if path is None or not path.is_file():
-                self.win.toast(tr("repos.failed"))
+                win.toast(tr("repos.failed"))
                 return
-            self._add(path)
+            _add(path)
 
         dialog.connect("response", _on_response)
         dialog.show()
 
-    def _add(self, source: Path) -> None:
-        def _task(emit) -> tuple[bool, str]:
-            target = REPO_DIR / source.name
-            emit(f"{source} → {target}")
-            code, out = run_command(
-                ["pkexec", "install", "-m", "0644", str(source), str(target)],
-                timeout=60,
-            )
-            if code != 0:
-                emit(out)
-                return False, tr("common.failed", code=code)
-            return True, tr("common.done")
+    actions = Adw.PreferencesGroup()
+    refresh = plain_row(title=tr("repos.refresh"), subtitle="dnf makecache")
+    refresh.set_activatable(True)
+    refresh.connect("activated", lambda *_: _refresh())
+    actions.add(refresh)
 
-        self.win.run_task(tr("repos.add"), _task)
+    add = plain_row(title=tr("repos.add"), subtitle=f"{REPO_DIR}/*.repo")
+    add.set_activatable(True)
+    add.connect("activated", lambda *_: _choose())
+    actions.add(add)
+    page.add(actions)
+
+    repos = repositories()
+    if not repos:
+        group.add(plain_row(title=tr("repos.empty")))
+    else:
+        for repo_id, name, enabled in repos:
+            row = Adw.SwitchRow()
+            row.set_title(repo_id)
+            row.set_subtitle(name)
+            row.set_use_markup(False)
+            row.set_active(enabled)
+            row.connect("notify::active", _on_toggle, repo_id)
+            group.add(row)
+
+    append_section_groups(page, win, "repos")
+    return page

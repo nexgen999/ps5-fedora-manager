@@ -38,46 +38,13 @@ def kernels() -> list[str]:
     return found
 
 
-class KernelPage(Adw.PreferencesPage):
-    def __init__(self, win) -> None:
-        super().__init__()
-        self.win = win
-        self.group = Adw.PreferencesGroup(title=tr("kernel.group"))
-        self.add(self.group)
-        self._fill()
-        append_section_groups(self, win, "kernel")
+def build(win) -> Adw.PreferencesPage:
+    """Construit la page (fonction : `Adw.PreferencesPage` est un type final)."""
+    page = Adw.PreferencesPage()
+    group = Adw.PreferencesGroup(title=tr("kernel.group"))
+    page.add(group)
 
-    def _fill(self) -> None:
-        running = platform.release()
-        self.group.add(plain_row(
-            title=tr("kernel.running"),
-            subtitle=f"{running} · {platform.machine()}",
-        ))
-        versions = kernels()
-        if not versions:
-            self.group.add(plain_row(title="—", subtitle=tr("kernel.empty")))
-            return
-        for version in versions:
-            row = action_row(
-                version,
-                running if version == running else "",
-                "drive-harddisk-symbolic",
-                on_activate=lambda v=version: self._set_default(v),
-                suffix=Gtk.Image.new_from_icon_name("emblem-default-symbolic")
-                if version == running
-                else None,
-            )
-            row.add_suffix(self._remove_button(version))
-            self.group.add(row)
-
-    def _remove_button(self, version: str) -> Gtk.Button:
-        button = Gtk.Button(label=tr("kernel.remove"))
-        button.add_css_class("destructive-action")
-        button.set_valign(Gtk.Align.CENTER)
-        button.connect("clicked", lambda *_: self._remove(version))
-        return button
-
-    def _set_default(self, version: str) -> None:
+    def _set_default(version: str) -> None:
         def _task(emit) -> tuple[bool, str]:
             target = f"/boot/vmlinuz-{version}"
             emit(f"grubby --set-default {target}")
@@ -89,16 +56,9 @@ class KernelPage(Adw.PreferencesPage):
             emit(out or target)
             return True, tr("kernel.default_set")
 
-        self.win.run_task(tr("kernel.set_default"), _task)
+        win.run_task(tr("kernel.set_default"), _task)
 
-    def _remove(self, version: str) -> None:
-        self.win.confirm(
-            tr("kernel.remove"),
-            tr("kernel.confirm_remove", version=version),
-            lambda: self._do_remove(version),
-        )
-
-    def _do_remove(self, version: str) -> None:
+    def _do_remove(version: str) -> None:
         def _task(emit) -> tuple[bool, str]:
             emit(f"dnf remove kernel-core-{version}")
             code, out = run_command(
@@ -110,4 +70,45 @@ class KernelPage(Adw.PreferencesPage):
                 return False, tr("common.failed", code=code)
             return True, tr("common.done")
 
-        self.win.run_task(tr("kernel.remove"), _task)
+        win.run_task(tr("kernel.remove"), _task)
+
+    def _remove(version: str) -> None:
+        win.confirm(
+            tr("kernel.remove"),
+            tr("kernel.confirm_remove", version=version),
+            lambda: _do_remove(version),
+        )
+
+    def _remove_button(version: str) -> Gtk.Button:
+        button = Gtk.Button(label=tr("kernel.remove"))
+        button.add_css_class("destructive-action")
+        button.set_valign(Gtk.Align.CENTER)
+        button.connect("clicked", lambda *_: _remove(version))
+        return button
+
+    running = platform.release()
+    group.add(
+        plain_row(
+            title=tr("kernel.running"),
+            subtitle=f"{running} · {platform.machine()}",
+        )
+    )
+    versions = kernels()
+    if not versions:
+        group.add(plain_row(title="—", subtitle=tr("kernel.empty")))
+    else:
+        for version in versions:
+            row = action_row(
+                version,
+                running if version == running else "",
+                "drive-harddisk-symbolic",
+                on_activate=lambda v=version: _set_default(v),
+                suffix=Gtk.Image.new_from_icon_name("emblem-default-symbolic")
+                if version == running
+                else None,
+            )
+            row.add_suffix(_remove_button(version))
+            group.add(row)
+
+    append_section_groups(page, win, "kernel")
+    return page

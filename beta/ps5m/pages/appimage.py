@@ -58,60 +58,56 @@ def remove_file(appimage: Path) -> None:
     appimage.unlink(missing_ok=True)
 
 
-class LibraryPage(Adw.PreferencesPage):
-    def __init__(self, win) -> None:
-        super().__init__()
-        self.win = win
-        self.group = Adw.PreferencesGroup(
-            title=tr("library.appimage_group"),
-            description=tr("library.appimage_hint"),
-        )
-        self.add(self.group)
+def build(win) -> Adw.PreferencesPage:
+    """Construit la page (fonction : `Adw.PreferencesPage` est un type final)."""
+    page = Adw.PreferencesPage()
+    group = Adw.PreferencesGroup(
+        title=tr("library.appimage_group"),
+        description=tr("library.appimage_hint"),
+    )
+    page.add(group)
 
-        button = Gtk.Button(label=tr("library.appimage_install"))
-        button.add_css_class("suggested-action")
-        button.set_halign(Gtk.Align.START)
-        button.connect("clicked", lambda *_: self._choose())
-        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        box.set_margin_top(6)
-        box.append(button)
-        holder = Adw.PreferencesGroup()
-        holder.add(box)
-        self.add(holder)
-
-        self._fill()
-        append_section_groups(self, win, "library")
-
-    def _fill(self) -> None:
+    def _fill() -> None:
+        group.remove_all()
         apps = installed()
         if not apps:
-            self.group.add(plain_row(title=tr("library.appimage_empty")))
+            group.add(plain_row(title=tr("library.appimage_empty")))
             return
         for appimage in apps:
-            row = action_row(
-                appimage.stem,
-                str(appimage),
-                "application-x-executable-symbolic",
-                on_activate=lambda a=appimage: self.win.confirm(
-                    tr("library.appimage_remove"),
-                    a.name,
-                    lambda: self._remove(a),
-                ),
+            group.add(
+                action_row(
+                    appimage.stem,
+                    str(appimage),
+                    "application-x-executable-symbolic",
+                    on_activate=lambda a=appimage: win.confirm(
+                        tr("library.appimage_remove"),
+                        a.name,
+                        lambda: _remove(a),
+                    ),
+                )
             )
-            self.group.add(row)
 
-    def _remove(self, appimage: Path) -> None:
+    def _remove(appimage: Path) -> None:
         def _task(emit) -> tuple[bool, str]:
             emit(str(appimage))
             remove_file(appimage)
             return True, tr("common.done")
 
-        self.win.run_task(tr("library.appimage_remove"), _task)
+        win.run_task(tr("library.appimage_remove"), _task)
 
-    def _choose(self) -> None:
+    def _install(source: Path) -> None:
+        def _task(emit) -> tuple[bool, str]:
+            emit(f"{source} → {APPS_DIR}")
+            target = install_file(source)
+            emit(target)
+            return True, tr("common.done")
+
+        win.run_task(tr("library.appimage_install"), _task)
+
+    def _choose() -> None:
         dialog = Gtk.FileChooserNative(
             title=tr("library.appimage_install"),
-            transient_for=self.win,
+            transient_for=win,
             action=Gtk.FileChooserAction.OPEN,
         )
         filter_appimage = Gtk.FileFilter()
@@ -128,22 +124,24 @@ class LibraryPage(Adw.PreferencesPage):
                 return
             path = Path(selected.get_path() or "")
             if not path.is_file():
-                self.win.toast(tr("library.appimage_failed"))
+                win.toast(tr("library.appimage_failed"))
                 return
-            self._install(path)
+            _install(path)
 
         dialog.connect("response", _on_response)
         dialog.show()
 
-    def _install(self, source: Path) -> None:
-        def _task(emit) -> tuple[bool, str]:
-            emit(f"{source} → {APPS_DIR}")
-            target = install_file(source)
-            emit(target)
-            return True, tr("common.done")
+    button = Gtk.Button(label=tr("library.appimage_install"))
+    button.add_css_class("suggested-action")
+    button.set_halign(Gtk.Align.START)
+    button.connect("clicked", lambda *_: _choose())
+    box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+    box.set_margin_top(6)
+    box.append(button)
+    holder = Adw.PreferencesGroup()
+    holder.add(box)
+    page.add(holder)
 
-        self.win.run_task(tr("library.appimage_install"), _task)
-
-    def reload(self) -> None:
-        self.group.remove_all()
-        self._fill()
+    _fill()
+    append_section_groups(page, win, "library")
+    return page

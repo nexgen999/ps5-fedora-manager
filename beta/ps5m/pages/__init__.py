@@ -8,12 +8,12 @@ from __future__ import annotations
 
 from .about import build as build_about
 from .addons import build_section
-from .appimage import LibraryPage
+from .appimage import build as build_library
 from .easy import build as build_easy
 from .fedora import build as build_fedora
-from .kernel import KernelPage
+from .kernel import build as build_kernel
 from .logs import build as build_logs
-from .repos import ReposPage
+from .repos import build as build_repos
 from .services import build as build_services
 from .ui_lang import build as build_ui_lang
 from .users import build as build_users
@@ -27,9 +27,9 @@ STATIC = (
 # Sections avec une page dédiée, dans l'ordre de la barre latérale.
 SECTIONS = (
     ("easy", build_easy),
-    ("library", LibraryPage),
-    ("repos", ReposPage),
-    ("kernel", KernelPage),
+    ("library", build_library),
+    ("repos", build_repos),
+    ("kernel", build_kernel),
     ("services", build_services),
     ("ui_lang", build_ui_lang),
     ("users", build_users),

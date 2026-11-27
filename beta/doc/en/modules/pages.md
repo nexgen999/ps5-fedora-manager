@@ -36,6 +36,16 @@ dedicated page or at least one addon.
 | `logs.py` | journal |
 | `about.py` | about, links, credits |
 
+## Rule: no widget subclassing
+
+Pages are **functions** `build(win)` and shared rows are **factories**
+(`service_row(win, unit)`, `name_dialog(parent, title, cb)`). Since GTK 4.22 /
+PyGObject 3.54 many Adwaita widgets are `final` (`Adw.SwitchRow`,
+`Adw.PreferencesPage`): deriving a Python class from them raises
+`RuntimeError: could not create new GType`. `tools/check.py` (`gtypes` group)
+rejects any `Adw.*`/`Gtk.*` subclass except `Adw.Application`,
+`Adw.ApplicationWindow` and `Adw.Window`.
+
 ## Adding a page
 
 1. Create `pages/my_page.py` with `build(win)`.

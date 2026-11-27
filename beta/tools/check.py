@@ -89,6 +89,41 @@ def check_langs() -> list[str]:
     return problems
 
 
+# Base de widgets qu'il est encore permis de dériver : PyGObject 3.54 refuse
+# toute sous-classe d'un type Adw/Gtk déclaré final (« could not create new
+# GType »), ce qui casse l'application au démarrage sans GTK pour le voir.
+ALLOWED_BASES = {"Adw.Application", "Adw.ApplicationWindow", "Adw.Window"}
+
+
+def check_gtypes() -> list[str]:
+    """Aucune sous-classe d'un widget Adw/Gtk (types finaux)."""
+    import ast
+
+    problems: list[str] = []
+    for path in sorted((ROOT / "ps5m").rglob("*.py")):
+        try:
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+        except SyntaxError as exc:
+            problems.append(f"{path.relative_to(ROOT)} : {exc}")
+            continue
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.ClassDef):
+                continue
+            for base in node.bases:
+                if not isinstance(base, ast.Attribute) or not isinstance(base.value, ast.Name):
+                    continue
+                dotted = f"{base.value.id}.{base.attr}"
+                if base.value.id not in {"Adw", "Gtk", "Gio"}:
+                    continue
+                if dotted in ALLOWED_BASES:
+                    continue
+                problems.append(
+                    f"{path.relative_to(ROOT)}:{node.lineno} : « {node.name}({dotted}) » "
+                    "dérive un type final — utilise une fabrique"
+                )
+    return problems
+
+
 def check_imports() -> list[str]:
     """Importe les modules (GTK réel si présent, factice sinon)."""
     result = subprocess.run(
@@ -109,6 +144,7 @@ def main() -> int:
         "greffons": check_addons(),
         "catalogue": check_index(),
         "langues": check_langs(),
+        "gtypes": check_gtypes(),
         "imports": check_imports(),
     }
     failed = False

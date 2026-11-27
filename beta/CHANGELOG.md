@@ -1,5 +1,24 @@
 # Journal de la bêta
 
+## [0.16.0-beta5] — 2026-11-27
+
+Premier démarrage réel sur la PS5 : deux blocages corrigés.
+
+### Corrigé
+- **Types Adwaita finaux.** `Adw.SwitchRow` et `Adw.PreferencesPage` sont
+  `final` ; PyGObject 3.54 lève `RuntimeError: could not create new GType` à
+  l'import. Les cinq pages concernées n'ont plus aucune sous-classe de widget :
+  `services.service_row()`, `appimage.build()`, `kernel.build()`,
+  `repos.build()`, `users.build()`, et `users.name_dialog()` remplacent les
+  classes. `pages/__init__.py` pointe sur les nouvelles fabriques.
+- **Contrôle anti-régression.** `tools/check.py` gagne le groupe `gtypes` :
+  toute sous-classe de `Adw.*`/`Gtk.*` hors `Adw.Application`,
+  `Adw.ApplicationWindow` et `Adw.Window` fait échouer le contrôle.
+
+### Ajouté
+- Documentation de la règle « pas de sous-classe de widget » dans
+  `doc/fr/modules/pages.md` et `doc/en/modules/pages.md`.
+
 ## [0.16.0-beta4] — 2026-11-27
 
 Quatrième étape : **couverture complète de la 0.15.11**. Toutes les options de la
