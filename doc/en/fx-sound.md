@@ -114,7 +114,7 @@ The **Audio and video codecs** row of the *Video* group.
 $ sudo dnf install -y \
     gstreamer1-plugins-good gstreamer1-plugins-bad-free \
     gstreamer1-plugins-bad-free-extras gstreamer1-plugins-ugly \
-    gstreamer1-plugins-libav gstreamer1-plugins-bad-freeworld \
+    gstreamer1-plugin-libav gstreamer1-plugins-bad-freeworld \
     gstreamer1-plugin-openh264 libavcodec-freeworld \
     lame x264-libs x265-libs
 ```
@@ -130,6 +130,9 @@ install.
 | MP3 (encoding) | `lame` |
 | x264 / x265 | `x264-libs`, `x265-libs` |
 | Full GStreamer plugins | `good`, `bad-free`, `bad-free-extras`, `libav`, `bad-freeworld` |
+
+> Since Fedora 43 the libav plugin is called `gstreamer1-plugin-libav` (singular):
+the old `gstreamer1-plugins-libav` name no longer exists and `dnf` answers "No match for argument".
 
 ## 5. FFmpeg (full codecs)
 

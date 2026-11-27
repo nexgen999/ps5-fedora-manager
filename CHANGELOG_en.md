@@ -7,6 +7,11 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.8] — 2026-11-27
+
+### Fixed
+- **Codecs stuck at 10/11 on Fedora 43 and newer.** Fedora renamed the GStreamer libav plugin to `gstreamer1-plugin-libav` (singular); the old `gstreamer1-plugins-libav` no longer exists, `dnf` answered "No match for argument" and the row stayed at 10/11. The list now uses the current name: 11/11 after installing.
+
 ## [0.15.7] — 2026-11-27
 
 ### Changed

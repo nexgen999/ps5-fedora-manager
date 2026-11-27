@@ -115,7 +115,7 @@ Ligne **Codecs audio et vidéo** du groupe *Vidéo*.
 $ sudo dnf install -y \
     gstreamer1-plugins-good gstreamer1-plugins-bad-free \
     gstreamer1-plugins-bad-free-extras gstreamer1-plugins-ugly \
-    gstreamer1-plugins-libav gstreamer1-plugins-bad-freeworld \
+    gstreamer1-plugin-libav gstreamer1-plugins-bad-freeworld \
     gstreamer1-plugin-openh264 libavcodec-freeworld \
     lame x264-libs x265-libs
 ```
@@ -131,6 +131,9 @@ l'installation.
 | MP3 (encodage) | `lame` |
 | x264 / x265 | `x264-libs`, `x265-libs` |
 | Greffons GStreamer complets | `good`, `bad-free`, `bad-free-extras`, `libav`, `bad-freeworld` |
+
+> Depuis Fedora 43, le greffon libav s'appelle `gstreamer1-plugin-libav` (singulier) :
+l'ancien nom `gstreamer1-plugins-libav` n'existe plus et `dnf` répond « Aucune correspondance ».
 
 ## 5. FFmpeg (codecs complets)
 

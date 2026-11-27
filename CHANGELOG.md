@@ -6,6 +6,11 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.8] — 2026-11-27
+
+### Corrigé
+- **Codecs : 10/11 sur Fedora 43 et plus récent.** Fedora a renommé le greffon GStreamer libav en `gstreamer1-plugin-libav` (singulier) ; l'ancien `gstreamer1-plugins-libav` n'existe plus, `dnf` répondait « Aucune correspondance pour l'argument » et la ligne restait à 10/11. La liste utilise désormais le nom actuel : 11/11 après installation.
+
 ## [0.15.7] — 2026-11-27
 
 ### Modifié
