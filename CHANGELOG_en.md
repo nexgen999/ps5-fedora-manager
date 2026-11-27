@@ -18,6 +18,9 @@ French version: [CHANGELOG.md](CHANGELOG.md)
   below the home page.
 - The application now starts on the home page (logs stay one click away, from
   the home page and from the log button of every page).
+- Home page refined after a try-out: a single PlayStation logo next to the
+  name, small Fedora and desktop logos with the system name, stable
+  version and build on a discreet line, smaller icons.
 - No change to the one-click setup: its 9-step plan does not depend on the
   sidebar sections.
 

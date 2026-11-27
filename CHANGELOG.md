@@ -18,6 +18,9 @@ Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
   groupes d'outils, inchangés, sous l'accueil.
 - L'application démarre sur l'accueil (le journal reste accessible en un clic
   depuis l'accueil et depuis le bouton journal de chaque page).
+- Page d'accueil affinée après essai : un seul logo PlayStation à côté du
+  nom, logos Fedora et bureau en petit avec le nom du système, version
+  stable et build sur une ligne discrète, icônes réduites.
 - Aucune modification du setup en 1 clic : son plan de 9 étapes ne dépend pas
   des sections de la barre latérale.
 

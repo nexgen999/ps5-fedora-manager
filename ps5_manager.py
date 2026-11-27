@@ -1092,7 +1092,7 @@ import gi  # noqa: E402
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
-from gi.repository import Adw, Gdk, Gio, GLib, Gtk  # noqa: E402
+from gi.repository import Adw, Gdk, GdkPixbuf, Gio, GLib, Gtk  # noqa: E402
 
 
 # ------------------------------------------------------------------------------
@@ -2061,6 +2061,8 @@ STRINGS = {
     "fr": {
         "app_title": "PS5 Fedora Manager",
         "sec_home": "PS5 Fedora Manager",
+        "home_stable": "Version stable %s",
+        "home_build": "build %s",
         "home_tagline": "Gestionnaire complet pour Fedora sur PlayStation 5",
         "home_version": "Version %s",
         "home_pick": "Accès rapide",
@@ -2518,6 +2520,8 @@ STRINGS = {
     "en": {
         "app_title": "PS5 Fedora Manager",
         "sec_home": "PS5 Fedora Manager",
+        "home_stable": "Stable version %s",
+        "home_build": "build %s",
         "home_tagline": "Complete manager for Fedora on PlayStation 5",
         "home_version": "Version %s",
         "home_pick": "Quick access",
@@ -2989,6 +2993,8 @@ LANG_LABELS = {
 
 STRINGS['es'] = {'app_title': 'PS5 Fedora Manager',
     'sec_home': 'PS5 Fedora Manager',
+    'home_stable': 'Versión estable %s',
+    'home_build': 'compilación %s',
     'home_tagline': 'Gestor completo para Fedora en PlayStation 5',
     'home_version': 'Versión %s',
     'home_pick': 'Acceso rápido',
@@ -3441,6 +3447,8 @@ STRINGS['es'] = {'app_title': 'PS5 Fedora Manager',
 
 STRINGS['it'] = {'app_title': 'PS5 Fedora Manager',
     'sec_home': 'PS5 Fedora Manager',
+    'home_stable': 'Versione stabile %s',
+    'home_build': 'build %s',
     'home_tagline': 'Gestore completo per Fedora su PlayStation 5',
     'home_version': 'Versione %s',
     'home_pick': 'Accesso rapido',
@@ -3889,6 +3897,8 @@ STRINGS['it'] = {'app_title': 'PS5 Fedora Manager',
 
 STRINGS['de'] = {'app_title': 'PS5 Fedora Manager',
     'sec_home': 'PS5 Fedora Manager',
+    'home_stable': 'Stabile Version %s',
+    'home_build': 'Build %s',
     'home_tagline': 'Kompletter Manager für Fedora auf der PlayStation 5',
     'home_version': 'Version %s',
     'home_pick': 'Schnellzugriff',
@@ -4337,6 +4347,8 @@ STRINGS['de'] = {'app_title': 'PS5 Fedora Manager',
 
 STRINGS['pt'] = {'app_title': 'PS5 Fedora Manager',
     'sec_home': 'PS5 Fedora Manager',
+    'home_stable': 'Versão estável %s',
+    'home_build': 'compilação %s',
     'home_tagline': 'Gestor completo para Fedora na PlayStation 5',
     'home_version': 'Versão %s',
     'home_pick': 'Acesso rápido',
@@ -7842,7 +7854,7 @@ class SystemInfoWindow(Adw.Window):
         row.set_subtitle_selectable(True)
         if icon:
             if sec_id == "home":
-                row.add_prefix(_logo_image("icon.png", 20, icon))
+                row.add_prefix(_logo_image("icon.png", 18, icon))
             else:
                 row.add_prefix(Gtk.Image.new_from_icon_name(icon))
         group.add(row)
@@ -7870,17 +7882,22 @@ def _logo_path(filename: str) -> str:
 
 
 def _logo_image(filename: str, size: int, fallback: str) -> Gtk.Widget:
-    """Logo depuis le disque s'il existe, sinon icône du thème en secours."""
+    """Logo du dossier d'installation, réduit à `size` px (icône en secours).
+
+    Gtk.Picture garde sa taille naturelle (674 × 512 pour le logo PlayStation),
+    d'où le passage par GdkPixbuf pour obtenir exactement la taille demandée.
+    """
     path = _logo_path(filename)
     if path:
-        pic = Gtk.Picture.new_for_filename(path)
-        pic.set_content_fit(Gtk.ContentFit.CONTAIN)
-        pic.set_can_shrink(True)
-        pic.set_size_request(size, size)
-        return pic
+        try:
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(path, size, size, True)
+            image = Gtk.Image.new_from_paintable(Gdk.Texture.new_for_pixbuf(pixbuf))
+            image.set_pixel_size(size)
+            return image
+        except (GLib.Error, OSError, ValueError):
+            pass
     image = Gtk.Image.new_from_icon_name(fallback)
     image.set_pixel_size(size)
-    image.set_size_request(size, size)
     return image
 
 
@@ -8111,53 +8128,68 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         header.pack_end(log_btn)
 
     def _make_home_page(self) -> Adw.NavigationPage:
-        """Accueil : logo PlayStation + Fedora, version stable et accès rapide."""
+        """Accueil : logo PlayStation, système, version stable et accès rapide."""
         toolbar = Adw.ToolbarView()
         header = Adw.HeaderBar()
         title_box = Gtk.Box(spacing=8, valign=Gtk.Align.CENTER)
-        title_box.append(_logo_image("icon.png", 22, "applications-games-symbolic"))
+        title_box.append(_logo_image("icon.png", 18, "applications-games-symbolic"))
         title_box.append(Adw.WindowTitle(title=APP_NAME))
         header.set_title_widget(title_box)
         self._pack_busy_controls(header)
         toolbar.add_top_bar(header)
 
-        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=22)
-        box.set_margin_top(34)
-        box.set_margin_bottom(34)
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=14)
+        box.set_margin_top(26)
+        box.set_margin_bottom(26)
         box.set_margin_start(18)
         box.set_margin_end(18)
 
-        hero = Gtk.Box(spacing=20, halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER)
-        hero.append(_logo_image("icon.png", 104, "applications-games-symbolic"))
-        hero.append(_logo_image("icons/fedora.png", 60, "distributor-logo-fedora"))
-        head_text = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4, valign=Gtk.Align.CENTER)
-        head_text.append(Gtk.Label(label=APP_NAME, xalign=0, css_classes=["title-1"]))
-        tagline = Gtk.Label(
-            label=T("home_tagline"), xalign=0, wrap=True, css_classes=["dim-label"]
+        # Un seul logo (PlayStation), puis le nom de l'application.
+        hero = Gtk.Box(spacing=10, halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER)
+        hero.append(_logo_image("icon.png", 40, "applications-games-symbolic"))
+        hero.append(
+            Gtk.Label(label=APP_NAME, css_classes=["title-1"], valign=Gtk.Align.CENTER)
         )
-        tagline.set_max_width_chars(42)
-        head_text.append(tagline)
-        head_text.append(
-            Gtk.Label(
-                label=T("home_version") % APP_VERSION,
-                xalign=0,
-                css_classes=["dim-label", "caption"],
-            )
-        )
-        hero.append(head_text)
         box.append(hero)
 
-        box.append(Gtk.Label(label=T("home_pick"), xalign=0, css_classes=["heading"]))
-
-        entries = (
-            ("update", "software-update-available-symbolic", "home_update_sub"),
-            ("lang", "preferences-desktop-locale-symbolic", "home_lang_sub"),
-            ("logs", "utilities-terminal-symbolic", "home_logs_sub"),
+        # Système : Fedora, environnement de bureau, version stable et build.
+        os_name, _kernel = get_os_summary()
+        env_row = Gtk.Box(spacing=6, halign=Gtk.Align.CENTER)
+        fedora_icon = _icon_image("fedora", 16)
+        if fedora_icon is not None:
+            env_row.append(fedora_icon)
+        env_row.append(Gtk.Label(label=os_name, css_classes=["caption", "dim-label"]))
+        desktop_icon = SYSTEM_ICONS.get(DESKTOP_ID)
+        if desktop_icon:
+            image = _icon_image(desktop_icon, 16)
+            if image is not None:
+                env_row.append(Gtk.Label(label="·", css_classes=["caption", "dim-label"]))
+                env_row.append(image)
+                env_row.append(
+                    Gtk.Label(
+                        label=DESKTOP_LABELS.get(DESKTOP_ID, ""),
+                        css_classes=["caption", "dim-label"],
+                    )
+                )
+        box.append(env_row)
+        box.append(
+            Gtk.Label(
+                label="%s · %s"
+                % (T("home_stable") % APP_VERSION, T("home_build") % APP_VERSION),
+                halign=Gtk.Align.CENTER,
+                css_classes=["caption", "dim-label"],
+            )
         )
+
+        # Menus de l'édition : mise à jour, langue, journal.
         quick = Gtk.ListBox()
         quick.add_css_class("boxed-list")
         quick.set_selection_mode(Gtk.SelectionMode.NONE)
-        for sec_id, icon, sub_key in entries:
+        for sec_id, icon, sub_key in (
+            ("update", "software-update-available-symbolic", "home_update_sub"),
+            ("lang", "preferences-desktop-locale-symbolic", "home_lang_sub"),
+            ("logs", "utilities-terminal-symbolic", "home_logs_sub"),
+        ):
             quick.append(
                 self.row(
                     T(f"sec_{sec_id}"),
@@ -8166,7 +8198,11 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
                     lambda *_args, s=sec_id: self._open_sub_section(s),
                 )
             )
-        box.append(quick)
+        menus = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        menus.set_margin_top(8)
+        menus.append(Gtk.Label(label=T("home_pick"), xalign=0, css_classes=["heading"]))
+        menus.append(quick)
+        box.append(menus)
 
         clamp = Adw.Clamp(maximum_size=720)
         clamp.set_child(box)
