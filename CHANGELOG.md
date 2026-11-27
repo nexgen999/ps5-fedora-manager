@@ -6,6 +6,13 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.16] — 2026-11-27
+
+### Corrigé
+- **Le raccourci réservé ignorait le 1 du pavé numérique.** Le pavé envoie
+  `KP_1` (Verr Num actif) ou `KP_End` (Verr Num inactif), pas `KEY_1` : les
+  trois variantes sont désormais reconnues, avec Ctrl.
+
 ## [0.15.15] — 2026-11-27
 
 ### Modifié

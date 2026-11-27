@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.15"
+APP_VERSION = "0.15.16"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -7858,8 +7858,12 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         self.start_auto_update()
 
     def _on_secret_shortcut(self, _controller, keyval, _keycode, state) -> bool:
-        """Ctrl+1 : menu de l'édition bêta, non documenté dans l'interface."""
-        if keyval == Gdk.KEY_1 and state & Gdk.ModifierType.CONTROL_MASK:
+        """Ctrl+1 : menu de l'édition bêta, non documenté dans l'interface.
+
+        Le 1 du pavé numérique envoie KP_1 (Verr Num actif) ou KP_End (inactif),
+        pas KEY_1 : les trois variantes sont acceptées.
+        """
+        if keyval in BETA_MENU_KEYS and state & Gdk.ModifierType.CONTROL_MASK:
             show_beta_menu(self)
             return True
         return False
@@ -9143,6 +9147,18 @@ def beta_version() -> str:
 def beta_present() -> bool:
     return os.path.isfile(os.path.join(BETA_DIR, "run.py"))
 
+
+# Touches acceptées pour le raccourci : 1 du haut, 1 du pavé numérique (Verr Num
+# actif → KP_1, inactif → KP_End).
+BETA_MENU_KEYS = tuple(
+    dict.fromkeys(
+        (
+            getattr(Gdk, "KEY_1", 0x31),
+            getattr(Gdk, "KEY_KP_1", 0xFFB1),
+            getattr(Gdk, "KEY_KP_End", 0xFFB7),
+        )
+    )
+)
 
 BETA_LOG_PATH = os.path.join(tempfile.gettempdir(), "ps5-manager-beta.log")
 

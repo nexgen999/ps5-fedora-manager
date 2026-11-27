@@ -7,6 +7,13 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.16] — 2026-11-27
+
+### Fixed
+- **The reserved shortcut ignored the keypad's 1.** The keypad sends `KP_1`
+  (Num Lock on) or `KP_End` (Num Lock off), not `KEY_1`: all three variants are
+  now accepted, with Ctrl.
+
 ## [0.15.15] — 2026-11-27
 
 ### Changed
