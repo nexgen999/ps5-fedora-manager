@@ -12,6 +12,8 @@ All scripts live in `beta/tools/` and run from the repository root.
 | `python3 beta/tools/lang_status.py --missing xx` | keys missing from a language |
 | `python3 beta/tools/docs.py` | regenerate `doc/{fr,en}/addons.md` |
 | `python3 beta/tools/new_addon.py` | create an addon from a few options |
+| `python3 beta/tools/import_check.py` | import every module (real or stubbed GTK) |
+| `python3 beta/tools/compare_stable.py` | compare `ps5_manager.py` options with the addons |
 
 ## Example: new addon
 

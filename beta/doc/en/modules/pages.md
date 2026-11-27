@@ -26,7 +26,7 @@ dedicated page or at least one addon.
 |---|---|
 | `addons.py` | generic section from the catalog |
 | `easy.py` | recommended chain (repos → codecs → gaming) |
-| `services.py` | `systemctl enable/disable --now` through `pkexec` |
+| `services.py` | one `systemctl show` call per service (presence + state), toggle through `pkexec`, polkit dismissal (code 126) is not an error |
 | `ui_lang.py` | language switch + translation coverage |
 | `users.py` | human accounts and groups (read-only) |
 | `fedora.py` | installed release, kernel, `dnf check-update` |

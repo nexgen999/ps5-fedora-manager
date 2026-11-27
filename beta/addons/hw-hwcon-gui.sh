@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 #@ id: hw-hwcon-gui
-#@ version: 1.0.0
+#@ version: 1.0.1
 #@ section: hardware
 #@ icon: applications-system-symbolic
 #@ title: Hardware Control GUI
 #@ title_fr: Hardware Control (interface)
-#@ desc: PyQt6 interface for the PS5 fan and LED controller.
-#@ desc_fr: Interface PyQt6 pour le contrôleur de ventilateur et de LED.
+#@ desc: PyQt6 interface for the PS5 fan and LED controller (installs PyQt6).
+#@ desc_fr: Interface PyQt6 pour le contrôleur de ventilateur et de LED (installe PyQt6).
 #@ check_paths: /opt/ps5-hwcon-gui/src/pyproject.toml
+#@ packages: python3-PyQt6
 #@ root: yes
 set -euo pipefail
 

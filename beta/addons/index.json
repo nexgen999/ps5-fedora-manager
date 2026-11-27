@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated": "2026-11-27T04:14:07Z",
+  "generated": "2026-11-27T04:32:15Z",
   "addons": [
     {
       "id": "ai-ollama",
@@ -231,6 +231,31 @@
       "sha256": "717fbd58ef273532b819d1d7980d10437e7d764f95e861099d086aca2592b3c5"
     },
     {
+      "id": "deps-32bit",
+      "version": "1.0.0",
+      "file": "deps-32bit.sh",
+      "section": "deps",
+      "icon": "video-display-symbolic",
+      "titles": {
+        "fr": "Bibliothèques graphiques 32 bits",
+        "en": "32-bit graphics stack"
+      },
+      "descriptions": {
+        "fr": "Nécessaires à Steam et aux jeux 32 bits sous Fedora.",
+        "en": "Needed by Steam and 32-bit games on Fedora."
+      },
+      "packages": [
+        "mesa-vulkan-drivers.i686",
+        "mesa-dri-drivers.i686",
+        "libva.i686"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "224a4c3cd9c7b9ed5837786037a6077b2dcf1d60ea77565e243471b7fae3a946"
+    },
+    {
       "id": "deps-build",
       "version": "1.0.0",
       "file": "deps-build.sh",
@@ -259,6 +284,30 @@
       "sha256": "9abc68e4101dc82b370b6107d6783bb187db5bb37e07aeda1d933f6cf036c921"
     },
     {
+      "id": "deps-fuse",
+      "version": "1.0.0",
+      "file": "deps-fuse.sh",
+      "section": "deps",
+      "icon": "application-x-addon-symbolic",
+      "titles": {
+        "fr": "Pile FUSE",
+        "en": "FUSE stack"
+      },
+      "descriptions": {
+        "fr": "fusermount et libfuse pour les AppImage et les runtimes Flatpak.",
+        "en": "fusermount and libfuse for AppImages and Flatpak runtimes."
+      },
+      "packages": [
+        "fuse",
+        "fuse-libs"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "dce6606e63e69d3221183937b9d44a118e30835897e9d0c1077f1238f3ef9292"
+    },
+    {
       "id": "deps-network",
       "version": "1.0.0",
       "file": "deps-network.sh",
@@ -283,6 +332,53 @@
       "action": false,
       "root": true,
       "sha256": "e31d3f94ad11b2ca6cf98c4583ce8b23dd482ec09faf70680cf6bb7c59b8ec78"
+    },
+    {
+      "id": "deps-node",
+      "version": "1.0.0",
+      "file": "deps-node.sh",
+      "section": "deps",
+      "icon": "text-x-script-symbolic",
+      "titles": {
+        "fr": "Node.js et npm",
+        "en": "Node.js and npm"
+      },
+      "descriptions": {
+        "fr": "Environnement JavaScript et gestionnaire de paquets.",
+        "en": "JavaScript runtime and package manager."
+      },
+      "packages": [
+        "nodejs",
+        "npm"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "639261ec0d6cf57f6896cfa5211b6e95d4f7e25671b5dc96153f8f4f6d090de4"
+    },
+    {
+      "id": "deps-tkinter",
+      "version": "1.0.0",
+      "file": "deps-tkinter.sh",
+      "section": "deps",
+      "icon": "text-x-python-symbolic",
+      "titles": {
+        "fr": "Python Tkinter",
+        "en": "Python Tkinter"
+      },
+      "descriptions": {
+        "fr": "Bindings Tk pour les scripts Python à interface graphique.",
+        "en": "Tk bindings for Python GUI scripts."
+      },
+      "packages": [
+        "python3-tkinter"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "0842951a1939d0bdbd5b211f51419f5b9536818fc3f508094e5778581a72d9fa"
     },
     {
       "id": "dev-git-tools",
@@ -579,7 +675,7 @@
     },
     {
       "id": "hw-hwcon-gui",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "file": "hw-hwcon-gui.sh",
       "section": "hardware",
       "icon": "applications-system-symbolic",
@@ -588,17 +684,19 @@
         "en": "Hardware Control GUI"
       },
       "descriptions": {
-        "fr": "Interface PyQt6 pour le contrôleur de ventilateur et de LED.",
-        "en": "PyQt6 interface for the PS5 fan and LED controller."
+        "fr": "Interface PyQt6 pour le contrôleur de ventilateur et de LED (installe PyQt6).",
+        "en": "PyQt6 interface for the PS5 fan and LED controller (installs PyQt6)."
       },
-      "packages": [],
+      "packages": [
+        "python3-PyQt6"
+      ],
       "needs": [],
       "check_paths": [
         "/opt/ps5-hwcon-gui/src/pyproject.toml"
       ],
       "action": false,
       "root": true,
-      "sha256": "dadf7bca1c7b4b8950e663705570a223f5c3b7df97d074e2a709513c60fb4ce7"
+      "sha256": "d55988c8c87686ddfa23708728b712fdd8ef13968a3dc71b46cec007098a8505"
     },
     {
       "id": "kernel-headers",
@@ -877,6 +975,29 @@
       "action": false,
       "root": true,
       "sha256": "56b742735a1b86c394df029dea5ffa1b2844813c1004b9757c36897d6d73799f"
+    },
+    {
+      "id": "mesa-tools",
+      "version": "1.0.0",
+      "file": "mesa-tools.sh",
+      "section": "mesa",
+      "icon": "video-display-symbolic",
+      "titles": {
+        "fr": "Outils de diagnostic Mesa",
+        "en": "Mesa diagnostic tools"
+      },
+      "descriptions": {
+        "fr": "glxinfo, eglinfo et les démos Mesa.",
+        "en": "glxinfo, eglinfo and the Mesa demos."
+      },
+      "packages": [
+        "mesa-demos"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "4d040cb58f96e29211f4dd2ffb0285f7e62257992d609de7b4493f3c36679d38"
     },
     {
       "id": "mesa-vulkan",

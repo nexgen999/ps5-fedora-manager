@@ -20,8 +20,12 @@ Chaque option de l'application est un script `.sh` autonome dans `beta/addons/`.
 
 | Greffon | Version | Paquets | État |
 |---|---|---|---|
+| **deps-32bit** (`deps-32bit`) | 1.0.0 | `mesa-vulkan-drivers.i686`, `mesa-dri-drivers.i686`, `libva.i686` | paquets RPM et/ou chemins |
 | **deps-build** (`deps-build`) | 1.0.0 | `gcc`, `gcc-c++`, `make`, `kernel-devel`, `dkms`, `openssl-devel` | paquets RPM et/ou chemins |
+| **deps-fuse** (`deps-fuse`) | 1.0.0 | `fuse`, `fuse-libs` | paquets RPM et/ou chemins |
 | **deps-network** (`deps-network`) | 1.0.0 | `curl`, `wget`, `rsync`, `openssh-clients` | paquets RPM et/ou chemins |
+| **deps-node** (`deps-node`) | 1.0.0 | `nodejs`, `npm` | paquets RPM et/ou chemins |
+| **deps-tkinter** (`deps-tkinter`) | 1.0.0 | `python3-tkinter` | paquets RPM et/ou chemins |
 
 ## Dépôts
 
@@ -57,6 +61,7 @@ Chaque option de l'application est un script `.sh` autonome dans `beta/addons/`.
 | Greffon | Version | Paquets | État |
 |---|---|---|---|
 | **mesa-freeworld** (`mesa-freeworld`) | 1.0.0 | `mesa-va-drivers-freeworld`, `mesa-vdpau-drivers-freeworld` | paquets RPM et/ou chemins |
+| **mesa-tools** (`mesa-tools`) | 1.0.0 | `mesa-demos` | paquets RPM et/ou chemins |
 | **mesa-vulkan** (`mesa-vulkan`) | 1.0.0 | `vulkan-tools`, `vulkan-loader-devel` | paquets RPM et/ou chemins |
 
 ## IA & développeur
@@ -100,7 +105,7 @@ Chaque option de l'application est un script `.sh` autonome dans `beta/addons/`.
 |---|---|---|---|
 | **hw-decky-loader** (`hw-decky-loader`) | 1.0.0 | — | paquets RPM et/ou chemins |
 | **hw-decky-ps5-plugin** (`hw-decky-ps5-plugin`) | 1.0.0 | — | paquets RPM et/ou chemins |
-| **hw-hwcon-gui** (`hw-hwcon-gui`) | 1.0.0 | — | paquets RPM et/ou chemins |
+| **hw-hwcon-gui** (`hw-hwcon-gui`) | 1.0.1 | `python3-PyQt6` | paquets RPM et/ou chemins |
 
 ## Mises à jour
 
@@ -165,4 +170,4 @@ Chaque option de l'application est un script `.sh` autonome dans `beta/addons/`.
 
 Contrat : `--check` renvoie 0 si l'option est déjà installée. Sans paquets, sans chemins et sans `action`, `tools/check.py` refuse le greffon.
 
-_46 addons, 19 sections._
+_51 addons, 19 sections._

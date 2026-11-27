@@ -6,7 +6,7 @@ The interface has no hard-coded strings: everything goes through
 `i18n.tr("key")`. Translations live in `beta/langs/*.json`, one file per
 language.
 
-Shipped: `fr`, `en`, `es`, `it`, `de`, `pt` — 78 keys each.
+Shipped: `fr`, `en`, `es`, `it`, `de`, `pt` — 81 keys each.
 
 ## Adding a language
 

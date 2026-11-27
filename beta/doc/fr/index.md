@@ -23,6 +23,8 @@ PS5M_LANG=en python3 beta/run.py   # forcer la langue de départ
 | [environnements.md](environnements.md) | GNOME, KDE, Cinnamon, Budgie, générique |
 | [outils.md](outils.md) | scripts de contrôle et de génération |
 | [contribuer.md](contribuer.md) | ajouter une option, une page, un test |
+| [ce qui manque](manques-0.15.11.md) | écart avec la 0.15.11, section par section |
+| [comparaison](comparaison-0.15.11.md) | tableaux générés, option par option |
 | [../TASKS.md](../TASKS.md) | ce qui est fait, ce qui reste |
 
 ## Trois règles

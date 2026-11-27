@@ -286,15 +286,20 @@ class BetaWindow(Adw.ApplicationWindow):
 
         threading.Thread(target=_worker, daemon=True).start()
 
-    def run_background(self, task: Callable[[], tuple[bool, str]], done) -> None:
-        """Lance une action courte sans fenêtre de log (interrupteurs, services)."""
+    def run_background(self, task: Callable[[], tuple], done) -> None:
+        """Lance une action courte sans fenêtre de log (interrupteurs, services).
+
+        `task` renvoie `(ok, message)` ou `(ok, message, *détails)` : le tuple est
+        transmis tel quel à `done`, ce qui laisse une page distinguer une
+        annulation d'une vraie erreur (page Services).
+        """
 
         def _worker() -> None:
             try:
-                ok, message = task()
+                result = task()
             except Exception as exc:  # noqa: BLE001
-                ok, message = False, str(exc)
-            GLib.idle_add(done, ok, message)
+                result = (False, str(exc))
+            GLib.idle_add(done, *result)
 
         threading.Thread(target=_worker, daemon=True).start()
 

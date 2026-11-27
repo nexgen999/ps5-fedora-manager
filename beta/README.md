@@ -21,6 +21,8 @@ PS5M_LANG=en python3 beta/run.py    # langue de départ forcée
 | [environnements](doc/fr/environnements.md) | [environments](doc/en/environments.md) |
 | [outils](doc/fr/outils.md) | [tools](doc/en/tools.md) |
 | [contribuer](doc/fr/contribuer.md) | [contributing](doc/en/contributing.md) |
+| [ce qui manque](doc/fr/manques-0.15.11.md) | [what is missing](doc/en/gaps-0.15.11.md) |
+| [comparaison complète](doc/fr/comparaison-0.15.11.md) | [full comparison](doc/en/comparison-0.15.11.md) |
 | [TASKS.md](TASKS.md) — fait / à faire | [TASKS.md](TASKS.md) |
 
 ## Trois principes
@@ -44,14 +46,14 @@ beta/
 │   ├── system.py     état rpm / chemins
 │   ├── journal.py · ui.py
 ├── addons/           un .sh par option + index.json généré
-├── langs/            6 langues, 78 clés
+├── langs/            6 langues, 81 clés
 ├── doc/fr · doc/en/  documentation
 └── tools/            build_catalog, check, lang_status, selftest, docs, new_addon
 ```
 
 ## Sections
 
-24 sections, 46 greffons. Les sections sans page dédiée utilisent la page
+24 sections, 51 greffons. Les sections sans page dédiée utilisent la page
 générique (une ligne par greffon, pastille, confirmation, installation) :
 
 `library` `aidev` `dev` `websrv` `deps` `repos` `gaming` `audio` `video`
@@ -83,6 +85,8 @@ python3 beta/tools/check.py                   # greffons + catalogue + langues
 python3 beta/tools/selftest.py                # logique, sans GTK
 python3 beta/tools/lang_status.py             # couverture des langues
 python3 beta/tools/docs.py                    # doc des greffons
+python3 beta/tools/import_check.py            # imports (GTK réel ou factice)
+python3 beta/tools/compare_stable.py          # écart avec la 0.15.11
 ```
 
 ## Limites connues

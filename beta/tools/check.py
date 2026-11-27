@@ -89,11 +89,27 @@ def check_langs() -> list[str]:
     return problems
 
 
+def check_imports() -> list[str]:
+    """Importe les modules (GTK réel si présent, factice sinon)."""
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "tools" / "import_check.py")],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode == 0:
+        return []
+    output = (result.stdout or "") + (result.stderr or "")
+    lines = [line.rstrip() for line in output.splitlines() if line.strip()]
+    return ["imports : échec"] + [f"  {line}" for line in lines[-25:]]
+
+
 def main() -> int:
     groups = {
         "greffons": check_addons(),
         "catalogue": check_index(),
         "langues": check_langs(),
+        "imports": check_imports(),
     }
     failed = False
     for name, problems in groups.items():

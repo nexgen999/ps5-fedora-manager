@@ -29,7 +29,8 @@ See [languages.md](languages.md).
 python3 -m py_compile $(find beta -name '*.py')
 for f in beta/addons/*.sh; do bash -n "$f"; done
 python3 beta/tools/build_catalog.py --check
-python3 beta/tools/check.py
+python3 beta/tools/check.py          # includes the import test
+python3 beta/tools/compare_stable.py  # what is still missing
 python3 beta/tools/selftest.py
 ```
 

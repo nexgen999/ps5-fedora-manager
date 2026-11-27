@@ -5,7 +5,7 @@
 L'interface ne contient aucune chaîne en dur : tout passe par `i18n.tr("clé")`.
 Les traductions vivent dans `beta/langs/*.json`, un fichier par langue.
 
-Langues livrées : `fr`, `en`, `es`, `it`, `de`, `pt` — 78 clés chacune.
+Langues livrées : `fr`, `en`, `es`, `it`, `de`, `pt` — 81 clés chacune.
 
 ## Ajouter une langue
 

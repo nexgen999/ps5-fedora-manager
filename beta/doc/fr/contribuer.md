@@ -30,7 +30,8 @@ Voir [langues.md](langues.md).
 python3 -m py_compile $(find beta -name '*.py')
 for f in beta/addons/*.sh; do bash -n "$f"; done
 python3 beta/tools/build_catalog.py --check
-python3 beta/tools/check.py
+python3 beta/tools/check.py          # inclut le test d'imports
+python3 beta/tools/compare_stable.py  # ce qui manque encore
 python3 beta/tools/selftest.py
 ```
 

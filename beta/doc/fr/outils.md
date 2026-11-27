@@ -13,6 +13,8 @@ dépôt.
 | `python3 beta/tools/lang_status.py --missing xx` | clés absentes d'une langue |
 | `python3 beta/tools/docs.py` | régénère `doc/{fr,en}/addons.md` |
 | `python3 beta/tools/new_addon.py` | crée un greffon à partir de quelques options |
+| `python3 beta/tools/import_check.py` | importe tous les modules (GTK réel ou factice) |
+| `python3 beta/tools/compare_stable.py` | compare les options de `ps5_manager.py` aux greffons |
 
 ## Exemple : nouvel addon
 

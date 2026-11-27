@@ -26,7 +26,7 @@ auxquelles correspondent une page dédiée ou au moins un greffon.
 |---|---|
 | `addons.py` | section générique depuis le catalogue |
 | `easy.py` | enchaînement recommandé (dépôts → codecs → jeu) |
-| `services.py` | `systemctl enable/disable --now` via `pkexec` |
+| `services.py` | un appel `systemctl show` par service (présence + état), bascule via `pkexec`, annulation polkit (code 126) sans erreur |
 | `ui_lang.py` | changement de langue + couverture des traductions |
 | `users.py` | comptes humains et groupes (lecture seule) |
 | `fedora.py` | version installée, noyau, `dnf check-update` |

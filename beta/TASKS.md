@@ -3,7 +3,7 @@
 Fichier de travail : il liste ce qui est **fait**, ce qui **reste**, et comment
 reprendre. Mise à jour à chaque étape livrée.
 
-Version : **0.16.0-beta2** — la stable reste **0.15.11**.
+Version : **0.16.0-beta3** — la stable reste **0.15.11**.
 
 ---
 
@@ -21,7 +21,7 @@ Version : **0.16.0-beta2** — la stable reste **0.15.11**.
 - [x] Convention d'en-tête `#@` (`id`, `version`, `section`, `icon`,
       `title`/`title_fr`, `desc`/`desc_fr`, `packages`, `check_paths`, `needs`,
       `action`, `root`).
-- [x] 46 scripts `.sh` couvrant les 24 sections de la stable.
+- [x] 51 scripts `.sh` couvrant les 24 sections de la stable.
 - [x] `addons/index.json` généré (version + SHA-256).
 - [x] Mise à jour sélective (`catalog.refresh`) : seuls les scripts dont la
       version augmente sont téléchargés, empreinte vérifiée, écriture atomique.
@@ -33,7 +33,9 @@ Version : **0.16.0-beta2** — la stable reste **0.15.11**.
 - [x] Page générique : pastilles `●`/`◐`/`○`, infobulle nommant le manquant,
       tri par dépendances, confirmation, log en direct.
 - [x] `easy` : enchaînement recommandé (dépôts → codecs → jeu).
-- [x] `services` : interrupteurs `systemctl enable/disable --now` via `pkexec`.
+- [x] `services` : un seul `systemctl show` par service (présence + `UnitFileState`),
+      bascule `pkexec`, annulation polkit (code 126) sans erreur ni pastille fausse,
+      services statiques et absents neutralisés.
 - [x] `ui_lang` : changement de langue à chaud + couverture des traductions.
 - [x] `users` : comptes humains, groupes, lecture seule.
 - [x] `fedora` : version, noyau, dnf, `dnf check-update`.
@@ -60,9 +62,13 @@ Version : **0.16.0-beta2** — la stable reste **0.15.11**.
 ### Vérifications
 
 - [x] `py_compile` sur tout `beta/`.
-- [x] `bash -n` sur les 46 scripts.
+- [x] `bash -n` sur les 51 scripts.
 - [x] `tools/check.py` : greffons, catalogue, langues.
 - [x] `tools/selftest.py` : 40 vérifications sans GTK.
+- [x] `tools/import_check.py` : 25 modules importés (GTK réel si présent, factice sinon),
+      intégré à `tools/check.py`.
+- [x] `tools/compare_stable.py` : 149 options de la 0.15.11 comparées aux greffons,
+      `doc/fr/comparaison-0.15.11.md` + `doc/en/comparison-0.15.11.md` générés.
 
 ---
 
@@ -78,8 +84,17 @@ Version : **0.16.0-beta2** — la stable reste **0.15.11**.
 
 ### Contenu
 
-- [ ] Porter les sous-options plus fines de la stable qui n'ont pas encore de
-      script dédié (au-delà des 46 livrés).
+- [ ] Porter le catalogue Développement (`dev-build`, `dev-python-gtk`,
+      `dev-containers`, `dev-virt`, `dev-rust`, `dev-cli-search`, `dev-terminal`,
+      `dev-diagnostic`, `dev-debug`, `dev-python-quality`, `dev-data`,
+      `dev-automation`, `dev-editors`) — 75 paquets, liste dans
+      [doc/fr/manques-0.15.11.md](doc/fr/manques-0.15.11.md).
+- [ ] `web-certbot` (Let's Encrypt) et `web-openssh` ; PHP / MySQL / phpMyAdmin /
+      Adminer / Webmin en `install` + `remove`.
+- [ ] Actions non-install listées dans [doc/fr/manques-0.15.11.md](doc/fr/manques-0.15.11.md) :
+      « effacer » le journal, AppImage, pile Open WebUI, profils `easy`, gestion des
+      dépôts, 10 actions de maintenance, statut/relance du ventilateur,
+      vérification/désinstallation du matériel, `fix-steam`, « tout installer » en langues.
 - [ ] Étendre `easy` : profils (bureautique, gaming, streaming).
 - [ ] Sauvegarde / restauration des réglages.
 - [ ] Export du journal en fichier.

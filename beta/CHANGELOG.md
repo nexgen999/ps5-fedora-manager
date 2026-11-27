@@ -1,5 +1,39 @@
 # Journal de la bêta
 
+## [0.16.0-beta3] — 2026-11-27
+
+Troisième étape : fiabilisation de la page Services, test d'imports, comparaison
+automatique avec la 0.15.11.
+
+### Page Services
+- Un seul appel `systemctl show -p LoadState -p UnitFileState` par service :
+  présence et état d'activation lus ensemble, plus de double interrogation.
+- Annulation de la demande polkit (code 126) : l'interrupteur revient à sa
+  position, aucun message d'erreur, sous-titre rechargé depuis le système.
+- Services absents (`not-found`) et statiques (`static`, `indirect`, `alias`)
+  neutralisés avec un sous-titre explicite.
+- `run_background` transmet désormais un tuple de résultat variable, ce qui
+  permet de distinguer une annulation d'une erreur.
+
+### Test d'imports sans affichage
+- `tools/import_check.py` importe les 25 modules : GTK réel quand `gi` est
+  présent (PS5), `gi` factice sinon (machine de développement, CI). Il vérifie
+  aussi que `Gtk 4.0` et `Adw 1` sont bien demandés.
+- Intégré à `tools/check.py` : `imports : ok` fait partie des contrôles.
+
+### Comparaison avec la stable
+- `tools/compare_stable.py` lit `ps5_manager.py` par AST (sections,
+  `build_page_*`, `DEV_CATALOG` / `WEB_CATALOG`, paquets des `dnf install`) et
+  génère `doc/fr/comparaison-0.15.11.md` + `doc/en/comparison-0.15.11.md`.
+- Analyse écrite : `doc/fr/manques-0.15.11.md` et `doc/en/gaps-0.15.11.md`
+  (149 options lues, 51 greffons, ce qui reste à porter et les choix assumés).
+
+### Greffons
+- 51 greffons : ajout de `deps-fuse`, `deps-32bit`, `deps-tkinter`, `deps-node`,
+  `mesa-tools` ; `hw-hwcon-gui` 1.0.1 déclare `python3-PyQt6`.
+- 3 clés ajoutées (`services.subtitle`, `services.cancelled`, `services.static`),
+  81 clés × 6 langues.
+
 ## [0.16.0-beta2] — 2026-11-27
 
 Deuxième étape : la bêta couvre désormais toutes les sections de la stable.

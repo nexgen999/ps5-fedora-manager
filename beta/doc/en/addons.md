@@ -29,8 +29,12 @@ Every option is a self-contained `.sh` script in `beta/addons/`. This table is *
 
 | Addon | Version | Packages | State |
 |---|---|---|---|
+| **deps-32bit** (`deps-32bit`) | 1.0.0 | `mesa-vulkan-drivers.i686`, `mesa-dri-drivers.i686`, `libva.i686` | RPM packages and/or paths |
 | **deps-build** (`deps-build`) | 1.0.0 | `gcc`, `gcc-c++`, `make`, `kernel-devel`, `dkms`, `openssl-devel` | RPM packages and/or paths |
+| **deps-fuse** (`deps-fuse`) | 1.0.0 | `fuse`, `fuse-libs` | RPM packages and/or paths |
 | **deps-network** (`deps-network`) | 1.0.0 | `curl`, `wget`, `rsync`, `openssh-clients` | RPM packages and/or paths |
+| **deps-node** (`deps-node`) | 1.0.0 | `nodejs`, `npm` | RPM packages and/or paths |
+| **deps-tkinter** (`deps-tkinter`) | 1.0.0 | `python3-tkinter` | RPM packages and/or paths |
 
 ## Development
 
@@ -65,6 +69,7 @@ Every option is a self-contained `.sh` script in `beta/addons/`. This table is *
 | Addon | Version | Packages | State |
 |---|---|---|---|
 | **mesa-freeworld** (`mesa-freeworld`) | 1.0.0 | `mesa-va-drivers-freeworld`, `mesa-vdpau-drivers-freeworld` | RPM packages and/or paths |
+| **mesa-tools** (`mesa-tools`) | 1.0.0 | `mesa-demos` | RPM packages and/or paths |
 | **mesa-vulkan** (`mesa-vulkan`) | 1.0.0 | `vulkan-tools`, `vulkan-loader-devel` | RPM packages and/or paths |
 
 ## Hardware
@@ -73,7 +78,7 @@ Every option is a self-contained `.sh` script in `beta/addons/`. This table is *
 |---|---|---|---|
 | **hw-decky-loader** (`hw-decky-loader`) | 1.0.0 | — | RPM packages and/or paths |
 | **hw-decky-ps5-plugin** (`hw-decky-ps5-plugin`) | 1.0.0 | — | RPM packages and/or paths |
-| **hw-hwcon-gui** (`hw-hwcon-gui`) | 1.0.0 | — | RPM packages and/or paths |
+| **hw-hwcon-gui** (`hw-hwcon-gui`) | 1.0.1 | `python3-PyQt6` | RPM packages and/or paths |
 
 ## Kernel
 
@@ -165,4 +170,4 @@ Every option is a self-contained `.sh` script in `beta/addons/`. This table is *
 
 Contract: `--check` exits 0 when the option is already installed. Without packages, paths or `action`, `tools/check.py` rejects it.
 
-_46 addons, 19 sections._
+_51 addons, 19 sections._
