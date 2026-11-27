@@ -7,6 +7,16 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.0] — 2026-11-27
+
+### Added
+- **“FX Sound” section** (`audio-volume-high-symbolic` icon, right after *Services*): installs **Easy Effects** (`dnf install easyeffects`) and then the **JackHack96 community presets**, each row with its status badge (● installed / ○ not installed) and the number of presets found in `~/.local/share/easyeffects`.
+- Preset installation **answers `1` automatically** to the official script's menu (every preset: Perfect EQ, bass, Dolby Atmos, laptop speaker, impulse responses); the script runs as the **desktop account**, not root.
+- **Documentation** `doc/fr/fx-sound.md` and `doc/en/fx-sound.md`: exact commands, option 1 contents, written files, checks, troubleshooting and uninstall; `doc/` index updated.
+
+### Changed
+- `SECTIONS` and `PAGE_BUILDERS` now include the `fx` section; `sec_fx` and the new labels are translated in all 6 languages and the “About” release notes are up to date.
+
 ## [0.14.0] — 2026-11-26
 
 ### Added

@@ -6,6 +6,7 @@
 | [serveur-web.md](serveur-web.md) | Apache, Nginx, PHP, MariaDB/MySQL, phpMyAdmin, Adminer, Certbot |
 | [developpement.md](developpement.md) | Outils de compilation, Python/GTK4, Docker, Forgejo, GitHub Desktop |
 | [services.md](services.md) | Interrupteurs on/off, unités systemd, gain de mémoire et de CPU |
+| [fx-sound.md](fx-sound.md) | FX Sound : Easy Effects et les presets communautaires JackHack96 |
 | [gamescope.md](gamescope.md) | Scripts Gamescope externes (GNOME, KDE, Cinnamon, Budgie) |
 | [freebuff.md](freebuff.md) | Installation et lancement de Freebuff (CLI npm) |
 | [reinitialisation.md](reinitialisation.md) | Désinstallation, nettoyage des configurations, cache DNF |

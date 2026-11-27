@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.14.0"
+APP_VERSION = "0.15.0"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1119,16 +1119,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.14.0",
-    "en": "What is new in 0.14.0",
-    "es": "Novedades de la 0.14.0",
-    "it": "Novità della 0.14.0",
-    "de": "Neu in 0.14.0",
-    "pt": "Novidades da 0.14.0",
+    "fr": "Nouveautés de la 0.15.0",
+    "en": "What is new in 0.15.0",
+    "es": "Novedades de la 0.15.0",
+    "it": "Novità della 0.15.0",
+    "de": "Neu in 0.15.0",
+    "pt": "Novidades da 0.15.0",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15 : section « FX Sound » — installation d'Easy Effects et des presets communautaires JackHack96 (option 1 : tous les presets), avec pastilles d'état et documentation FR/EN dédiée",
         "0.14 : pastilles d'état (installé / partiel / absent) sur les catalogues et les profils, nouvelle section « Services » avec interrupteurs on/off systemd et raccourci pour couper bluetooth, CUPS, Avahi et ModemManager, et une documentation FR/EN complète dans le dossier doc/",
         "0.13 : six profils d'installation (dont WordPress et tout-en-un), quinze options de configuration (port HTTP, mémoire et envoi PHP, fuseau, certificat Let's Encrypt, port et compte admin Forgejo) et un outil de réinitialisation qui désinstalle les composants et efface les configurations du manager",
         "0.12 : section « Installation facile » — profils LAMP, LEMP, Code &amp; outils et Conteneurs, avec choix des composants, configuration (ServerName, dossier web, base de données) et la même fenêtre de progression que le setup 1 clic, qui reste inchangé",
@@ -1148,6 +1149,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15: “FX Sound” section — install Easy Effects and the JackHack96 community presets (option 1: all presets), with status badges and dedicated FR/EN documentation",
         "0.14: status badges (installed / partial / missing) on the catalogues and profiles, a new “Services” section with systemd on/off switches and a shortcut to turn off bluetooth, CUPS, Avahi and ModemManager, and complete FR/EN documentation in the doc/ folder",
         "0.13: six setup profiles (including WordPress and all-in-one), fifteen configuration options (HTTP port, PHP memory and upload size, timezone, Let's Encrypt certificate, Forgejo port and admin account) and a reset tool that uninstalls components and clears the manager's configuration files",
         "0.12: “Easy setup” section — LAMP, LEMP, Code &amp; tools and Containers profiles, with component selection, configuration (ServerName, web root, database) and the same progress window as the 1-click setup, which stays unchanged",
@@ -1167,6 +1169,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15 : sección «FX Sound» — instalación de Easy Effects y de los presets comunitarios de JackHack96 (opción 1: todos los presets), con indicadores de estado y documentación FR/EN dedicada",
         "0.14 : indicadores de estado (instalado / parcial / ausente) en los catálogos y perfiles, nueva sección «Servicios» con interruptores on/off de systemd y un atajo para apagar bluetooth, CUPS, Avahi y ModemManager, y documentación completa FR/EN en la carpeta doc/",
         "0.13 : seis perfiles de instalación (incluidos WordPress y todo en uno), quince opciones de configuración (puerto HTTP, memoria y subida PHP, zona horaria, certificado Let's Encrypt, puerto y cuenta admin de Forgejo) y una herramienta de restablecimiento que desinstala componentes y borra las configuraciones del gestor",
         "0.12 : sección «Instalación fácil» — perfiles LAMP, LEMP, Código y herramientas y Contenedores, con selección de componentes, configuración (ServerName, carpeta web, base de datos) y la misma ventana de progreso que la configuración en 1 clic, que no cambia",
@@ -1186,6 +1189,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15 : sezione «FX Sound» — installazione di Easy Effects e dei preset della community di JackHack96 (opzione 1: tutti i preset), con indicatori di stato e documentazione FR/EN dedicata",
         "0.14 : indicatori di stato (installato / parziale / assente) nei cataloghi e nei profili, nuova sezione «Servizi» con interruttori on/off systemd e una scorciatoia per spegnere bluetooth, CUPS, Avahi e ModemManager, e documentazione completa FR/EN nella cartella doc/",
         "0.13 : sei profili di installazione (inclusi WordPress e tutto in uno), quindici opzioni di configurazione (porta HTTP, memoria e upload PHP, fuso orario, certificato Let's Encrypt, porta e account admin Forgejo) e uno strumento di ripristino che disinstalla i componenti e cancella le configurazioni del gestore",
         "0.12 : sezione «Installazione facile» — profili LAMP, LEMP, Codice e strumenti e Contenitori, con scelta dei componenti, configurazione (ServerName, cartella web, database) e la stessa finestra di avanzamento della configurazione in 1 clic, che resta invariata",
@@ -1205,6 +1209,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15 : Abschnitt „FX Sound“ – Installation von Easy Effects und den Community-Presets von JackHack96 (Option 1: alle Presets), mit Statusanzeigen und eigener FR/EN-Dokumentation",
         "0.14 : Statusanzeigen (installiert / teilweise / fehlend) in den Katalogen und Profilen, neuer Abschnitt „Dienste“ mit systemd-Ein/Aus-Schaltern und einer Abkürzung zum Abschalten von Bluetooth, CUPS, Avahi und ModemManager sowie vollständige FR/EN-Dokumentation im Ordner doc/",
         "0.13 : sechs Installationsprofile (darunter WordPress und Alles-in-einem), fünfzehn Konfigurationsoptionen (HTTP-Port, PHP-Speicher und Upload-Größe, Zeitzone, Let's-Encrypt-Zertifikat, Forgejo-Port und Admin-Konto) und ein Zurücksetzen-Werkzeug, das Komponenten deinstalliert und die Konfigurationsdateien des Managers entfernt",
         "0.12 : Abschnitt „Einfache Installation“ – Profile LAMP, LEMP, Code &amp; Werkzeuge und Container mit Komponentenauswahl, Konfiguration (ServerName, Webverzeichnis, Datenbank) und demselben Fortschrittsfenster wie das 1-Klick-Setup, das unverändert bleibt",
@@ -1224,6 +1229,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15 : secção «FX Sound» — instalação do Easy Effects e dos presets da comunidade de JackHack96 (opção 1: todos os presets), com indicadores de estado e documentação FR/EN dedicada",
         "0.14 : indicadores de estado (instalado / parcial / ausente) nos catálogos e perfis, nova secção «Serviços» com interruptores on/off do systemd e um atalho para desligar bluetooth, CUPS, Avahi e ModemManager, e documentação completa FR/EN na pasta doc/",
         "0.13 : seis perfis de instalação (incluindo WordPress e tudo-em-um), quinze opções de configuração (porta HTTP, memória e upload PHP, fuso horário, certificado Let's Encrypt, porta e conta admin do Forgejo) e uma ferramenta de reposição que desinstala componentes e apaga as configurações do gestor",
         "0.12 : secção «Instalação fácil» — perfis LAMP, LEMP, Código e ferramentas e Contêineres, com escolha de componentes, configuração (ServerName, pasta web, base de dados) e a mesma janela de progresso da configuração em 1 clique, que se mantém igual",
@@ -1993,6 +1999,7 @@ STRINGS = {
         "sec_web": "Serveur web",
         "sec_easy": "Installation facile",
         "sec_services": "Services (marche/arrêt)",
+        "sec_fx": "FX Sound",
         "sec_deps": "Dépendances Supplémentaires",
         "sec_gaming": "Gaming Mode",
         "sec_fix": "Divers Fix",
@@ -2442,6 +2449,7 @@ STRINGS = {
         "sec_web": "Web server",
         "sec_easy": "Easy setup",
         "sec_services": "Services (on/off)",
+        "sec_fx": "FX Sound",
         "sec_deps": "Additional Dependencies",
         "sec_gaming": "Gaming Mode",
         "sec_fix": "Misc Fixes",
@@ -2904,6 +2912,7 @@ STRINGS['es'] = {'app_title': 'PS5 Fedora Manager',
  'sec_web': 'Servidor web',
  'sec_easy': 'Instalación fácil',
  'sec_services': 'Servicios (encendido/apagado)',
+ 'sec_fx': 'Sonido FX',
  'sec_deps': 'Dependencias adicionales',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Arreglos varios',
@@ -3348,6 +3357,7 @@ STRINGS['it'] = {'app_title': 'PS5 Fedora Manager',
  'sec_web': 'Server web',
  'sec_easy': 'Installazione facile',
  'sec_services': 'Servizi (on/off)',
+ 'sec_fx': 'Audio FX',
  'sec_deps': 'Dipendenze aggiuntive',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Correzioni varie',
@@ -3788,6 +3798,7 @@ STRINGS['de'] = {'app_title': 'PS5 Fedora Manager',
  'sec_web': 'Webserver',
  'sec_easy': 'Einfache Installation',
  'sec_services': 'Dienste (ein/aus)',
+ 'sec_fx': 'FX-Sound',
  'sec_deps': 'Zusätzliche Abhängigkeiten',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Diverse Korrekturen',
@@ -4228,6 +4239,7 @@ STRINGS['pt'] = {'app_title': 'PS5 Fedora Manager',
  'sec_web': 'Servidor web',
  'sec_easy': 'Instalação fácil',
  'sec_services': 'Serviços (ligar/desligar)',
+ 'sec_fx': 'Som FX',
  'sec_deps': 'Dependências adicionais',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Correções diversas',
@@ -5689,6 +5701,7 @@ SECTIONS = [
     ("websrv", "network-server-symbolic", "sec_web", 1),
     ("easy", "preferences-other-symbolic", "sec_easy", 1),
     ("services", "system-run-symbolic", "sec_services", 1),
+    ("fx", "audio-volume-high-symbolic", "sec_fx", 1),
     ("deps", "application-x-addon-symbolic", "sec_deps", 1),
     ("gaming", "input-gaming-symbolic", "sec_gaming", 1),
     ("features", "application-x-executable-symbolic", "sec_features", 1),
@@ -7003,6 +7016,90 @@ _L_TABLE = {
         "Unità systemd non trovata: il componente non è installato.",
         "systemd-Unit nicht gefunden: die Komponente ist nicht installiert.",
         "Unidade systemd não encontrada: o componente não está instalado.",
+    ),
+    "Effets audio (FX Sound)": (
+        "Efectos de audio (FX Sound)",
+        "Effetti audio (FX Sound)",
+        "Audioeffekte (FX Sound)",
+        "Efeitos de áudio (FX Sound)",
+    ),
+    "Easy Effects applique un égaliseur, une réduction de bruit et des effets Dolby Atmos au son de la PS5 via PipeWire.": (
+        "Easy Effects aplica un ecualizador, reducción de ruido y efectos Dolby Atmos al sonido de la PS5 a través de PipeWire.",
+        "Easy Effects applica un equalizzatore, riduzione del rumore ed effetti Dolby Atmos all'audio della PS5 tramite PipeWire.",
+        "Easy Effects wendet über PipeWire einen Equalizer, Rauschunterdrückung und Dolby-Atmos-Effekte auf den PS5-Ton an.",
+        "O Easy Effects aplica um equalizador, redução de ruído e efeitos Dolby Atmos ao som da PS5 através do PipeWire.",
+    ),
+    "Égaliseur, réduction de bruit, Dolby Atmos (paquet easyeffects)": (
+        "Ecualizador, reducción de ruido, Dolby Atmos (paquete easyeffects)",
+        "Equalizzatore, riduzione del rumore, Dolby Atmos (pacchetto easyeffects)",
+        "Equalizer, Rauschunterdrückung, Dolby Atmos (Paket easyeffects)",
+        "Equalizador, redução de ruído, Dolby Atmos (pacote easyeffects)",
+    ),
+    "Installer Easy Effects": (
+        "Instalar Easy Effects",
+        "Installa Easy Effects",
+        "Easy Effects installieren",
+        "Instalar o Easy Effects",
+    ),
+    "dnf installe Easy Effects ; l'application apparaît dans le menu des applications.": (
+        "dnf instala Easy Effects; la aplicación aparece en el menú de aplicaciones.",
+        "dnf installa Easy Effects; l'applicazione compare nel menu delle applicazioni.",
+        "dnf installiert Easy Effects; die Anwendung erscheint im Anwendungsmenü.",
+        "O dnf instala o Easy Effects; a aplicação aparece no menu de aplicações.",
+    ),
+    "Presets communautaires (JackHack96)": (
+        "Presets comunitarios (JackHack96)",
+        "Preset della community (JackHack96)",
+        "Community-Presets (JackHack96)",
+        "Presets da comunidade (JackHack96)",
+    ),
+    "%d presets installés · option 1 (tout)": (
+        "%d presets instalados · opción 1 (todo)",
+        "%d preset installati · opzione 1 (tutto)",
+        "%d Presets installiert · Option 1 (alle)",
+        "%d presets instalados · opção 1 (tudo)",
+    ),
+    "Aucun preset installé · script JackHack96, option 1 (tout)": (
+        "Ningún preset instalado · script de JackHack96, opción 1 (todo)",
+        "Nessun preset installato · script di JackHack96, opzione 1 (tutto)",
+        "Keine Presets installiert · JackHack96-Skript, Option 1 (alle)",
+        "Nenhum preset instalado · script do JackHack96, opção 1 (tudo)",
+    ),
+    "Installer les presets communautaires (option 1 : tout)": (
+        "Instalar los presets comunitarios (opción 1: todo)",
+        "Installa i preset della community (opzione 1: tutto)",
+        "Community-Presets installieren (Option 1: alle)",
+        "Instalar os presets da comunidade (opção 1: tudo)",
+    ),
+    "Le script officiel télécharge tous les presets (option 1) : Perfect EQ, basses, Dolby Atmos, haut-parleur de portable… Installation dans ~/.local/share/easyeffects.": (
+        "El script oficial descarga todos los presets (opción 1): Perfect EQ, graves, Dolby Atmos, altavoz de portátil… Instalación en ~/.local/share/easyeffects.",
+        "Lo script ufficiale scarica tutti i preset (opzione 1): Perfect EQ, bassi, Dolby Atmos, altoparlante del portatile… Installazione in ~/.local/share/easyeffects.",
+        "Das offizielle Skript lädt alle Presets (Option 1): Perfect EQ, Bässe, Dolby Atmos, Laptop-Lautsprecher… Installation in ~/.local/share/easyeffects.",
+        "O script oficial descarrega todos os presets (opção 1): Perfect EQ, graves, Dolby Atmos, altifalante do portátil… Instalação em ~/.local/share/easyeffects.",
+    ),
+    "Les presets sont installés pour le compte de bureau, pas pour root.": (
+        "Los presets se instalan para la cuenta de escritorio, no para root.",
+        "I preset vengono installati per l'account del desktop, non per root.",
+        "Die Presets werden für das Desktop-Konto installiert, nicht für root.",
+        "Os presets são instalados para a conta do ambiente de trabalho, não para root.",
+    ),
+    "Ouvre Easy Effects puis choisis un preset dans l'onglet « Presets ».": (
+        "Abre Easy Effects y elige un preset en la pestaña «Presets».",
+        "Apri Easy Effects e scegli un preset nella scheda «Presets».",
+        "Öffne Easy Effects und wähle ein Preset im Tab „Presets“.",
+        "Abre o Easy Effects e escolhe um preset no separador «Presets».",
+    ),
+    "Aucun effet n'est appliqué tant qu'Easy Effects ne tourne pas.": (
+        "Ningún efecto se aplica mientras Easy Effects no esté en ejecución.",
+        "Nessun effetto viene applicato finché Easy Effects non è in esecuzione.",
+        "Es wird kein Effekt angewendet, solange Easy Effects nicht läuft.",
+        "Nenhum efeito é aplicado enquanto o Easy Effects não estiver em execução.",
+    ),
+    "Easy Effects est déjà installé.": (
+        "Easy Effects ya está instalado.",
+        "Easy Effects è già installato.",
+        "Easy Effects ist bereits installiert.",
+        "O Easy Effects já está instalado.",
     ),
 }
 
@@ -13850,6 +13947,178 @@ def build_page_services(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> Non
     page.add(actions)
 
 
+# ------------------------------------------------------------------------------
+# FX Sound : Easy Effects et presets communautaires (JackHack96)
+# ------------------------------------------------------------------------------
+EASYEFFECTS_PRESETS_URL = (
+    "https://raw.githubusercontent.com/JackHack96/EasyEffects-Presets/master/install.sh"
+)
+
+
+def _fx_presets_dir() -> str:
+    """Dossier des presets Easy Effects de l'utilisateur de bureau (jamais /root)."""
+    home = REAL_HOME if (REAL_HOME and REAL_HOME != "/root") else os.path.expanduser("~")
+    return os.path.join(home, ".local", "share", "easyeffects")
+
+
+def _fx_preset_count() -> int:
+    """Nombre de presets déjà installés (sortie + entrée)."""
+    base = _fx_presets_dir()
+    total = 0
+    for sub in ("output", "input"):
+        try:
+            names = os.listdir(os.path.join(base, sub))
+        except OSError:
+            continue
+        total += sum(1 for name in names if name.endswith(".json"))
+    return total
+
+
+def build_page_fx(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
+    """FX Sound : installation d'Easy Effects et des presets communautaires."""
+    installed = _dev_rpm_ok("easyeffects")
+    presets = _fx_preset_count()
+
+    def _install_easyeffects() -> None:
+        def _done(ok: bool, msg: str) -> None:
+            if ok:
+                win._select_section("fx")
+            else:
+                win.toast(msg)
+
+        win.run_task(
+            "dnf install easyeffects",
+            lambda emit: (
+                win.run_cmd_pty(["dnf", "install", "-y", "easyeffects"], emit) == 0,
+                T("done"),
+            ),
+            _done,
+        )
+
+    def _install_presets() -> None:
+        # Le script de JackHack96 affiche un menu 1 → 8 : « 1 » installe tout.
+        cmd = (
+            "printf '1\\n' | bash <(curl -fsSL "
+            f"{EASYEFFECTS_PRESETS_URL})"
+        )
+
+        def _done(ok: bool, msg: str) -> None:
+            if ok:
+                win._select_section("fx")
+            else:
+                win.toast(msg)
+
+        win.run_task(
+            _L(
+                "Installer les presets communautaires (option 1 : tout)",
+                "Install community presets (option 1: all)",
+            ),
+            lambda emit: (win.run_cmd_pty(cmd, emit, as_user=True) == 0, T("done")),
+            _done,
+        )
+
+    grp = pref_group(
+        title=_L("Effets audio (FX Sound)", "Audio effects (FX Sound)"),
+        description=_L(
+            "Easy Effects applique un égaliseur, une réduction de bruit et des effets "
+            "Dolby Atmos au son de la PS5 via PipeWire.",
+            "Easy Effects applies an equalizer, noise reduction and Dolby Atmos "
+            "effects to the PS5 sound through PipeWire.",
+        ),
+    )
+
+    def _on_easyeffects(*_args: Any) -> None:
+        if _dev_rpm_ok("easyeffects"):
+            win.toast(_L("Easy Effects est déjà installé.", "Easy Effects is already installed."))
+            return
+        win.show_confirm(
+            _L("Installer Easy Effects", "Install Easy Effects"),
+            _L(
+                "dnf installe Easy Effects ; l'application apparaît dans le menu des applications.",
+                "dnf installs Easy Effects; the app appears in the applications menu.",
+            ),
+            _install_easyeffects,
+            destructive=False,
+        )
+
+    easy_row = win.row(
+        "Easy Effects",
+        _L(
+            "Égaliseur, réduction de bruit, Dolby Atmos (paquet easyeffects)",
+            "Equalizer, noise reduction, Dolby Atmos (easyeffects package)",
+        ),
+        "audio-x-generic-symbolic",
+        _on_easyeffects,
+        suffix_icon=None,
+    )
+    badge = _status_badge(1 if installed else 0, 1)
+    if badge is not None:
+        easy_row.add_suffix(badge)
+    easy_row.add_suffix(Gtk.Image.new_from_icon_name("go-next-symbolic"))
+    grp.add(easy_row)
+
+    presets_row = win.row(
+        _L("Presets communautaires (JackHack96)", "Community presets (JackHack96)"),
+        (
+            _L("%d presets installés · option 1 (tout)",
+               "%d presets installed · option 1 (all)") % presets
+            if presets
+            else _L(
+                "Aucun preset installé · script JackHack96, option 1 (tout)",
+                "No preset installed · JackHack96 script, option 1 (all)",
+            )
+        ),
+        "folder-music-symbolic",
+        lambda *_: win.show_confirm(
+            _L(
+                "Installer les presets communautaires (option 1 : tout)",
+                "Install community presets (option 1: all)",
+            ),
+            _L(
+                "Le script officiel télécharge tous les presets (option 1) : Perfect EQ, "
+                "basses, Dolby Atmos, haut-parleur de portable… Installation dans "
+                "~/.local/share/easyeffects.",
+                "The official script downloads every preset (option 1): Perfect EQ, "
+                "bass, Dolby Atmos, laptop speaker… Installed in "
+                "~/.local/share/easyeffects.",
+            ),
+            _install_presets,
+            destructive=False,
+        ),
+        suffix_icon=None,
+    )
+    pbadge = _status_badge(1 if presets else 0, 1)
+    if pbadge is not None:
+        presets_row.add_suffix(pbadge)
+    presets_row.add_suffix(Gtk.Image.new_from_icon_name("go-next-symbolic"))
+    grp.add(presets_row)
+    page.add(grp)
+
+    notes = pref_group(title=_L("Bon à savoir", "Good to know"), description="")
+    notes.add(plain_row(
+        Adw.ActionRow,
+        title=_L(
+            "Les presets sont installés pour le compte de bureau, pas pour root.",
+            "Presets are installed for the desktop account, not for root.",
+        ),
+    ))
+    notes.add(plain_row(
+        Adw.ActionRow,
+        title=_L(
+            "Ouvre Easy Effects puis choisis un preset dans l'onglet « Presets ».",
+            "Open Easy Effects, then pick a preset in the “Presets” tab.",
+        ),
+    ))
+    notes.add(plain_row(
+        Adw.ActionRow,
+        title=_L(
+            "Aucun effet n'est appliqué tant qu'Easy Effects ne tourne pas.",
+            "No effect is applied while Easy Effects is not running.",
+        ),
+    ))
+    page.add(notes)
+
+
 def build_page_easy(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     grp = pref_group(
         title=T("sec_easy"),
@@ -13962,6 +14231,7 @@ PAGE_BUILDERS = {
     "websrv": build_page_web,
     "easy": build_page_easy,
     "services": build_page_services,
+    "fx": build_page_fx,
     "deps": build_page_deps,
     "gaming": build_page_gaming,
     "features": build_page_features,

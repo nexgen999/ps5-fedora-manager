@@ -6,6 +6,16 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.0] — 2026-11-27
+
+### Ajouté
+- **Section « FX Sound »** (icône `audio-volume-high-symbolic`, juste après *Services*) : installation d'**Easy Effects** (`dnf install easyeffects`) puis des **presets communautaires JackHack96**, chaque ligne avec sa pastille d'état (● installé / ○ non installé) et le nombre de presets détectés dans `~/.local/share/easyeffects`.
+- L'installation des presets **répond automatiquement `1`** au menu du script officiel (tous les presets : Perfect EQ, basses, Dolby Atmos, haut-parleur de portable, réponses impulsionnelles) ; le script tourne avec l'identité du **compte de bureau**, pas de root.
+- **Documentation** `doc/fr/fx-sound.md` et `doc/en/fx-sound.md` : commandes exactes, contenu de l'option 1, fichiers écrits, vérifications, dépannage et désinstallation ; index `doc/` mis à jour.
+
+### Modifié
+- `SECTIONS` et `PAGE_BUILDERS` accueillent la section `fx` ; `sec_fx` et les nouveaux libellés sont traduits dans les 6 langues et les notes de version de la boîte « À propos » sont à jour.
+
 ## [0.14.0] — 2026-11-26
 
 ### Ajouté
