@@ -6,6 +6,28 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.14] — 2026-11-27
+
+### Corrigé
+- **La bêta s'arrêtait au démarrage (`code 1`).** Deux causes, toutes deux
+  visibles seulement avec un vrai PyGObject :
+  1. `RuntimeError: could not create new GType … (subclass of AdwSwitchRow)` :
+     libadwaita déclare `Adw.SwitchRow` et `Adw.PreferencesPage` **finaux**, et
+     PyGObject 3.54 refuse désormais d'en dériver une classe Python. Les pages
+     Services, Logithèque, Noyau, Dépôts et Utilisateurs construisent
+     maintenant leurs lignes et leurs pages par des fabriques
+     (`service_row()`, `build(win)`), sans aucune sous-classe de widget.
+  2. `Authorization required, but no authorization protocol specified` : le
+     cookie X de root (`/root/.Xauthority`, 0600) n'est pas lisible par
+     l'utilisateur. Le lanceur exécute `xhost +SI:localuser:<utilisateur>`
+     avant de démarrer la bêta, ce qui autorise l'affichage par UID (X11 et
+     Xwayland), et le journal indique si l'accès a été accordé.
+
+### Ajouté
+- `beta/tools/check.py` refuse maintenant toute sous-classe d'un widget
+  Adw/Gtk (`gtypes`), pour que cette erreur ne puisse plus revenir sans être
+  vue : elle n'apparaît qu'avec GTK réel, jamais avec le GTK factice.
+
 ## [0.15.13] — 2026-11-27
 
 ### Corrigé

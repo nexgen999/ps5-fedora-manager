@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.13"
+APP_VERSION = "0.15.14"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1133,6 +1133,7 @@ _RELEASE_NOTES_TITLE = {
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15.14 : la bêta s'ouvre enfin — plus de sous-classe des widgets Adwaita déclarés finaux (Adw.SwitchRow, Adw.PreferencesPage) que PyGObject 3.54 refuse, et autorisation X11 de l'utilisateur par `xhost +SI:localuser` pour que GTK ne s'arrête plus sur « Authorization required »",
         "0.15.13 : le lancement de la bêta est fiabilisé et devient visible — environnement de session nettoyé (HOME, XDG_RUNTIME_DIR, XAUTHORITY, bus), repli X11 automatique, vérification de GTK4/libadwaita avant démarrage, journal dans /tmp/ps5-manager-beta.log et option « Lancer dans un terminal »",
         "0.15.12 : nouvelle option « Installer et essayer la version bêta » dans la mise à jour du manager — elle récupère la bêta du dépôt et la lance en tant qu'utilisateur, sans toucher à la version stable",
         "0.15.11 : traductions complètes de la page Services et de la réinitialisation (7 textes qui restaient en anglais) et lien « Historique complet » dans À propos",
@@ -1166,6 +1167,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15.14: the beta finally opens — no more subclassing of Adwaita widgets declared final (Adw.SwitchRow, Adw.PreferencesPage), which PyGObject 3.54 rejects, and X11 access granted to the user through `xhost +SI:localuser` so GTK no longer stops on “Authorization required”",
         "0.15.13: launching the beta is now reliable and visible — cleaned session environment (HOME, XDG_RUNTIME_DIR, XAUTHORITY, bus), automatic X11 fallback, a GTK4/libadwaita check before starting, a log in /tmp/ps5-manager-beta.log and a “Launch in a terminal” option",
         "0.15.12: new “Install and try the beta release” option in the manager update page — it fetches the beta from the repository and launches it as your user, without touching the stable version",
         "0.15.11: full translations for the Services page and the reset section (7 texts that stayed English) and a “Full changelog” link in About",
@@ -1199,6 +1201,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15.14 : la beta ya se abre — sin subclases de widgets Adwaita declarados finales (Adw.SwitchRow, Adw.PreferencesPage), que PyGObject 3.54 rechaza, y con acceso X11 del usuario mediante `xhost +SI:localuser` para que GTK no se detenga en «Authorization required»",
         "0.15.13 : el inicio de la beta es más fiable y visible — entorno de sesión limpio (HOME, XDG_RUNTIME_DIR, XAUTHORITY, bus), repliegue automático a X11, comprobación de GTK4/libadwaita antes de arrancar, registro en /tmp/ps5-manager-beta.log y opción «Ejecutar en un terminal»",
         "0.15.12 : nueva opción «Instalar y probar la versión beta» en la actualización del gestor — descarga la beta del repositorio y la inicia como tu usuario, sin tocar la versión estable",
         "0.15.11 : traducciones completas de la página Servicios y de la reinicialización (7 textos que seguían en inglés) y enlace «Historial completo» en Acerca de",
@@ -1232,6 +1235,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15.14 : la beta finalmente si apre — niente più sottoclassi di widget Adwaita dichiarati finali (Adw.SwitchRow, Adw.PreferencesPage), che PyGObject 3.54 rifiuta, e accesso X11 dell'utente tramite `xhost +SI:localuser` così GTK non si ferma più su «Authorization required»",
         "0.15.13 : l'avvio della beta è più affidabile e visibile — ambiente di sessione ripulito (HOME, XDG_RUNTIME_DIR, XAUTHORITY, bus), fallback automatico a X11, controllo di GTK4/libadwaita prima dell'avvio, registro in /tmp/ps5-manager-beta.log e opzione «Avvia in un terminale»",
         "0.15.12 : nuova opzione «Installa e prova la versione beta» nell'aggiornamento del gestore — scarica la beta dal repository e la avvia come utente, senza toccare la versione stabile",
         "0.15.11 : traduzioni complete della pagina Servizi e della reimpostazione (7 testi rimasti in inglese) e link «Cronologia completa» in Informazioni",
@@ -1265,6 +1269,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15.14 : die Beta öffnet sich endlich – keine Unterklassen von als final deklarierten Adwaita-Widgets mehr (Adw.SwitchRow, Adw.PreferencesPage), die PyGObject 3.54 ablehnt, und X11-Zugriff für den Benutzer über `xhost +SI:localuser`, damit GTK nicht mehr an „Authorization required“ scheitert",
         "0.15.13 : der Start der Beta ist zuverlässiger und sichtbar – bereinigte Sitzungsumgebung (HOME, XDG_RUNTIME_DIR, XAUTHORITY, Bus), automatischer X11-Fallback, GTK4/libadwaita-Prüfung vor dem Start, Protokoll in /tmp/ps5-manager-beta.log und Option „Im Terminal starten“",
         "0.15.12 : neue Option „Beta-Version installieren und ausprobieren“ in der Manager-Aktualisierung – lädt die Beta aus dem Repository und startet sie als Benutzer, ohne die stabile Version anzutasten",
         "0.15.11 : vollständige Übersetzungen für die Dienste-Seite und das Zurücksetzen (7 Texte waren noch englisch) und ein Link „Vollständiger Verlauf“ im Über-Fenster",
@@ -1298,6 +1303,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15.14 : a beta abre finalmente — sem subclasses de widgets Adwaita declarados finais (Adw.SwitchRow, Adw.PreferencesPage), que o PyGObject 3.54 recusa, e com acesso X11 do utilizador via `xhost +SI:localuser` para o GTK deixar de parar em «Authorization required»",
         "0.15.13 : o arranque da beta é mais fiável e visível — ambiente de sessão limpo (HOME, XDG_RUNTIME_DIR, XAUTHORITY, bus), recurso automático a X11, verificação de GTK4/libadwaita antes de arrancar, registo em /tmp/ps5-manager-beta.log e opção «Executar num terminal»",
         "0.15.12 : nova opção «Instalar e experimentar a versão beta» na atualização do gestor — obtém a beta do repositório e inicia-a como utilizador, sem tocar na versão estável",
         "0.15.11 : traduções completas da página Serviços e da reposição (7 textos que ficavam em inglês) e ligação «Histórico completo» em Sobre",
@@ -9175,12 +9181,37 @@ def beta_preflight(timeout: float = 20.0) -> tuple[bool, str]:
     return proc.returncode == 0, detail or f"code {proc.returncode}"
 
 
+def _grant_x_access() -> bool:
+    """Autorise l'utilisateur réel sur le serveur X (X11 comme Xwayland).
+
+    Le cookie de root est dans /root/.Xauthority (0600) : sans cette
+    autorisation par UID, GTK échoue avec « Authorization required, but no
+    authorization protocol specified » et aucune fenêtre ne s'ouvre.
+    """
+    if REAL_USER == "root" or not os.environ.get("DISPLAY"):
+        return False
+    xhost = shutil.which("xhost") or "/usr/bin/xhost"
+    if not os.path.exists(xhost):
+        return False
+    try:
+        result = subprocess.run(
+            [xhost, f"+SI:localuser:{REAL_USER}"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return result.returncode == 0
+
+
 def spawn_beta(backend: str = "") -> Any:
     """Lance beta/run.py en tant qu'utilisateur réel, sortie dans BETA_LOG_PATH."""
     entry = os.path.join(BETA_DIR, "run.py")
     if not os.path.isfile(entry) or REAL_USER == "root":
         return None
     env = _beta_env()
+    x_granted = _grant_x_access()
     if backend:
         env["GDK_BACKEND"] = backend
     cmd = [sys.executable, entry]
@@ -9189,7 +9220,10 @@ def spawn_beta(backend: str = "") -> Any:
     except OSError:
         log = None  # type: ignore[assignment]
     if log is not None:
-        log.write(f"[beta] {' '.join(cmd)} — backend={backend or 'auto'} — uid={REAL_UID}\n".encode())
+        log.write(
+            f"[beta] {' '.join(cmd)} — backend={backend or 'auto'} — uid={REAL_UID}"
+            f" — accès X={'accordé' if x_granted else 'non accordé'}\n".encode()
+        )
         log.flush()
     try:
         proc = subprocess.Popen(

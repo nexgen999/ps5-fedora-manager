@@ -7,6 +7,28 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.14] — 2026-11-27
+
+### Fixed
+- **The beta stopped on startup (`code 1`).** Two causes, both visible only
+  with a real PyGObject:
+  1. `RuntimeError: could not create new GType … (subclass of AdwSwitchRow)`:
+     libadwaita declares `Adw.SwitchRow` and `Adw.PreferencesPage` **final**,
+     and PyGObject 3.54 now refuses to derive a Python class from them.
+     Services, Applications, Kernel, Repositories and Users pages now build
+     their rows and pages through factories (`service_row()`, `build(win)`),
+     with no widget subclass at all.
+  2. `Authorization required, but no authorization protocol specified`: root's
+     X cookie (`/root/.Xauthority`, 0600) cannot be read by the user. The
+     launcher now runs `xhost +SI:localuser:<user>` before starting the beta,
+     which authorises the display by UID (X11 and Xwayland), and the log says
+     whether access was granted.
+
+### Added
+- `beta/tools/check.py` now rejects any Adw/Gtk widget subclass (`gtypes`), so
+  this error can no longer come back unseen: it only appears with real GTK,
+  never with the stub.
+
 ## [0.15.13] — 2026-11-27
 
 ### Fixed
