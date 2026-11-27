@@ -50,12 +50,11 @@ def _install(win, addon: catalog.Addon) -> None:
     win.run_task(f"{addon.title(win.language)} {addon.version}", _task)
 
 
-def build_section(win, section: str) -> Gtk.Widget:
-    page = Adw.PreferencesPage()
-    group = Adw.PreferencesGroup()
-    group.set_title(tr(f"section.{section}"))
-    group.set_description(tr("catalog.subtitle"))
-
+def append_section_groups(page: Adw.PreferencesPage, win, section: str) -> None:
+    """Ajoute à `page` les groupes de greffons d'une section (page dédiée)."""
+    group = Adw.PreferencesGroup(
+        title=tr(f"section.{section}"), description=tr("catalog.subtitle")
+    )
     addons = [a for a in win.addons.values() if a.section == section]
     for addon in catalog.order(addons):
         done, total = (0, 0) if addon.action else _state(addon)
@@ -68,6 +67,10 @@ def build_section(win, section: str) -> Gtk.Widget:
         )
         row.set_tooltip_text(f"{addon.id} · v{addon.version}")
         group.add(row)
-
     page.add(group)
+
+
+def build_section(win, section: str) -> Gtk.Widget:
+    page = Adw.PreferencesPage()
+    append_section_groups(page, win, section)
     return page

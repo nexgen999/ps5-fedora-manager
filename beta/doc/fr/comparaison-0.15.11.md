@@ -6,27 +6,27 @@ Généré par `tools/compare_stable.py` à partir de `ps5_manager.py` et de `add
 |---|---|---|---|
 | `logs` | 4 | 0 | 0 |
 | `library` | 7 | 4 | 0 |
-| `aidev` | 15 | 2 | 0 |
-| `dev` | 20 | 2 | 74 |
-| `websrv` | 13 | 3 | 4 |
+| `aidev` | 15 | 10 | 0 |
+| `dev` | 20 | 15 | 0 |
+| `websrv` | 13 | 5 | 0 |
 | `easy` | 4 | 0 | 0 |
-| `services` | 1 | 0 | 0 |
+| `services` | 1 | 1 | 0 |
 | `fx` | 8 | 4 | 0 |
-| `deps` | 11 | 6 | 0 |
-| `gaming` | 3 | 3 | 0 |
-| `features` | 6 | 2 | 0 |
-| `update` | 2 | 2 | 1 |
-| `lang` | 3 | 6 | 0 |
-| `repos` | 11 | 2 | 0 |
+| `deps` | 11 | 9 | 0 |
+| `gaming` | 3 | 5 | 0 |
+| `features` | 6 | 7 | 0 |
+| `update` | 2 | 3 | 1 |
+| `lang` | 3 | 7 | 0 |
+| `repos` | 11 | 4 | 0 |
 | `users` | 5 | 0 | 0 |
 | `fedora` | 4 | 0 | 0 |
-| `maint` | 11 | 3 | 0 |
+| `maint` | 11 | 11 | 0 |
 | `power` | 2 | 2 | 0 |
-| `fan` | 3 | 1 | 0 |
-| `hw` | 6 | 3 | 0 |
-| `mesa` | 4 | 3 | 0 |
-| `kernel` | 5 | 2 | 0 |
-| `fix` | 1 | 1 | 0 |
+| `fan` | 3 | 3 | 0 |
+| `hw` | 6 | 6 | 0 |
+| `mesa` | 4 | 6 | 0 |
+| `kernel` | 5 | 3 | 0 |
+| `fix` | 1 | 2 | 0 |
 | `ui_lang` | 0 | 0 | 0 |
 
 ## `logs` → logs
@@ -90,8 +90,16 @@ Groupes : Outils & Applications IA / Dev · Contrôle des services IA · Modèle
 
 | Greffon bêta | Version | Paquets |
 |---|---|---|
+| **ai-clean** (`ai-clean`) | 1.0.0 | — |
+| **ai-diagnostic** (`ai-diagnostic`) | 1.0.0 | — |
+| **ai-logs** (`ai-logs`) | 1.0.0 | — |
+| **ai-models** (`ai-models`) | 1.0.0 | — |
 | **ai-ollama** (`ai-ollama`) | 1.0.0 | — |
+| **ai-openwebui** (`ai-openwebui`) | 1.0.0 | `podman` |
 | **ai-python** (`ai-python`) | 1.0.0 | `python3`, `python3-pip`, `python3-virtualenv`, `python3-notebook` |
+| **ai-start** (`ai-start`) | 1.0.0 | — |
+| **ai-status** (`ai-status`) | 1.0.0 | — |
+| **ai-stop** (`ai-stop`) | 1.0.0 | — |
 
 Tous les paquets de la stable sont couverts.
 
@@ -122,10 +130,23 @@ Tous les paquets de la stable sont couverts.
 
 | Greffon bêta | Version | Paquets |
 |---|---|---|
-| **dev-git-tools** (`dev-git-tools`) | 1.0.0 | `git`, `git-lfs`, `gh` |
+| **dev-automation** (`dev-automation`) | 1.0.0 | `just`, `direnv`, `shellcheck` |
+| **dev-build** (`dev-build`) | 1.0.0 | `gcc`, `gcc-c++`, `make`, `cmake`, `meson`, `ninja-build`, `pkgconf-pkg-config`, `autoconf`, `automake`, `libtool`, `patch`, `rpmdevtools`, `rpmlint` |
+| **dev-cli-search** (`dev-cli-search`) | 1.0.0 | `ripgrep`, `fd-find`, `bat`, `eza`, `fzf`, `zoxide` |
+| **dev-containers** (`dev-containers`) | 1.0.0 | `podman`, `podman-docker`, `buildah`, `skopeo`, `distrobox`, `toolbox` |
+| **dev-data** (`dev-data`) | 1.0.0 | `jq`, `yq`, `httpie`, `sqlite`, `sqlitebrowser` |
+| **dev-debug** (`dev-debug`) | 1.0.0 | `gdb`, `lldb`, `valgrind`, `heaptrack`, `sysprof` |
+| **dev-diagnostic** (`dev-diagnostic`) | 1.0.0 | `lsof`, `strace`, `ltrace`, `sysstat`, `perf`, `ncdu`, `duf`, `hyperfine` |
+| **dev-editors** (`dev-editors`) | 1.0.0 | `neovim`, `helix` |
+| **dev-git-tools** (`dev-git-tools`) | 1.1.0 | `git`, `git-lfs`, `gh`, `glab`, `lazygit`, `git-delta` |
 | **dev-python** (`dev-python`) | 1.0.0 | `python3-devel`, `python3-debugpy`, `python3-flake8`, `python3-black` |
+| **dev-python-gtk** (`dev-python-gtk`) | 1.0.0 | `python3-devel`, `python3-pip`, `python3-virtualenv`, `python3-pytest`, `gobject-introspection-devel`, `gtk4-devel`, `libadwaita-devel`, `libsecret-devel`, `blueprint-compiler`, `desktop-file-utils`, `appstream`, `gtk4-devel-tools`, `devhelp` |
+| **dev-python-quality** (`dev-python-quality`) | 1.0.0 | `uv`, `ruff`, `mypy`, `pre-commit` |
+| **dev-rust** (`dev-rust`) | 1.0.0 | `rust`, `cargo`, `rustfmt`, `clippy` |
+| **dev-terminal** (`dev-terminal`) | 1.0.0 | `tmux`, `zellij` |
+| **dev-virt** (`dev-virt`) | 1.0.0 | `qemu-kvm`, `libvirt`, `virt-install`, `virt-manager`, `virt-viewer`, `gnome-boxes`, `edk2-ovmf`, `swtpm`, `swtpm-tools` |
 
-Paquets de la stable sans équivalent dans les greffons : `cmake`, `meson`, `ninja-build`, `pkgconf-pkg-config`, `autoconf`, `automake`, `libtool`, `patch`, `rpmdevtools`, `rpmlint`, `python3-pytest`, `gobject-introspection-devel`, `gtk4-devel`, `libadwaita-devel`, `libsecret-devel`, `blueprint-compiler`, `desktop-file-utils`, `appstream`, `gtk4-devel-tools`, `devhelp`, `podman`, `podman-docker`, `buildah`, `skopeo`, `distrobox`, `qemu-kvm`, `libvirt`, `virt-install`, `virt-manager`, `virt-viewer`, `gnome-boxes`, `edk2-ovmf`, `swtpm`, `swtpm-tools`, `rust`, `cargo`, `rustfmt`, `clippy`, `ripgrep`, `fd-find`, `bat`, `eza`, `fzf`, `zoxide`, `glab`, `lazygit`, `git-delta`, `tmux`, `ncdu`, `duf`, `hyperfine`, `lsof`, `strace`, `ltrace`, `sysstat`, `perf`, `gdb`, `lldb`, `valgrind`, `heaptrack`, `sysprof`, `ruff`, `mypy`, `pre-commit`, `jq`, `yq`, `httpie`, `just`, `direnv`, `shellcheck`, `neovim`, `helix`, `sqlite`, `sqlitebrowser`
+Tous les paquets de la stable sont couverts.
 
 ## `websrv` → websrv
 
@@ -147,11 +168,13 @@ Paquets de la stable sans équivalent dans les greffons : `cmake`, `meson`, `nin
 
 | Greffon bêta | Version | Paquets |
 |---|---|---|
+| **web-certbot** (`web-certbot`) | 1.0.0 | `certbot`, `python3-certbot-apache`, `python3-certbot-nginx` |
 | **web-db** (`web-db`) | 1.0.0 | `mariadb-server` |
 | **web-httpd** (`web-httpd`) | 1.0.0 | `httpd`, `php`, `php-mysqlnd` |
 | **web-nginx** (`web-nginx`) | 1.0.0 | `nginx` |
+| **web-openssh** (`web-openssh`) | 1.0.0 | `openssh-server` |
 
-Paquets de la stable sans équivalent dans les greffons : `certbot`, `python3-certbot-apache`, `python3-certbot-nginx`, `openssh-server`
+Tous les paquets de la stable sont couverts.
 
 ## `easy` → easy
 
@@ -175,6 +198,9 @@ Groupes : Raccourcis
 |---|---|
 | Couper les daemons inutiles | `show_confirm` |
 
+| Greffon bêta | Version | Paquets |
+|---|---|---|
+| **services-bulk** (`services-bulk`) | 1.0.0 | — |
 
 Tous les paquets de la stable sont couverts.
 
@@ -227,6 +253,9 @@ Groupes : Paquets système · Python 3 · Node.js / npm
 | **deps-fuse** (`deps-fuse`) | 1.0.0 | `fuse`, `fuse-libs` |
 | **deps-network** (`deps-network`) | 1.0.0 | `curl`, `wget`, `rsync`, `openssh-clients` |
 | **deps-node** (`deps-node`) | 1.0.0 | `nodejs`, `npm` |
+| **deps-node-uninstall** (`deps-node-uninstall`) | 1.0.0 | — |
+| **deps-python-venv** (`deps-python-venv`) | 1.0.0 | — |
+| **deps-python-versions** (`deps-python-versions`) | 1.0.0 | — |
 | **deps-tkinter** (`deps-tkinter`) | 1.0.0 | `python3-tkinter` |
 
 Tous les paquets de la stable sont couverts.
@@ -245,7 +274,9 @@ Groupes : Gamescope / session Steam Big Picture
 |---|---|---|
 | **gaming-gamemode** (`gaming-gamemode`) | 1.0.0 | `gamemode` |
 | **gaming-gamescope** (`gaming-gamescope`) | 1.0.0 | `gamescope`, `mangohud` |
+| **gaming-log** (`gaming-log`) | 1.0.0 | — |
 | **gaming-mangohud** (`gaming-mangohud`) | 1.0.0 | `mangohud` |
+| **gaming-uninstall** (`gaming-uninstall`) | 1.0.0 | — |
 
 Tous les paquets de la stable sont couverts.
 
@@ -265,6 +296,11 @@ Groupes : Gestion mobile · Imprimantes & scanners
 | Greffon bêta | Version | Paquets |
 |---|---|---|
 | **feature-cockpit** (`feature-cockpit`) | 1.0.0 | `cockpit`, `cockpit-storaged`, `cockpit-networkmanager` |
+| **feature-mobile** (`feature-mobile`) | 1.0.0 | `gnome-shell-extension-gsconnect`, `nautilus-gsconnect` |
+| **feature-print** (`feature-print`) | 1.0.0 | `cups`, `cups-filters`, `system-config-printer` |
+| **feature-print-off** (`feature-print-off`) | 1.0.0 | — |
+| **feature-print-on** (`feature-print-on`) | 1.0.0 | — |
+| **feature-print-status** (`feature-print-status`) | 1.0.0 | — |
 | **feature-toolbox** (`feature-toolbox`) | 1.0.0 | `toolbox` |
 
 Tous les paquets de la stable sont couverts.
@@ -282,6 +318,7 @@ Groupes : PS5 Fedora Manager
 |---|---|---|
 | **update-beta** (`update-beta`) | 1.0.0 | — |
 | **update-system** (`update-system`) | 1.0.0 | — |
+| **update-uninstall** (`update-uninstall`) | 1.0.0 | — |
 
 Paquets de la stable sans équivalent dans les greffons : `xhost`
 
@@ -297,6 +334,7 @@ Groupes : Langues & clavier
 
 | Greffon bêta | Version | Paquets |
 |---|---|---|
+| **lang-all** (`lang-all`) | 1.0.0 | `langpacks-fr`, `langpacks-es`, `langpacks-it`, `langpacks-de`, `langpacks-pt`, `langpacks-ja`, `langpacks-zh_CN`, `langpacks-ru` |
 | **lang-de** (`lang-de`) | 1.0.0 | `langpacks-de` |
 | **lang-es** (`lang-es`) | 1.0.0 | `langpacks-es` |
 | **lang-fr** (`lang-fr`) | 1.0.0 | `langpacks-fr` |
@@ -328,6 +366,8 @@ Groupes : Dépôts · <dynamique>
 |---|---|---|
 | **repo-flathub** (`repo-flathub`) | 1.0.0 | — |
 | **repo-rpmfusion** (`repo-rpmfusion`) | 1.0.0 | `rpmfusion-free-release`, `rpmfusion-nonfree-release` |
+| **repos-openh264** (`repos-openh264`) | 1.0.0 | — |
+| **repos-refresh** (`repos-refresh`) | 1.0.0 | — |
 
 Tous les paquets de la stable sont couverts.
 
@@ -381,7 +421,15 @@ Groupes : Maintenance · Maintenance KDE Plasma
 | Greffon bêta | Version | Paquets |
 |---|---|---|
 | **maint-clean** (`maint-clean`) | 1.0.0 | — |
+| **maint-desktop-db** (`maint-desktop-db`) | 1.0.0 | — |
+| **maint-disk** (`maint-disk`) | 1.0.0 | — |
 | **maint-flatpak** (`maint-flatpak`) | 1.0.0 | — |
+| **maint-fonts** (`maint-fonts`) | 1.0.0 | — |
+| **maint-journal** (`maint-journal`) | 1.0.0 | — |
+| **maint-kde-menu** (`maint-kde-menu`) | 1.0.0 | — |
+| **maint-old-kernels** (`maint-old-kernels`) | 1.0.0 | — |
+| **maint-thumbs** (`maint-thumbs`) | 1.0.0 | — |
+| **maint-tmp** (`maint-tmp`) | 1.0.0 | — |
 | **maint-trim** (`maint-trim`) | 1.0.0 | `util-linux` |
 
 Tous les paquets de la stable sont couverts.
@@ -414,6 +462,8 @@ Groupes : Ventilateur
 
 | Greffon bêta | Version | Paquets |
 |---|---|---|
+| **fan-restart** (`fan-restart`) | 1.0.0 | — |
+| **fan-status** (`fan-status`) | 1.0.0 | — |
 | **fan-tools** (`fan-tools`) | 1.0.0 | — |
 
 Tous les paquets de la stable sont couverts.
@@ -433,9 +483,12 @@ Groupes : Hardware Control · Hardware Control Plugin
 
 | Greffon bêta | Version | Paquets |
 |---|---|---|
+| **hw-check** (`hw-check`) | 1.0.0 | — |
 | **hw-decky-loader** (`hw-decky-loader`) | 1.0.0 | — |
 | **hw-decky-ps5-plugin** (`hw-decky-ps5-plugin`) | 1.0.0 | — |
 | **hw-hwcon-gui** (`hw-hwcon-gui`) | 1.0.1 | `python3-PyQt6` |
+| **hw-uninstall** (`hw-uninstall`) | 1.0.0 | — |
+| **hw-update-check** (`hw-update-check`) | 1.0.0 | — |
 
 Tous les paquets de la stable sont couverts.
 
@@ -453,7 +506,10 @@ Groupes : Mesa / Vulkan
 | Greffon bêta | Version | Paquets |
 |---|---|---|
 | **mesa-freeworld** (`mesa-freeworld`) | 1.0.0 | `mesa-va-drivers-freeworld`, `mesa-vdpau-drivers-freeworld` |
+| **mesa-radv** (`mesa-radv`) | 1.0.0 | — |
+| **mesa-summary** (`mesa-summary`) | 1.0.0 | — |
 | **mesa-tools** (`mesa-tools`) | 1.0.0 | `mesa-demos` |
+| **mesa-update** (`mesa-update`) | 1.0.0 | — |
 | **mesa-vulkan** (`mesa-vulkan`) | 1.0.0 | `vulkan-tools`, `vulkan-loader-devel` |
 
 Tous les paquets de la stable sont couverts.
@@ -473,6 +529,7 @@ Groupes : Kernel PS5
 | Greffon bêta | Version | Paquets |
 |---|---|---|
 | **kernel-headers** (`kernel-headers`) | 1.0.0 | `kernel-headers`, `kernel-devel` |
+| **kernel-latest** (`kernel-latest`) | 1.0.0 | `kernel` |
 | **kernel-ps5** (`kernel-ps5`) | 1.0.0 | — |
 
 Tous les paquets de la stable sont couverts.
@@ -488,6 +545,7 @@ Groupes : Steam
 | Greffon bêta | Version | Paquets |
 |---|---|---|
 | **fix-dnf** (`fix-dnf`) | 1.0.0 | — |
+| **fix-steam** (`fix-steam`) | 1.0.0 | — |
 
 Tous les paquets de la stable sont couverts.
 

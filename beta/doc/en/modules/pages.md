@@ -25,10 +25,13 @@ dedicated page or at least one addon.
 | Page | Role |
 |---|---|
 | `addons.py` | generic section from the catalog |
-| `easy.py` | recommended chain (repos → codecs → gaming) |
+| `easy.py` | four profiles (recommended, gaming, streaming, office) + cleanup |
+| `appimage.py` | AppImage install/list/uninstall (+ section addons) |
+| `repos.py` | repositories: enable/disable, refresh, add a `.repo` |
+| `kernel.py` | installed kernels, default kernel, removal |
 | `services.py` | one `systemctl show` call per service (presence + state), toggle through `pkexec`, polkit dismissal (code 126) is not an error |
 | `ui_lang.py` | language switch + translation coverage |
-| `users.py` | human accounts and groups (read-only) |
+| `users.py` | human accounts, creation (`useradd -m`) and removal (`userdel -r`) |
 | `fedora.py` | installed release, kernel, `dnf check-update` |
 | `logs.py` | journal |
 | `about.py` | about, links, credits |

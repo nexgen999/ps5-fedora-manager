@@ -263,6 +263,21 @@ class BetaWindow(Adw.ApplicationWindow):
         dialog.connect("response", _on_response)
         dialog.present(self)
 
+    def confirm(self, heading: str, body: str, on_accept) -> None:
+        """Confirmation simple pour une action destructive."""
+        dialog = Adw.AlertDialog(heading=heading, body=body)
+        dialog.add_response("cancel", i18n.tr("action.cancel"))
+        dialog.add_response("ok", i18n.tr("action.install"))
+        dialog.set_response_appearance("ok", Adw.ResponseAppearance.DESTRUCTIVE)
+        dialog.set_default_response("cancel")
+
+        def _on_response(_dialog, response: str) -> None:
+            if response == "ok":
+                on_accept()
+
+        dialog.connect("response", _on_response)
+        dialog.present(self)
+
     def run_task(self, title: str, task) -> None:
         """Exécute `task(emit) -> (ok, message)` dans un fil, avec log en direct."""
         window = LogWindow(self, title)

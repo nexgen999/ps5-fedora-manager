@@ -23,7 +23,7 @@ PS5M_LANG=en python3 beta/run.py    # force the starting language
 | [environments.md](environments.md) | GNOME, KDE, Cinnamon, Budgie, generic |
 | [tools.md](tools.md) | checks and generators |
 | [contributing.md](contributing.md) | adding an option, a page, a test |
-| [what is missing](gaps-0.15.11.md) | gap with 0.15.11, section by section |
+| [coverage](coverage-0.15.11.md) | equivalence with 0.15.11, deliberate differences |
 | [comparison](comparison-0.15.11.md) | generated tables, option by option |
 | [../TASKS.md](../TASKS.md) | what is done, what is left |
 

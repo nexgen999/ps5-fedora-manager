@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 #@ id: dev-git-tools
-#@ version: 1.0.0
+#@ version: 1.1.0
 #@ section: dev
 #@ icon: git-symbolic
-#@ title: Git & GitHub CLI
-#@ title_fr: Git et GitHub CLI
-#@ desc: git, git-lfs and the gh command line client.
-#@ desc_fr: git, git-lfs et le client en ligne de commande gh.
-#@ packages: git git-lfs gh
+#@ title: Git & platforms
+#@ title_fr: Git et plateformes
+#@ desc: Git, git-lfs, GitHub/GitLab CLIs, lazygit and git-delta.
+#@ desc_fr: Git, git-lfs, CLI GitHub/GitLab, lazygit et git-delta.
+#@ packages: git git-lfs gh glab lazygit git-delta
 #@ root: yes
 set -euo pipefail
 
-PKGS=(git git-lfs gh)
+PKGS=(git git-lfs gh glab lazygit git-delta)
 
 if [ "${1:-}" = "--check" ]; then
     rpm -q "${PKGS[@]}" >/dev/null 2>&1 && exit 0

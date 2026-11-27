@@ -19,6 +19,7 @@ from gi.repository import Adw, Gtk  # noqa: E402
 from ..i18n import tr  # noqa: E402
 from ..runner import run_command  # noqa: E402
 from ..ui import plain_row  # noqa: E402
+from .addons import append_section_groups  # noqa: E402
 
 # Code de sortie de pkexec quand la boîte d'authentification est fermée.
 POLKIT_DISMISSED = 126
@@ -160,4 +161,5 @@ def build(win) -> Gtk.Widget:
     note.set_activatable(False)
     group.add(note)
     page.add(group)
+    append_section_groups(page, win, "services")
     return page

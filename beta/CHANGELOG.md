@@ -1,5 +1,41 @@
 # Journal de la bêta
 
+## [0.16.0-beta4] — 2026-11-27
+
+Quatrième étape : **couverture complète de la 0.15.11**. Toutes les options de la
+version stable ont un équivalent.
+
+### Greffons
+- 107 greffons : catalogue Développement complet (14 entrées), `web-certbot`,
+  `web-openssh`, `feature-print` (+ on/off/status), `feature-mobile`,
+  `kernel-latest`, `lang-all`.
+- Actions : 11 `maint-*`, 8 `ai-*` (Open WebUI, démarrage, logs, diagnostic,
+  nettoyage), `fan-status`, `fan-restart`, `hw-check`, `hw-update-check`,
+  `hw-uninstall`, `mesa-radv`, `mesa-summary`, `mesa-update`, `repos-refresh`,
+  `repos-openh264`, `gaming-log`, `gaming-uninstall`, `fix-steam`,
+  `deps-python-venv`, `deps-python-versions`, `deps-node-uninstall`,
+  `services-bulk`, `update-uninstall`.
+- `new_addon.py` accepte `--action`.
+
+### Pages
+- `library` : gestion des AppImage (installation par sélecteur de fichier,
+  entrée de menu, désinstallation) + greffons de la section.
+- `repos` : activation/désactivation d'un dépôt, rafraîchissement, ajout d'un
+  fichier `.repo`.
+- `kernel` : noyaux installés, noyau courant, `grubby --set-default`,
+  suppression avec confirmation.
+- `users` : création (`useradd -m` + `passwd` dans un terminal) et suppression
+  (`userdel -r`), compte principal protégé.
+- `easy` : quatre profils (recommandé, gaming, streaming, bureautique) et
+  groupe de nettoyage.
+- `logs` : bouton « Effacer ».
+- `services` : action groupée « couper les daemons inutiles ».
+
+### Documentation
+- `doc/{fr,en}/couverture-0.15.11.md` : équivalences, seul paquet non porté
+  (`xhost`) et différences assumées.
+- 112 clés × 6 langues.
+
 ## [0.16.0-beta3] — 2026-11-27
 
 Troisième étape : fiabilisation de la page Services, test d'imports, comparaison

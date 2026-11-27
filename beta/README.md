@@ -21,7 +21,7 @@ PS5M_LANG=en python3 beta/run.py    # langue de départ forcée
 | [environnements](doc/fr/environnements.md) | [environments](doc/en/environments.md) |
 | [outils](doc/fr/outils.md) | [tools](doc/en/tools.md) |
 | [contribuer](doc/fr/contribuer.md) | [contributing](doc/en/contributing.md) |
-| [ce qui manque](doc/fr/manques-0.15.11.md) | [what is missing](doc/en/gaps-0.15.11.md) |
+| [couverture](doc/fr/couverture-0.15.11.md) | [coverage](doc/en/coverage-0.15.11.md) |
 | [comparaison complète](doc/fr/comparaison-0.15.11.md) | [full comparison](doc/en/comparison-0.15.11.md) |
 | [TASKS.md](TASKS.md) — fait / à faire | [TASKS.md](TASKS.md) |
 
@@ -46,23 +46,25 @@ beta/
 │   ├── system.py     état rpm / chemins
 │   ├── journal.py · ui.py
 ├── addons/           un .sh par option + index.json généré
-├── langs/            6 langues, 81 clés
+├── langs/            6 langues, 112 clés
 ├── doc/fr · doc/en/  documentation
 └── tools/            build_catalog, check, lang_status, selftest, docs, new_addon
 ```
 
 ## Sections
 
-24 sections, 51 greffons. Les sections sans page dédiée utilisent la page
+24 sections, 107 greffons. Les sections sans page dédiée utilisent la page
 générique (une ligne par greffon, pastille, confirmation, installation) :
 
 `library` `aidev` `dev` `websrv` `deps` `repos` `gaming` `audio` `video`
 `hardware` `mesa` `kernel` `power` `fan` `maint` `update` `lang` `features`
 `fix`
 
-Pages dédiées : `easy` (enchaînement recommandé), `services` (interrupteurs
-systemd), `ui_lang` (choix de langue), `users` (comptes, lecture seule),
-`fedora` (version, noyau, `dnf check-update`), plus Journal et À propos.
+Pages dédiées : `easy` (profils d'installation), `library` (AppImage),
+`repos` (activation/ajout de dépôts), `kernel` (noyau par défaut,
+suppression), `services` (interrupteurs systemd), `ui_lang` (langue),
+`users` (comptes), `fedora` (version, noyau, `dnf check-update`), plus
+Journal et À propos.
 
 ## Ajouter une option
 
@@ -92,7 +94,7 @@ python3 beta/tools/compare_stable.py          # écart avec la 0.15.11
 ## Limites connues
 
 - L'interface n'est pas testée dans l'environnement de développement (pas de
-  GTK) : à valider sur la PS5.
+  GTK) : à valider sur la PS5 (le test d'imports couvre le câblage).
 - Le mode non-root n'est pas proposé comme un mode global : chaque greffon
   déclare `root: yes/no`.
 - Les notes de version de la bêta sont dans [CHANGELOG.md](CHANGELOG.md).

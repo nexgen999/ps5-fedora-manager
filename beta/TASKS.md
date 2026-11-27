@@ -3,7 +3,7 @@
 Fichier de travail : il liste ce qui est **fait**, ce qui **reste**, et comment
 reprendre. Mise à jour à chaque étape livrée.
 
-Version : **0.16.0-beta3** — la stable reste **0.15.11**.
+Version : **0.16.0-beta4** — la stable reste **0.15.11**.
 
 ---
 
@@ -21,7 +21,7 @@ Version : **0.16.0-beta3** — la stable reste **0.15.11**.
 - [x] Convention d'en-tête `#@` (`id`, `version`, `section`, `icon`,
       `title`/`title_fr`, `desc`/`desc_fr`, `packages`, `check_paths`, `needs`,
       `action`, `root`).
-- [x] 51 scripts `.sh` couvrant les 24 sections de la stable.
+- [x] 107 scripts `.sh` couvrant les 24 sections de la stable.
 - [x] `addons/index.json` généré (version + SHA-256).
 - [x] Mise à jour sélective (`catalog.refresh`) : seuls les scripts dont la
       version augmente sont téléchargés, empreinte vérifiée, écriture atomique.
@@ -62,7 +62,7 @@ Version : **0.16.0-beta3** — la stable reste **0.15.11**.
 ### Vérifications
 
 - [x] `py_compile` sur tout `beta/`.
-- [x] `bash -n` sur les 51 scripts.
+- [x] `bash -n` sur les 107 scripts.
 - [x] `tools/check.py` : greffons, catalogue, langues.
 - [x] `tools/selftest.py` : 40 vérifications sans GTK.
 - [x] `tools/import_check.py` : 25 modules importés (GTK réel si présent, factice sinon),
@@ -74,7 +74,7 @@ Version : **0.16.0-beta3** — la stable reste **0.15.11**.
 
 ## À faire
 
-### Validation sur la PS5 (priorité 1)
+### Validation sur la PS5 (seul reste bloquant)
 
 - [ ] Lancer `python3 beta/run.py` sur la PS5 et vérifier le rendu GTK4/Adw.
 - [ ] Installer un greffon `root: no` (ex. `app-btop`) : pastille, log, retour.
@@ -82,19 +82,21 @@ Version : **0.16.0-beta3** — la stable reste **0.15.11**.
 - [ ] Vérifier `update-beta` (git pull) et le bouton de mise à jour.
 - [ ] Vérifier la page Services sur un système où certains services manquent.
 
-### Contenu
+### Contenu (fait)
 
-- [ ] Porter le catalogue Développement (`dev-build`, `dev-python-gtk`,
+- [x] Catalogue Développement complet : `dev-build`, `dev-python-gtk`,
       `dev-containers`, `dev-virt`, `dev-rust`, `dev-cli-search`, `dev-terminal`,
       `dev-diagnostic`, `dev-debug`, `dev-python-quality`, `dev-data`,
-      `dev-automation`, `dev-editors`) — 75 paquets, liste dans
-      [doc/fr/manques-0.15.11.md](doc/fr/manques-0.15.11.md).
-- [ ] `web-certbot` (Let's Encrypt) et `web-openssh` ; PHP / MySQL / phpMyAdmin /
-      Adminer / Webmin en `install` + `remove`.
-- [ ] Actions non-install listées dans [doc/fr/manques-0.15.11.md](doc/fr/manques-0.15.11.md) :
-      « effacer » le journal, AppImage, pile Open WebUI, profils `easy`, gestion des
-      dépôts, 10 actions de maintenance, statut/relance du ventilateur,
-      vérification/désinstallation du matériel, `fix-steam`, « tout installer » en langues.
+      `dev-automation`, `dev-editors`, `dev-git-tools` 1.1.0.
+- [x] `web-certbot`, `web-openssh`, `feature-print` (+ on/off/status),
+      `feature-mobile`, `kernel-latest`.
+- [x] Actions : journal (bouton « Effacer » sur la page), AppImage (page Logithèque),
+      pile IA (8 greffons), profils `easy` + nettoyage, dépôts (page),
+      maintenance (11 actions), ventilateur (statut/relance), matériel
+      (vérifier/MAJ/désinstaller), `fix-steam`, `lang-all`, `update-uninstall`,
+      `services-bulk`, noyaux (page), comptes (page).
+- [x] Couverture mesurée : 149 options de la 0.15.11, 1 seul paquet non porté
+      (`xhost`, inutile) — [doc/fr/couverture-0.15.11.md](doc/fr/couverture-0.15.11.md).
 - [ ] Étendre `easy` : profils (bureautique, gaming, streaming).
 - [ ] Sauvegarde / restauration des réglages.
 - [ ] Export du journal en fichier.

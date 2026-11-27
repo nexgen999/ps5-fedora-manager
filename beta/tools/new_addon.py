@@ -35,6 +35,7 @@ def render(
     check_paths: str = "",
     needs: str = "",
     root: str = "yes",
+    action: bool = False,
     body: str = "",
 ) -> str:
     """Texte complet d'un script de greffon."""
@@ -55,6 +56,8 @@ def render(
         header.append(f"#@ check_paths: {check_paths}")
     if needs:
         header.append(f"#@ needs: {needs}")
+    if action:
+        header.append("#@ action: yes")
     header.append(f"#@ root: {root}")
 
     if body:
@@ -89,6 +92,8 @@ def main() -> int:
     parser.add_argument("--check-paths", default="")
     parser.add_argument("--needs", default="")
     parser.add_argument("--root", default="yes", choices=("yes", "no"))
+    parser.add_argument("--action", action="store_true",
+                        help="action pure : pas d'état à vérifier")
     parser.add_argument("--body-file", default="")
     args = parser.parse_args()
 
@@ -111,6 +116,7 @@ def main() -> int:
             check_paths=args.check_paths,
             needs=args.needs,
             root=args.root,
+            action=args.action,
             body=body,
         ),
         encoding="utf-8",

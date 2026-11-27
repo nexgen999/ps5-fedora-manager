@@ -33,6 +33,17 @@ def build(win) -> Gtk.Widget:
 
     copy.connect("clicked", _copy)
     buttons.append(copy)
+
+    clear = Gtk.Button(label=tr("logs.clear"))
+    clear.add_css_class("destructive-action")
+
+    def _clear(*_args) -> None:
+        win.journal.clear()
+        win.toast(tr("logs.cleared"))
+        win.go_to("logs")
+
+    clear.connect("clicked", _clear)
+    buttons.append(clear)
     group.add(buttons)
     page.add(group)
     page.add(body)
