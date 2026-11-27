@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.2"
+APP_VERSION = "0.15.3"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1119,16 +1119,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.15.2",
-    "en": "What is new in 0.15.2",
-    "es": "Novedades de la 0.15.2",
-    "it": "Novità della 0.15.2",
-    "de": "Neu in 0.15.2",
-    "pt": "Novidades da 0.15.2",
+    "fr": "Nouveautés de la 0.15.3",
+    "en": "What is new in 0.15.3",
+    "es": "Novedades de la 0.15.3",
+    "it": "Novità della 0.15.3",
+    "de": "Neu in 0.15.3",
+    "pt": "Novidades da 0.15.3",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15.3 : pastille d'état (● installé / ○ non installé) sur chaque application de la Logithèque, comme le reste de l'interface — le texte « · Installé (RPM) » du sous-titre est remplacé",
         "0.15.2 : détection correcte des dépôts sous Fedora 41+ (dnf5) — RPM Fusion livré dans /usr/share/dnf5/repos.d et activations de config-manager dans /etc/dnf/repos.override.d",
         "0.15.1 : pastilles d'état (● installé / ◐ partiel / ○ absent) dans les sections Dépendances, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Ventilateur, Hardware Control, Dépôts et Logithèque (AppImage Pool, Gear Lever)",
         "0.15 : section « FX Sound » — installation d'Easy Effects et des presets communautaires JackHack96 (option 1 : tous les presets), avec pastilles d'état et documentation FR/EN dédiée",
@@ -1151,6 +1152,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15.3: status badge (● installed / ○ not installed) on every App store entry, matching the rest of the interface — the “· Installed (RPM)” subtitle text is gone",
         "0.15.2: correct repository detection on Fedora 41+ (dnf5) — RPM Fusion ships in /usr/share/dnf5/repos.d and config-manager stores enablement in /etc/dnf/repos.override.d",
         "0.15.1: status badges (● installed / ◐ partial / ○ missing) in the Dependencies, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Fan, Hardware Control, Repositories sections and the App store (AppImage Pool, Gear Lever)",
         "0.15: “FX Sound” section — install Easy Effects and the JackHack96 community presets (option 1: all presets), with status badges and dedicated FR/EN documentation",
@@ -1173,6 +1175,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15.3 : indicador de estado (● instalado / ○ no instalado) en cada aplicación de la Tienda, como el resto de la interfaz — desaparece el texto «· Instalado (RPM)» del subtítulo",
         "0.15.2 : detección correcta de repositorios en Fedora 41+ (dnf5): RPM Fusion se instala en /usr/share/dnf5/repos.d y config-manager guarda la activación en /etc/dnf/repos.override.d",
         "0.15.1 : indicadores de estado (● instalado / ◐ parcial / ○ ausente) en las secciones Dependencias, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Ventilador, Hardware Control, Repositorios y Tienda (AppImage Pool, Gear Lever)",
         "0.15 : sección «FX Sound» — instalación de Easy Effects y de los presets comunitarios de JackHack96 (opción 1: todos los presets), con indicadores de estado y documentación FR/EN dedicada",
@@ -1195,6 +1198,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15.3 : indicatore di stato (● installato / ○ non installato) su ogni applicazione dell'App store, come il resto dell'interfaccia — sparisce il testo «· Installato (RPM)» dal sottotitolo",
         "0.15.2 : rilevamento corretto dei repository su Fedora 41+ (dnf5): RPM Fusion risiede in /usr/share/dnf5/repos.d e config-manager salva l'attivazione in /etc/dnf/repos.override.d",
         "0.15.1 : indicatori di stato (● installato / ◐ parziale / ○ assente) nelle sezioni Dipendenze, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Ventola, Hardware Control, Repository e App store (AppImage Pool, Gear Lever)",
         "0.15 : sezione «FX Sound» — installazione di Easy Effects e dei preset della community di JackHack96 (opzione 1: tutti i preset), con indicatori di stato e documentazione FR/EN dedicata",
@@ -1217,6 +1221,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15.3 : Statusanzeige (● installiert / ○ nicht installiert) bei jeder App im App-Store wie im Rest der Oberfläche – der Text „· Installiert (RPM)“ im Untertitel entfällt",
         "0.15.2 : korrekte Paketquellen-Erkennung unter Fedora 41+ (dnf5) – RPM Fusion liegt in /usr/share/dnf5/repos.d und config-manager speichert Aktivierungen in /etc/dnf/repos.override.d",
         "0.15.1 : Statusanzeigen (● installiert / ◐ teilweise / ○ fehlt) in den Abschnitten Abhängigkeiten, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Lüfter, Hardware Control, Paketquellen und App-Store (AppImage Pool, Gear Lever)",
         "0.15 : Abschnitt „FX Sound“ – Installation von Easy Effects und den Community-Presets von JackHack96 (Option 1: alle Presets), mit Statusanzeigen und eigener FR/EN-Dokumentation",
@@ -1239,6 +1244,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15.3 : indicador de estado (● instalado / ○ não instalado) em cada aplicação da Loja, como no resto da interface — o texto «· Instalado (RPM)» do subtítulo desaparece",
         "0.15.2 : deteção correta dos repositórios no Fedora 41+ (dnf5): o RPM Fusion fica em /usr/share/dnf5/repos.d e o config-manager guarda a ativação em /etc/dnf/repos.override.d",
         "0.15.1 : indicadores de estado (● instalado / ◐ parcial / ○ ausente) nas secções Dependências, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Ventoinha, Hardware Control, Repositórios e Loja (AppImage Pool, Gear Lever)",
         "0.15 : secção «FX Sound» — instalação do Easy Effects e dos presets da comunidade de JackHack96 (opção 1: todos os presets), com indicadores de estado e documentação FR/EN dedicada",
@@ -8070,28 +8076,30 @@ def _open_file_log(win: Ps5ManagerWindow, path: str, name: str) -> None:
 
 
 def _fill_software_status(
-    win: "Ps5ManagerWindow", pending: list[tuple[Adw.ActionRow, SoftwareItem]]
+    win: "Ps5ManagerWindow",
+    pending: list[tuple[Adw.ActionRow, SoftwareItem, Gtk.Label]],
 ) -> None:
-    """Complète les statuts RPM / Flatpak hors du fil GTK.
+    """Complète les pastilles RPM / Flatpak hors du fil GTK.
 
     `rpm -q` et surtout `flatpak info` prennent du temps : les exécuter pendant
     la construction de la page gelait l'interface. Les lignes sont affichées
-    tout de suite avec leur description, puis leur sous-titre est complété.
+    tout de suite avec leur description, puis la pastille d'état est remplie
+    (● installé / ○ non installé), comme dans le reste de l'application.
     """
     if not pending:
         return
 
     def _worker() -> None:
         results = [
-            (row, item, detect_software_status(item)[1]) for row, item in pending
+            (badge, detect_software_status(item)[0])
+            for _row, item, badge in pending
         ]
         GLib.idle_add(_apply, results)
 
-    def _apply(results: list[tuple[Adw.ActionRow, SoftwareItem, str]]) -> bool:
-        for row, item, label in results:
-            desc = item.description_fr if UI_LANG == "fr" else item.description_en
+    def _apply(results: list[tuple[Gtk.Label, str]]) -> bool:
+        for badge, code in results:
             try:
-                row.set_subtitle(f"{desc} · {label}")
+                _apply_badge(badge, 0 if code == "none" else 1, 1)
             except Exception:  # ligne déjà détruite (page quittée)
                 pass
         return False
@@ -8101,7 +8109,24 @@ def _fill_software_status(
 
 def build_page_library(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     seen_categories: set[str] = set()
-    pending: list[tuple[Adw.ActionRow, SoftwareItem]] = []
+    pending: list[tuple[Adw.ActionRow, SoftwareItem, Gtk.Label]] = []
+
+    def _software_row(item: SoftwareItem) -> Adw.ActionRow:
+        """Ligne d'application avec sa pastille d'état (remplie en arrière-plan)."""
+        desc = item.description_fr if UI_LANG == "fr" else item.description_en
+        row = win.row(
+            item.name,
+            desc,
+            item.icon,
+            lambda _r, it=item: _push_software_actions(win, it),
+            suffix_icon=None,
+        )
+        badge = _badge_label()
+        row.add_suffix(badge)
+        row.add_suffix(Gtk.Image.new_from_icon_name("go-next-symbolic"))
+        pending.append((row, item, badge))
+        return row
+
     for cat_id, title_key, sub_key in SOFTWARE_CATEGORIES:
         items = [
             it for it in SOFTWARE_CATALOG
@@ -8112,15 +8137,7 @@ def build_page_library(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None
         seen_categories.add(cat_id)
         grp = pref_group(title=T(title_key), description=T(sub_key))
         for item in items:
-            desc = item.description_fr if UI_LANG == "fr" else item.description_en
-            row = win.row(
-                item.name,
-                desc,
-                item.icon,
-                lambda _r, it=item: _push_software_actions(win, it),
-            )
-            pending.append((row, item))
-            grp.add(row)
+            grp.add(_software_row(item))
         page.add(grp)
 
     extra = [
@@ -8130,15 +8147,7 @@ def build_page_library(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None
     if extra:
         grp = pref_group(title=T("lib_title"), description=T("lib_sub"))
         for item in extra:
-            desc = item.description_fr if UI_LANG == "fr" else item.description_en
-            row = win.row(
-                item.name,
-                desc,
-                item.icon,
-                lambda _r, it=item: _push_software_actions(win, it),
-            )
-            pending.append((row, item))
-            grp.add(row)
+            grp.add(_software_row(item))
         page.add(grp)
 
     _fill_software_status(win, pending)
@@ -12686,27 +12695,46 @@ def _push_dev_entry(
     win.nav.push(Adw.NavigationPage(child=tb, title=title))
 
 
-def _status_badge(done: int, total: int) -> Optional[Gtk.Widget]:
-    """Pastille d'état : ● Installé (vert), ◐ partiel, ○ Non installé (gris)."""
+def _badge_parts(done: int, total: int) -> Optional[tuple[str, str, str]]:
+    """(texte, classe CSS, infobulle) de la pastille d'état."""
     if total <= 0:
         return None
     if done >= total:
-        text = "● " + _L("Installé", "Installed")
-        css = "success"
-        tip = T("installed_rpm")
-    elif done:
-        text = f"◐ {done}/{total}"
-        css = "warning"
-        tip = f"{done}/{total}"
-    else:
-        text = "○ " + _L("Non installé", "Not installed")
-        css = "dim-label"
-        tip = T("not_installed")
-    badge = Gtk.Label(label=text)
+        return "● " + _L("Installé", "Installed"), "success", T("installed_rpm")
+    if done:
+        return f"◐ {done}/{total}", "warning", f"{done}/{total}"
+    return "○ " + _L("Non installé", "Not installed"), "dim-label", T("not_installed")
+
+
+def _badge_label() -> Gtk.Label:
+    """Pastille vide, remplie plus tard quand la détection est terminée."""
+    badge = Gtk.Label(label="")
     badge.add_css_class("caption")
+    badge.add_css_class("dim-label")
+    badge.set_valign(Gtk.Align.CENTER)
+    return badge
+
+
+def _apply_badge(badge: Gtk.Label, done: int, total: int) -> None:
+    parts = _badge_parts(done, total)
+    if parts is None:
+        badge.set_text("")
+        return
+    text, css, tip = parts
+    for name in ("success", "warning", "dim-label"):
+        badge.remove_css_class(name)
+    badge.set_text(text)
     badge.add_css_class(css)
     badge.set_tooltip_text(tip)
-    badge.set_valign(Gtk.Align.CENTER)
+
+
+def _status_badge(done: int, total: int) -> Optional[Gtk.Widget]:
+    """Pastille d'état : ● Installé (vert), ◐ partiel, ○ Non installé (gris)."""
+    parts = _badge_parts(done, total)
+    if parts is None:
+        return None
+    badge = _badge_label()
+    _apply_badge(badge, done, total)
     return badge
 
 

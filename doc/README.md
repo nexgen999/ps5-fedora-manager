@@ -40,7 +40,7 @@ les catalogues :
 
 Sections concernées : *Installation facile*, *Services*, *FX Sound*, *Dépendances
 supplémentaires*, *Add Fedora Feature*, *Gaming Mode*, *Mesa / Vulkan*, *Ventilateur*,
-*Hardware Control*, *Dépôts*, *Logithèque* (AppImage Pool, Gear Lever), ainsi que les
+*Hardware Control*, *Dépôts*, *Logithèque*, ainsi que les
 catalogues *Développement* et *Serveur web*.
 
 La détection se fait à l'ouverture de la page, sans commande bloquante : `rpm -q`

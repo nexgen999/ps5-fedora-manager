@@ -6,6 +6,12 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.3] — 2026-11-27
+
+### Modifié
+- **Logithèque** : chaque application (Steam, Heroic, Opera, Brave, Etcher, Bazaar…) affiche désormais la **pastille d'état** de l'application — **● Installé**, **○ Non installé** — à gauche du chevron, exactement comme *AppImage Pool* et *Gear Lever* en bas de page. Le texte « · Installé (RPM) » / « · Installé (Flatpak) » du sous-titre est supprimé : le sous-titre ne garde que la description.
+- La détection reste en arrière-plan (`rpm -q`, `flatpak info`) : la page s'affiche immédiatement, les pastilles se remplissent dès que le statut est connu, sans gel de l'interface.
+
 ## [0.15.2] — 2026-11-27
 
 ### Corrigé

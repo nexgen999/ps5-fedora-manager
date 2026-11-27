@@ -7,6 +7,12 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.3] — 2026-11-27
+
+### Changed
+- **App store**: every application (Steam, Heroic, Opera, Brave, Etcher, Bazaar…) now shows the application **status badge** — **● Installed**, **○ Not installed** — left of the chevron, exactly like *AppImage Pool* and *Gear Lever* at the bottom of the page. The “· Installed (RPM)” / “· Installed (Flatpak)” subtitle text is gone: the subtitle keeps the description only.
+- Detection still runs in the background (`rpm -q`, `flatpak info`): the page appears immediately, badges fill in as soon as the status is known, with no UI freeze.
+
 ## [0.15.2] — 2026-11-27
 
 ### Fixed
