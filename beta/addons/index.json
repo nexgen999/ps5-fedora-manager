@@ -1,0 +1,248 @@
+{
+  "schema": 1,
+  "generated": "2026-11-27T04:06:36Z",
+  "addons": [
+    {
+      "id": "audio-easyeffects",
+      "version": "1.0.0",
+      "file": "audio-easyeffects.sh",
+      "section": "audio",
+      "icon": "audio-volume-high-symbolic",
+      "titles": {
+        "fr": "Easy Effects",
+        "en": "Easy Effects"
+      },
+      "descriptions": {
+        "fr": "Égaliseur, réduction de bruit et effets Dolby Atmos via PipeWire.",
+        "en": "Equalizer, noise reduction and Dolby Atmos effects over PipeWire."
+      },
+      "packages": [
+        "easyeffects"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "root": true,
+      "sha256": "ed425245c4b8acd762ecf6b21e9ed758f41b0f1c43ce115e3bb23b648b175622"
+    },
+    {
+      "id": "audio-presets-jackhack",
+      "version": "1.0.0",
+      "file": "audio-presets-jackhack.sh",
+      "section": "audio",
+      "icon": "media-playlist-shuffle-symbolic",
+      "titles": {
+        "fr": "Presets communautaires (JackHack96)",
+        "en": "Community presets (JackHack96)"
+      },
+      "descriptions": {
+        "fr": "Dix presets prêts à l'emploi, installés dans le compte de bureau.",
+        "en": "Ten ready-made presets installed in the desktop account."
+      },
+      "packages": [],
+      "needs": [
+        "audio-easyeffects"
+      ],
+      "check_paths": [
+        "~/.config/easyeffects/output"
+      ],
+      "root": false,
+      "sha256": "1b87081d1c0a136fc7d8155d71563fad36922328a3232a39fa3ec5da465a8ba6"
+    },
+    {
+      "id": "codecs-av",
+      "version": "1.0.1",
+      "file": "codecs-av.sh",
+      "section": "video",
+      "icon": "video-x-generic-symbolic",
+      "titles": {
+        "fr": "Codecs audio et vidéo",
+        "en": "Audio and video codecs"
+      },
+      "descriptions": {
+        "fr": "GStreamer complet et codecs RPM Fusion (H.264, HEVC, AAC, MP3, Dolby…).",
+        "en": "Full GStreamer plus RPM Fusion codecs (H.264, HEVC, AAC, MP3, Dolby…)."
+      },
+      "packages": [
+        "gstreamer1-plugins-good",
+        "gstreamer1-plugins-bad-free",
+        "gstreamer1-plugins-bad-free-extras",
+        "gstreamer1-plugins-ugly",
+        "gstreamer1-plugin-libav",
+        "gstreamer1-plugins-bad-freeworld",
+        "gstreamer1-plugin-openh264",
+        "libavcodec-freeworld",
+        "lame",
+        "x264-libs",
+        "x265-libs"
+      ],
+      "needs": [
+        "repo-rpmfusion"
+      ],
+      "check_paths": [],
+      "root": true,
+      "sha256": "717fbd58ef273532b819d1d7980d10437e7d764f95e861099d086aca2592b3c5"
+    },
+    {
+      "id": "ffmpeg-full",
+      "version": "1.0.0",
+      "file": "ffmpeg-full.sh",
+      "section": "video",
+      "icon": "applications-multimedia-symbolic",
+      "titles": {
+        "fr": "FFmpeg (codecs complets)",
+        "en": "FFmpeg (full codecs)"
+      },
+      "descriptions": {
+        "fr": "ffmpeg et libavcodec-freeworld pour tous les formats.",
+        "en": "ffmpeg and libavcodec-freeworld for every format."
+      },
+      "packages": [
+        "ffmpeg",
+        "libavcodec-freeworld"
+      ],
+      "needs": [
+        "repo-rpmfusion"
+      ],
+      "check_paths": [],
+      "root": true,
+      "sha256": "d63dd1e4b1953fdc2dd39754552cd0a2be7b9dccbd59820ae2ebc1e23710992a"
+    },
+    {
+      "id": "gaming-gamescope",
+      "version": "1.0.0",
+      "file": "gaming-gamescope.sh",
+      "section": "gaming",
+      "icon": "applications-games-symbolic",
+      "titles": {
+        "fr": "Gamescope + MangoHud",
+        "en": "Gamescope + MangoHud"
+      },
+      "descriptions": {
+        "fr": "Micro-compositeur pour jeux en plein écran et surcouche de performance.",
+        "en": "Micro-compositor for full-screen games and a performance overlay."
+      },
+      "packages": [
+        "gamescope",
+        "mangohud"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "root": true,
+      "sha256": "ee3ae46520cdea586194df5d82ab3f70d0290432ad7a0a85f27a762c9a38686a"
+    },
+    {
+      "id": "hw-decky-loader",
+      "version": "1.0.0",
+      "file": "hw-decky-loader.sh",
+      "section": "hardware",
+      "icon": "applications-games-symbolic",
+      "titles": {
+        "fr": "Decky Loader",
+        "en": "Decky Loader"
+      },
+      "descriptions": {
+        "fr": "Chargeur de plugins utilisé par le plugin PS5 Hardware Control.",
+        "en": "Plugin loader used by the PS5 Hardware Control plugin."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [
+        "~/homebrew"
+      ],
+      "root": false,
+      "sha256": "aadddeede7b1c11aa3436633bbe12d9c77236813a7c0d43043befbd91cb3066f"
+    },
+    {
+      "id": "hw-decky-ps5-plugin",
+      "version": "1.0.0",
+      "file": "hw-decky-ps5-plugin.sh",
+      "section": "hardware",
+      "icon": "applications-system-symbolic",
+      "titles": {
+        "fr": "Plugin PS5 Hardware Control",
+        "en": "PS5 Hardware Control plugin"
+      },
+      "descriptions": {
+        "fr": "Plugin Decky pour piloter le ventilateur et les LED de la PS5.",
+        "en": "Decky plugin to control the PS5 fan and LEDs."
+      },
+      "packages": [],
+      "needs": [
+        "hw-decky-loader"
+      ],
+      "check_paths": [
+        "~/homebrew/plugins/ps5-hardware-control",
+        "/home/*/homebrew/plugins/ps5-hardware-control"
+      ],
+      "root": false,
+      "sha256": "6cd7694c6e8360bb541144e310ab0bd6729c8a30e0f28f0de9d07b47b532bc63"
+    },
+    {
+      "id": "hw-hwcon-gui",
+      "version": "1.0.0",
+      "file": "hw-hwcon-gui.sh",
+      "section": "hardware",
+      "icon": "applications-system-symbolic",
+      "titles": {
+        "fr": "Hardware Control (interface)",
+        "en": "Hardware Control GUI"
+      },
+      "descriptions": {
+        "fr": "Interface PyQt6 pour le contrôleur de ventilateur et de LED.",
+        "en": "PyQt6 interface for the PS5 fan and LED controller."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [
+        "/opt/ps5-hwcon-gui/src/pyproject.toml"
+      ],
+      "root": true,
+      "sha256": "dadf7bca1c7b4b8950e663705570a223f5c3b7df97d074e2a709513c60fb4ce7"
+    },
+    {
+      "id": "repo-flathub",
+      "version": "1.0.0",
+      "file": "repo-flathub.sh",
+      "section": "repos",
+      "icon": "software-store-symbolic",
+      "titles": {
+        "fr": "Flathub",
+        "en": "Flathub"
+      },
+      "descriptions": {
+        "fr": "Ajoute le dépôt Flathub pour les applications Flatpak.",
+        "en": "Adds the Flathub remote for Flatpak applications."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [
+        "/var/lib/flatpak/repo"
+      ],
+      "root": true,
+      "sha256": "e6513b8655296205cc70588a77aaa7ae14ef5ed5b5656e38c51e9dd54905a151"
+    },
+    {
+      "id": "repo-rpmfusion",
+      "version": "1.0.0",
+      "file": "repo-rpmfusion.sh",
+      "section": "repos",
+      "icon": "network-server-symbolic",
+      "titles": {
+        "fr": "RPM Fusion (free + nonfree)",
+        "en": "RPM Fusion (free + nonfree)"
+      },
+      "descriptions": {
+        "fr": "Ajoute les dépôts RPM Fusion free et nonfree.",
+        "en": "Adds the RPM Fusion free and nonfree repositories."
+      },
+      "packages": [
+        "rpmfusion-free-release",
+        "rpmfusion-nonfree-release"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "root": true,
+      "sha256": "a84efc76b99ac715e8052b04839b033a394aafd1ab8a3f2e65e7bb1f7cd26565"
+    }
+  ]
+}
