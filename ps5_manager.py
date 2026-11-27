@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.10"
+APP_VERSION = "0.15.11"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1123,16 +1123,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.15.10",
-    "en": "What is new in 0.15.10",
-    "es": "Novedades de la 0.15.10",
-    "it": "Novità della 0.15.10",
-    "de": "Neu in 0.15.10",
-    "pt": "Novidades da 0.15.10",
+    "fr": "Nouveautés de la 0.15.11",
+    "en": "What is new in 0.15.11",
+    "es": "Novedades de la 0.15.11",
+    "it": "Novità della 0.15.11",
+    "de": "Neu in 0.15.11",
+    "pt": "Novidades da 0.15.11",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15.11 : traductions complètes de la page Services et de la réinitialisation (7 textes qui restaient en anglais) et lien « Historique complet » dans À propos",
         "0.15.10 : fenêtre « À propos » repensée — 900 × 740 px au lieu de la colonne étroite d'Adw.AboutDialog, avec le logo, les liens (site web, problèmes), les informations techniques et les nouveautés dans une carte lisible",
         "0.15.9 : les notes de version échappent le « & » : la fenêtre « Quoi de neuf » s'affiche à nouveau au lieu de signaler « Impossible d'analyser les notes de version »",
         "0.15.8 : le greffon GStreamer libav est installé sous son nom actuel « gstreamer1-plugin-libav » (l'ancien « gstreamer1-plugins-libav » n'existe plus depuis Fedora 43), la pastille codecs passe donc de 10/11 à 11/11",
@@ -1163,6 +1164,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15.11: full translations for the Services page and the reset section (7 texts that stayed English) and a “Full changelog” link in About",
         "0.15.10: redesigned “About” window — 900 × 740 px instead of Adw.AboutDialog’s narrow column, with the logo, links (website, issues), technical information and the release notes in a readable card",
         "0.15.9: release notes now escape “&”: the “What’s new” window displays again instead of reporting “Unable to parse release notes”",
         "0.15.8: the GStreamer libav plugin is installed under its current name “gstreamer1-plugin-libav” (the old “gstreamer1-plugins-libav” no longer exists since Fedora 43), so the codec badge goes from 10/11 to 11/11",
@@ -1193,6 +1195,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15.11 : traducciones completas de la página Servicios y de la reinicialización (7 textos que seguían en inglés) y enlace «Historial completo» en Acerca de",
         "0.15.10 : ventana «Acerca de» rediseñada — 900 × 740 px en lugar de la columna estrecha de Adw.AboutDialog, con el logotipo, los enlaces (sitio web, problemas), la información técnica y las novedades en una tarjeta legible",
         "0.15.9 : las notas de versión escapan el «&»: la ventana «Novedades» vuelve a mostrarse en lugar de indicar «No se pueden analizar las notas de versión»",
         "0.15.8 : el complemento libav de GStreamer se instala con su nombre actual «gstreamer1-plugin-libav» (el antiguo «gstreamer1-plugins-libav» ya no existe desde Fedora 43), así que el indicador de códecs pasa de 10/11 a 11/11",
@@ -1223,6 +1226,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15.11 : traduzioni complete della pagina Servizi e della reimpostazione (7 testi rimasti in inglese) e link «Cronologia completa» in Informazioni",
         "0.15.10 : finestra «Informazioni» ridisegnata — 900 × 740 px al posto della colonna stretta di Adw.AboutDialog, con logo, link (sito web, problemi), informazioni tecniche e novità in una scheda leggibile",
         "0.15.9 : le note di versione proteggono la «&»: la finestra «Novità» torna a mostrarsi invece di segnalare «Impossibile analizzare le note di versione»",
         "0.15.8 : il plugin libav di GStreamer viene installato con il nome attuale «gstreamer1-plugin-libav» (il vecchio «gstreamer1-plugins-libav» non esiste più da Fedora 43), quindi l'indicatore dei codec passa da 10/11 a 11/11",
@@ -1253,6 +1257,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15.11 : vollständige Übersetzungen für die Dienste-Seite und das Zurücksetzen (7 Texte waren noch englisch) und ein Link „Vollständiger Verlauf“ im Über-Fenster",
         "0.15.10 : „Über“-Fenster neu gestaltet – 900 × 740 px statt der schmalen Spalte von Adw.AboutDialog, mit Logo, Links (Webseite, Probleme), technischen Informationen und den Versionshinweisen in einer gut lesbaren Karte",
         "0.15.9 : die Versionshinweise maskieren jetzt das „&“: das Fenster „Neu“ erscheint wieder, statt „Versionshinweise konnten nicht gelesen werden“ zu melden",
         "0.15.8 : das libav-Plugin von GStreamer wird unter dem aktuellen Namen „gstreamer1-plugin-libav“ installiert (das alte „gstreamer1-plugins-libav“ gibt es seit Fedora 43 nicht mehr), die Codec-Anzeige springt dadurch von 10/11 auf 11/11",
@@ -1283,6 +1288,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15.11 : traduções completas da página Serviços e da reposição (7 textos que ficavam em inglês) e ligação «Histórico completo» em Sobre",
         "0.15.10 : janela «Sobre» redesenhada — 900 × 740 px em vez da coluna estreita do Adw.AboutDialog, com o logótipo, as ligações (site, problemas), as informações técnicas e as novidades num cartão legível",
         "0.15.9 : as notas de versão escapam o «&»: a janela «Novidades» volta a aparecer em vez de indicar «Não é possível analisar as notas de versão»",
         "0.15.8 : o plugin libav do GStreamer é instalado com o nome atual «gstreamer1-plugin-libav» (o antigo «gstreamer1-plugins-libav» já não existe desde o Fedora 43), pelo que o indicador de codecs passa de 10/11 para 11/11",
@@ -7284,11 +7290,49 @@ _L_TABLE = {
         "Informações técnicas",
     ),
     "Nouveautés": ("Novedades", "Novità", "Neu", "Novidades"),
+    "Historique complet": (
+        "Historial completo",
+        "Cronologia completa",
+        "Vollständiger Verlauf",
+        "Histórico completo",
+    ),
     "Développé par nexgen999": (
         "Desarrollado por nexgen999",
         "Sviluppato da nexgen999",
         "Entwickelt von nexgen999",
         "Desenvolvido por nexgen999",
+    ),
+    "Actif": ("Activo", "Attivo", "Aktiv", "Ativo"),
+    "Raccourcis": ("Atajos", "Scorciatoie", "Verknüpfungen", "Atalhos"),
+    "Aucun de ces services n'est installé.": (
+        "Ninguno de estos servicios está instalado.",
+        "Nessuno di questi servizi è installato.",
+        "Keiner dieser Dienste ist installiert.",
+        "Nenhum destes serviços está instalado.",
+    ),
+    "Un service coupé ne consomme plus de mémoire ni de CPU, mais reste installé.": (
+        "Un servicio detenido ya no consume memoria ni CPU, pero sigue instalado.",
+        "Un servizio fermato non consuma più memoria né CPU, ma resta installato.",
+        "Ein gestoppter Dienst verbraucht weder Speicher noch CPU, bleibt aber installiert.",
+        "Um serviço parado deixa de consumir memória e CPU, mas continua instalado.",
+    ),
+    "Désinstaller les composants installés et repartir d'une base propre.": (
+        "Desinstalar los componentes instalados y partir de una base limpia.",
+        "Disinstalla i componenti installati e riparti da una base pulita.",
+        "Installierte Komponenten entfernen und von einer sauberen Basis starten.",
+        "Desinstalar os componentes instalados e recomeçar de uma base limpa.",
+    ),
+    "Choisis ce qui doit être retiré, puis nettoie les fichiers du manager.": (
+        "Elige lo que debe quitarse y luego limpia los archivos del gestor.",
+        "Scegli cosa rimuovere, poi pulisci i file del gestore.",
+        "Wähle aus, was entfernt werden soll, und bereinige dann die Dateien des Managers.",
+        "Escolhe o que deve ser removido e depois limpa os ficheiros do gestor.",
+    ),
+    "Supprimer les configurations écrites par l'application ?": (
+        "¿Eliminar las configuraciones escritas por la aplicación?",
+        "Eliminare le configurazioni scritte dall'applicazione?",
+        "Die von der Anwendung geschriebenen Konfigurationen löschen?",
+        "Eliminar as configurações escritas pela aplicação?",
     ),
     "manquant : ": (
         "faltante: ",
@@ -7427,6 +7471,14 @@ class AboutWindow(Adw.Window):
                 _L("Signaler un problème", "Report an issue"),
                 self.ISSUES,
                 "dialog-warning-symbolic",
+            )
+        )
+        changelog = "CHANGELOG.md" if UI_LANG == "fr" else "CHANGELOG_en.md"
+        links.add(
+            self._link_row(
+                _L("Historique complet", "Full changelog"),
+                f"{self.WEBSITE}/blob/main/{changelog}",
+                "document-open-recent-symbolic",
             )
         )
         content.append(links)

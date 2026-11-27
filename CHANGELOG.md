@@ -6,6 +6,21 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.11] — 2026-11-27
+
+### Corrigé
+- **Textes restés en anglais.** Sept chaînes étaient appelées avec `_L()` sans entrée dans `_L_TABLE` : elles s'affichaient en français/anglais seulement, quelle que soit la langue choisie. Traduites en es, it, de et pt :
+  - « Actif » (sous-titre d'un service actif mais non activé au démarrage) ;
+  - « Raccourcis » (groupe de la page Services) ;
+  - « Aucun de ces services n'est installé. » ;
+  - « Un service coupé ne consomme plus de mémoire ni de CPU, mais reste installé. » ;
+  - « Désinstaller les composants installés et repartir d'une base propre. » ;
+  - « Choisis ce qui doit être retiré, puis nettoie les fichiers du manager. » ;
+  - « Supprimer les configurations écrites par l'application ? ».
+
+### Ajouté
+- **Lien « Historique complet »** dans la fenêtre À propos : ouvre le `CHANGELOG.md` (français) ou `CHANGELOG_en.md` (autres langues) sur GitHub, puisque la carte des nouveautés n'affiche que les 5 dernières entrées.
+
 ## [0.15.10] — 2026-11-27
 
 ### Modifié

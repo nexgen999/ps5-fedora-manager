@@ -7,6 +7,21 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.11] — 2026-11-27
+
+### Fixed
+- **Texts that stayed English.** Seven strings were passed to `_L()` without an entry in `_L_TABLE`, so they showed in French/English only whatever language was selected. Translated into es, it, de and pt:
+  - “Actif” (subtitle of a running service that is not enabled at boot);
+  - “Raccourcis” (Services page group);
+  - “Aucun de ces services n'est installé.”;
+  - “Un service coupé ne consomme plus de mémoire ni de CPU, mais reste installé.”;
+  - “Désinstaller les composants installés et repartir d'une base propre.”;
+  - “Choisis ce qui doit être retiré, puis nettoie les fichiers du manager.”;
+  - “Supprimer les configurations écrites par l'application ?”.
+
+### Added
+- **“Full changelog” link** in the About window: opens `CHANGELOG.md` (French) or `CHANGELOG_en.md` (other languages) on GitHub, since the What's new card only shows the latest 5 entries.
+
 ## [0.15.10] — 2026-11-27
 
 ### Changed
