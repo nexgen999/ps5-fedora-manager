@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.5"
+APP_VERSION = "0.15.6"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1123,16 +1123,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.15.5",
-    "en": "What is new in 0.15.5",
-    "es": "Novedades de la 0.15.5",
-    "it": "Novità della 0.15.5",
-    "de": "Neu in 0.15.5",
-    "pt": "Novidades da 0.15.5",
+    "fr": "Nouveautés de la 0.15.6",
+    "en": "What is new in 0.15.6",
+    "es": "Novedades de la 0.15.6",
+    "it": "Novità della 0.15.6",
+    "de": "Neu in 0.15.6",
+    "pt": "Novidades da 0.15.6",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15.6 : la section « FX Sound » devient « FX Sound & Vidéo » — nouveau groupe Vidéo avec l'installation des codecs audio et vidéo (GStreamer complet + RPM Fusion : H.264, HEVC, AAC, MP3, Dolby…) et de FFmpeg complet (libavcodec-freeworld)",
         "0.15.5 : la pastille du plugin Decky « PS5 Hardware Control » reconnaît son vrai dossier d'installation (~/homebrew/plugins/ps5-hardware-control) et s'affiche enfin comme installé",
         "0.15.4 : la mise à jour du manager remarche sous Fedora 45 — polkit-gnome (paquet supprimé) retiré des dépendances, dnf lancé avec --skip-unavailable et une erreur de dépendances ne bloque plus la mise à jour",
         "0.15.3 : pastille d'état (● installé / ○ non installé) sur chaque application de la Logithèque, comme le reste de l'interface — le texte « · Installé (RPM) » du sous-titre est remplacé",
@@ -1158,6 +1159,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15.6: the “FX Sound” section becomes “FX Sound & Video” — new Video group installing every audio and video codec (full GStreamer + RPM Fusion: H.264, HEVC, AAC, MP3, Dolby…) and full FFmpeg (libavcodec-freeworld)",
         "0.15.5: the Decky “PS5 Hardware Control” plugin badge now recognises its real install folder (~/homebrew/plugins/ps5-hardware-control) and shows as installed",
         "0.15.4: manager updates work again on Fedora 45 — polkit-gnome (removed package) dropped from the dependencies, dnf runs with --skip-unavailable and a dependency error no longer blocks the update",
         "0.15.3: status badge (● installed / ○ not installed) on every App store entry, matching the rest of the interface — the “· Installed (RPM)” subtitle text is gone",
@@ -1183,6 +1185,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15.6 : la sección «FX Sound» pasa a «FX Sound y Vídeo» — nuevo grupo Vídeo con la instalación de todos los códecs de audio y vídeo (GStreamer completo + RPM Fusion: H.264, HEVC, AAC, MP3, Dolby…) y de FFmpeg completo (libavcodec-freeworld)",
         "0.15.5 : el indicador del plugin Decky «PS5 Hardware Control» reconoce su carpeta real (~/homebrew/plugins/ps5-hardware-control) y aparece como instalado",
         "0.15.4 : la actualización del gestor vuelve a funcionar en Fedora 45 — polkit-gnome (paquete eliminado) fuera de las dependencias, dnf con --skip-unavailable y un error de dependencias ya no bloquea la actualización",
         "0.15.3 : indicador de estado (● instalado / ○ no instalado) en cada aplicación de la Tienda, como el resto de la interfaz — desaparece el texto «· Instalado (RPM)» del subtítulo",
@@ -1208,6 +1211,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15.6 : la sezione «FX Sound» diventa «FX Sound e Video» — nuovo gruppo Video con l'installazione di tutti i codec audio e video (GStreamer completo + RPM Fusion: H.264, HEVC, AAC, MP3, Dolby…) e di FFmpeg completo (libavcodec-freeworld)",
         "0.15.5 : l'indicatore del plugin Decky «PS5 Hardware Control» riconosce la cartella reale (~/homebrew/plugins/ps5-hardware-control) e appare installato",
         "0.15.4 : l'aggiornamento del gestore torna a funzionare su Fedora 45 — polkit-gnome (pacchetto rimosso) escluso dalle dipendenze, dnf con --skip-unavailable e un errore di dipendenze non blocca più l'aggiornamento",
         "0.15.3 : indicatore di stato (● installato / ○ non installato) su ogni applicazione dell'App store, come il resto dell'interfaccia — sparisce il testo «· Installato (RPM)» dal sottotitolo",
@@ -1233,6 +1237,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15.6 : aus „FX Sound“ wird „FX Sound & Video“ – neuer Abschnitt Video mit der Installation aller Audio- und Videocodecs (vollständiges GStreamer + RPM Fusion: H.264, HEVC, AAC, MP3, Dolby…) und von vollständigem FFmpeg (libavcodec-freeworld)",
         "0.15.5 : die Statusanzeige des Decky-Plugins „PS5 Hardware Control“ erkennt den echten Ordner (~/homebrew/plugins/ps5-hardware-control) und gilt als installiert",
         "0.15.4 : die Manager-Aktualisierung funktioniert unter Fedora 45 wieder – polkit-gnome (entferntes Paket) aus den Abhängigkeiten gestrichen, dnf mit --skip-unavailable und ein Abhängigkeitsfehler blockiert die Aktualisierung nicht mehr",
         "0.15.3 : Statusanzeige (● installiert / ○ nicht installiert) bei jeder App im App-Store wie im Rest der Oberfläche – der Text „· Installiert (RPM)“ im Untertitel entfällt",
@@ -1258,6 +1263,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15.6 : a secção «FX Sound» passa a «FX Sound e Vídeo» — novo grupo Vídeo com a instalação de todos os codecs de áudio e vídeo (GStreamer completo + RPM Fusion: H.264, HEVC, AAC, MP3, Dolby…) e do FFmpeg completo (libavcodec-freeworld)",
         "0.15.5 : o indicador do plugin Decky «PS5 Hardware Control» reconhece a pasta real (~/homebrew/plugins/ps5-hardware-control) e aparece como instalado",
         "0.15.4 : a atualização do gestor volta a funcionar no Fedora 45 — polkit-gnome (pacote removido) saiu das dependências, dnf com --skip-unavailable e um erro de dependências já não bloqueia a atualização",
         "0.15.3 : indicador de estado (● instalado / ○ não instalado) em cada aplicação da Loja, como no resto da interface — o texto «· Instalado (RPM)» do subtítulo desaparece",
@@ -2033,7 +2039,7 @@ STRINGS = {
         "sec_web": "Serveur web",
         "sec_easy": "Installation facile",
         "sec_services": "Services (marche/arrêt)",
-        "sec_fx": "FX Sound",
+        "sec_fx": "FX Sound & Vidéo",
         "sec_deps": "Dépendances Supplémentaires",
         "sec_gaming": "Gaming Mode",
         "sec_fix": "Divers Fix",
@@ -2483,7 +2489,7 @@ STRINGS = {
         "sec_web": "Web server",
         "sec_easy": "Easy setup",
         "sec_services": "Services (on/off)",
-        "sec_fx": "FX Sound",
+        "sec_fx": "FX Sound & Video",
         "sec_deps": "Additional Dependencies",
         "sec_gaming": "Gaming Mode",
         "sec_fix": "Misc Fixes",
@@ -2946,7 +2952,7 @@ STRINGS['es'] = {'app_title': 'PS5 Fedora Manager',
  'sec_web': 'Servidor web',
  'sec_easy': 'Instalación fácil',
  'sec_services': 'Servicios (encendido/apagado)',
- 'sec_fx': 'Sonido FX',
+ 'sec_fx': 'FX Sound y Vídeo',
  'sec_deps': 'Dependencias adicionales',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Arreglos varios',
@@ -3391,7 +3397,7 @@ STRINGS['it'] = {'app_title': 'PS5 Fedora Manager',
  'sec_web': 'Server web',
  'sec_easy': 'Installazione facile',
  'sec_services': 'Servizi (on/off)',
- 'sec_fx': 'Audio FX',
+ 'sec_fx': 'FX Sound e Video',
  'sec_deps': 'Dipendenze aggiuntive',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Correzioni varie',
@@ -3832,7 +3838,7 @@ STRINGS['de'] = {'app_title': 'PS5 Fedora Manager',
  'sec_web': 'Webserver',
  'sec_easy': 'Einfache Installation',
  'sec_services': 'Dienste (ein/aus)',
- 'sec_fx': 'FX-Sound',
+ 'sec_fx': 'FX Sound & Video',
  'sec_deps': 'Zusätzliche Abhängigkeiten',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Diverse Korrekturen',
@@ -4273,7 +4279,7 @@ STRINGS['pt'] = {'app_title': 'PS5 Fedora Manager',
  'sec_web': 'Servidor web',
  'sec_easy': 'Instalação fácil',
  'sec_services': 'Serviços (ligar/desligar)',
- 'sec_fx': 'Som FX',
+ 'sec_fx': 'FX Sound e Vídeo',
  'sec_deps': 'Dependências adicionais',
  'sec_gaming': 'Gaming Mode',
  'sec_fix': 'Correções diversas',
@@ -7140,6 +7146,90 @@ _L_TABLE = {
         "Dipendenze non aggiornate (codice %d): si prosegue con l'aggiornamento del gestore.",
         "Abhängigkeiten nicht aktualisiert (Code %d) – Aktualisierung des Managers läuft weiter.",
         "Dependências não atualizadas (código %d): a atualização do gestor continua.",
+    ),
+    "Vidéo": (
+        "Vídeo",
+        "Video",
+        "Video",
+        "Vídeo",
+    ),
+    "Codecs audio et vidéo + FFmpeg : lecture de tous les formats (H.264, HEVC, AAC, MP3, Dolby…).": (
+        "Códecs de audio y vídeo + FFmpeg: reproducción de todos los formatos (H.264, HEVC, AAC, MP3, Dolby…).",
+        "Codec audio e video + FFmpeg: riproduzione di tutti i formati (H.264, HEVC, AAC, MP3, Dolby…).",
+        "Audio- und Videocodecs + FFmpeg: Wiedergabe aller Formate (H.264, HEVC, AAC, MP3, Dolby…).",
+        "Codecs de áudio e vídeo + FFmpeg: reprodução de todos os formatos (H.264, HEVC, AAC, MP3, Dolby…).",
+    ),
+    "Codecs audio et vidéo": (
+        "Códecs de audio y vídeo",
+        "Codec audio e video",
+        "Audio- und Videocodecs",
+        "Codecs de áudio e vídeo",
+    ),
+    "GStreamer complet, libavcodec-freeworld, lame, x264, x265 (RPM Fusion)": (
+        "GStreamer completo, libavcodec-freeworld, lame, x264, x265 (RPM Fusion)",
+        "GStreamer completo, libavcodec-freeworld, lame, x264, x265 (RPM Fusion)",
+        "Vollständiges GStreamer, libavcodec-freeworld, lame, x264, x265 (RPM Fusion)",
+        "GStreamer completo, libavcodec-freeworld, lame, x264, x265 (RPM Fusion)",
+    ),
+    "Installer les codecs audio et vidéo": (
+        "Instalar los códecs de audio y vídeo",
+        "Installa i codec audio e video",
+        "Audio- und Videocodecs installieren",
+        "Instalar os codecs de áudio e vídeo",
+    ),
+    "RPM Fusion est activé (si besoin) puis les greffons GStreamer et les codecs complets sont installés.": (
+        "Se activa RPM Fusion (si es necesario) y se instalan los complementos GStreamer y los códecs completos.",
+        "RPM Fusion viene attivato (se necessario) e vengono installati i plugin GStreamer e i codec completi.",
+        "RPM Fusion wird (falls nötig) aktiviert, dann werden die GStreamer-Plugins und die vollständigen Codecs installiert.",
+        "O RPM Fusion é ativado (se necessário) e depois são instalados os plugins GStreamer e os codecs completos.",
+    ),
+    "FFmpeg (codecs complets)": (
+        "FFmpeg (códecs completos)",
+        "FFmpeg (codec completi)",
+        "FFmpeg (vollständige Codecs)",
+        "FFmpeg (codecs completos)",
+    ),
+    "ffmpeg + libavcodec-freeworld : encodage et décodage de tous les formats": (
+        "ffmpeg + libavcodec-freeworld: codificación y decodificación de todos los formatos",
+        "ffmpeg + libavcodec-freeworld: codifica e decodifica tutti i formati",
+        "ffmpeg + libavcodec-freeworld: Kodieren und Dekodieren aller Formate",
+        "ffmpeg + libavcodec-freeworld: codificação e descodificação de todos os formatos",
+    ),
+    "Installer FFmpeg": (
+        "Instalar FFmpeg",
+        "Installa FFmpeg",
+        "FFmpeg installieren",
+        "Instalar o FFmpeg",
+    ),
+    "ffmpeg remplace libavcodec-free par libavcodec-freeworld (codecs complets).": (
+        "ffmpeg sustituye libavcodec-free por libavcodec-freeworld (códecs completos).",
+        "ffmpeg sostituisce libavcodec-free con libavcodec-freeworld (codec completi).",
+        "ffmpeg ersetzt libavcodec-free durch libavcodec-freeworld (vollständige Codecs).",
+        "O ffmpeg substitui libavcodec-free por libavcodec-freeworld (codecs completos).",
+    ),
+    "RPM Fusion n'a pas pu être activé.": (
+        "No se pudo activar RPM Fusion.",
+        "Impossibile attivare RPM Fusion.",
+        "RPM Fusion konnte nicht aktiviert werden.",
+        "Não foi possível ativar o RPM Fusion.",
+    ),
+    "Les codecs viennent de RPM Fusion, activé automatiquement si besoin.": (
+        "Los códecs vienen de RPM Fusion, que se activa automáticamente si es necesario.",
+        "I codec provengono da RPM Fusion, attivato automaticamente se necessario.",
+        "Die Codecs stammen aus RPM Fusion, das bei Bedarf automatisch aktiviert wird.",
+        "Os codecs vêm do RPM Fusion, ativado automaticamente se necessário.",
+    ),
+    "FFmpeg remplace libavcodec-free de Fedora par libavcodec-freeworld (codecs complets).": (
+        "FFmpeg sustituye libavcodec-free de Fedora por libavcodec-freeworld (códecs completos).",
+        "FFmpeg sostituisce libavcodec-free di Fedora con libavcodec-freeworld (codec completi).",
+        "FFmpeg ersetzt Fedoras libavcodec-free durch libavcodec-freeworld (vollständige Codecs).",
+        "O FFmpeg substitui o libavcodec-free do Fedora pelo libavcodec-freeworld (codecs completos).",
+    ),
+    "Relance les applications (ou la session) après l'installation pour utiliser les nouveaux codecs.": (
+        "Reinicia las aplicaciones (o la sesión) tras la instalación para usar los nuevos códecs.",
+        "Riavvia le applicazioni (o la sessione) dopo l'installazione per usare i nuovi codec.",
+        "Starte die Anwendungen (oder die Sitzung) nach der Installation neu, um die neuen Codecs zu nutzen.",
+        "Reinicia as aplicações (ou a sessão) após a instalação para usar os novos codecs.",
     ),
 }
 
@@ -14225,6 +14315,28 @@ EASYEFFECTS_PRESETS_URL = (
     "https://raw.githubusercontent.com/JackHack96/EasyEffects-Presets/master/install.sh"
 )
 
+# Codecs audio/vidéo : GStreamer complet + codecs RPM Fusion (H.264, HEVC, AAC,
+# MP3, DVD…). --skip-unavailable absorbe les paquets propres à une version.
+VIDEO_CODEC_PACKAGES = [
+    "gstreamer1-plugins-good",
+    "gstreamer1-plugins-bad-free",
+    "gstreamer1-plugins-bad-free-extras",
+    "gstreamer1-plugins-ugly",
+    "gstreamer1-plugins-libav",
+    "gstreamer1-plugins-bad-freeworld",
+    "gstreamer1-plugin-openh264",
+    "libavcodec-freeworld",
+    "lame",
+    "x264-libs",
+    "x265-libs",
+]
+
+# FFmpeg complet : libavcodec-freeworld remplace libavcodec-free de Fedora.
+FFMPEG_PACKAGES = [
+    "ffmpeg",
+    "libavcodec-freeworld",
+]
+
 
 def _fx_presets_dir() -> str:
     """Dossier des presets Easy Effects de l'utilisateur de bureau (jamais /root)."""
@@ -14365,6 +14477,99 @@ def build_page_fx(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     grp.add(presets_row)
     page.add(grp)
 
+    video = pref_group(
+        title=_L("Vidéo", "Video"),
+        description=_L(
+            "Codecs audio et vidéo + FFmpeg : lecture de tous les formats "
+            "(H.264, HEVC, AAC, MP3, Dolby…).",
+            "Audio and video codecs + FFmpeg: play every format "
+            "(H.264, HEVC, AAC, MP3, Dolby…).",
+        ),
+    )
+
+    def _install_video_codecs() -> None:
+        def _task(emit: Callable[[str], None]) -> tuple[bool, str]:
+            if not _ensure_rpmfusion(win, emit):
+                return False, _L(
+                    "RPM Fusion n'a pas pu être activé.",
+                    "RPM Fusion could not be enabled.",
+                )
+            rc = win.run_cmd_pty(
+                ["dnf", "install", "-y", "--skip-unavailable", *VIDEO_CODEC_PACKAGES],
+                emit,
+            )
+            return rc == 0, (T("done") if rc == 0 else T("failed") % rc)
+
+        win.run_task(
+            _L("Installer les codecs audio et vidéo", "Install audio and video codecs"),
+            _task,
+            lambda *_: win._select_section("fx"),
+        )
+
+    def _install_ffmpeg() -> None:
+        def _task(emit: Callable[[str], None]) -> tuple[bool, str]:
+            if not _ensure_rpmfusion(win, emit):
+                return False, _L(
+                    "RPM Fusion n'a pas pu être activé.",
+                    "RPM Fusion could not be enabled.",
+                )
+            rc = win.run_cmd_pty(
+                ["dnf", "install", "-y", "--skip-unavailable", *FFMPEG_PACKAGES],
+                emit,
+            )
+            return rc == 0, (T("done") if rc == 0 else T("failed") % rc)
+
+        win.run_task(
+            _L("Installer FFmpeg", "Install FFmpeg"),
+            _task,
+            lambda *_: win._select_section("fx"),
+        )
+
+    video.add(_install_row(
+        win,
+        _L("Codecs audio et vidéo", "Audio and video codecs"),
+        _L(
+            "GStreamer complet, libavcodec-freeworld, lame, x264, x265 (RPM Fusion)",
+            "Full GStreamer, libavcodec-freeworld, lame, x264, x265 (RPM Fusion)",
+        ),
+        "video-x-generic-symbolic",
+        lambda *_: win.show_confirm(
+            _L("Installer les codecs audio et vidéo", "Install audio and video codecs"),
+            _L(
+                "RPM Fusion est activé (si besoin) puis les greffons GStreamer et les "
+                "codecs complets sont installés.",
+                "RPM Fusion is enabled (if needed), then the GStreamer plugins and the "
+                "full codecs are installed.",
+            ),
+            _install_video_codecs,
+            destructive=False,
+        ),
+        packages=VIDEO_CODEC_PACKAGES,
+    ))
+
+    video.add(_install_row(
+        win,
+        _L("FFmpeg (codecs complets)", "FFmpeg (full codecs)"),
+        _L(
+            "ffmpeg + libavcodec-freeworld : encodage et décodage de tous les formats",
+            "ffmpeg + libavcodec-freeworld: encoding and decoding of every format",
+        ),
+        "applications-multimedia-symbolic",
+        lambda *_: win.show_confirm(
+            _L("Installer FFmpeg", "Install FFmpeg"),
+            _L(
+                "ffmpeg remplace libavcodec-free par libavcodec-freeworld "
+                "(codecs complets).",
+                "ffmpeg replaces libavcodec-free with libavcodec-freeworld "
+                "(full codecs).",
+            ),
+            _install_ffmpeg,
+            destructive=False,
+        ),
+        packages=FFMPEG_PACKAGES,
+    ))
+    page.add(video)
+
     notes = pref_group(title=_L("Bon à savoir", "Good to know"), description="")
     notes.add(plain_row(
         Adw.ActionRow,
@@ -14385,6 +14590,27 @@ def build_page_fx(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         title=_L(
             "Aucun effet n'est appliqué tant qu'Easy Effects ne tourne pas.",
             "No effect is applied while Easy Effects is not running.",
+        ),
+    ))
+    notes.add(plain_row(
+        Adw.ActionRow,
+        title=_L(
+            "Les codecs viennent de RPM Fusion, activé automatiquement si besoin.",
+            "Codecs come from RPM Fusion, enabled automatically when needed.",
+        ),
+    ))
+    notes.add(plain_row(
+        Adw.ActionRow,
+        title=_L(
+            "FFmpeg remplace libavcodec-free de Fedora par libavcodec-freeworld (codecs complets).",
+            "FFmpeg replaces Fedora's libavcodec-free with libavcodec-freeworld (full codecs).",
+        ),
+    ))
+    notes.add(plain_row(
+        Adw.ActionRow,
+        title=_L(
+            "Relance les applications (ou la session) après l'installation pour utiliser les nouveaux codecs.",
+            "Restart applications (or the session) after installing to use the new codecs.",
         ),
     ))
     page.add(notes)

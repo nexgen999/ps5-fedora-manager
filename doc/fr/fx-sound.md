@@ -1,12 +1,15 @@
-# FX Sound (Easy Effects)
+# FX Sound & Vidéo (Easy Effects, codecs, FFmpeg)
 
-Section **FX Sound** (`audio-volume-high-symbolic`, juste après *Services*).
+Section **FX Sound & Vidéo** (`audio-volume-high-symbolic`, juste après *Services*).
 
-Elle installe deux éléments, l'un après l'autre :
+Elle installe deux éléments audio, puis un groupe **Vidéo** :
 
 1. **Easy Effects** — l'égaliseur système pour PipeWire ;
 2. **les presets communautaires** de JackHack96 — une dizaine de réglages prêts à
-   l'emploi, appliqués en un clic.
+   l'emploi, appliqués en un clic ;
+3. **les codecs audio et vidéo** (groupe *Vidéo*) — GStreamer complet et codecs
+   RPM Fusion ;
+4. **FFmpeg complet** — `ffmpeg` avec `libavcodec-freeworld`.
 
 Chaque ligne porte une **pastille d'état** lue sur le système :
 
@@ -104,6 +107,52 @@ script est lancé avec l'identité de l'utilisateur réel (`PKEXEC_UID` / `SUDO_
 Easy Effects doit **rester lancé** (fenêtre ou arrière-plan) pour que les effets
 s'appliquent ; c'est un traitement temps réel, pas un réglage écrit dans le matériel.
 
+## 4. Codecs audio et vidéo
+
+Ligne **Codecs audio et vidéo** du groupe *Vidéo*.
+
+```bash
+$ sudo dnf install -y \
+    gstreamer1-plugins-good gstreamer1-plugins-bad-free \
+    gstreamer1-plugins-bad-free-extras gstreamer1-plugins-ugly \
+    gstreamer1-plugins-libav gstreamer1-plugins-bad-freeworld \
+    gstreamer1-plugin-openh264 libavcodec-freeworld \
+    lame x264-libs x265-libs
+```
+
+RPM Fusion est activé automatiquement si nécessaire, et la commande utilise
+`--skip-unavailable` : un paquet retiré d'une version de Fedora n'annule plus
+l'installation.
+
+| Format | Paquet |
+|---|---|
+| H.264 / HEVC / AAC / DVD | `libavcodec-freeworld`, `gstreamer1-plugins-ugly` |
+| H.264 pour les navigateurs | `gstreamer1-plugin-openh264` |
+| MP3 (encodage) | `lame` |
+| x264 / x265 | `x264-libs`, `x265-libs` |
+| Greffons GStreamer complets | `good`, `bad-free`, `bad-free-extras`, `libav`, `bad-freeworld` |
+
+## 5. FFmpeg (codecs complets)
+
+Ligne **FFmpeg (codecs complets)** :
+
+```bash
+$ sudo dnf install -y ffmpeg libavcodec-freeworld
+$ ffmpeg -version
+$ ffmpeg -codecs | head
+```
+
+Le paquet Fedora `libavcodec-free` est bridé : `libavcodec-freeworld` (RPM Fusion)
+le remplace pour décoder et encoder tous les formats.
+
+```bash
+# Convertir en H.264 / AAC
+$ ffmpeg -i entree.mkv -c:v libx264 -c:a aac sortie.mp4
+
+# Extraire l'audio
+$ ffmpeg -i video.mp4 -vn -c:a copy audio.m4a
+```
+
 ## Vérifications utiles
 
 ```bash
@@ -141,6 +190,10 @@ $ rm -rf ~/.local/share/easyeffects
 
 # Retirer l'application
 $ sudo dnf remove easyeffects
+
+# Retirer les codecs et FFmpeg (RPM Fusion)
+$ sudo dnf remove ffmpeg libavcodec-freeworld gstreamer1-plugins-ugly \
+    gstreamer1-plugins-bad-freeworld
 ```
 
 La section ne modifie aucun fichier de configuration système : supprimer le paquet et

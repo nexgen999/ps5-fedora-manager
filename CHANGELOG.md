@@ -6,6 +6,17 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.6] — 2026-11-27
+
+### Ajouté
+- **FX Sound & Vidéo** : la section s'appelle désormais « FX Sound & Vidéo » et gagne un groupe **Vidéo**.
+  - **Codecs audio et vidéo** : GStreamer complet (`good`, `bad-free`, `bad-free-extras`, `ugly`, `libav`, `bad-freeworld`), `libavcodec-freeworld`, `lame`, `x264-libs`, `x265-libs`, `gstreamer1-plugin-openh264` — RPM Fusion activé automatiquement si nécessaire, `--skip-unavailable` pour les paquets absents d'une version.
+  - **FFmpeg (codecs complets)** : `ffmpeg` + `libavcodec-freeworld` (remplace le `libavcodec-free` bridé de Fedora).
+  - Pastilles d'état sur les deux lignes, notes sur RPM Fusion et sur le redémarrage des applications après installation.
+
+### Modifié
+- `sec_fx` traduit dans les 6 langues : « FX Sound & Vidéo » (fr), « FX Sound & Video » (en/de), « FX Sound y Vídeo » (es), « FX Sound e Video » (it), « FX Sound e Vídeo » (pt).
+
 ## [0.15.5] — 2026-11-27
 
 ### Corrigé

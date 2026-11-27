@@ -7,6 +7,17 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.6] — 2026-11-27
+
+### Added
+- **FX Sound & Video**: the section is now called “FX Sound & Video” and gains a **Video** group.
+  - **Audio and video codecs**: full GStreamer (`good`, `bad-free`, `bad-free-extras`, `ugly`, `libav`, `bad-freeworld`), `libavcodec-freeworld`, `lame`, `x264-libs`, `x265-libs`, `gstreamer1-plugin-openh264` — RPM Fusion enabled automatically when needed, `--skip-unavailable` for packages missing from a release.
+  - **FFmpeg (full codecs)**: `ffmpeg` + `libavcodec-freeworld` (replaces Fedora's crippled `libavcodec-free`).
+  - Status badges on both rows, notes about RPM Fusion and about restarting applications after installing.
+
+### Changed
+- `sec_fx` translated in all 6 languages: “FX Sound & Vidéo” (fr), “FX Sound & Video” (en/de), “FX Sound y Vídeo” (es), “FX Sound e Video” (it), “FX Sound e Vídeo” (pt).
+
 ## [0.15.5] — 2026-11-27
 
 ### Fixed

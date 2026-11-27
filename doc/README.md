@@ -13,7 +13,7 @@ La documentation existe en deux langues, avec le même contenu :
 | Serveur web (Apache, Nginx, PHP, MariaDB) | [fr/serveur-web.md](fr/serveur-web.md) | [en/web-server.md](en/web-server.md) |
 | Page Développement | [fr/developpement.md](fr/developpement.md) | [en/development.md](en/development.md) |
 | Services on/off | [fr/services.md](fr/services.md) | [en/services.md](en/services.md) |
-| FX Sound (Easy Effects + presets) | [fr/fx-sound.md](fr/fx-sound.md) | [en/fx-sound.md](en/fx-sound.md) |
+| FX Sound & Vidéo (Easy Effects, presets, codecs, FFmpeg) | [fr/fx-sound.md](fr/fx-sound.md) | [en/fx-sound.md](en/fx-sound.md) |
 | Gamescope (scripts externes) | [fr/gamescope.md](fr/gamescope.md) | [en/gamescope.md](en/gamescope.md) |
 | Freebuff | [fr/freebuff.md](fr/freebuff.md) | [en/freebuff.md](en/freebuff.md) |
 | Réinitialisation / désinstallation | [fr/reinitialisation.md](fr/reinitialisation.md) | [en/reset.md](en/reset.md) |
