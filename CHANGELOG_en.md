@@ -7,6 +7,20 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.15] — 2026-11-27
+
+### Changed
+- **The “beta release” block leaves the manager update page.** The beta edition
+  is now driven from a reserved menu, opened by an internal keyboard shortcut:
+  no row, no button and no release note mentions it in the interface.
+
+### Added
+- **“Uninstall the beta release”** in that menu: deletes
+  `/opt/ps5-manager/beta` and `/tmp/ps5-manager-beta.log` after confirmation.
+  A manager update reinstalls the beta when needed.
+- The menu's five actions (install and launch, launch, terminal, log, uninstall)
+  are translated into all six languages, 24 keys in total.
+
 ## [0.15.14] — 2026-11-27
 
 ### Fixed

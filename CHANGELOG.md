@@ -6,6 +6,21 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.15] — 2026-11-27
+
+### Modifié
+- **Le bloc « version bêta » quitte la page de mise à jour.** L'édition bêta se
+  pilote désormais depuis un menu réservé, ouvert par un raccourci clavier
+  interne : aucune ligne, aucun bouton et aucune note de version ne le signale
+  dans l'interface.
+
+### Ajouté
+- **« Désinstaller la version bêta »** dans ce menu : supprime
+  `/opt/ps5-manager/beta` et `/tmp/ps5-manager-beta.log` après confirmation.
+  Une mise à jour du manager réinstalle la bêta au besoin.
+- Les cinq actions du menu (installer et lancer, lancer, terminal, journal,
+  désinstaller) sont traduites dans les six langues, 24 clés au total.
+
 ## [0.15.14] — 2026-11-27
 
 ### Corrigé

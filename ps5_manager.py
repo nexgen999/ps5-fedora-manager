@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.14"
+APP_VERSION = "0.15.15"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -7845,10 +7845,24 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         self.overlay.set_child(self.split)
         self.set_content(self.overlay)
 
+        # Raccourci réservé (Ctrl+1) : ouvre le menu de l'édition bêta.
+        # En phase CAPTURE pour fonctionner même quand un champ a le focus.
+        keys = Gtk.EventControllerKey()
+        keys.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+        keys.connect("key-pressed", self._on_secret_shortcut)
+        self.add_controller(keys)
+
         self._select_section("logs")
 
         # Vérification de mise à jour en arrière-plan (l'ouverture reste instantanée)
         self.start_auto_update()
+
+    def _on_secret_shortcut(self, _controller, keyval, _keycode, state) -> bool:
+        """Ctrl+1 : menu de l'édition bêta, non documenté dans l'interface."""
+        if keyval == Gdk.KEY_1 and state & Gdk.ModifierType.CONTROL_MASK:
+            show_beta_menu(self)
+            return True
+        return False
 
     # ---- Barre latérale ----
     def _build_sidebar(self) -> Adw.NavigationPage:
@@ -8971,6 +8985,12 @@ BETA_STRINGS: dict[str, dict[str, str]] = {
         "preflight": "La bêta ne peut pas démarrer",
         "crash": "La bêta s'est arrêtée (code %s)",
         "empty_log": "Journal vide : le processus n'a rien écrit.",
+        "popup_title": "Menu bêta",
+        "popup_sub": "Raccourci Ctrl+1 — installation, lancement et désinstallation",
+        "uninstall": "Désinstaller la version bêta",
+        "uninstall_sub": "Supprime le dossier beta/ et le journal",
+        "uninstall_confirm": "Supprimer /opt/ps5-manager/beta et son journal ? Une mise à jour du manager la réinstallera.",
+        "uninstalled": "Version bêta désinstallée",
     },
     "en": {
         "group": "Beta release",
@@ -8991,6 +9011,12 @@ BETA_STRINGS: dict[str, dict[str, str]] = {
         "preflight": "The beta cannot start",
         "crash": "The beta exited (code %s)",
         "empty_log": "Empty log: the process wrote nothing.",
+        "popup_title": "Beta menu",
+        "popup_sub": "Ctrl+1 shortcut — install, launch and uninstall",
+        "uninstall": "Uninstall the beta release",
+        "uninstall_sub": "Deletes the beta/ folder and its log",
+        "uninstall_confirm": "Delete /opt/ps5-manager/beta and its log? A manager update will install it again.",
+        "uninstalled": "Beta release uninstalled",
     },
     "es": {
         "group": "Versión beta",
@@ -9011,6 +9037,12 @@ BETA_STRINGS: dict[str, dict[str, str]] = {
         "preflight": "La beta no puede iniciarse",
         "crash": "La beta se detuvo (código %s)",
         "empty_log": "Registro vacío: el proceso no escribió nada.",
+        "popup_title": "Menú beta",
+        "popup_sub": "Atajo Ctrl+1 — instalar, iniciar y desinstalar",
+        "uninstall": "Desinstalar la versión beta",
+        "uninstall_sub": "Elimina la carpeta beta/ y su registro",
+        "uninstall_confirm": "¿Eliminar /opt/ps5-manager/beta y su registro? Una actualización del gestor la reinstalará.",
+        "uninstalled": "Versión beta desinstalada",
     },
     "it": {
         "group": "Versione beta",
@@ -9031,6 +9063,12 @@ BETA_STRINGS: dict[str, dict[str, str]] = {
         "preflight": "La beta non può avviarsi",
         "crash": "La beta si è chiusa (codice %s)",
         "empty_log": "Registro vuoto: il processo non ha scritto nulla.",
+        "popup_title": "Menu beta",
+        "popup_sub": "Scorciatoia Ctrl+1 — installa, avvia e disinstalla",
+        "uninstall": "Disinstalla la versione beta",
+        "uninstall_sub": "Elimina la cartella beta/ e il registro",
+        "uninstall_confirm": "Eliminare /opt/ps5-manager/beta e il registro? Un aggiornamento del gestore la reinstallerà.",
+        "uninstalled": "Versione beta disinstallata",
     },
     "de": {
         "group": "Beta-Version",
@@ -9051,6 +9089,12 @@ BETA_STRINGS: dict[str, dict[str, str]] = {
         "preflight": "Die Beta kann nicht starten",
         "crash": "Die Beta wurde beendet (Code %s)",
         "empty_log": "Leeres Protokoll: der Prozess hat nichts geschrieben.",
+        "popup_title": "Beta-Menü",
+        "popup_sub": "Tastenkürzel Strg+1 – installieren, starten und deinstallieren",
+        "uninstall": "Beta-Version deinstallieren",
+        "uninstall_sub": "Löscht den Ordner beta/ und das Protokoll",
+        "uninstall_confirm": "/opt/ps5-manager/beta und das Protokoll löschen? Eine Aktualisierung des Managers installiert sie erneut.",
+        "uninstalled": "Beta-Version deinstalliert",
     },
     "pt": {
         "group": "Versão beta",
@@ -9071,6 +9115,12 @@ BETA_STRINGS: dict[str, dict[str, str]] = {
         "preflight": "A beta não consegue arrancar",
         "crash": "A beta terminou (código %s)",
         "empty_log": "Registo vazio: o processo não escreveu nada.",
+        "popup_title": "Menu beta",
+        "popup_sub": "Atalho Ctrl+1 — instalar, iniciar e desinstalar",
+        "uninstall": "Desinstalar a versão beta",
+        "uninstall_sub": "Elimina a pasta beta/ e o registo",
+        "uninstall_confirm": "Eliminar /opt/ps5-manager/beta e o respetivo registo? Uma atualização do gestor volta a instalá-la.",
+        "uninstalled": "Versão beta desinstalada",
     },
 }
 
@@ -9242,6 +9292,182 @@ def spawn_beta(backend: str = "") -> Any:
     return proc
 
 
+def beta_log_text(prefix: str = "") -> str:
+    try:
+        with open(BETA_LOG_PATH, encoding="utf-8", errors="replace") as handle:
+            tail = "".join(handle.readlines()[-80:]).strip()
+    except OSError:
+        tail = ""
+    body = tail or _bt("empty_log")
+    return f"{prefix}\n\n{body}" if prefix else body
+
+
+def show_beta_log(win: Any, prefix: str = "") -> None:
+    win.show_text_modal(_bt("log_title"), beta_log_text(prefix))
+
+
+def watch_beta(win: Any, proc: Any, on_dead: Callable[[int], None]) -> None:
+    """Après 2,5 s : fenêtre ouverte → toast, processus mort → diagnostic."""
+
+    def _poll() -> bool:
+        code = proc.poll()
+        if code is None:
+            win.toast(_bt("launched"))
+            return False
+        on_dead(code)
+        return False
+
+    GLib.timeout_add(2500, _poll)
+
+
+def start_beta(win: Any) -> None:
+    """Lance la bêta ; repli X11 automatique, journal affiché en cas d'échec."""
+    if not beta_present():
+        win.toast(_bt("missing"))
+        return
+    ok, detail = beta_preflight()
+    if not ok:
+        win.show_text_modal(_bt("preflight"), detail)
+        return
+
+    def _give_up(code: int) -> None:
+        show_beta_log(win, _bt("crash") % code)
+
+    def _retry_x11(code: int) -> None:
+        proc_x11 = spawn_beta("x11")
+        if proc_x11 is None:
+            _give_up(code)
+            return
+        watch_beta(win, proc_x11, _give_up)
+
+    proc = spawn_beta("")
+    if proc is None:
+        win.toast(_bt("root"))
+        return
+    watch_beta(win, proc, _retry_x11)
+
+
+def install_beta(win: Any) -> None:
+    """Récupère la bêta du dépôt puis la lance."""
+
+    def _task(emit):
+        if os.path.isdir(os.path.join(INSTALL_DIR, ".git")):
+            rc = win.run_cmd_pty(["git", "-C", INSTALL_DIR, "fetch", "--all", "--prune"], emit)
+            if rc == 0:
+                rc = win.run_cmd_pty(["git", "-C", INSTALL_DIR, "reset", "--hard", "origin/main"], emit)
+        else:
+            os.makedirs(INSTALL_DIR, mode=0o755, exist_ok=True)
+            rc = win.run_cmd_pty(["git", "clone", REPO_URL, INSTALL_DIR], emit)
+        if rc != 0:
+            return False, T("failed") % rc
+        if not beta_present():
+            return False, _bt("missing")
+        version = beta_version() or "beta"
+        emit(_bt("installed") % version)
+        GLib.idle_add(lambda: start_beta(win))
+        return True, _bt("installed") % version
+
+    win.run_task(T("mgr_update"), _task, lambda _ok, msg: win.toast(msg))
+
+
+def uninstall_beta(win: Any) -> None:
+    """Supprime beta/ et son journal ; une mise à jour du manager la réinstalle."""
+    if not beta_present():
+        win.toast(_bt("missing"))
+        return
+
+    def _do() -> None:
+        def _task(emit):
+            emit(f"rm -rf {BETA_DIR}")
+            shutil.rmtree(BETA_DIR, ignore_errors=True)
+            try:
+                os.remove(BETA_LOG_PATH)
+            except OSError:
+                pass
+            return True, _bt("uninstalled")
+
+        win.run_task(_bt("uninstall"), _task)
+
+    win.show_confirm(_bt("uninstall"), _bt("uninstall_confirm"), _do)
+
+
+def beta_in_terminal(win: Any) -> None:
+    if not beta_present():
+        win.toast(_bt("missing"))
+        return
+    entry = os.path.join(BETA_DIR, "run.py")
+    if not _launch_in_terminal(f"{sys.executable} {entry}"):
+        win.toast(_bt("terminal_missing"))
+
+
+def show_beta_menu(win: Any) -> None:
+    """Menu discret de l'édition bêta (Ctrl+1) : rien dans l'interface visible."""
+    dialog = Adw.Dialog()
+    dialog.set_content_width(480)
+
+    page = Adw.PreferencesPage()
+    group = Adw.PreferencesGroup(title=_bt("group"), description=_bt("popup_sub"))
+    installed_version = beta_version() if beta_present() else ""
+
+    def _then(action: Callable[[Any], None]):
+        def _run(*_args) -> None:
+            dialog.close()
+            action(win)
+
+        return _run
+
+    group.add(
+        win.row(
+            _bt("install"),
+            (_bt("installed") % installed_version) if installed_version else _bt("install_sub"),
+            "system-software-install-symbolic",
+            _then(install_beta),
+        )
+    )
+    group.add(
+        win.row(
+            _bt("launch"),
+            _bt("launch_sub"),
+            "media-playback-start-symbolic",
+            _then(start_beta),
+        )
+    )
+    group.add(
+        win.row(
+            _bt("terminal"),
+            _bt("terminal_sub"),
+            "utilities-terminal-symbolic",
+            _then(beta_in_terminal),
+        )
+    )
+    group.add(
+        win.row(
+            _bt("log"),
+            _bt("log_sub"),
+            "text-x-generic-symbolic",
+            _then(lambda w: show_beta_log(w)),
+        )
+    )
+    group.add(
+        win.row(
+            _bt("uninstall"),
+            _bt("uninstall_sub"),
+            "user-trash-symbolic",
+            _then(uninstall_beta),
+            suffix_icon=None,
+        )
+    )
+    page.add(group)
+
+    header = Adw.HeaderBar()
+    header.set_title_widget(Adw.WindowTitle(title=_bt("popup_title")))
+    toolbar = Adw.ToolbarView()
+    toolbar.add_top_bar(header)
+    toolbar.set_content(page)
+    dialog.set_child(toolbar)
+    dialog.present(win)
+
+
 def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     grp = pref_group(title=T("mgr_title"))
 
@@ -9366,124 +9592,6 @@ def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     )
     page.add(grp)
 
-    # ---- Version bêta : installation et lancement depuis la même page ----
-    beta_grp = pref_group(title=_bt("group"))
-    installed_version = beta_version() if beta_present() else ""
-
-    def _beta_log_text(prefix: str = "") -> str:
-        try:
-            with open(BETA_LOG_PATH, encoding="utf-8", errors="replace") as handle:
-                tail = "".join(handle.readlines()[-80:]).strip()
-        except OSError:
-            tail = ""
-        body = tail or _bt("empty_log")
-        return f"{prefix}\n\n{body}" if prefix else body
-
-    def _show_beta_log(prefix: str = "") -> None:
-        win.show_text_modal(_bt("log_title"), _beta_log_text(prefix))
-
-    def _watch_beta(proc: Any, on_dead: Callable[[int], None]) -> None:
-        """Attend 2,5 s : fenêtre ouverte → toast, processus mort → diagnostic."""
-
-        def _poll() -> bool:
-            code = proc.poll()
-            if code is None:
-                win.toast(_bt("launched"))
-                return False
-            on_dead(code)
-            return False
-
-        GLib.timeout_add(2500, _poll)
-
-    def _start_beta() -> None:
-        if not beta_present():
-            win.toast(_bt("missing"))
-            return
-        ok, detail = beta_preflight()
-        if not ok:
-            win.show_text_modal(_bt("preflight"), detail)
-            return
-
-        def _give_up(code: int) -> None:
-            _show_beta_log(_bt("crash") % code)
-
-        def _retry_x11(code: int) -> None:
-            proc_x11 = spawn_beta("x11")
-            if proc_x11 is None:
-                _give_up(code)
-                return
-            _watch_beta(proc_x11, _give_up)
-
-        proc = spawn_beta("")
-        if proc is None:
-            win.toast(_bt("root"))
-            return
-        _watch_beta(proc, _retry_x11)
-
-    def _install_beta():
-        def _task(emit):
-            if os.path.isdir(os.path.join(INSTALL_DIR, ".git")):
-                rc = win.run_cmd_pty(["git", "-C", INSTALL_DIR, "fetch", "--all", "--prune"], emit)
-                if rc == 0:
-                    rc = win.run_cmd_pty(["git", "-C", INSTALL_DIR, "reset", "--hard", "origin/main"], emit)
-            else:
-                os.makedirs(INSTALL_DIR, mode=0o755, exist_ok=True)
-                rc = win.run_cmd_pty(["git", "clone", REPO_URL, INSTALL_DIR], emit)
-            if rc != 0:
-                return False, T("failed") % rc
-            if not beta_present():
-                return False, _bt("missing")
-            version = beta_version() or "beta"
-            emit(_bt("installed") % version)
-            GLib.idle_add(_start_beta)
-            return True, _bt("installed") % version
-
-        win.run_task(T("mgr_update"), _task, lambda _ok, msg: win.toast(msg))
-
-    def _run_beta():
-        _start_beta()
-
-    def _beta_in_terminal() -> None:
-        if not beta_present():
-            win.toast(_bt("missing"))
-            return
-        entry = os.path.join(BETA_DIR, "run.py")
-        if not _launch_in_terminal(f"{sys.executable} {entry}"):
-            win.toast(_bt("terminal_missing"))
-
-    beta_grp.add(
-        win.row(
-            _bt("install"),
-            (_bt("installed") % installed_version) if installed_version else _bt("install_sub"),
-            "system-software-install-symbolic",
-            lambda *_: _install_beta(),
-        )
-    )
-    beta_grp.add(
-        win.row(
-            _bt("launch"),
-            _bt("launch_sub"),
-            "media-playback-start-symbolic",
-            lambda *_: _run_beta(),
-        )
-    )
-    beta_grp.add(
-        win.row(
-            _bt("terminal"),
-            _bt("terminal_sub"),
-            "utilities-terminal-symbolic",
-            lambda *_: _beta_in_terminal(),
-        )
-    )
-    beta_grp.add(
-        win.row(
-            _bt("log"),
-            _bt("log_sub"),
-            "text-x-generic-symbolic",
-            lambda *_: _show_beta_log(),
-        )
-    )
-    page.add(beta_grp)
 
 
 def build_page_lang(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
