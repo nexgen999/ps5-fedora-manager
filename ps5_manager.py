@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.1"
+APP_VERSION = "0.15.2"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1119,16 +1119,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.15.1",
-    "en": "What is new in 0.15.1",
-    "es": "Novedades de la 0.15.1",
-    "it": "Novità della 0.15.1",
-    "de": "Neu in 0.15.1",
-    "pt": "Novidades da 0.15.1",
+    "fr": "Nouveautés de la 0.15.2",
+    "en": "What is new in 0.15.2",
+    "es": "Novedades de la 0.15.2",
+    "it": "Novità della 0.15.2",
+    "de": "Neu in 0.15.2",
+    "pt": "Novidades da 0.15.2",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15.2 : détection correcte des dépôts sous Fedora 41+ (dnf5) — RPM Fusion livré dans /usr/share/dnf5/repos.d et activations de config-manager dans /etc/dnf/repos.override.d",
         "0.15.1 : pastilles d'état (● installé / ◐ partiel / ○ absent) dans les sections Dépendances, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Ventilateur, Hardware Control, Dépôts et Logithèque (AppImage Pool, Gear Lever)",
         "0.15 : section « FX Sound » — installation d'Easy Effects et des presets communautaires JackHack96 (option 1 : tous les presets), avec pastilles d'état et documentation FR/EN dédiée",
         "0.14 : pastilles d'état (installé / partiel / absent) sur les catalogues et les profils, nouvelle section « Services » avec interrupteurs on/off systemd et raccourci pour couper bluetooth, CUPS, Avahi et ModemManager, et une documentation FR/EN complète dans le dossier doc/",
@@ -1150,6 +1151,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15.2: correct repository detection on Fedora 41+ (dnf5) — RPM Fusion ships in /usr/share/dnf5/repos.d and config-manager stores enablement in /etc/dnf/repos.override.d",
         "0.15.1: status badges (● installed / ◐ partial / ○ missing) in the Dependencies, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Fan, Hardware Control, Repositories sections and the App store (AppImage Pool, Gear Lever)",
         "0.15: “FX Sound” section — install Easy Effects and the JackHack96 community presets (option 1: all presets), with status badges and dedicated FR/EN documentation",
         "0.14: status badges (installed / partial / missing) on the catalogues and profiles, a new “Services” section with systemd on/off switches and a shortcut to turn off bluetooth, CUPS, Avahi and ModemManager, and complete FR/EN documentation in the doc/ folder",
@@ -1171,6 +1173,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15.2 : detección correcta de repositorios en Fedora 41+ (dnf5): RPM Fusion se instala en /usr/share/dnf5/repos.d y config-manager guarda la activación en /etc/dnf/repos.override.d",
         "0.15.1 : indicadores de estado (● instalado / ◐ parcial / ○ ausente) en las secciones Dependencias, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Ventilador, Hardware Control, Repositorios y Tienda (AppImage Pool, Gear Lever)",
         "0.15 : sección «FX Sound» — instalación de Easy Effects y de los presets comunitarios de JackHack96 (opción 1: todos los presets), con indicadores de estado y documentación FR/EN dedicada",
         "0.14 : indicadores de estado (instalado / parcial / ausente) en los catálogos y perfiles, nueva sección «Servicios» con interruptores on/off de systemd y un atajo para apagar bluetooth, CUPS, Avahi y ModemManager, y documentación completa FR/EN en la carpeta doc/",
@@ -1192,6 +1195,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15.2 : rilevamento corretto dei repository su Fedora 41+ (dnf5): RPM Fusion risiede in /usr/share/dnf5/repos.d e config-manager salva l'attivazione in /etc/dnf/repos.override.d",
         "0.15.1 : indicatori di stato (● installato / ◐ parziale / ○ assente) nelle sezioni Dipendenze, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Ventola, Hardware Control, Repository e App store (AppImage Pool, Gear Lever)",
         "0.15 : sezione «FX Sound» — installazione di Easy Effects e dei preset della community di JackHack96 (opzione 1: tutti i preset), con indicatori di stato e documentazione FR/EN dedicata",
         "0.14 : indicatori di stato (installato / parziale / assente) nei cataloghi e nei profili, nuova sezione «Servizi» con interruttori on/off systemd e una scorciatoia per spegnere bluetooth, CUPS, Avahi e ModemManager, e documentazione completa FR/EN nella cartella doc/",
@@ -1213,6 +1217,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15.2 : korrekte Paketquellen-Erkennung unter Fedora 41+ (dnf5) – RPM Fusion liegt in /usr/share/dnf5/repos.d und config-manager speichert Aktivierungen in /etc/dnf/repos.override.d",
         "0.15.1 : Statusanzeigen (● installiert / ◐ teilweise / ○ fehlt) in den Abschnitten Abhängigkeiten, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Lüfter, Hardware Control, Paketquellen und App-Store (AppImage Pool, Gear Lever)",
         "0.15 : Abschnitt „FX Sound“ – Installation von Easy Effects und den Community-Presets von JackHack96 (Option 1: alle Presets), mit Statusanzeigen und eigener FR/EN-Dokumentation",
         "0.14 : Statusanzeigen (installiert / teilweise / fehlend) in den Katalogen und Profilen, neuer Abschnitt „Dienste“ mit systemd-Ein/Aus-Schaltern und einer Abkürzung zum Abschalten von Bluetooth, CUPS, Avahi und ModemManager sowie vollständige FR/EN-Dokumentation im Ordner doc/",
@@ -1234,6 +1239,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15.2 : deteção correta dos repositórios no Fedora 41+ (dnf5): o RPM Fusion fica em /usr/share/dnf5/repos.d e o config-manager guarda a ativação em /etc/dnf/repos.override.d",
         "0.15.1 : indicadores de estado (● instalado / ◐ parcial / ○ ausente) nas secções Dependências, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Ventoinha, Hardware Control, Repositórios e Loja (AppImage Pool, Gear Lever)",
         "0.15 : secção «FX Sound» — instalação do Easy Effects e dos presets da comunidade de JackHack96 (opção 1: todos os presets), com indicadores de estado e documentação FR/EN dedicada",
         "0.14 : indicadores de estado (instalado / parcial / ausente) nos catálogos e perfis, nova secção «Serviços» com interruptores on/off do systemd e um atalho para desligar bluetooth, CUPS, Avahi e ModemManager, e documentação completa FR/EN na pasta doc/",
@@ -8242,7 +8248,7 @@ def _push_software_actions(win: Ps5ManagerWindow, item: SoftwareItem) -> None:
 
 
 def _ensure_rpmfusion(win: Ps5ManagerWindow, emit: Callable[[str], None]) -> bool:
-    if os.path.isfile("/etc/yum.repos.d/rpmfusion-nonfree.repo"):
+    if _rpmfusion_enabled() or os.path.isfile("/etc/yum.repos.d/rpmfusion-nonfree.repo"):
         return True
     fed = subprocess.run(["rpm", "-E", "%fedora"], capture_output=True, text=True).stdout.strip() or "45"
     rc = win.run_cmd_pty(
@@ -12774,27 +12780,61 @@ def _install_row(
     return row
 
 
+# Dépôts DNF : définition livrée par Fedora/RPM Fusion (dnf5, Fedora 41+ : /usr),
+# fichiers ajoutés à la main (/etc/yum.repos.d) puis overrides de config-manager,
+# appliqués dans cet ordre (le dernier gagne).
+DNF_REPO_DIRS = (
+    "/usr/share/dnf5/repos.d",
+    "/etc/yum.repos.d",
+    "/usr/share/dnf5/repos.override.d",
+    "/etc/dnf/repos.override.d",
+)
+
+
+def _dnf_repos() -> dict[str, bool]:
+    """Dépôts DNF définis et leur état effectif (enabled), sans lancer dnf."""
+    repos: dict[str, bool] = {}
+    for directory in DNF_REPO_DIRS:
+        for repo_path in sorted(glob.glob(os.path.join(directory, "*.repo"))):
+            repoid = ""
+            enabled = True
+            try:
+                with open(repo_path, encoding="utf-8", errors="replace") as fh:
+                    for line in fh:
+                        stripped = line.strip()
+                        if stripped.startswith("["):
+                            if repoid:
+                                repos[repoid] = enabled
+                            end = stripped.find("]")
+                            repoid = stripped[1:end] if end > 0 else ""
+                            enabled = True
+                            continue
+                        key, sep, value = stripped.partition("=")
+                        if repoid and sep and key.strip().lower() == "enabled":
+                            enabled = value.strip() != "0"
+            except OSError:
+                continue
+            if repoid:
+                repos[repoid] = enabled
+    return repos
+
+
 def _repo_enabled(repoid: str) -> bool:
-    """Dépôt DNF activé, lu dans /etc/yum.repos.d (sans lancer dnf)."""
-    header = re.compile(rf"^\s*\[{re.escape(repoid)}\]\s*$")
-    enabled = re.compile(r"^\s*enabled\s*=\s*1\s*$", re.I)
-    for repo_path in glob.glob("/etc/yum.repos.d/*.repo"):
-        try:
-            with open(repo_path, encoding="utf-8", errors="replace") as fh:
-                inside = False
-                for line in fh:
-                    if line.lstrip().startswith("["):
-                        inside = bool(header.match(line))
-                        continue
-                    if inside and enabled.match(line):
-                        return True
-        except OSError:
-            continue
-    return False
+    return _dnf_repos().get(repoid, False)
+
+
+def _rpmfusion_enabled() -> bool:
+    return any(
+        rid.startswith("rpmfusion-") and enabled
+        for rid, enabled in _dnf_repos().items()
+    )
 
 
 def _rpmfusion_present() -> bool:
-    return bool(glob.glob("/etc/yum.repos.d/rpmfusion-*.repo"))
+    if _rpmfusion_enabled():
+        return True
+    present = _rpm_present(["rpmfusion-free-release", "rpmfusion-nonfree-release"])
+    return any(present.values())
 
 
 def _flathub_present() -> bool:

@@ -45,4 +45,5 @@ catalogues *Développement* et *Serveur web*.
 
 La détection se fait à l'ouverture de la page, sans commande bloquante : `rpm -q`
 groupé (architecture comprise), fichiers et unités systemd, dépôts lus dans
-`/etc/yum.repos.d`, remotes Flatpak (`flatpak remotes`, `flatpak info`).
+`/usr/share/dnf5/repos.d`, `/etc/yum.repos.d` et les overrides
+`/etc/dnf/repos.override.d` (dnf5), remotes Flatpak (`flatpak remotes`, `flatpak info`).

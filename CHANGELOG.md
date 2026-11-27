@@ -6,6 +6,13 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.2] — 2026-11-27
+
+### Corrigé
+- **Dépôts détectés correctement sous Fedora 41+ (dnf5)** : la lecture des dépôts couvre désormais `/usr/share/dnf5/repos.d` (définitions livrées, dont **RPM Fusion**), `/etc/yum.repos.d` puis les overrides `/usr/share/dnf5/repos.override.d` et `/etc/dnf/repos.override.d` — l'ordre réel d'application de dnf5.
+- **RPM Fusion** : plus de faux « ○ Non installé ». La détection reconnaît les dépôts `rpmfusion-*` actifs quel que soit leur emplacement, et se replie sur les paquets `rpmfusion-free-release` / `rpmfusion-nonfree-release`. L'installation ne relance plus les RPM de release inutilement.
+- **fedora-cisco-openh264** : la pastille lit l'activation écrite par `dnf config-manager` dans `/etc/dnf/repos.override.d/99-config_manager.repo`, pas seulement le fichier `.repo` d'origine.
+
 ## [0.15.1] — 2026-11-27
 
 ### Modifié

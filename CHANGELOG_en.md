@@ -7,6 +7,13 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.2] — 2026-11-27
+
+### Fixed
+- **Correct repository detection on Fedora 41+ (dnf5)**: repository reading now covers `/usr/share/dnf5/repos.d` (shipped definitions, including **RPM Fusion**), `/etc/yum.repos.d`, then the `/usr/share/dnf5/repos.override.d` and `/etc/dnf/repos.override.d` overrides — dnf5's actual application order.
+- **RPM Fusion**: no more false “○ Not installed”. Detection recognises active `rpmfusion-*` repositories wherever they live, and falls back to the `rpmfusion-free-release` / `rpmfusion-nonfree-release` packages. Installing no longer re-runs the release RPMs needlessly.
+- **fedora-cisco-openh264**: the badge reads the enablement written by `dnf config-manager` into `/etc/dnf/repos.override.d/99-config_manager.repo`, not only the original `.repo` file.
+
 ## [0.15.1] — 2026-11-27
 
 ### Changed
