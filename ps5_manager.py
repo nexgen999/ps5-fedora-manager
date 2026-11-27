@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.6"
+APP_VERSION = "0.15.7"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1123,16 +1123,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.15.6",
-    "en": "What is new in 0.15.6",
-    "es": "Novedades de la 0.15.6",
-    "it": "Novità della 0.15.6",
-    "de": "Neu in 0.15.6",
-    "pt": "Novidades da 0.15.6",
+    "fr": "Nouveautés de la 0.15.7",
+    "en": "What is new in 0.15.7",
+    "es": "Novedades de la 0.15.7",
+    "it": "Novità della 0.15.7",
+    "de": "Neu in 0.15.7",
+    "pt": "Novidades da 0.15.7",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15.7 : une pastille partielle (◐ 10/11) indique désormais le paquet manquant dans son infobulle et dans le journal d'installation, pour voir quel codec n'a pas pu être installé",
         "0.15.6 : la section « FX Sound » devient « FX Sound & Vidéo » — nouveau groupe Vidéo avec l'installation des codecs audio et vidéo (GStreamer complet + RPM Fusion : H.264, HEVC, AAC, MP3, Dolby…) et de FFmpeg complet (libavcodec-freeworld)",
         "0.15.5 : la pastille du plugin Decky « PS5 Hardware Control » reconnaît son vrai dossier d'installation (~/homebrew/plugins/ps5-hardware-control) et s'affiche enfin comme installé",
         "0.15.4 : la mise à jour du manager remarche sous Fedora 45 — polkit-gnome (paquet supprimé) retiré des dépendances, dnf lancé avec --skip-unavailable et une erreur de dépendances ne bloque plus la mise à jour",
@@ -1159,6 +1160,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15.7: a partial badge (◐ 10/11) now names the missing package in its tooltip and in the install log, so you can see which codec could not be installed",
         "0.15.6: the “FX Sound” section becomes “FX Sound & Video” — new Video group installing every audio and video codec (full GStreamer + RPM Fusion: H.264, HEVC, AAC, MP3, Dolby…) and full FFmpeg (libavcodec-freeworld)",
         "0.15.5: the Decky “PS5 Hardware Control” plugin badge now recognises its real install folder (~/homebrew/plugins/ps5-hardware-control) and shows as installed",
         "0.15.4: manager updates work again on Fedora 45 — polkit-gnome (removed package) dropped from the dependencies, dnf runs with --skip-unavailable and a dependency error no longer blocks the update",
@@ -1185,6 +1187,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15.7 : un indicador parcial (◐ 10/11) indica ahora el paquete que falta en su información emergente y en el registro de instalación, para ver qué códec no se pudo instalar",
         "0.15.6 : la sección «FX Sound» pasa a «FX Sound y Vídeo» — nuevo grupo Vídeo con la instalación de todos los códecs de audio y vídeo (GStreamer completo + RPM Fusion: H.264, HEVC, AAC, MP3, Dolby…) y de FFmpeg completo (libavcodec-freeworld)",
         "0.15.5 : el indicador del plugin Decky «PS5 Hardware Control» reconoce su carpeta real (~/homebrew/plugins/ps5-hardware-control) y aparece como instalado",
         "0.15.4 : la actualización del gestor vuelve a funcionar en Fedora 45 — polkit-gnome (paquete eliminado) fuera de las dependencias, dnf con --skip-unavailable y un error de dependencias ya no bloquea la actualización",
@@ -1211,6 +1214,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15.7 : un indicatore parziale (◐ 10/11) mostra ora il pacchetto mancante nel suggerimento e nel registro di installazione, per vedere quale codec non è stato installato",
         "0.15.6 : la sezione «FX Sound» diventa «FX Sound e Video» — nuovo gruppo Video con l'installazione di tutti i codec audio e video (GStreamer completo + RPM Fusion: H.264, HEVC, AAC, MP3, Dolby…) e di FFmpeg completo (libavcodec-freeworld)",
         "0.15.5 : l'indicatore del plugin Decky «PS5 Hardware Control» riconosce la cartella reale (~/homebrew/plugins/ps5-hardware-control) e appare installato",
         "0.15.4 : l'aggiornamento del gestore torna a funzionare su Fedora 45 — polkit-gnome (pacchetto rimosso) escluso dalle dipendenze, dnf con --skip-unavailable e un errore di dipendenze non blocca più l'aggiornamento",
@@ -1237,6 +1241,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15.7 : eine unvollständige Anzeige (◐ 10/11) nennt jetzt das fehlende Paket im Tooltip und im Installationsprotokoll, damit du siehst, welcher Codec nicht installiert werden konnte",
         "0.15.6 : aus „FX Sound“ wird „FX Sound & Video“ – neuer Abschnitt Video mit der Installation aller Audio- und Videocodecs (vollständiges GStreamer + RPM Fusion: H.264, HEVC, AAC, MP3, Dolby…) und von vollständigem FFmpeg (libavcodec-freeworld)",
         "0.15.5 : die Statusanzeige des Decky-Plugins „PS5 Hardware Control“ erkennt den echten Ordner (~/homebrew/plugins/ps5-hardware-control) und gilt als installiert",
         "0.15.4 : die Manager-Aktualisierung funktioniert unter Fedora 45 wieder – polkit-gnome (entferntes Paket) aus den Abhängigkeiten gestrichen, dnf mit --skip-unavailable und ein Abhängigkeitsfehler blockiert die Aktualisierung nicht mehr",
@@ -1263,6 +1268,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15.7 : um indicador parcial (◐ 10/11) indica agora o pacote em falta na sua dica e no registo de instalação, para ver qual codec não foi instalado",
         "0.15.6 : a secção «FX Sound» passa a «FX Sound e Vídeo» — novo grupo Vídeo com a instalação de todos os codecs de áudio e vídeo (GStreamer completo + RPM Fusion: H.264, HEVC, AAC, MP3, Dolby…) e do FFmpeg completo (libavcodec-freeworld)",
         "0.15.5 : o indicador do plugin Decky «PS5 Hardware Control» reconhece a pasta real (~/homebrew/plugins/ps5-hardware-control) e aparece como instalado",
         "0.15.4 : a atualização do gestor volta a funcionar no Fedora 45 — polkit-gnome (pacote removido) saiu das dependências, dnf com --skip-unavailable e um erro de dependências já não bloqueia a atualização",
@@ -7225,6 +7231,24 @@ _L_TABLE = {
         "FFmpeg ersetzt Fedoras libavcodec-free durch libavcodec-freeworld (vollständige Codecs).",
         "O FFmpeg substitui o libavcodec-free do Fedora pelo libavcodec-freeworld (codecs completos).",
     ),
+    "manquant : ": (
+        "faltante: ",
+        "mancante: ",
+        "fehlt: ",
+        "em falta: ",
+    ),
+    "Non installés : ": (
+        "No instalados: ",
+        "Non installati: ",
+        "Nicht installiert: ",
+        "Não instalados: ",
+    ),
+    "Installation terminée ; paquets indisponibles : ": (
+        "Instalación terminada; paquetes no disponibles: ",
+        "Installazione completata; pacchetti non disponibili: ",
+        "Installation beendet; nicht verfügbare Pakete: ",
+        "Instalação concluída; pacotes indisponíveis: ",
+    ),
     "Relance les applications (ou la session) après l'installation pour utiliser les nouveaux codecs.": (
         "Reinicia las aplicaciones (o la sesión) tras la instalación para usar los nuevos códecs.",
         "Riavvia le applicazioni (o la sessione) dopo l'installazione per usare i nuovi codec.",
@@ -12903,12 +12927,40 @@ def _install_state(
     return sum(1 for ok in present.values() if ok), len(present)
 
 
+def _install_missing(packages: Optional[list[str]]) -> list[str]:
+    """Paquets de la liste qui ne sont pas installés (nom seul)."""
+    if not packages:
+        return []
+    present = _rpm_present(packages)
+    return [name for name, ok in present.items() if not ok]
+
+
+def _install_tooltip(
+    packages: Optional[list[str]],
+    done: int,
+    total: int,
+) -> Optional[str]:
+    """« 10/11 · manquant : paquet » quand l'installation est partielle."""
+    if not packages or not (0 < done < total):
+        return None
+    missing = _install_missing(packages)
+    if not missing:
+        return None
+    return f"{done}/{total} · " + _L("manquant : ", "missing: ") + ", ".join(missing)
+
+
 def _install_badge(
     packages: Optional[list[str]] = None,
     check: Optional[Callable[[], bool]] = None,
 ) -> Optional[Gtk.Widget]:
     """Pastille ● / ◐ / ○ d'une ligne qui installe quelque chose."""
-    return _status_badge(*_install_state(packages, check))
+    done, total = _install_state(packages, check)
+    badge = _status_badge(done, total)
+    if badge is not None:
+        tip = _install_tooltip(packages, done, total)
+        if tip:
+            badge.set_tooltip_text(tip)
+    return badge
 
 
 def _install_row(
@@ -12922,9 +12974,15 @@ def _install_row(
 ) -> Adw.ActionRow:
     """Ligne d'installation avec pastille d'état et chevron, comme les catalogues."""
     row = win.row(title, subtitle, icon, callback, suffix_icon=None)
-    badge = _install_badge(packages, check)
+    done, total = _install_state(packages, check)
+    tip = _install_tooltip(packages, done, total)
+    badge = _status_badge(done, total)
     if badge is not None:
+        if tip:
+            badge.set_tooltip_text(tip)
         row.add_suffix(badge)
+    if tip:
+        row.set_tooltip_text(tip)
     row.add_suffix(Gtk.Image.new_from_icon_name("go-next-symbolic"))
     return row
 
@@ -14498,7 +14556,21 @@ def build_page_fx(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
                 ["dnf", "install", "-y", "--skip-unavailable", *VIDEO_CODEC_PACKAGES],
                 emit,
             )
-            return rc == 0, (T("done") if rc == 0 else T("failed") % rc)
+            if rc != 0:
+                return False, T("failed") % rc
+            missing = _install_missing(VIDEO_CODEC_PACKAGES)
+            if missing:
+                emit(
+                    _L("Non installés : ", "Not installed: ") + ", ".join(missing)
+                )
+                return True, (
+                    _L(
+                        "Installation terminée ; paquets indisponibles : ",
+                        "Install finished; unavailable packages: ",
+                    )
+                    + ", ".join(missing)
+                )
+            return True, T("done")
 
         win.run_task(
             _L("Installer les codecs audio et vidéo", "Install audio and video codecs"),

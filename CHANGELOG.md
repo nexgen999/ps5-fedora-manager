@@ -6,6 +6,12 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.7] — 2026-11-27
+
+### Modifié
+- **Pastille partielle explicite** : quand une ligne affiche ◐ 10/11, son infobulle (et celle de la ligne) donne le nom du paquet manquant — par exemple `10/11 · manquant : gstreamer1-plugin-openh264`. Le journal d'installation liste aussi les paquets indisponibles à la fin de l'opération.
+- Aucun changement sur la liste des codecs ni sur les commandes `dnf` : seule la lecture de l'état est plus précise.
+
 ## [0.15.6] — 2026-11-27
 
 ### Ajouté

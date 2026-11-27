@@ -7,6 +7,12 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.7] — 2026-11-27
+
+### Changed
+- **Explicit partial badge**: when a row shows ◐ 10/11, its tooltip (and the row's) names the missing package — e.g. `10/11 · missing: gstreamer1-plugin-openh264`. The install log also lists unavailable packages when the operation ends.
+- No change to the codec list or the `dnf` commands: only the state reading is more precise.
+
 ## [0.15.6] — 2026-11-27
 
 ### Added
