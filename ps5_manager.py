@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.8"
+APP_VERSION = "0.15.9"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1123,16 +1123,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.15.8",
-    "en": "What is new in 0.15.8",
-    "es": "Novedades de la 0.15.8",
-    "it": "Novità della 0.15.8",
-    "de": "Neu in 0.15.8",
-    "pt": "Novidades da 0.15.8",
+    "fr": "Nouveautés de la 0.15.9",
+    "en": "What is new in 0.15.9",
+    "es": "Novedades de la 0.15.9",
+    "it": "Novità della 0.15.9",
+    "de": "Neu in 0.15.9",
+    "pt": "Novidades da 0.15.9",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15.9 : les notes de version échappent le « & » : la fenêtre « Quoi de neuf » s'affiche à nouveau au lieu de signaler « Impossible d'analyser les notes de version »",
         "0.15.8 : le greffon GStreamer libav est installé sous son nom actuel « gstreamer1-plugin-libav » (l'ancien « gstreamer1-plugins-libav » n'existe plus depuis Fedora 43), la pastille codecs passe donc de 10/11 à 11/11",
         "0.15.7 : une pastille partielle (◐ 10/11) indique désormais le paquet manquant dans son infobulle et dans le journal d'installation, pour voir quel codec n'a pas pu être installé",
         "0.15.6 : la section « FX Sound » devient « FX Sound & Vidéo » — nouveau groupe Vidéo avec l'installation des codecs audio et vidéo (GStreamer complet + RPM Fusion : H.264, HEVC, AAC, MP3, Dolby…) et de FFmpeg complet (libavcodec-freeworld)",
@@ -1161,6 +1162,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15.9: release notes now escape “&”: the “What’s new” window displays again instead of reporting “Unable to parse release notes”",
         "0.15.8: the GStreamer libav plugin is installed under its current name “gstreamer1-plugin-libav” (the old “gstreamer1-plugins-libav” no longer exists since Fedora 43), so the codec badge goes from 10/11 to 11/11",
         "0.15.7: a partial badge (◐ 10/11) now names the missing package in its tooltip and in the install log, so you can see which codec could not be installed",
         "0.15.6: the “FX Sound” section becomes “FX Sound & Video” — new Video group installing every audio and video codec (full GStreamer + RPM Fusion: H.264, HEVC, AAC, MP3, Dolby…) and full FFmpeg (libavcodec-freeworld)",
@@ -1189,6 +1191,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15.9 : las notas de versión escapan el «&»: la ventana «Novedades» vuelve a mostrarse en lugar de indicar «No se pueden analizar las notas de versión»",
         "0.15.8 : el complemento libav de GStreamer se instala con su nombre actual «gstreamer1-plugin-libav» (el antiguo «gstreamer1-plugins-libav» ya no existe desde Fedora 43), así que el indicador de códecs pasa de 10/11 a 11/11",
         "0.15.7 : un indicador parcial (◐ 10/11) indica ahora el paquete que falta en su información emergente y en el registro de instalación, para ver qué códec no se pudo instalar",
         "0.15.6 : la sección «FX Sound» pasa a «FX Sound y Vídeo» — nuevo grupo Vídeo con la instalación de todos los códecs de audio y vídeo (GStreamer completo + RPM Fusion: H.264, HEVC, AAC, MP3, Dolby…) y de FFmpeg completo (libavcodec-freeworld)",
@@ -1217,6 +1220,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15.9 : le note di versione proteggono la «&»: la finestra «Novità» torna a mostrarsi invece di segnalare «Impossibile analizzare le note di versione»",
         "0.15.8 : il plugin libav di GStreamer viene installato con il nome attuale «gstreamer1-plugin-libav» (il vecchio «gstreamer1-plugins-libav» non esiste più da Fedora 43), quindi l'indicatore dei codec passa da 10/11 a 11/11",
         "0.15.7 : un indicatore parziale (◐ 10/11) mostra ora il pacchetto mancante nel suggerimento e nel registro di installazione, per vedere quale codec non è stato installato",
         "0.15.6 : la sezione «FX Sound» diventa «FX Sound e Video» — nuovo gruppo Video con l'installazione di tutti i codec audio e video (GStreamer completo + RPM Fusion: H.264, HEVC, AAC, MP3, Dolby…) e di FFmpeg completo (libavcodec-freeworld)",
@@ -1245,6 +1249,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15.9 : die Versionshinweise maskieren jetzt das „&“: das Fenster „Neu“ erscheint wieder, statt „Versionshinweise konnten nicht gelesen werden“ zu melden",
         "0.15.8 : das libav-Plugin von GStreamer wird unter dem aktuellen Namen „gstreamer1-plugin-libav“ installiert (das alte „gstreamer1-plugins-libav“ gibt es seit Fedora 43 nicht mehr), die Codec-Anzeige springt dadurch von 10/11 auf 11/11",
         "0.15.7 : eine unvollständige Anzeige (◐ 10/11) nennt jetzt das fehlende Paket im Tooltip und im Installationsprotokoll, damit du siehst, welcher Codec nicht installiert werden konnte",
         "0.15.6 : aus „FX Sound“ wird „FX Sound & Video“ – neuer Abschnitt Video mit der Installation aller Audio- und Videocodecs (vollständiges GStreamer + RPM Fusion: H.264, HEVC, AAC, MP3, Dolby…) und von vollständigem FFmpeg (libavcodec-freeworld)",
@@ -1273,6 +1278,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15.9 : as notas de versão escapam o «&»: a janela «Novidades» volta a aparecer em vez de indicar «Não é possível analisar as notas de versão»",
         "0.15.8 : o plugin libav do GStreamer é instalado com o nome atual «gstreamer1-plugin-libav» (o antigo «gstreamer1-plugins-libav» já não existe desde o Fedora 43), pelo que o indicador de codecs passa de 10/11 para 11/11",
         "0.15.7 : um indicador parcial (◐ 10/11) indica agora o pacote em falta na sua dica e no registo de instalação, para ver qual codec não foi instalado",
         "0.15.6 : a secção «FX Sound» passa a «FX Sound e Vídeo» — novo grupo Vídeo com a instalação de todos os codecs de áudio e vídeo (GStreamer completo + RPM Fusion: H.264, HEVC, AAC, MP3, Dolby…) e do FFmpeg completo (libavcodec-freeworld)",
@@ -1303,11 +1309,23 @@ _RELEASE_NOTES_ITEMS = {
 }
 
 
+def _notes_escape(text: str) -> str:
+    """Échappe le texte des notes : un « & » brut fait échouer l'analyseur Pango."""
+    return (
+        text.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+    )
+
+
 def release_notes_html() -> str:
     """Notes de version localisées pour la boîte « À propos »."""
     lang = UI_LANG if UI_LANG in _RELEASE_NOTES_ITEMS else "en"
-    bullets = "".join(f"<li>{item}</li>" for item in _RELEASE_NOTES_ITEMS[lang])
-    return f"<p>{_RELEASE_NOTES_TITLE[lang]}</p><ul>{bullets}</ul>"
+    bullets = "".join(
+        f"<li>{_notes_escape(item)}</li>" for item in _RELEASE_NOTES_ITEMS[lang]
+    )
+    title = _notes_escape(_RELEASE_NOTES_TITLE[lang])
+    return f"<p>{title}</p><ul>{bullets}</ul>"
 
 
 # ------------------------------------------------------------------------------

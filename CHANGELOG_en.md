@@ -7,6 +7,11 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.9] — 2026-11-27
+
+### Fixed
+- **Broken “What's new”**: the release notes contained a raw “&” (“FX Sound & Video”) inside Pango markup, so the About dialog showed “Unable to parse release notes” instead of the text. `release_notes_html()` now escapes the title and every item (`&`, `<`, `>`), so the notes render in every language.
+
 ## [0.15.8] — 2026-11-27
 
 ### Fixed

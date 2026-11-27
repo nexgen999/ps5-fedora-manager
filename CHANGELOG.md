@@ -6,6 +6,11 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.9] — 2026-11-27
+
+### Corrigé
+- **« Quoi de neuf » cassé** : les notes de version contenaient un « & » brut (« FX Sound & Vidéo ») dans un texte interprété comme du markup Pango. La boîte « À propos » affichait « Impossible d'analyser les notes de version » à la place du texte. `release_notes_html()` échappe désormais le titre et chaque point (`&`, `<`, `>`), donc les notes s'affichent quelle que soit la langue.
+
 ## [0.15.8] — 2026-11-27
 
 ### Corrigé
