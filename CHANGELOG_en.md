@@ -23,6 +23,10 @@ French version: [CHANGELOG.md](CHANGELOG.md)
 - Home page refined after a try-out: a single PlayStation logo next to the
   name, small Fedora and desktop logos with the system name, stable
   version and build on a discreet line, smaller icons.
+- “Interface language” is no longer listed twice: it leaves the main list
+  and stays reachable from the home page. “FX Sound & Video” (including
+  audio/video codecs and FFmpeg) and “Gaming Mode” move into “Add Fedora
+  Feature”, next to mobile management and printers.
 - No change to the one-click setup: its 9-step plan does not depend on the
   sidebar sections.
 

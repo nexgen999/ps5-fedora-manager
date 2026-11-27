@@ -24,6 +24,11 @@ Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 - Page d'accueil affinée après essai : un seul logo PlayStation à côté du
   nom, logos Fedora et bureau en petit avec le nom du système, version
   stable et build sur une ligne discrète, icônes réduites.
+- « Langue de l'interface » ne figure plus deux fois : elle quitte la liste
+  principale et reste accessible depuis l'accueil. « FX Sound & Vidéo »
+  (codecs audio/vidéo et FFmpeg compris) et « Gaming Mode » sont transférés
+  dans « Add Fedora Feature », aux côtés de la gestion mobile et des
+  imprimantes.
 - Aucune modification du setup en 1 clic : son plan de 9 étapes ne dépend pas
   des sections de la barre latérale.
 

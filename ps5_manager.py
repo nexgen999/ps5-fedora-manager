@@ -5869,9 +5869,8 @@ SECTIONS = [
     ("websrv", "network-server-symbolic", "sec_web", 2),
     ("easy", "preferences-other-symbolic", "sec_easy", 2),
     ("services", "system-run-symbolic", "sec_services", 2),
-    ("fx", "audio-volume-high-symbolic", "sec_fx", 2),
     ("deps", "application-x-addon-symbolic", "sec_deps", 2),
-    ("gaming", "input-gaming-symbolic", "sec_gaming", 2),
+    # FX Sound & Vidéo et Gaming Mode sont désormais des groupes de cette page.
     ("features", "application-x-executable-symbolic", "sec_features", 2),
     # Groupe 3 — système Fedora
     ("lang", "preferences-desktop-keyboard-symbolic", "sec_lang", 3),
@@ -5886,7 +5885,12 @@ SECTIONS = [
     ("mesa", "video-display-symbolic", "sec_mesa", 4),
     ("kernel", "drive-harddisk-symbolic", "sec_kernel", 4),
     ("fix", "view-refresh-symbolic", "sec_fix", 4),
-    ("ui_lang", "preferences-desktop-keyboard-symbolic", "sec_ui_lang", 4),
+]
+
+# Pages sans entrée dans la barre latérale : elles s'ouvrent depuis l'accueil
+# (« Langue de l'interface ») et gardent malgré tout leur titre.
+DETACHED_SECTIONS = [
+    ("ui_lang", "preferences-desktop-keyboard-symbolic", "sec_ui_lang", 0),
 ]
 
 
@@ -8224,7 +8228,9 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
     def _make_section_page(self, sec_id: str) -> Adw.NavigationPage:
         if sec_id == "home":
             return self._make_home_page()
-        sec_meta = next((s for s in SECTIONS if s[0] == sec_id), SECTIONS[0])
+        sec_meta = next(
+            (s for s in SECTIONS + DETACHED_SECTIONS if s[0] == sec_id), SECTIONS[0]
+        )
         title = T(sec_meta[2])
 
         toolbar = Adw.ToolbarView()
@@ -10824,6 +10830,10 @@ def build_page_features(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> Non
         )
     )
     page.add(grp_print)
+
+    # FX Sound & Vidéo et Gaming Mode, transférés ici depuis la barre latérale.
+    build_page_fx(win, page)
+    build_page_gaming(win, page)
 
 
 def build_page_gaming(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
@@ -15447,7 +15457,7 @@ def build_page_fx(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     def _install_easyeffects() -> None:
         def _done(ok: bool, msg: str) -> None:
             if ok:
-                win._select_section("fx")
+                win._select_section("features")
             else:
                 win.toast(msg)
 
@@ -15469,7 +15479,7 @@ def build_page_fx(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
         def _done(ok: bool, msg: str) -> None:
             if ok:
-                win._select_section("fx")
+                win._select_section("features")
             else:
                 win.toast(msg)
 
@@ -15599,7 +15609,7 @@ def build_page_fx(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         win.run_task(
             _L("Installer les codecs audio et vidéo", "Install audio and video codecs"),
             _task,
-            lambda *_: win._select_section("fx"),
+            lambda *_: win._select_section("features"),
         )
 
     def _install_ffmpeg() -> None:
@@ -15618,7 +15628,7 @@ def build_page_fx(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         win.run_task(
             _L("Installer FFmpeg", "Install FFmpeg"),
             _task,
-            lambda *_: win._select_section("fx"),
+            lambda *_: win._select_section("features"),
         )
 
     video.add(_install_row(
