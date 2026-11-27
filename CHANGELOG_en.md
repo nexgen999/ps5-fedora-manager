@@ -7,6 +7,20 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.1] — 2026-11-27
+
+### Changed
+- **Status badges everywhere**: sections that did not show what is installed now use the same badge as the catalogues — **● Installed**, **◐ n/total** (partial), **○ Not installed**, with a tooltip.
+  - *Additional dependencies*: FUSE, Steam 32-bit drivers, Python/pip, Tkinter, Node.js/npm.
+  - *Add Fedora Feature*: mobile management and printing & scanners (packages matching the detected desktop).
+  - *Gaming Mode*: gamescope + `switch-session` session.
+  - *Mesa / Vulkan*: `vulkan-tools` and `mesa-demos`.
+  - *Fan*: PS5 Linux Tools (`ps5_control`, `ps5fan` service).
+  - *Hardware Control*: `ps5-hwcon-gui` UI and the Decky plugin.
+  - *Repositories*: RPM Fusion, Flathub, enabled OpenH264, GStreamer codecs.
+  - *App store*: AppImage Pool and Gear Lever (Flatpak, system or user).
+- Detection runs when the page opens: grouped `rpm -q` (architecture aware), files and systemd units, repositories read from `/etc/yum.repos.d`, Flatpak remotes — nothing blocking.
+
 ## [0.15.0] — 2026-11-27
 
 ### Added

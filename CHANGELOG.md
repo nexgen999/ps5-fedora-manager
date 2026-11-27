@@ -6,6 +6,20 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.1] — 2026-11-27
+
+### Modifié
+- **Pastilles d'état partout** : les sections qui ne montraient pas ce qui est installé affichent désormais la même pastille que les catalogues — **● Installé**, **◐ n/total** (partiel), **○ Non installé**, avec infobulle.
+  - *Dépendances supplémentaires* : FUSE, pilotes 32 bits Steam, Python/pip, Tkinter, Node.js/npm.
+  - *Add Fedora Feature* : gestion mobile et impression & scanners (selon les paquets du bureau détecté).
+  - *Gaming Mode* : gamescope + session `switch-session`.
+  - *Mesa / Vulkan* : `vulkan-tools` et `mesa-demos`.
+  - *Ventilateur* : PS5 Linux Tools (`ps5_control`, service `ps5fan`).
+  - *Hardware Control* : interface `ps5-hwcon-gui` et plugin Decky.
+  - *Dépôts* : RPM Fusion, Flathub, OpenH264 activé, codecs GStreamer.
+  - *Logithèque* : AppImage Pool et Gear Lever (Flatpak, système ou utilisateur).
+- Détection faite à l'ouverture de la page : `rpm -q` groupé (architecture comprise), fichiers et services systemd, dépôts lus dans `/etc/yum.repos.d`, remotes Flatpak — aucune commande bloquante.
+
 ## [0.15.0] — 2026-11-27
 
 ### Ajouté

@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.0"
+APP_VERSION = "0.15.1"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1119,16 +1119,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.15.0",
-    "en": "What is new in 0.15.0",
-    "es": "Novedades de la 0.15.0",
-    "it": "Novità della 0.15.0",
-    "de": "Neu in 0.15.0",
-    "pt": "Novidades da 0.15.0",
+    "fr": "Nouveautés de la 0.15.1",
+    "en": "What is new in 0.15.1",
+    "es": "Novedades de la 0.15.1",
+    "it": "Novità della 0.15.1",
+    "de": "Neu in 0.15.1",
+    "pt": "Novidades da 0.15.1",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15.1 : pastilles d'état (● installé / ◐ partiel / ○ absent) dans les sections Dépendances, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Ventilateur, Hardware Control, Dépôts et Logithèque (AppImage Pool, Gear Lever)",
         "0.15 : section « FX Sound » — installation d'Easy Effects et des presets communautaires JackHack96 (option 1 : tous les presets), avec pastilles d'état et documentation FR/EN dédiée",
         "0.14 : pastilles d'état (installé / partiel / absent) sur les catalogues et les profils, nouvelle section « Services » avec interrupteurs on/off systemd et raccourci pour couper bluetooth, CUPS, Avahi et ModemManager, et une documentation FR/EN complète dans le dossier doc/",
         "0.13 : six profils d'installation (dont WordPress et tout-en-un), quinze options de configuration (port HTTP, mémoire et envoi PHP, fuseau, certificat Let's Encrypt, port et compte admin Forgejo) et un outil de réinitialisation qui désinstalle les composants et efface les configurations du manager",
@@ -1149,6 +1150,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15.1: status badges (● installed / ◐ partial / ○ missing) in the Dependencies, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Fan, Hardware Control, Repositories sections and the App store (AppImage Pool, Gear Lever)",
         "0.15: “FX Sound” section — install Easy Effects and the JackHack96 community presets (option 1: all presets), with status badges and dedicated FR/EN documentation",
         "0.14: status badges (installed / partial / missing) on the catalogues and profiles, a new “Services” section with systemd on/off switches and a shortcut to turn off bluetooth, CUPS, Avahi and ModemManager, and complete FR/EN documentation in the doc/ folder",
         "0.13: six setup profiles (including WordPress and all-in-one), fifteen configuration options (HTTP port, PHP memory and upload size, timezone, Let's Encrypt certificate, Forgejo port and admin account) and a reset tool that uninstalls components and clears the manager's configuration files",
@@ -1169,6 +1171,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15.1 : indicadores de estado (● instalado / ◐ parcial / ○ ausente) en las secciones Dependencias, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Ventilador, Hardware Control, Repositorios y Tienda (AppImage Pool, Gear Lever)",
         "0.15 : sección «FX Sound» — instalación de Easy Effects y de los presets comunitarios de JackHack96 (opción 1: todos los presets), con indicadores de estado y documentación FR/EN dedicada",
         "0.14 : indicadores de estado (instalado / parcial / ausente) en los catálogos y perfiles, nueva sección «Servicios» con interruptores on/off de systemd y un atajo para apagar bluetooth, CUPS, Avahi y ModemManager, y documentación completa FR/EN en la carpeta doc/",
         "0.13 : seis perfiles de instalación (incluidos WordPress y todo en uno), quince opciones de configuración (puerto HTTP, memoria y subida PHP, zona horaria, certificado Let's Encrypt, puerto y cuenta admin de Forgejo) y una herramienta de restablecimiento que desinstala componentes y borra las configuraciones del gestor",
@@ -1189,6 +1192,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15.1 : indicatori di stato (● installato / ◐ parziale / ○ assente) nelle sezioni Dipendenze, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Ventola, Hardware Control, Repository e App store (AppImage Pool, Gear Lever)",
         "0.15 : sezione «FX Sound» — installazione di Easy Effects e dei preset della community di JackHack96 (opzione 1: tutti i preset), con indicatori di stato e documentazione FR/EN dedicata",
         "0.14 : indicatori di stato (installato / parziale / assente) nei cataloghi e nei profili, nuova sezione «Servizi» con interruttori on/off systemd e una scorciatoia per spegnere bluetooth, CUPS, Avahi e ModemManager, e documentazione completa FR/EN nella cartella doc/",
         "0.13 : sei profili di installazione (inclusi WordPress e tutto in uno), quindici opzioni di configurazione (porta HTTP, memoria e upload PHP, fuso orario, certificato Let's Encrypt, porta e account admin Forgejo) e uno strumento di ripristino che disinstalla i componenti e cancella le configurazioni del gestore",
@@ -1209,6 +1213,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15.1 : Statusanzeigen (● installiert / ◐ teilweise / ○ fehlt) in den Abschnitten Abhängigkeiten, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Lüfter, Hardware Control, Paketquellen und App-Store (AppImage Pool, Gear Lever)",
         "0.15 : Abschnitt „FX Sound“ – Installation von Easy Effects und den Community-Presets von JackHack96 (Option 1: alle Presets), mit Statusanzeigen und eigener FR/EN-Dokumentation",
         "0.14 : Statusanzeigen (installiert / teilweise / fehlend) in den Katalogen und Profilen, neuer Abschnitt „Dienste“ mit systemd-Ein/Aus-Schaltern und einer Abkürzung zum Abschalten von Bluetooth, CUPS, Avahi und ModemManager sowie vollständige FR/EN-Dokumentation im Ordner doc/",
         "0.13 : sechs Installationsprofile (darunter WordPress und Alles-in-einem), fünfzehn Konfigurationsoptionen (HTTP-Port, PHP-Speicher und Upload-Größe, Zeitzone, Let's-Encrypt-Zertifikat, Forgejo-Port und Admin-Konto) und ein Zurücksetzen-Werkzeug, das Komponenten deinstalliert und die Konfigurationsdateien des Managers entfernt",
@@ -1229,6 +1234,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15.1 : indicadores de estado (● instalado / ◐ parcial / ○ ausente) nas secções Dependências, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Ventoinha, Hardware Control, Repositórios e Loja (AppImage Pool, Gear Lever)",
         "0.15 : secção «FX Sound» — instalação do Easy Effects e dos presets da comunidade de JackHack96 (opção 1: todos os presets), com indicadores de estado e documentação FR/EN dedicada",
         "0.14 : indicadores de estado (instalado / parcial / ausente) nos catálogos e perfis, nova secção «Serviços» com interruptores on/off do systemd e um atalho para desligar bluetooth, CUPS, Avahi e ModemManager, e documentação completa FR/EN na pasta doc/",
         "0.13 : seis perfis de instalação (incluindo WordPress e tudo-em-um), quinze opções de configuração (porta HTTP, memória e upload PHP, fuso horário, certificado Let's Encrypt, porta e conta admin do Forgejo) e uma ferramenta de reposição que desinstala componentes e apaga as configurações do gestor",
@@ -8161,10 +8167,10 @@ def build_page_library(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None
             win.run_task(label, lambda e, c=cmd: (win.run_cmd_pty(c, e) == 0, T("done")))
 
         g_app.add(
-            win.row(
+            _install_row(win,
                 T("appimage_install"), app_id, "system-software-install-symbolic",
                 lambda *_, f=_flatpak: f("install"),
-            )
+            check=lambda a=app_id: _flatpak_app_installed(a))
         )
         g_app.add(
             win.row(
@@ -8740,8 +8746,8 @@ def build_page_repos(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         return ok, T("done") if ok else T("failed") % 1
 
     g1.add(win.row(T("repo_list"), T("repo_list_sub"), "view-list-symbolic", lambda *_: _list_all()))
-    g1.add(win.row(T("repo_rpmfusion"), T("repo_rpmfusion_sub"), "system-software-install-symbolic", lambda *_: win.run_task("RPM Fusion", _install_rpmfusion_task)))
-    g1.add(win.row(T("repo_flathub"), T("repo_flathub_sub"), "system-software-install-symbolic", lambda *_: win.run_task("Flathub", _install_flathub_task)))
+    g1.add(_install_row(win, T("repo_rpmfusion"), T("repo_rpmfusion_sub"), "system-software-install-symbolic", lambda *_: win.run_task("RPM Fusion", _install_rpmfusion_task), check=_rpmfusion_present))
+    g1.add(_install_row(win, T("repo_flathub"), T("repo_flathub_sub"), "system-software-install-symbolic", lambda *_: win.run_task("Flathub", _install_flathub_task), check=_flathub_present))
     def _enable_openh264_task(emit):
         cmd = (
             ["dnf", "config-manager", "setopt", "fedora-cisco-openh264.enabled=1"]
@@ -8765,8 +8771,8 @@ def build_page_repos(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         return rc == 0, T("done") if rc == 0 else T("failed") % rc
 
     g1.add(win.row(T("repo_refresh"), T("repo_refresh_sub"), "view-refresh-symbolic", lambda *_: _refresh_repos_task(win)))
-    g1.add(win.row(T("repo_openh264"), T("repo_openh264_sub"), "software-update-available-symbolic", lambda *_: win.run_task(T("repo_openh264"), _enable_openh264_task)))
-    g1.add(win.row(T("repo_codecs"), T("repo_codecs_sub"), "video-display-symbolic", lambda *_: win.run_task(T("repo_codecs"), _install_codecs_task)))
+    g1.add(_install_row(win, T("repo_openh264"), T("repo_openh264_sub"), "software-update-available-symbolic", lambda *_: win.run_task(T("repo_openh264"), _enable_openh264_task), check=lambda: _repo_enabled("fedora-cisco-openh264")))
+    g1.add(_install_row(win, T("repo_codecs"), T("repo_codecs_sub"), "video-display-symbolic", lambda *_: win.run_task(T("repo_codecs"), _install_codecs_task), packages=["gstreamer1-plugins-ugly", "gstreamer1-plugins-bad-free-extras"]))
     g1.add(
         win.row(
             T("repo_add"),
@@ -9270,13 +9276,13 @@ def build_page_fan(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     grp.add(win.row(T("fan_status"), None, "utilities-system-monitor-symbolic", lambda *_: _show_fan_status()))
     grp.add(win.row(T("fan_restart"), None, "view-refresh-symbolic", lambda *_: win.toast(T("done") if subprocess.run(["systemctl", "restart", "ps5fan.service"]).returncode == 0 else T("failed") % 1)))
     grp.add(
-        win.row(
+        _install_row(win,
             T("fan_tools"), T("fan_tools_sub"), "system-software-install-symbolic",
             lambda *_: win.run_task(T("fan_tools"), lambda e: (
                 win.run_cmd_pty(["bash", "-c", f"tmp=$(mktemp -d) && git clone --depth=1 '{TOOLS_REPO}' \"$tmp/tools\" && cd \"$tmp/tools\" && ./install.sh && rm -rf \"$tmp\""], e) == 0,
                 T("done"),
             )),
-        )
+        check=_fan_tools_installed)
     )
     page.add(grp)
 
@@ -9318,7 +9324,7 @@ def build_page_hw(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
     grp.add(win.row(T("hw_check"), T("hw_check_sub"), "applications-system-symbolic", lambda *_: _hw_nodes()))
     grp.add(
-        win.row(
+        _install_row(win,
             T("hw_install"), T("hw_install_sub"), "system-software-install-symbolic",
             lambda *_: win.run_task(T("hw_install"), lambda e: (
                 # Dépendance obligatoire : sans PyQt6 système, l'installation est abandonnée
@@ -9328,7 +9334,7 @@ def build_page_hw(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
                 ) == 0,
                 T("done"),
             )),
-        )
+        check=_hwcon_gui_installed)
     )
     grp.add(win.row(T("hw_check_upd"), None, "software-update-available-symbolic", lambda *_: _hwcon_check()))
     grp.add(
@@ -9348,13 +9354,13 @@ def build_page_hw(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     # Plugin Decky (mode Jeu) : dépôt NotHavocc/ps5-hwcon-plugin
     grp_plugin = pref_group(title=T("hw_plugin_group"), description=T("hw_plugin_group_sub"))
     grp_plugin.add(
-        win.row(
+        _install_row(win,
             T("hw_plugin_install"), T("hw_plugin_install_sub"), "system-software-install-symbolic",
             lambda *_: win.run_task(T("hw_plugin_install"), lambda e: (
                 win.run_cmd_pty(f"curl -fsSL '{HWCON_PLUGIN_INSTALL}' | bash", e, as_user=True) == 0,
                 T("done"),
             )),
-        )
+        check=_hwcon_plugin_installed)
     )
     grp_plugin.add(
         win.row(
@@ -9377,16 +9383,16 @@ def build_page_hw(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 def build_page_deps(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     grp = pref_group(title=T("deps_group"), description=T("deps_group_sub"))
     grp.add(
-        win.row(
+        _install_row(win,
             T("deps_fuse"), T("deps_fuse_sub"), "application-x-addon-symbolic",
             lambda *_: win.run_task(T("deps_fuse"), lambda e: (
                 win.run_cmd_pty(["dnf", "install", "-y", "fuse", "fuse-libs"], e) == 0,
                 T("done"),
             )),
-        )
+        packages=["fuse", "fuse-libs"])
     )
     grp.add(
-        win.row(
+        _install_row(win,
             T("deps_steam32"), T("deps_steam32_sub"), "video-display-symbolic",
             lambda *_: win.run_task(T("deps_steam32"), lambda e: (
                 win.run_cmd_pty(
@@ -9395,7 +9401,7 @@ def build_page_deps(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
                 ) == 0,
                 T("done"),
             )),
-        )
+        packages=["mesa-vulkan-drivers.i686", "mesa-dri-drivers.i686", "libva.i686"])
     )
     page.add(grp)
 
@@ -9412,13 +9418,13 @@ def build_page_deps(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
     grp_py = pref_group(title=T("deps_python_group"), description=T("deps_python_group_sub"))
     grp_py.add(
-        win.row(
+        _install_row(win,
             T("deps_python"), T("deps_python_sub"), "applications-development-symbolic",
             lambda *_: win.run_task(T("deps_python"), lambda e: (
                 win.run_cmd_pty(["dnf", "install", "-y", "python3", "python3-pip"], e) == 0,
                 T("done"),
             )),
-        )
+        packages=["python3", "python3-pip"])
     )
 
     def _venv_task(emit: Callable[[str], None]) -> tuple[bool, str]:
@@ -9448,25 +9454,25 @@ def build_page_deps(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         )
     )
     grp_py.add(
-        win.row(
+        _install_row(win,
             T("deps_tkinter"), T("deps_tkinter_sub"), "application-x-addon-symbolic",
             lambda *_: win.run_task(T("deps_tkinter"), lambda e: (
                 win.run_cmd_pty(["dnf", "install", "-y", "python3-tkinter"], e) == 0,
                 T("done"),
             )),
-        )
+        packages=["python3-tkinter"])
     )
     page.add(grp_py)
 
     grp_node = pref_group(title=T("deps_node_group"), description=T("deps_node_group_sub"))
     grp_node.add(
-        win.row(
+        _install_row(win,
             T("deps_node_install"), T("deps_node_install_sub"), "system-software-install-symbolic",
             lambda *_: win.run_task(T("deps_node_install"), lambda e: (
                 win.run_cmd_pty(["dnf", "install", "-y", "nodejs", "npm"], e) == 0,
                 T("done"),
             )),
-        )
+        packages=["nodejs", "npm"])
     )
     grp_node.add(
         win.row(
@@ -9551,7 +9557,7 @@ def build_page_features(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> Non
         title=T("features_group_mobile"), description=T("features_group_mobile_sub")
     )
     grp_mobile.add(
-        win.row(
+        _install_row(win,
             T("features_mobile_install"),
             f"{T('features_mobile_install_sub')} · {T('features_de_sub') % DESKTOP_LABEL}",
             "network-wireless-symbolic",
@@ -9560,7 +9566,7 @@ def build_page_features(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> Non
                 mobile_feature_packages(),
                 hint_key="features_mobile_done" if DESKTOP_ID == "gnome" else None,
             ),
-        )
+        packages=mobile_feature_packages())
     )
     page.add(grp_mobile)
 
@@ -9568,7 +9574,7 @@ def build_page_features(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> Non
         title=T("features_group_print"), description=T("features_group_print_sub")
     )
     grp_print.add(
-        win.row(
+        _install_row(win,
             T("features_print_install"),
             f"{T('features_print_install_sub')} · {T('features_de_sub') % DESKTOP_LABEL}",
             "system-software-install-symbolic",
@@ -9576,7 +9582,7 @@ def build_page_features(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> Non
                 "features_print_install",
                 printer_feature_packages(),
             ),
-        )
+        packages=printer_feature_packages())
     )
     grp_print.add(
         win.row(
@@ -9663,10 +9669,10 @@ def build_page_gaming(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         description=f"{T('gaming_group_sub')} · {DESKTOP_LABEL} / {DISPLAY_MANAGER_LABEL}",
     )
     grp.add(
-        win.row(
+        _install_row(win,
             T("gaming_install"), T("gaming_install_sub"), "system-software-install-symbolic",
             lambda *_: _run_script("install", T("gaming_install")),
-        )
+        check=_gaming_installed)
     )
     grp.add(
         win.row(
@@ -9737,7 +9743,7 @@ def build_page_mesa(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
             out = "\n".join(lines) or "Aucun périphérique RADV détecté."
         win.show_text_modal(T("mesa_radv") if radv_only else T("mesa_summary"), out)
 
-    grp.add(win.row(T("mesa_tools"), T("mesa_tools_sub"), "system-software-install-symbolic", lambda *_: win.run_task(T("mesa_tools"), lambda e: (win.run_cmd_pty(["dnf", "install", "-y", "vulkan-tools", "mesa-demos"], e) == 0, T("done")))))
+    grp.add(_install_row(win, T("mesa_tools"), T("mesa_tools_sub"), "system-software-install-symbolic", lambda *_: win.run_task(T("mesa_tools"), lambda e: (win.run_cmd_pty(["dnf", "install", "-y", "vulkan-tools", "mesa-demos"], e) == 0, T("done"))), packages=["vulkan-tools", "mesa-demos"]))
     grp.add(win.row(T("mesa_upd"), T("mesa_upd_sub"), "software-update-available-symbolic", lambda *_: win.run_task(T("mesa_upd"), lambda e: (win.run_cmd_pty(["dnf", "upgrade", "-y", "mesa*", "vulkan*"], e) == 0, T("done")))))
     grp.add(win.row(T("mesa_radv"), None, "video-display-symbolic", lambda *_: _vulkan_summary(True)))
     grp.add(win.row(T("mesa_summary"), None, "utilities-terminal-symbolic", lambda *_: _vulkan_summary(False)))
@@ -12696,6 +12702,154 @@ def _status_badge(done: int, total: int) -> Optional[Gtk.Widget]:
     badge.set_tooltip_text(tip)
     badge.set_valign(Gtk.Align.CENTER)
     return badge
+
+
+def _rpm_present(packages: list[str]) -> dict[str, bool]:
+    """Présence de paquets RPM, architecture comprise (un seul appel)."""
+    specs = [p for p in dict.fromkeys(packages) if p]
+    if not specs:
+        return {}
+    try:
+        res = subprocess.run(
+            ["rpm", "-q", "--qf", "%{NAME} %{ARCH}\\n", *specs],
+            capture_output=True, text=True, timeout=20,
+        )
+        out = res.stdout or ""
+    except (OSError, subprocess.SubprocessError):
+        out = ""
+    found: set[str] = set()
+    for line in out.splitlines():
+        parts = line.split()
+        if len(parts) == 2:
+            found.add(parts[0])
+            found.add(f"{parts[0]}.{parts[1]}")
+    result: dict[str, bool] = {}
+    for spec in specs:
+        base, _, arch = spec.partition(".")
+        # Avec une architecture explicite (.i686, .x86_64…), elle doit correspondre :
+        # sinon un paquet i686 ferait croire que la variante 64 bits est installée.
+        result[spec] = f"{base}.{arch}" in found if arch else base in found
+    return result
+
+
+def _install_state(
+    packages: Optional[list[str]] = None,
+    check: Optional[Callable[[], bool]] = None,
+) -> tuple[int, int]:
+    """(installés, total) pour une ligne d'installation."""
+    if check is not None:
+        try:
+            return (1 if check() else 0), 1
+        except Exception:  # noqa: BLE001 - une détection ne doit jamais bloquer la page
+            return 0, 1
+    if not packages:
+        return 0, 0
+    present = _rpm_present(packages)
+    return sum(1 for ok in present.values() if ok), len(present)
+
+
+def _install_badge(
+    packages: Optional[list[str]] = None,
+    check: Optional[Callable[[], bool]] = None,
+) -> Optional[Gtk.Widget]:
+    """Pastille ● / ◐ / ○ d'une ligne qui installe quelque chose."""
+    return _status_badge(*_install_state(packages, check))
+
+
+def _install_row(
+    win: "Ps5ManagerWindow",
+    title: str,
+    subtitle: Optional[str] = None,
+    icon: Optional[str] = None,
+    callback: Optional[Callable] = None,
+    packages: Optional[list[str]] = None,
+    check: Optional[Callable[[], bool]] = None,
+) -> Adw.ActionRow:
+    """Ligne d'installation avec pastille d'état et chevron, comme les catalogues."""
+    row = win.row(title, subtitle, icon, callback, suffix_icon=None)
+    badge = _install_badge(packages, check)
+    if badge is not None:
+        row.add_suffix(badge)
+    row.add_suffix(Gtk.Image.new_from_icon_name("go-next-symbolic"))
+    return row
+
+
+def _repo_enabled(repoid: str) -> bool:
+    """Dépôt DNF activé, lu dans /etc/yum.repos.d (sans lancer dnf)."""
+    header = re.compile(rf"^\s*\[{re.escape(repoid)}\]\s*$")
+    enabled = re.compile(r"^\s*enabled\s*=\s*1\s*$", re.I)
+    for repo_path in glob.glob("/etc/yum.repos.d/*.repo"):
+        try:
+            with open(repo_path, encoding="utf-8", errors="replace") as fh:
+                inside = False
+                for line in fh:
+                    if line.lstrip().startswith("["):
+                        inside = bool(header.match(line))
+                        continue
+                    if inside and enabled.match(line):
+                        return True
+        except OSError:
+            continue
+    return False
+
+
+def _rpmfusion_present() -> bool:
+    return bool(glob.glob("/etc/yum.repos.d/rpmfusion-*.repo"))
+
+
+def _flathub_present() -> bool:
+    if not shutil.which("flatpak"):
+        return False
+    try:
+        res = subprocess.run(
+            ["flatpak", "remotes", "--system", "--columns=name"],
+            capture_output=True, text=True, timeout=5,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return "flathub" in (res.stdout or "").split()
+
+
+def _flatpak_app_installed(app_id: str) -> bool:
+    if not shutil.which("flatpak"):
+        return False
+    for scope in ("--system", "--user"):
+        try:
+            res = subprocess.run(
+                ["flatpak", "info", scope, app_id], capture_output=True, timeout=5,
+            )
+        except (OSError, subprocess.SubprocessError):
+            continue
+        if res.returncode == 0:
+            return True
+    return False
+
+
+def _gaming_installed() -> bool:
+    return (
+        os.path.isfile("/usr/local/bin/switch-session")
+        and _dev_rpm_ok("gamescope")
+    )
+
+
+def _fan_tools_installed() -> bool:
+    return (
+        os.access("/usr/local/sbin/ps5_control", os.X_OK)
+        or os.path.isfile("/usr/lib/systemd/system/ps5fan.service")
+        or os.path.isfile("/etc/systemd/system/ps5fan.service")
+    )
+
+
+def _hwcon_gui_installed() -> bool:
+    return os.path.isfile(os.path.join(HWCON_PREFIX, "src", "pyproject.toml"))
+
+
+def _hwcon_plugin_installed() -> bool:
+    base = os.path.join(REAL_HOME or "/root", "homebrew", "plugins")
+    try:
+        return any("hwcon" in name.lower() for name in os.listdir(base))
+    except OSError:
+        return False
 
 
 def _profile_state(profile: dict[str, Any]) -> tuple[int, int]:

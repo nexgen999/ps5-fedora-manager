@@ -26,3 +26,23 @@ La documentation existe en deux langues, avec le même contenu :
   `pkexec`), le mot de passe n'est donc demandé qu'une fois, à l'ouverture.
 - Le journal complet de chaque action se trouve dans `/var/log/ps5-manager/`
   (bouton terminal de l'en-tête, ou menu ⋮ → *Informations système*).
+
+## Pastilles d'état
+
+Depuis la 0.15.1, chaque ligne qui installe quelque chose porte la même pastille que
+les catalogues :
+
+| Pastille | Sens |
+|---|---|
+| **● Installé** | tout est présent |
+| **◐ 2/3** | installation partielle (le sous-titre donne le détail) |
+| **○ Non installé** | rien n'est présent |
+
+Sections concernées : *Installation facile*, *Services*, *FX Sound*, *Dépendances
+supplémentaires*, *Add Fedora Feature*, *Gaming Mode*, *Mesa / Vulkan*, *Ventilateur*,
+*Hardware Control*, *Dépôts*, *Logithèque* (AppImage Pool, Gear Lever), ainsi que les
+catalogues *Développement* et *Serveur web*.
+
+La détection se fait à l'ouverture de la page, sans commande bloquante : `rpm -q`
+groupé (architecture comprise), fichiers et unités systemd, dépôts lus dans
+`/etc/yum.repos.d`, remotes Flatpak (`flatpak remotes`, `flatpak info`).
