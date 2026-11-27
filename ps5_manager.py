@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.17"
+APP_VERSION = "0.15.18"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1123,16 +1123,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.15.11",
-    "en": "What is new in 0.15.11",
-    "es": "Novedades de la 0.15.11",
-    "it": "Novità della 0.15.11",
-    "de": "Neu in 0.15.11",
-    "pt": "Novidades da 0.15.11",
+    "fr": "Nouveautés de la 0.15.18",
+    "en": "What is new in 0.15.18",
+    "es": "Novedades de la 0.15.18",
+    "it": "Novità della 0.15.18",
+    "de": "Neu in 0.15.18",
+    "pt": "Novidades da 0.15.18",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15.18 : « Bon à savoir » d'Add Fedora Feature se range dans une sous-page, l'accueil n'affiche plus deux fois le numéro de build et « Relancer Steam » rejoint le sous-menu de Steam de la logithèque",
         "0.15.17 : nouvelle page d'accueil « PS5 Fedora Manager » — logos PlayStation et Fedora, version stable installée, et accès rapide à la mise à jour du manager, à la langue de l'interface et au journal, qui s'ouvrent en sous-page avec un bouton retour",
         "0.15.14 : la bêta s'ouvre enfin — plus de sous-classe des widgets Adwaita déclarés finaux (Adw.SwitchRow, Adw.PreferencesPage) que PyGObject 3.54 refuse, et autorisation X11 de l'utilisateur par `xhost +SI:localuser` pour que GTK ne s'arrête plus sur « Authorization required »",
         "0.15.13 : le lancement de la bêta est fiabilisé et devient visible — environnement de session nettoyé (HOME, XDG_RUNTIME_DIR, XAUTHORITY, bus), repli X11 automatique, vérification de GTK4/libadwaita avant démarrage, journal dans /tmp/ps5-manager-beta.log et option « Lancer dans un terminal »",
@@ -1168,6 +1169,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15.18: “Good to know” in Add Fedora Feature moves into a sub-page, the home page no longer shows the build number twice and “Restart Steam” joins Steam's sub-menu in the library",
         "0.15.17: new “PS5 Fedora Manager” home page — PlayStation and Fedora logos, the installed stable version, and quick access to manager updates, interface language and the log, each opening as a sub-page with a back button",
         "0.15.14: the beta finally opens — no more subclassing of Adwaita widgets declared final (Adw.SwitchRow, Adw.PreferencesPage), which PyGObject 3.54 rejects, and X11 access granted to the user through `xhost +SI:localuser` so GTK no longer stops on “Authorization required”",
         "0.15.13: launching the beta is now reliable and visible — cleaned session environment (HOME, XDG_RUNTIME_DIR, XAUTHORITY, bus), automatic X11 fallback, a GTK4/libadwaita check before starting, a log in /tmp/ps5-manager-beta.log and a “Launch in a terminal” option",
@@ -1203,6 +1205,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15.18: «Good to know» de Add Fedora Feature pasa a una subpágina, la página de inicio ya no muestra dos veces el número de compilación y «Restart Steam» se une al submenú de Steam de la biblioteca",
         "0.15.17: nueva página de inicio «PS5 Fedora Manager» — logotipos de PlayStation y Fedora, versión estable instalada y acceso rápido a la actualización del gestor, al idioma de la interfaz y al registro, que se abren como subpágina con botón de volver",
         "0.15.14 : la beta ya se abre — sin subclases de widgets Adwaita declarados finales (Adw.SwitchRow, Adw.PreferencesPage), que PyGObject 3.54 rechaza, y con acceso X11 del usuario mediante `xhost +SI:localuser` para que GTK no se detenga en «Authorization required»",
         "0.15.13 : el inicio de la beta es más fiable y visible — entorno de sesión limpio (HOME, XDG_RUNTIME_DIR, XAUTHORITY, bus), repliegue automático a X11, comprobación de GTK4/libadwaita antes de arrancar, registro en /tmp/ps5-manager-beta.log y opción «Ejecutar en un terminal»",
@@ -1238,6 +1241,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15.18: «Good to know» di Add Fedora Feature passa in una sottopagina, la pagina iniziale non mostra più due volte il numero di build e «Restart Steam» entra nel sottomenu di Steam della libreria",
         "0.15.17: nuova pagina iniziale «PS5 Fedora Manager» — loghi PlayStation e Fedora, versione stabile installata e accesso rapido all'aggiornamento del gestore, alla lingua dell'interfaccia e al registro, che si aprono come sottopagina con pulsante indietro",
         "0.15.14 : la beta finalmente si apre — niente più sottoclassi di widget Adwaita dichiarati finali (Adw.SwitchRow, Adw.PreferencesPage), che PyGObject 3.54 rifiuta, e accesso X11 dell'utente tramite `xhost +SI:localuser` così GTK non si ferma più su «Authorization required»",
         "0.15.13 : l'avvio della beta è più affidabile e visibile — ambiente di sessione ripulito (HOME, XDG_RUNTIME_DIR, XAUTHORITY, bus), fallback automatico a X11, controllo di GTK4/libadwaita prima dell'avvio, registro in /tmp/ps5-manager-beta.log e opzione «Avvia in un terminale»",
@@ -1273,6 +1277,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15.18: „Good to know“ in Add Fedora Feature wandert in eine Unterseite, die Startseite zeigt die Build-Nummer nicht mehr doppelt und „Restart Steam“ steht im Steam-Untermenü der Bibliothek",
         "0.15.17: neue Startseite „PS5 Fedora Manager“ – PlayStation- und Fedora-Logos, installierte stabile Version und Schnellzugriff auf Manager-Update, Oberflächensprache und Protokoll, die als Unterseite mit Zurück-Schaltfläche öffnen",
         "0.15.14 : die Beta öffnet sich endlich – keine Unterklassen von als final deklarierten Adwaita-Widgets mehr (Adw.SwitchRow, Adw.PreferencesPage), die PyGObject 3.54 ablehnt, und X11-Zugriff für den Benutzer über `xhost +SI:localuser`, damit GTK nicht mehr an „Authorization required“ scheitert",
         "0.15.13 : der Start der Beta ist zuverlässiger und sichtbar – bereinigte Sitzungsumgebung (HOME, XDG_RUNTIME_DIR, XAUTHORITY, Bus), automatischer X11-Fallback, GTK4/libadwaita-Prüfung vor dem Start, Protokoll in /tmp/ps5-manager-beta.log und Option „Im Terminal starten“",
@@ -1308,6 +1313,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15.18: «Good to know» do Add Fedora Feature passa para uma subpágina, a página inicial já não mostra duas vezes o número de compilação e «Restart Steam» junta-se ao submenu do Steam da biblioteca",
         "0.15.17: nova página inicial «PS5 Fedora Manager» — logótipos PlayStation e Fedora, versão estável instalada e acesso rápido à atualização do gestor, ao idioma da interface e ao registo, que abrem como subpágina com botão de voltar",
         "0.15.14 : a beta abre finalmente — sem subclasses de widgets Adwaita declarados finais (Adw.SwitchRow, Adw.PreferencesPage), que o PyGObject 3.54 recusa, e com acesso X11 do utilizador via `xhost +SI:localuser` para o GTK deixar de parar em «Authorization required»",
         "0.15.13 : o arranque da beta é mais fiável e visível — ambiente de sessão limpo (HOME, XDG_RUNTIME_DIR, XAUTHORITY, bus), recurso automático a X11, verificação de GTK4/libadwaita antes de arrancar, registo em /tmp/ps5-manager-beta.log e opção «Executar num terminal»",
@@ -8187,8 +8193,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         box.append(env_row)
         box.append(
             Gtk.Label(
-                label="%s · %s"
-                % (T("home_stable") % APP_VERSION, T("home_build") % APP_VERSION),
+                label=T("home_stable") % f"· build v{APP_VERSION}",
                 halign=Gtk.Align.CENTER,
                 css_classes=["caption", "dim-label"],
             )
@@ -15447,6 +15452,58 @@ def _fx_preset_count() -> int:
     return total
 
 
+# Notes « Bon à savoir » de FX Sound & Vidéo, affichées en sous-page.
+_FX_NOTES: tuple[tuple[str, str], ...] = (
+    (
+        "Les presets sont installés pour le compte de bureau, pas pour root.",
+        "Presets are installed for the desktop account, not for root.",
+    ),
+    (
+        "Ouvre Easy Effects puis choisis un preset dans l'onglet « Presets ».",
+        "Open Easy Effects, then pick a preset in the “Presets” tab.",
+    ),
+    (
+        "Aucun effet n'est appliqué tant qu'Easy Effects ne tourne pas.",
+        "No effect is applied while Easy Effects is not running.",
+    ),
+    (
+        "Les codecs viennent de RPM Fusion, activé automatiquement si besoin.",
+        "Codecs come from RPM Fusion, enabled automatically when needed.",
+    ),
+    (
+        "FFmpeg remplace libavcodec-free de Fedora par libavcodec-freeworld (codecs complets).",
+        "FFmpeg replaces Fedora's libavcodec-free with libavcodec-freeworld (full codecs).",
+    ),
+    (
+        "Relance les applications (ou la session) après l'installation pour utiliser les nouveaux codecs.",
+        "Restart applications (or the session) after installing to use the new codecs.",
+    ),
+)
+
+
+def _push_fx_notes(win: Ps5ManagerWindow) -> None:
+    """Ouvre « Bon à savoir » (FX Sound & Vidéo) en sous-page, façon changelog."""
+    title = _L("Bon à savoir", "Good to know")
+    page = Adw.PreferencesPage()
+    grp = pref_group(
+        title=title,
+        description=_L(
+            "FX Sound & Vidéo — presets, codecs et FFmpeg.",
+            "FX Sound & Video — presets, codecs and FFmpeg.",
+        ),
+    )
+    for fr, en in _FX_NOTES:
+        grp.add(plain_row(Adw.ActionRow, title=_L(fr, en)))
+    page.add(grp)
+
+    toolbar = Adw.ToolbarView()
+    header = Adw.HeaderBar()
+    header.set_title_widget(Adw.WindowTitle(title=title))
+    toolbar.add_top_bar(header)
+    toolbar.set_content(page)
+    win.nav.push(Adw.NavigationPage(child=toolbar, title=title))
+
+
 def build_page_fx(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     """FX Sound : installation d'Easy Effects et des presets communautaires."""
     installed = _dev_rpm_ok("easyeffects")
@@ -15674,49 +15731,22 @@ def build_page_fx(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     ))
     page.add(video)
 
-    notes = pref_group(title=_L("Bon à savoir", "Good to know"), description="")
-    notes.add(plain_row(
-        Adw.ActionRow,
-        title=_L(
-            "Les presets sont installés pour le compte de bureau, pas pour root.",
-            "Presets are installed for the desktop account, not for root.",
+    # Les notes tenaient une demi-page : un seul bouton les ouvre en sous-page.
+    notes = pref_group(
+        title=_L("Aide", "Help"),
+        description=_L(
+            "Presets, codecs et FFmpeg : les points à retenir.",
+            "Presets, codecs and FFmpeg: the key points.",
         ),
-    ))
-    notes.add(plain_row(
-        Adw.ActionRow,
-        title=_L(
-            "Ouvre Easy Effects puis choisis un preset dans l'onglet « Presets ».",
-            "Open Easy Effects, then pick a preset in the “Presets” tab.",
-        ),
-    ))
-    notes.add(plain_row(
-        Adw.ActionRow,
-        title=_L(
-            "Aucun effet n'est appliqué tant qu'Easy Effects ne tourne pas.",
-            "No effect is applied while Easy Effects is not running.",
-        ),
-    ))
-    notes.add(plain_row(
-        Adw.ActionRow,
-        title=_L(
-            "Les codecs viennent de RPM Fusion, activé automatiquement si besoin.",
-            "Codecs come from RPM Fusion, enabled automatically when needed.",
-        ),
-    ))
-    notes.add(plain_row(
-        Adw.ActionRow,
-        title=_L(
-            "FFmpeg remplace libavcodec-free de Fedora par libavcodec-freeworld (codecs complets).",
-            "FFmpeg replaces Fedora's libavcodec-free with libavcodec-freeworld (full codecs).",
-        ),
-    ))
-    notes.add(plain_row(
-        Adw.ActionRow,
-        title=_L(
-            "Relance les applications (ou la session) après l'installation pour utiliser les nouveaux codecs.",
-            "Restart applications (or the session) after installing to use the new codecs.",
-        ),
-    ))
+    )
+    notes.add(
+        win.row(
+            _L("Bon à savoir", "Good to know"),
+            _L("Ouvre les notes détaillées", "Opens the detailed notes"),
+            "help-about-symbolic",
+            lambda *_: _push_fx_notes(win),
+        )
+    )
     page.add(notes)
 
 

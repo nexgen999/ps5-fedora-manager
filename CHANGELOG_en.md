@@ -7,6 +7,16 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.18] — 2026-11-27
+
+### Changed
+- **“Good to know” in “Add Fedora Feature” moved into a sub-page**: the six
+  notes about presets, codecs and FFmpeg used to take half a page; a
+  “Good to know” button now opens them as a sub-page, laid out like a
+  changelog, with the back button.
+- **Home version line no longer duplicated**: “Stable version · build
+  v0.15.18” instead of the build number shown twice.
+
 ## [0.15.17] — 2026-11-27
 
 ### Changed

@@ -6,6 +6,16 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.18] — 2026-11-27
+
+### Modifié
+- **« Bon à savoir » d'« Add Fedora Feature » rangé dans une sous-page** : les
+  six notes sur les presets, les codecs et FFmpeg occupaient une demi-page ;
+  un bouton « Bon à savoir » les ouvre désormais en sous-page, texte présenté
+  comme un changelog, avec le bouton retour.
+- **Ligne de version de l'accueil dédoublonnée** : « Version stable · build
+  v0.15.18 » au lieu du numéro de build répété deux fois.
+
 ## [0.15.17] — 2026-11-27
 
 ### Modifié
