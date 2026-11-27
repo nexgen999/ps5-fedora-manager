@@ -6,6 +6,17 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.10] — 2026-11-27
+
+### Modifié
+- **Fenêtre « À propos » repensée.** `Adw.AboutDialog` impose une colonne de ~450 px : la fenêtre devenait un rectangle vertical haut et étroit, pénible à lire. Remplacée par une fenêtre `Adw.Window` de **900 × 740 px** (contenu limité à 760 px, centré) qui contient :
+  - l'en-tête avec le logo de l'application, le nom, la version et la description ;
+  - un groupe **Liens** (site web, signalement de problème) ouvrant le navigateur ;
+  - un groupe **Informations techniques** (version, GTK, Libadwaita, Python, chemin du fichier, valeurs sélectionnables) ;
+  - les **nouveautés** (5 dernières entrées) dans une carte avec retour à la ligne ;
+  - le pied de page « © 2026 nexgen999 · Développé par nexgen999 ».
+- Nouvelles chaînes traduites dans les 6 langues (« À propos », « Liens », « Site web », « Signaler un problème », « Informations techniques », « Nouveautés », « Développé par nexgen999 »).
+
 ## [0.15.9] — 2026-11-27
 
 ### Corrigé

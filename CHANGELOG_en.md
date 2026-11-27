@@ -7,6 +7,17 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.10] — 2026-11-27
+
+### Changed
+- **Redesigned “About” window.** `Adw.AboutDialog` enforces a ~450 px column, making the window a tall, narrow, hard-to-read rectangle. Replaced by an `Adw.Window` of **900 × 740 px** (content clamped to 760 px, centred) with:
+  - a header showing the app logo, name, version and description;
+  - a **Links** group (website, issue tracker) opening the browser;
+  - a **Technical information** group (version, GTK, Libadwaita, Python, file path, selectable values);
+  - the **What's new** entries (latest 5) in a wrapping card;
+  - a “© 2026 nexgen999 · Developed by nexgen999” footer.
+- New strings translated into all 6 languages (“About”, “Links”, “Website”, “Report an issue”, “Technical information”, “What's new”, “Developed by nexgen999”).
+
 ## [0.15.9] — 2026-11-27
 
 ### Fixed

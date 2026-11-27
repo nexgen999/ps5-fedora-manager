@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.9"
+APP_VERSION = "0.15.10"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1123,16 +1123,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.15.9",
-    "en": "What is new in 0.15.9",
-    "es": "Novedades de la 0.15.9",
-    "it": "Novità della 0.15.9",
-    "de": "Neu in 0.15.9",
-    "pt": "Novidades da 0.15.9",
+    "fr": "Nouveautés de la 0.15.10",
+    "en": "What is new in 0.15.10",
+    "es": "Novedades de la 0.15.10",
+    "it": "Novità della 0.15.10",
+    "de": "Neu in 0.15.10",
+    "pt": "Novidades da 0.15.10",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15.10 : fenêtre « À propos » repensée — 900 × 740 px au lieu de la colonne étroite d'Adw.AboutDialog, avec le logo, les liens (site web, problèmes), les informations techniques et les nouveautés dans une carte lisible",
         "0.15.9 : les notes de version échappent le « & » : la fenêtre « Quoi de neuf » s'affiche à nouveau au lieu de signaler « Impossible d'analyser les notes de version »",
         "0.15.8 : le greffon GStreamer libav est installé sous son nom actuel « gstreamer1-plugin-libav » (l'ancien « gstreamer1-plugins-libav » n'existe plus depuis Fedora 43), la pastille codecs passe donc de 10/11 à 11/11",
         "0.15.7 : une pastille partielle (◐ 10/11) indique désormais le paquet manquant dans son infobulle et dans le journal d'installation, pour voir quel codec n'a pas pu être installé",
@@ -1162,6 +1163,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15.10: redesigned “About” window — 900 × 740 px instead of Adw.AboutDialog’s narrow column, with the logo, links (website, issues), technical information and the release notes in a readable card",
         "0.15.9: release notes now escape “&”: the “What’s new” window displays again instead of reporting “Unable to parse release notes”",
         "0.15.8: the GStreamer libav plugin is installed under its current name “gstreamer1-plugin-libav” (the old “gstreamer1-plugins-libav” no longer exists since Fedora 43), so the codec badge goes from 10/11 to 11/11",
         "0.15.7: a partial badge (◐ 10/11) now names the missing package in its tooltip and in the install log, so you can see which codec could not be installed",
@@ -1191,6 +1193,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15.10 : ventana «Acerca de» rediseñada — 900 × 740 px en lugar de la columna estrecha de Adw.AboutDialog, con el logotipo, los enlaces (sitio web, problemas), la información técnica y las novedades en una tarjeta legible",
         "0.15.9 : las notas de versión escapan el «&»: la ventana «Novedades» vuelve a mostrarse en lugar de indicar «No se pueden analizar las notas de versión»",
         "0.15.8 : el complemento libav de GStreamer se instala con su nombre actual «gstreamer1-plugin-libav» (el antiguo «gstreamer1-plugins-libav» ya no existe desde Fedora 43), así que el indicador de códecs pasa de 10/11 a 11/11",
         "0.15.7 : un indicador parcial (◐ 10/11) indica ahora el paquete que falta en su información emergente y en el registro de instalación, para ver qué códec no se pudo instalar",
@@ -1220,6 +1223,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15.10 : finestra «Informazioni» ridisegnata — 900 × 740 px al posto della colonna stretta di Adw.AboutDialog, con logo, link (sito web, problemi), informazioni tecniche e novità in una scheda leggibile",
         "0.15.9 : le note di versione proteggono la «&»: la finestra «Novità» torna a mostrarsi invece di segnalare «Impossibile analizzare le note di versione»",
         "0.15.8 : il plugin libav di GStreamer viene installato con il nome attuale «gstreamer1-plugin-libav» (il vecchio «gstreamer1-plugins-libav» non esiste più da Fedora 43), quindi l'indicatore dei codec passa da 10/11 a 11/11",
         "0.15.7 : un indicatore parziale (◐ 10/11) mostra ora il pacchetto mancante nel suggerimento e nel registro di installazione, per vedere quale codec non è stato installato",
@@ -1249,6 +1253,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15.10 : „Über“-Fenster neu gestaltet – 900 × 740 px statt der schmalen Spalte von Adw.AboutDialog, mit Logo, Links (Webseite, Probleme), technischen Informationen und den Versionshinweisen in einer gut lesbaren Karte",
         "0.15.9 : die Versionshinweise maskieren jetzt das „&“: das Fenster „Neu“ erscheint wieder, statt „Versionshinweise konnten nicht gelesen werden“ zu melden",
         "0.15.8 : das libav-Plugin von GStreamer wird unter dem aktuellen Namen „gstreamer1-plugin-libav“ installiert (das alte „gstreamer1-plugins-libav“ gibt es seit Fedora 43 nicht mehr), die Codec-Anzeige springt dadurch von 10/11 auf 11/11",
         "0.15.7 : eine unvollständige Anzeige (◐ 10/11) nennt jetzt das fehlende Paket im Tooltip und im Installationsprotokoll, damit du siehst, welcher Codec nicht installiert werden konnte",
@@ -1278,6 +1283,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15.10 : janela «Sobre» redesenhada — 900 × 740 px em vez da coluna estreita do Adw.AboutDialog, com o logótipo, as ligações (site, problemas), as informações técnicas e as novidades num cartão legível",
         "0.15.9 : as notas de versão escapam o «&»: a janela «Novidades» volta a aparecer em vez de indicar «Não é possível analisar as notas de versão»",
         "0.15.8 : o plugin libav do GStreamer é instalado com o nome atual «gstreamer1-plugin-libav» (o antigo «gstreamer1-plugins-libav» já não existe desde o Fedora 43), pelo que o indicador de codecs passa de 10/11 para 11/11",
         "0.15.7 : um indicador parcial (◐ 10/11) indica agora o pacote em falta na sua dica e no registo de instalação, para ver qual codec não foi instalado",
@@ -1326,6 +1332,13 @@ def release_notes_html() -> str:
     )
     title = _notes_escape(_RELEASE_NOTES_TITLE[lang])
     return f"<p>{title}</p><ul>{bullets}</ul>"
+
+
+def release_notes_plain(limit: int = 5) -> str:
+    """Dernières notes de version en texte simple, pour une Gtk.Label."""
+    lang = UI_LANG if UI_LANG in _RELEASE_NOTES_ITEMS else "en"
+    items = _RELEASE_NOTES_ITEMS[lang][:limit]
+    return "\n".join("• " + item for item in items)
 
 
 # ------------------------------------------------------------------------------
@@ -7255,6 +7268,28 @@ _L_TABLE = {
         "FFmpeg ersetzt Fedoras libavcodec-free durch libavcodec-freeworld (vollständige Codecs).",
         "O FFmpeg substitui o libavcodec-free do Fedora pelo libavcodec-freeworld (codecs completos).",
     ),
+    "À propos": ("Acerca de", "Informazioni", "Über", "Sobre"),
+    "Liens": ("Enlaces", "Link", "Links", "Ligações"),
+    "Site web": ("Sitio web", "Sito web", "Webseite", "Site"),
+    "Signaler un problème": (
+        "Informar de un problema",
+        "Segnala un problema",
+        "Problem melden",
+        "Reportar um problema",
+    ),
+    "Informations techniques": (
+        "Información técnica",
+        "Informazioni tecniche",
+        "Technische Informationen",
+        "Informações técnicas",
+    ),
+    "Nouveautés": ("Novedades", "Novità", "Neu", "Novidades"),
+    "Développé par nexgen999": (
+        "Desarrollado por nexgen999",
+        "Sviluppato da nexgen999",
+        "Entwickelt von nexgen999",
+        "Desenvolvido por nexgen999",
+    ),
     "manquant : ": (
         "faltante: ",
         "mancante: ",
@@ -7346,6 +7381,187 @@ def _icon_image(name: str, size: int) -> Optional[Gtk.Image]:
     image = Gtk.Image.new_from_paintable(texture)
     image.set_pixel_size(size)
     return image
+
+
+class AboutWindow(Adw.Window):
+    """Fenêtre « À propos » large et lisible.
+
+    Adw.AboutDialog impose une colonne étroite (≈450 px) : les notes de version
+    s'y étirent en hauteur. On utilise donc une vraie fenêtre, plus large, avec
+    les liens, les versions et les nouveautés dans des cartes lisibles.
+    """
+
+    WEBSITE = "https://github.com/nexgen999/ps5-fedora-manager"
+    ISSUES = "https://github.com/nexgen999/ps5-fedora-manager/issues"
+
+    def __init__(self, parent: "Ps5ManagerWindow") -> None:
+        super().__init__(transient_for=parent, modal=True, title=_L("À propos", "About"))
+        self._parent = parent
+        self.set_default_size(900, 740)
+
+        header = Adw.HeaderBar()
+        header.set_title_widget(
+            Adw.WindowTitle(title=_L("À propos", "About"), subtitle=APP_NAME)
+        )
+        close_btn = Gtk.Button(icon_name="window-close-symbolic")
+        close_btn.set_tooltip_text(T("close"))
+        close_btn.add_css_class("flat")
+        close_btn.connect("clicked", lambda *_: self.close())
+        header.pack_end(close_btn)
+
+        content = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
+        content.set_margin_top(24)
+        content.set_margin_bottom(28)
+        content.set_margin_start(24)
+        content.set_margin_end(24)
+        content.append(self._hero())
+
+        links = pref_group(title=_L("Liens", "Links"))
+        links.add(
+            self._link_row(
+                _L("Site web", "Website"), self.WEBSITE, "web-browser-symbolic"
+            )
+        )
+        links.add(
+            self._link_row(
+                _L("Signaler un problème", "Report an issue"),
+                self.ISSUES,
+                "dialog-warning-symbolic",
+            )
+        )
+        content.append(links)
+
+        tech = pref_group(
+            title=_L("Informations techniques", "Technical information")
+        )
+        tech.add(self._info_row(T("sys_version"), APP_VERSION, "info-symbolic"))
+        tech.add(
+            self._info_row(
+                "GTK",
+                f"{Gtk.get_major_version()}.{Gtk.get_minor_version()}."
+                f"{Gtk.get_micro_version()}",
+                "applications-graphics-symbolic",
+            )
+        )
+        tech.add(
+            self._info_row(
+                "Libadwaita",
+                f"{Adw.MAJOR_VERSION}.{Adw.MINOR_VERSION}.{Adw.MICRO_VERSION}",
+                "applications-graphics-symbolic",
+            )
+        )
+        tech.add(
+            self._info_row("Python", sys.version.split()[0], "text-x-script-symbolic")
+        )
+        tech.add(
+            self._info_row(
+                T("sys_file"),
+                os.path.abspath(sys.argv[0]),
+                "text-x-generic-symbolic",
+            )
+        )
+        content.append(tech)
+
+        content.append(self._notes())
+
+        footer = Gtk.Label(
+            label="© 2026 nexgen999 · "
+            + _L("Développé par nexgen999", "Developed by nexgen999"),
+            xalign=0.5,
+        )
+        footer.add_css_class("dim-label")
+        footer.add_css_class("caption")
+        footer.set_wrap(True)
+        content.append(footer)
+
+        scroll = Gtk.ScrolledWindow(hexpand=True, vexpand=True)
+        scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        scroll.set_child(
+            Adw.Clamp(maximum_size=760, tightening_threshold=620, child=content)
+        )
+
+        toolbar = Adw.ToolbarView()
+        toolbar.add_top_bar(header)
+        toolbar.set_content(scroll)
+        self.set_content(toolbar)
+
+    # ---- Construction ----
+    def _hero(self) -> Gtk.Widget:
+        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=20)
+
+        icon_name = "ps5-manager"
+        display = Gdk.Display.get_default()
+        if display is not None and not Gtk.IconTheme.get_for_display(
+            display
+        ).has_icon(icon_name):
+            icon_name = "applications-system-symbolic"
+        logo = _icon_image(icon_name, 96)
+        if logo is None:
+            image = Gtk.Image.new_from_icon_name(icon_name)
+            image.set_pixel_size(72)
+            logo = image
+        logo.set_valign(Gtk.Align.CENTER)
+        box.append(logo)
+
+        titles = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        titles.set_valign(Gtk.Align.CENTER)
+        titles.set_hexpand(True)
+
+        name = Gtk.Label(label=APP_NAME, xalign=0.0)
+        name.add_css_class("title-1")
+        version = Gtk.Label(label=f"{T('sys_version')} {APP_VERSION}", xalign=0.0)
+        version.add_css_class("dim-label")
+        description = Gtk.Label(
+            label=_L(
+                "Gestionnaire système, matériel et logiciels pour Fedora sur PS5.",
+                "System, hardware and software manager for Fedora on PS5.",
+            ),
+            xalign=0.0,
+        )
+        description.add_css_class("body")
+        description.set_wrap(True)
+        description.set_hexpand(True)
+
+        titles.append(name)
+        titles.append(version)
+        titles.append(description)
+        box.append(titles)
+        return box
+
+    def _link_row(self, label: str, url: str, icon: str) -> Adw.ActionRow:
+        row = plain_row(Adw.ActionRow, title=label, subtitle=url)
+        row.add_prefix(Gtk.Image.new_from_icon_name(icon))
+        row.add_suffix(Gtk.Image.new_from_icon_name("go-next-symbolic"))
+        row.set_activatable(True)
+        row.connect("activated", lambda *_: open_uri(url))
+        return row
+
+    def _info_row(self, label: str, value: str, icon: str) -> Adw.ActionRow:
+        row = plain_row(Adw.ActionRow, title=label, subtitle=value)
+        row.set_subtitle_selectable(True)
+        row.add_prefix(Gtk.Image.new_from_icon_name(icon))
+        return row
+
+    def _notes(self) -> Gtk.Widget:
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box.add_css_class("card")
+
+        title = Gtk.Label(label=_L("Nouveautés", "What's new"), xalign=0.0)
+        title.add_css_class("heading")
+        title.set_margin_top(16)
+        title.set_margin_start(16)
+        title.set_margin_end(16)
+
+        body = Gtk.Label(label=release_notes_plain(5), xalign=0.0)
+        body.set_wrap(True)
+        body.add_css_class("body")
+        body.set_margin_bottom(16)
+        body.set_margin_start(16)
+        body.set_margin_end(16)
+
+        box.append(title)
+        box.append(body)
+        return box
 
 
 class SystemInfoWindow(Adw.Window):
@@ -8107,40 +8323,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         SystemInfoWindow(self, self.theme_sync.current_accent).present()
 
     def _show_about(self) -> None:
-        debug_info = (
-            f"{T('debug_version')} : {APP_VERSION}\n"
-            f"GTK {Gtk.get_major_version()}.{Gtk.get_minor_version()}.{Gtk.get_micro_version()}\n"
-            f"Libadwaita {Adw.MAJOR_VERSION}.{Adw.MINOR_VERSION}.{Adw.MICRO_VERSION}\n"
-            f"Python {sys.version.split()[0]}\n"
-            f"{T('sys_file')} : {os.path.abspath(sys.argv[0])}"
-        )
-        # Vrai logo de l'application, repli sur une icône symbolique s'il est absent
-        icon_name = "ps5-manager"
-        display = Gdk.Display.get_default()
-        if display is not None and not Gtk.IconTheme.get_for_display(display).has_icon(icon_name):
-            icon_name = "applications-system-symbolic"
-
-        if not hasattr(Adw, "AboutDialog"):
-            self.show_info(APP_NAME, f"{APP_NAME} {APP_VERSION} — GTK4 / Libadwaita (nexgen999)")
-            return
-
-        about = Adw.AboutDialog(
-            application_name=APP_NAME,
-            application_icon=icon_name,
-            version=APP_VERSION,
-            developer_name="nexgen999",
-            developers=["nexgen999"],
-            copyright="© 2026 nexgen999",
-            website="https://github.com/nexgen999/ps5-fedora-manager",
-            issue_url="https://github.com/nexgen999/ps5-fedora-manager/issues",
-            comments=(
-                _L("Gestionnaire système, matériel et logiciels pour Fedora sur PS5.", "System, hardware and software manager for Fedora on PS5.")
-            ),
-            debug_info=debug_info,
-            release_notes_version=APP_VERSION,
-            release_notes=_safe_release_notes(release_notes_html()),
-        )
-        about.present(self)
+        AboutWindow(self).present()
 
 
 # ------------------------------------------------------------------------------
