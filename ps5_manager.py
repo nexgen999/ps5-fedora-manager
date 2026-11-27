@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.4"
+APP_VERSION = "0.15.5"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1123,16 +1123,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.15.4",
-    "en": "What is new in 0.15.4",
-    "es": "Novedades de la 0.15.4",
-    "it": "Novità della 0.15.4",
-    "de": "Neu in 0.15.4",
-    "pt": "Novidades da 0.15.4",
+    "fr": "Nouveautés de la 0.15.5",
+    "en": "What is new in 0.15.5",
+    "es": "Novedades de la 0.15.5",
+    "it": "Novità della 0.15.5",
+    "de": "Neu in 0.15.5",
+    "pt": "Novidades da 0.15.5",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15.5 : la pastille du plugin Decky « PS5 Hardware Control » reconnaît son vrai dossier d'installation (~/homebrew/plugins/ps5-hardware-control) et s'affiche enfin comme installé",
         "0.15.4 : la mise à jour du manager remarche sous Fedora 45 — polkit-gnome (paquet supprimé) retiré des dépendances, dnf lancé avec --skip-unavailable et une erreur de dépendances ne bloque plus la mise à jour",
         "0.15.3 : pastille d'état (● installé / ○ non installé) sur chaque application de la Logithèque, comme le reste de l'interface — le texte « · Installé (RPM) » du sous-titre est remplacé",
         "0.15.2 : détection correcte des dépôts sous Fedora 41+ (dnf5) — RPM Fusion livré dans /usr/share/dnf5/repos.d et activations de config-manager dans /etc/dnf/repos.override.d",
@@ -1157,6 +1158,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15.5: the Decky “PS5 Hardware Control” plugin badge now recognises its real install folder (~/homebrew/plugins/ps5-hardware-control) and shows as installed",
         "0.15.4: manager updates work again on Fedora 45 — polkit-gnome (removed package) dropped from the dependencies, dnf runs with --skip-unavailable and a dependency error no longer blocks the update",
         "0.15.3: status badge (● installed / ○ not installed) on every App store entry, matching the rest of the interface — the “· Installed (RPM)” subtitle text is gone",
         "0.15.2: correct repository detection on Fedora 41+ (dnf5) — RPM Fusion ships in /usr/share/dnf5/repos.d and config-manager stores enablement in /etc/dnf/repos.override.d",
@@ -1181,6 +1183,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15.5 : el indicador del plugin Decky «PS5 Hardware Control» reconoce su carpeta real (~/homebrew/plugins/ps5-hardware-control) y aparece como instalado",
         "0.15.4 : la actualización del gestor vuelve a funcionar en Fedora 45 — polkit-gnome (paquete eliminado) fuera de las dependencias, dnf con --skip-unavailable y un error de dependencias ya no bloquea la actualización",
         "0.15.3 : indicador de estado (● instalado / ○ no instalado) en cada aplicación de la Tienda, como el resto de la interfaz — desaparece el texto «· Instalado (RPM)» del subtítulo",
         "0.15.2 : detección correcta de repositorios en Fedora 41+ (dnf5): RPM Fusion se instala en /usr/share/dnf5/repos.d y config-manager guarda la activación en /etc/dnf/repos.override.d",
@@ -1205,6 +1208,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15.5 : l'indicatore del plugin Decky «PS5 Hardware Control» riconosce la cartella reale (~/homebrew/plugins/ps5-hardware-control) e appare installato",
         "0.15.4 : l'aggiornamento del gestore torna a funzionare su Fedora 45 — polkit-gnome (pacchetto rimosso) escluso dalle dipendenze, dnf con --skip-unavailable e un errore di dipendenze non blocca più l'aggiornamento",
         "0.15.3 : indicatore di stato (● installato / ○ non installato) su ogni applicazione dell'App store, come il resto dell'interfaccia — sparisce il testo «· Installato (RPM)» dal sottotitolo",
         "0.15.2 : rilevamento corretto dei repository su Fedora 41+ (dnf5): RPM Fusion risiede in /usr/share/dnf5/repos.d e config-manager salva l'attivazione in /etc/dnf/repos.override.d",
@@ -1229,6 +1233,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15.5 : die Statusanzeige des Decky-Plugins „PS5 Hardware Control“ erkennt den echten Ordner (~/homebrew/plugins/ps5-hardware-control) und gilt als installiert",
         "0.15.4 : die Manager-Aktualisierung funktioniert unter Fedora 45 wieder – polkit-gnome (entferntes Paket) aus den Abhängigkeiten gestrichen, dnf mit --skip-unavailable und ein Abhängigkeitsfehler blockiert die Aktualisierung nicht mehr",
         "0.15.3 : Statusanzeige (● installiert / ○ nicht installiert) bei jeder App im App-Store wie im Rest der Oberfläche – der Text „· Installiert (RPM)“ im Untertitel entfällt",
         "0.15.2 : korrekte Paketquellen-Erkennung unter Fedora 41+ (dnf5) – RPM Fusion liegt in /usr/share/dnf5/repos.d und config-manager speichert Aktivierungen in /etc/dnf/repos.override.d",
@@ -1253,6 +1258,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15.5 : o indicador do plugin Decky «PS5 Hardware Control» reconhece a pasta real (~/homebrew/plugins/ps5-hardware-control) e aparece como instalado",
         "0.15.4 : a atualização do gestor volta a funcionar no Fedora 45 — polkit-gnome (pacote removido) saiu das dependências, dnf com --skip-unavailable e um erro de dependências já não bloqueia a atualização",
         "0.15.3 : indicador de estado (● instalado / ○ não instalado) em cada aplicação da Loja, como no resto da interface — o texto «· Instalado (RPM)» do subtítulo desaparece",
         "0.15.2 : deteção correta dos repositórios no Fedora 41+ (dnf5): o RPM Fusion fica em /usr/share/dnf5/repos.d e o config-manager guarda a ativação em /etc/dnf/repos.override.d",
@@ -12938,11 +12944,29 @@ def _hwcon_gui_installed() -> bool:
 
 
 def _hwcon_plugin_installed() -> bool:
-    base = os.path.join(REAL_HOME or "/root", "homebrew", "plugins")
-    try:
-        return any("hwcon" in name.lower() for name in os.listdir(base))
-    except OSError:
-        return False
+    """Plugin Decky « PS5 Hardware Control ».
+
+    Son installateur officiel copie le plugin dans
+    ``~/homebrew/plugins/ps5-hardware-control`` (dossier root:root) : c'est ce
+    nom qu'il faut reconnaître, pas seulement « hwcon ».
+    """
+    markers = ("ps5-hardware-control", "ps5-hwcon", "hwcon")
+    roots = [
+        os.path.join(REAL_HOME or "/root", "homebrew", "plugins"),
+        "/root/homebrew/plugins",
+        *glob.glob("/home/*/homebrew/plugins"),
+    ]
+    for base in dict.fromkeys(roots):
+        try:
+            entries = os.listdir(base)
+        except OSError:
+            continue
+        if any(
+            any(marker in name.lower() for marker in markers)
+            for name in entries
+        ):
+            return True
+    return False
 
 
 def _profile_state(profile: dict[str, Any]) -> tuple[int, int]:

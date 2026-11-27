@@ -6,6 +6,11 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.5] — 2026-11-27
+
+### Corrigé
+- **Hardware Control — plugin Decky** : la pastille restait « ○ Non installé » alors que le plugin était bien présent. L'installateur officiel copie le plugin dans `~/homebrew/plugins/ps5-hardware-control`, alors que la détection ne cherchait que « hwcon » dans le nom du dossier. Elle reconnaît désormais `ps5-hardware-control`, `ps5-hwcon` et `hwcon`, dans le home de l'utilisateur de bureau, dans `/root` et dans tous les `/home/*/homebrew/plugins`.
+
 ## [0.15.4] — 2026-11-27
 
 ### Corrigé

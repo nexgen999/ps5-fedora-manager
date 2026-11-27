@@ -7,6 +7,11 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.5] — 2026-11-27
+
+### Fixed
+- **Hardware Control — Decky plugin**: the badge stayed at “○ Not installed” while the plugin was actually present. The official installer copies it to `~/homebrew/plugins/ps5-hardware-control`, whereas detection only looked for “hwcon” in the folder name. It now recognises `ps5-hardware-control`, `ps5-hwcon` and `hwcon`, in the desktop user's home, in `/root` and in every `/home/*/homebrew/plugins`.
+
 ## [0.15.4] — 2026-11-27
 
 ### Fixed
