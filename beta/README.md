@@ -1,125 +1,94 @@
 # PS5 Fedora Manager — édition bêta modulaire
 
 Tout ce dossier est **indépendant de la version stable** : `install.sh` ne le
-copie pas, `ps5_manager.py` ne l'importe pas, et rien ici ne modifie `/opt/ps5-manager`.
-On prépare l'avenir sans toucher à ce qui fonctionne chez les utilisateurs.
-
-Lancer la bêta (GTK4 + Libadwaita requis, comme la version stable) :
+copie pas, `ps5_manager.py` ne l'importe pas, et rien ici ne modifie
+`/opt/ps5-manager`. La stable reste en 0.15.x et continue de fonctionner.
 
 ```bash
-python3 beta/run.py            # langue française par défaut
-PS5M_LANG=en python3 beta/run.py
+python3 beta/run.py                 # interface (français par défaut)
+PS5M_LANG=en python3 beta/run.py    # langue de départ forcée
 ```
+
+## Documentation
+
+| FR | EN |
+|---|---|
+| [doc/fr/index.md](doc/fr/index.md) | [doc/en/index.md](doc/en/index.md) |
+| [architecture](doc/fr/architecture.md) | [architecture](doc/en/architecture.md) |
+| [un document par module](doc/fr/modules/) | [one document per module](doc/en/modules/) |
+| [référence des greffons (générée)](doc/fr/addons.md) | [addon reference (generated)](doc/en/addons.md) |
+| [langues](doc/fr/langues.md) | [languages](doc/en/languages.md) |
+| [environnements](doc/fr/environnements.md) | [environments](doc/en/environments.md) |
+| [outils](doc/fr/outils.md) | [tools](doc/en/tools.md) |
+| [contribuer](doc/fr/contribuer.md) | [contributing](doc/en/contributing.md) |
+| [TASKS.md](TASKS.md) — fait / à faire | [TASKS.md](TASKS.md) |
+
+## Trois principes
+
+1. **Une option = un script.** `addons/*.sh`, versionné, avec `--check`.
+2. **Une langue = un fichier.** `langs/xx.json`, aucun code à écrire.
+3. **Un environnement = un module.** `ps5m/env/`, seulement ce qui diffère.
 
 ## Architecture
 
 ```
 beta/
-├── run.py                 point d'entrée (ajoute beta/ au PYTHONPATH)
-├── VERSION                version de l'édition bêta
+├── run.py · VERSION · TASKS.md · CHANGELOG.md
 ├── ps5m/
-│   ├── app.py             fenêtre, barre latérale, log en direct
-│   ├── i18n.py            paquets de langue JSON + repli anglais
-│   ├── catalog.py         greffons : en-têtes, versions, mises à jour
-│   ├── system.py          état du système (rpm, chemins)
-│   ├── runner.py          exécution des scripts (PTY, streaming)
-│   ├── journal.py         journal fichier
-│   ├── ui.py              pastilles, lignes, blocs de texte
-│   ├── env/               environnements de bureau (gnome, kde, cinnamon, budgie…)
-│   └── pages/             une page = un module (journal, à propos, sections)
-├── addons/                un script .sh par option + index.json
-├── langs/                 une langue = un fichier JSON
-└── tools/                 build_catalog.py, lang_status.py, check.py
+│   ├── app.py        fenêtre, barre latérale, log en direct
+│   ├── catalog.py    en-têtes, versions, mises à jour SHA-256
+│   ├── i18n.py       langues JSON + repli anglais
+│   ├── env/          gnome, kde, cinnamon, budgie, generic
+│   ├── pages/        sections génériques + pages dédiées
+│   ├── runner.py     exécution PTY, pkexec
+│   ├── system.py     état rpm / chemins
+│   ├── journal.py · ui.py
+├── addons/           un .sh par option + index.json généré
+├── langs/            6 langues, 78 clés
+├── doc/fr · doc/en/  documentation
+└── tools/            build_catalog, check, lang_status, selftest, docs, new_addon
 ```
 
-## 1. Ajouter ou modifier une option
+## Sections
 
-Une option = **un script autonome** dans `addons/`, avec un en-tête de métadonnées :
+24 sections, 46 greffons. Les sections sans page dédiée utilisent la page
+générique (une ligne par greffon, pastille, confirmation, installation) :
+
+`library` `aidev` `dev` `websrv` `deps` `repos` `gaming` `audio` `video`
+`hardware` `mesa` `kernel` `power` `fan` `maint` `update` `lang` `features`
+`fix`
+
+Pages dédiées : `easy` (enchaînement recommandé), `services` (interrupteurs
+systemd), `ui_lang` (choix de langue), `users` (comptes, lecture seule),
+`fedora` (version, noyau, `dnf check-update`), plus Journal et À propos.
+
+## Ajouter une option
 
 ```bash
-#!/usr/bin/env bash
-#@ id: mon-option              # identifiant unique, jamais réutilisé
-#@ version: 1.0.0              # à incrémenter à chaque modification
-#@ section: audio              # audio | video | repos | gaming | hardware | deps
-#@ icon: audio-volume-high-symbolic
-#@ title: My option            # anglais (repli)
-#@ title_fr: Mon option
-#@ desc: What it does.
-#@ desc_fr: Ce que ça fait.
-#@ packages: paquet1 paquet2   # état lu par rpm (facultatif)
-#@ check_paths: ~/dossier      # chemins vérifiés, globs acceptés (facultatif)
-#@ needs: autre-id             # greffons à installer d'abord (facultatif)
-#@ root: yes                   # no = s'exécute avec les droits du compte de bureau
-set -euo pipefail
-
-if [ "${1:-}" = "--check" ]; then      # contrat : 0 = installé
-    rpm -q paquet1 >/dev/null 2>&1 && exit 0
-    exit 1
-fi
-
-dnf install -y paquet1 paquet2
+python3 beta/tools/new_addon.py --id app-htop --section library \
+  --packages "htop" --title-en "htop" --title-fr "htop" \
+  --desc-en "Process viewer." --desc-fr "Visionneuse de processus."
+python3 beta/tools/build_catalog.py
+python3 beta/tools/docs.py
+python3 beta/tools/check.py
 ```
 
-Puis :
+En-tête complet et contrat `--check` : [doc/fr/addons.md](doc/fr/addons.md).
+
+## Contrôles
 
 ```bash
-python3 beta/tools/build_catalog.py     # met à jour addons/index.json
-python3 beta/tools/check.py             # valide en-têtes, versions, bash -n, langues
+python3 beta/tools/build_catalog.py --check   # index à jour
+python3 beta/tools/check.py                   # greffons + catalogue + langues
+python3 beta/tools/selftest.py                # logique, sans GTK
+python3 beta/tools/lang_status.py             # couverture des langues
+python3 beta/tools/docs.py                    # doc des greffons
 ```
 
-L'application relit `index.json` : elle ne télécharge que les scripts dont
-`version` a augmenté (`catalog.refresh()`, empreinte SHA-256 vérifiée).
-Modifier une commande = éditer ce seul fichier, incrémenter `version`, relancer
-`build_catalog.py` et pousser : les utilisateurs reçoivent la mise à jour sans
-réinstaller le manager.
+## Limites connues
 
-## 2. Ajouter une langue
-
-```bash
-cp beta/langs/en.json beta/langs/nl.json     # traduire les valeurs, garder les clés
-python3 beta/tools/lang_status.py            # couverture, clés manquantes
-python3 beta/tools/lang_status.py --missing nl
-```
-
-Aucun code à toucher : la langue apparaît dans le menu dès que le fichier existe.
-Une clé absente retombe sur l'anglais, une langue incomplète reste utilisable.
-Le champ `_meta.direction` permet un affichage `rtl` (arabe, hébreu).
-
-## 3. Ajouter un environnement de bureau
-
-```python
-# beta/ps5m/env/mate.py
-class Mate(Environment):
-    def __init__(self) -> None:
-        super().__init__(id="mate", name="MATE", terminal=("mate-terminal", "--"))
-```
-
-Déclarer la classe dans `beta/ps5m/env/detect.py` (`FACTORIES` + `_TOKENS`).
-Les pages n'utilisent que `Environment` (`open_terminal`, `set_theme_commands`,
-`set_accent_commands`, `supports`), jamais le nom d'un bureau.
-
-## 4. Ajouter une page
-
-Créer `beta/ps5m/pages/xxx.py` avec `build(win) -> Gtk.Widget`, puis l'ajouter à
-`STATIC` dans `pages/__init__.py`, ou créer une nouvelle section en ajoutant un
-script avec `#@ section: xxx` (la page est générée automatiquement).
-
-## 5. Contrôles avant de pousser
-
-```bash
-python3 beta/tools/check.py             # greffons + catalogue + langues
-python3 beta/tools/selftest.py          # 37 vérifications de logique, sans GTK
-python3 beta/tools/build_catalog.py --check
-python3 beta/tools/lang_status.py
-bash -n beta/addons/*.sh
-python3 -m py_compile $(find beta -name '*.py')
-```
-
-## Limites assumées de cette première étape
-
-- Toutes les pages de la version stable ne sont pas encore portées : la bêta
-  fournit le socle (catalogue, journal, à propos) et les greffons audio/vidéo,
-  dépôts, gaming et matériel, qui servent de modèle pour le reste.
-- L'interface n'a pas de mode non-root dédié : les scripts `root: no` savent
-  redescendre vers `$SUDO_USER`, comme la version stable.
-- Rien n'est installé ni publié : cette édition s'exécute depuis le dépôt.
+- L'interface n'est pas testée dans l'environnement de développement (pas de
+  GTK) : à valider sur la PS5.
+- Le mode non-root n'est pas proposé comme un mode global : chaque greffon
+  déclare `root: yes/no`.
+- Les notes de version de la bêta sont dans [CHANGELOG.md](CHANGELOG.md).

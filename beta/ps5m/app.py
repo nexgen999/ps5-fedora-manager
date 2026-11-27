@@ -4,6 +4,7 @@ from __future__ import annotations
 import os
 import sys
 import threading
+from typing import Callable
 
 import gi
 
@@ -15,10 +16,37 @@ from gi.repository import Adw, Gdk, Gio, GLib, Gtk  # noqa: E402
 from . import __version__, catalog, i18n  # noqa: E402
 from .env import current as current_env  # noqa: E402
 from .journal import Journal  # noqa: E402
-from .pages import STATIC, build_section  # noqa: E402
+from .pages import ORDER, STATIC, SECTIONS as SECTION_PAGES, build_section  # noqa: E402
 
 APP_ID = "io.github.nexgen999.ps5manager.beta"
-SECTIONS = ("audio", "video", "repos", "gaming", "hardware", "deps")
+
+# Icône de chaque section ; une section inconnue garde l'icône de dossier.
+SECTION_ICONS = {
+    "easy": "emblem-ok-symbolic",
+    "library": "applications-other-symbolic",
+    "aidev": "applications-science-symbolic",
+    "dev": "applications-development-symbolic",
+    "websrv": "network-server-symbolic",
+    "deps": "application-x-addon-symbolic",
+    "repos": "folder-download-symbolic",
+    "gaming": "applications-games-symbolic",
+    "audio": "audio-x-generic-symbolic",
+    "video": "video-x-generic-symbolic",
+    "hardware": "computer-symbolic",
+    "mesa": "video-display-symbolic",
+    "kernel": "drive-harddisk-symbolic",
+    "power": "preferences-system-power-symbolic",
+    "fan": "weather-windy-symbolic",
+    "maint": "user-trash-symbolic",
+    "update": "software-update-available-symbolic",
+    "lang": "preferences-desktop-locale-symbolic",
+    "features": "starred-symbolic",
+    "fix": "emblem-system-symbolic",
+    "services": "system-run-symbolic",
+    "ui_lang": "preferences-desktop-locale-symbolic",
+    "users": "system-users-symbolic",
+    "fedora": "fedora-logo-symbolic",
+}
 
 
 def open_uri(url: str) -> None:
@@ -88,6 +116,15 @@ class BetaWindow(Adw.ApplicationWindow):
 
         threading.Thread(target=self._check_addon_updates, daemon=True).start()
 
+    # ---- sections ----
+    def section_ids(self) -> list[str]:
+        """Sections affichées : page dédiée ou au moins un greffon."""
+        known = {ident for ident, _b in SECTION_PAGES}
+        return [
+            ident for ident in ORDER
+            if ident in known or any(a.section == ident for a in self.addons.values())
+        ]
+
     # ---- construction ----
     def _build_sidebar(self) -> Adw.NavigationPage:
         header = Adw.HeaderBar()
@@ -99,12 +136,7 @@ class BetaWindow(Adw.ApplicationWindow):
         refresh.connect("clicked", lambda *_: self.refresh_addons())
         header.pack_start(refresh)
 
-        for section in SECTIONS:
-            if not any(a.section == section for a in self.addons.values()):
-                continue
-            self.sidebar_box.append(self._sidebar_row(f"section.{section}", section))
-        for ident, label_key, _builder in STATIC:
-            self.sidebar_box.append(self._sidebar_row(label_key, ident))
+        self._fill_sidebar()
 
         scroll = Gtk.ScrolledWindow(hexpand=True, vexpand=True)
         scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
@@ -117,6 +149,12 @@ class BetaWindow(Adw.ApplicationWindow):
         page.set_child(toolbar)
         return page
 
+    def _fill_sidebar(self) -> None:
+        for ident in self.section_ids():
+            self.sidebar_box.append(self._sidebar_row(f"section.{ident}", ident))
+        for ident, label_key, _builder in STATIC:
+            self.sidebar_box.append(self._sidebar_row(label_key, ident))
+
     def _sidebar_row(self, label_key: str, ident: str) -> Gtk.ListBoxRow:
         row = Gtk.ListBoxRow()
         row.ident = ident  # type: ignore[attr-defined]
@@ -125,7 +163,7 @@ class BetaWindow(Adw.ApplicationWindow):
         box.set_margin_bottom(8)
         box.set_margin_start(12)
         box.set_margin_end(12)
-        icon = "folder-symbolic" if ident in SECTIONS else "emblem-documents-symbolic"
+        icon = SECTION_ICONS.get(ident, "emblem-documents-symbolic")
         box.append(Gtk.Image.new_from_icon_name(icon))
         label = Gtk.Label(label=i18n.tr(label_key), xalign=0.0, hexpand=True)
         label.set_use_markup(False)
@@ -154,38 +192,50 @@ class BetaWindow(Adw.ApplicationWindow):
         if row is None:
             return
         ident = row.ident  # type: ignore[attr-defined]
-        if ident in SECTIONS:
-            widget = build_section(self, ident)
+        builders = dict(SECTION_PAGES)
+        if ident in builders:
+            widget = builders[ident](self)
             title = i18n.tr(f"section.{ident}")
-        else:
+        elif ident in {i for i, _l, _b in STATIC}:
             builder = next(b for i, _l, b in STATIC if i == ident)
             widget = builder(self)
             title = i18n.tr(next(l for i, l, _b in STATIC if i == ident))
+        else:
+            widget = build_section(self, ident)
+            title = i18n.tr(f"section.{ident}")
         page = Adw.NavigationPage(title=title)
         page.set_child(widget)
         self.nav.push(page)
+
+    def go_to(self, ident: str) -> None:
+        """Ouvre une section depuis une autre page (lien interne)."""
+        for index, row in enumerate(self.sidebar_box):
+            if getattr(row, "ident", None) == ident:
+                self.sidebar_box.select_row(row)
+                return
+        self.toast(i18n.tr(f"section.{ident}"))
 
     def _on_language_selected(self, dropdown, _pspec) -> None:
         index = dropdown.get_selected()
         if index < 0 or index >= len(self._lang_codes):
             return
-        code = self._lang_codes[index]
+        self.set_language(self._lang_codes[index])
+
+    def set_language(self, code: str) -> None:
         if code == self.language:
             return
         i18n.load(code)
         self.language = code
         self.journal.write(f"langue : {code}")
+        if code in self._lang_codes:
+            self.lang_dropdown.set_selected(self._lang_codes.index(code))
         self.rebuild_ui()
 
     def rebuild_ui(self) -> None:
         """Reconstruit la barre latérale et les titres après un changement de langue."""
         self.set_title(i18n.tr("app.title"))
         self.sidebar_box.remove_all()
-        for section in SECTIONS:
-            if any(a.section == section for a in self.addons.values()):
-                self.sidebar_box.append(self._sidebar_row(f"section.{section}", section))
-        for ident, label_key, _builder in STATIC:
-            self.sidebar_box.append(self._sidebar_row(label_key, ident))
+        self._fill_sidebar()
         self.nav = Adw.NavigationView()
         self.split.get_content().set_child(self.nav)
 
@@ -236,6 +286,18 @@ class BetaWindow(Adw.ApplicationWindow):
 
         threading.Thread(target=_worker, daemon=True).start()
 
+    def run_background(self, task: Callable[[], tuple[bool, str]], done) -> None:
+        """Lance une action courte sans fenêtre de log (interrupteurs, services)."""
+
+        def _worker() -> None:
+            try:
+                ok, message = task()
+            except Exception as exc:  # noqa: BLE001
+                ok, message = False, str(exc)
+            GLib.idle_add(done, ok, message)
+
+        threading.Thread(target=_worker, daemon=True).start()
+
     def refresh_addons_state(self) -> None:
         """Relit les scripts après une installation (versions et états à jour)."""
         self.addons = catalog.load_local()
@@ -250,7 +312,10 @@ class BetaWindow(Adw.ApplicationWindow):
         outdated, _removed = catalog.pending(self.addons, remote)
         if not outdated:
             return
-        GLib.idle_add(self.toast, i18n.tr("action.refresh") + f" ({len(outdated)})")
+        GLib.idle_add(self.refresh_hint, len(outdated))
+
+    def refresh_hint(self, count: int) -> None:
+        self.toast(f"{i18n.tr('action.refresh')} · {count}")
 
     def refresh_addons(self) -> None:
         def _task(emit) -> tuple[bool, str]:

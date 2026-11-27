@@ -60,6 +60,7 @@ class Addon:
     packages: tuple[str, ...] = ()
     needs: tuple[str, ...] = ()
     check_paths: tuple[str, ...] = ()
+    action: bool = False
     root: bool = True
     sha256: str = ""
     path: Path | None = None
@@ -94,6 +95,7 @@ class Addon:
             "packages": list(self.packages),
             "needs": list(self.needs),
             "check_paths": list(self.check_paths),
+            "action": self.action,
             "root": self.root,
         }
         if self.sha256:
@@ -115,6 +117,7 @@ class Addon:
             packages=tuple(data.get("packages") or ()),
             needs=tuple(data.get("needs") or ()),
             check_paths=tuple(data.get("check_paths") or ()),
+            action=bool(data.get("action", False)),
             root=bool(data.get("root", True)),
             sha256=str(data.get("sha256", "")),
         )
@@ -165,6 +168,7 @@ def parse_script(path: Path) -> Addon:
         packages=_split(meta.get("packages", "")),
         needs=_split(meta.get("needs", "")),
         check_paths=_split(meta.get("check_paths", "")),
+        action=meta.get("action", "no").lower() in ("yes", "true", "1"),
         root=meta.get("root", "yes").lower() not in ("no", "false", "0"),
         sha256=_sha256(path),
         path=path,

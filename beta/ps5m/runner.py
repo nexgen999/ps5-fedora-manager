@@ -4,6 +4,7 @@ from __future__ import annotations
 import os
 import pty
 import select
+import shutil
 import subprocess
 from pathlib import Path
 from typing import Callable
@@ -11,16 +12,23 @@ from typing import Callable
 Emit = Callable[[str], None]
 
 
-def run_script(script: Path, emit: Emit, args: tuple[str, ...] = ()) -> int:
+def run_script(
+    script: Path, emit: Emit, args: tuple[str, ...] = (), root: bool = False
+) -> int:
     """Lance `bash script.sh [args]` et renvoie le code de sortie.
 
     Même approche que l'application stable : un pseudo-terminal pour que dnf et
-    les installateurs s'affichent ligne par ligne dans le journal.
+    les installateurs s'affichent ligne par ligne dans le journal. Un greffon
+    `root: yes` passe par `pkexec` quand l'application n'est pas déjà root :
+    polkit demande alors le mot de passe une seule fois, dans une boîte native.
     """
-    emit(f"commande : bash {script} {' '.join(args)}".strip())
+    command = ["bash", str(script), *args]
+    if root and os.geteuid() != 0 and shutil.which("pkexec"):
+        command = ["pkexec", *command]
+    emit(f"commande : {' '.join(command)}")
     master, slave = pty.openpty()
     process = subprocess.Popen(
-        ["bash", str(script), *args],
+        command,
         stdin=subprocess.DEVNULL,
         stdout=slave,
         stderr=slave,
@@ -62,3 +70,14 @@ def check_script(script: Path) -> bool:
     except (OSError, subprocess.SubprocessError):
         return False
     return result.returncode == 0
+
+
+def run_command(command: list[str], timeout: float = 30.0) -> tuple[int, str]:
+    """Exécute une commande courte et renvoie (code, sortie)."""
+    try:
+        result = subprocess.run(
+            command, capture_output=True, text=True, timeout=timeout, check=False
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        return 127, str(exc)
+    return result.returncode, (result.stdout or result.stderr or "").strip()

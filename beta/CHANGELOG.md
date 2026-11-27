@@ -1,5 +1,33 @@
 # Journal de la bêta
 
+## [0.16.0-beta2] — 2026-11-27
+
+Deuxième étape : la bêta couvre désormais toutes les sections de la stable.
+
+### Greffons
+- 46 scripts `.sh` (contre 10) répartis sur 24 sections : dépôts, codecs,
+  FFmpeg, Easy Effects, presets JackHack96, Gamescope, GameMode, MangoHud,
+  Steam, Lutris, Decky Loader, plugin PS5, Hardware Control, Mesa freeworld,
+  Vulkan, noyau, alimentation, ventilateur, maintenance, mises à jour,
+  langues système, serveur web, développement, IA, logithèque.
+- Nouveau champ `action: yes` : les actions pures (nettoyage, `dnf upgrade`,
+  vérification) n'affichent pas de pastille d'état.
+- `run_script(root=…)` : un greffon `root: yes` passe par `pkexec` quand
+  l'application n'est pas root.
+
+### Pages
+- `easy` (enchaînement recommandé), `services` (interrupteurs systemd),
+  `ui_lang` (choix de langue avec couverture), `users` (comptes, lecture seule),
+  `fedora` (version, noyau, `dnf check-update`).
+- 78 clés de langue × 6 langues (fr, en, es, it, de, pt).
+
+### Outils et documentation
+- `tools/new_addon.py` : génère un greffon conforme.
+- `tools/docs.py` : génère `doc/{fr,en}/addons.md` depuis l'index.
+- Documentation complète FR/EN : architecture, un document par module,
+  langues, environnements, outils, contribuer.
+- `TASKS.md` : suivi fait / à faire.
+
 ## [0.16.0-beta1] — 2026-11-27
 
 Première étape de l'architecture modulaire, entièrement sous `beta/`. La version

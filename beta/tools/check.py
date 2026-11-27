@@ -38,8 +38,8 @@ def check_addons() -> list[str]:
         for need in addon.needs:
             if need not in addons:
                 problems.append(f"{addon.id} : dépendance inconnue « {need} »")
-        if not addon.packages and not addon.check_paths:
-            problems.append(f"{addon.id} : ni paquets ni chemins à vérifier")
+        if not addon.packages and not addon.check_paths and not addon.action:
+            problems.append(f"{addon.id} : ni paquets, ni chemins, ni action")
         script = addon.path
         if script is None or not script.exists():
             problems.append(f"{addon.id} : script introuvable")

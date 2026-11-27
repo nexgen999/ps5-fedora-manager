@@ -31,7 +31,12 @@ def ok(condition: bool, label: str) -> None:
 
 def test_catalog() -> None:
     addons = catalog.load_local()
-    ok(len(addons) == 10, f"10 greffons lus ({len(addons)})")
+    ok(len(addons) >= 40, f"{len(addons)} greffons lus")
+    sections = {a.section for a in addons.values()}
+    ok(len(sections) >= 14, f"{len(sections)} sections couvertes")
+    ok(any(a.action for a in addons.values()), "greffons d'action reconnus")
+    ok(all(a.version.count(".") == 2 for a in addons.values()),
+       "versions au format x.y.z")
     codecs = addons["codecs-av"]
     ok(codecs.version == "1.0.1", f"version de codecs-av = {codecs.version}")
     ok(len(codecs.packages) == 11, f"codecs-av : {len(codecs.packages)} paquets")

@@ -44,7 +44,7 @@ def _install(win, addon: catalog.Addon) -> None:
         if check_script(addon.path):
             emit(tr("status.installed"))
             return True, tr("common.done")
-        code = run_script(addon.path, emit)
+        code = run_script(addon.path, emit, root=addon.root)
         return code == 0, tr("common.done") if code == 0 else tr("common.failed", code=code)
 
     win.run_task(f"{addon.title(win.language)} {addon.version}", _task)
@@ -58,7 +58,7 @@ def build_section(win, section: str) -> Gtk.Widget:
 
     addons = [a for a in win.addons.values() if a.section == section]
     for addon in catalog.order(addons):
-        done, total = _state(addon)
+        done, total = (0, 0) if addon.action else _state(addon)
         row = action_row(
             addon.title(win.language),
             addon.description(win.language),
