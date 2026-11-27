@@ -22,4 +22,4 @@ cp -a backup/stable/v0.15.17/. /opt/ps5-manager/
 | Sauvegarde | Contenu |
 |---|---|
 | `v0.15.16` | dernière version avant la page d'accueil « PS5 Fedora Manager » |
-| `v0.15.17` | version 0.15.17 avant l'affinage de la page d'accueil |
+| `v0.15.17` | version 0.15.17 avant le déplacement de « Langue de l'interface » |

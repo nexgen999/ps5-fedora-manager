@@ -2067,7 +2067,7 @@ STRINGS = {
         "home_version": "Version %s",
         "home_pick": "Accès rapide",
         "home_update_sub": "Installer les mises à jour du manager",
-        "home_lang_sub": "Changer la langue de l'interface",
+        "home_lang_sub": "Changer la langue de l'interface du manager",
         "home_logs_sub": "Journal de la session et journal en direct",
         "search_placeholder": "Rechercher une option ou un logiciel…",
         "sys_group_session": "Session",
@@ -2526,7 +2526,7 @@ STRINGS = {
         "home_version": "Version %s",
         "home_pick": "Quick access",
         "home_update_sub": "Install manager updates",
-        "home_lang_sub": "Change the interface language",
+        "home_lang_sub": "Change the manager interface language",
         "home_logs_sub": "Session log and live log",
         "search_placeholder": "Search an option or software…",
         "sys_group_session": "Session",
@@ -2999,7 +2999,7 @@ STRINGS['es'] = {'app_title': 'PS5 Fedora Manager',
     'home_version': 'Versión %s',
     'home_pick': 'Acceso rápido',
     'home_update_sub': 'Instalar las actualizaciones del gestor',
-    'home_lang_sub': 'Cambiar el idioma de la interfaz',
+    'home_lang_sub': 'Cambiar el idioma de la interfaz del gestor',
     'home_logs_sub': 'Registro de la sesión y registro en directo',
  'search_placeholder': 'Buscar una opción o un programa…',
  'sys_group_session': 'Sesión',
@@ -3453,7 +3453,7 @@ STRINGS['it'] = {'app_title': 'PS5 Fedora Manager',
     'home_version': 'Versione %s',
     'home_pick': 'Accesso rapido',
     'home_update_sub': 'Installa gli aggiornamenti del gestore',
-    'home_lang_sub': "Cambia la lingua dell'interfaccia",
+    'home_lang_sub': "Cambia la lingua dell'interfaccia del gestore",
     'home_logs_sub': 'Registro della sessione e registro in tempo reale',
  'search_placeholder': "Cerca un'opzione o un programma…",
  'sys_group_session': 'Sessione',
@@ -3903,7 +3903,7 @@ STRINGS['de'] = {'app_title': 'PS5 Fedora Manager',
     'home_version': 'Version %s',
     'home_pick': 'Schnellzugriff',
     'home_update_sub': 'Updates des Managers installieren',
-    'home_lang_sub': 'Sprache der Oberfläche ändern',
+    'home_lang_sub': 'Sprache der Manager-Oberfläche ändern',
     'home_logs_sub': 'Sitzungsprotokoll und Live-Protokoll',
  'search_placeholder': 'Option oder Programm suchen…',
  'sys_group_session': 'Sitzung',
@@ -4353,7 +4353,7 @@ STRINGS['pt'] = {'app_title': 'PS5 Fedora Manager',
     'home_version': 'Versão %s',
     'home_pick': 'Acesso rápido',
     'home_update_sub': 'Instalar as atualizações do gestor',
-    'home_lang_sub': 'Alterar o idioma da interface',
+    'home_lang_sub': 'Alterar o idioma da interface do gestor',
     'home_logs_sub': 'Registo da sessão e registo em direto',
  'search_placeholder': 'Pesquisar uma opção ou um programa…',
  'sys_group_session': 'Sessão',
@@ -5874,6 +5874,7 @@ SECTIONS = [
     ("gaming", "input-gaming-symbolic", "sec_gaming", 2),
     ("features", "application-x-executable-symbolic", "sec_features", 2),
     # Groupe 3 — système Fedora
+    ("lang", "preferences-desktop-keyboard-symbolic", "sec_lang", 3),
     ("repos", "network-server-symbolic", "sec_repos", 3),
     ("users", "system-users-symbolic", "sec_users", 3),
     ("fedora", "system-software-update-symbolic", "sec_fedora", 3),
@@ -8094,7 +8095,16 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
             self.nav.replace([page])
 
     def _open_sub_section(self, sec_id: str) -> None:
-        """Ouvre une page rattachée à l'accueil, sans quitter l'accueil."""
+        """Ouvre une page depuis l'accueil.
+
+        Les pages propres au manager (mise à jour, journal) s'empilent au-dessus
+        de l'accueil ; celles qui ont aussi une entrée dans la barre latérale
+        (langue de l'interface) passent par elle pour garder la sélection.
+        """
+        if sec_id in self.sidebar_rows:
+            self._select_section(sec_id)
+            self.split.set_show_content(True)
+            return
         self.active_section = sec_id
         self.nav.push(self._make_section_page(sec_id))
         self.split.set_show_content(True)
@@ -8187,7 +8197,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         quick.set_selection_mode(Gtk.SelectionMode.NONE)
         for sec_id, icon, sub_key in (
             ("update", "software-update-available-symbolic", "home_update_sub"),
-            ("lang", "preferences-desktop-locale-symbolic", "home_lang_sub"),
+            ("ui_lang", "preferences-desktop-locale-symbolic", "home_lang_sub"),
             ("logs", "utilities-terminal-symbolic", "home_logs_sub"),
         ):
             quick.append(
