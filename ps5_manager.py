@@ -5878,13 +5878,12 @@ SECTIONS = [
     ("users", "system-users-symbolic", "sec_users", 3),
     ("fedora", "system-software-update-symbolic", "sec_fedora", 3),
     ("maint", "applications-engineering-symbolic", "sec_maint", 3),
-    # Groupe 4 — matériel, noyau, réparation
+    # Groupe 4 — matériel, noyau
     ("power", "preferences-system-power-symbolic", "sec_power", 4),
     ("fan", "weather-windy-symbolic", "sec_fan", 4),
     ("hw", "applications-system-symbolic", "sec_hw", 4),
     ("mesa", "video-display-symbolic", "sec_mesa", 4),
     ("kernel", "drive-harddisk-symbolic", "sec_kernel", 4),
-    ("fix", "view-refresh-symbolic", "sec_fix", 4),
 ]
 
 # Pages sans entrée dans la barre latérale : elles s'ouvrent depuis l'accueil
@@ -8889,6 +8888,25 @@ def _push_software_actions(win: Ps5ManagerWindow, item: SoftwareItem) -> None:
     ]
     for act, lbl, ic in actions:
         grp.add(win.row(lbl, None, ic, lambda _r, a=act: _run_sw(a)))
+
+    # « Relancer Steam » vient de l'ancienne section « Divers Fix » : il rejoint
+    # le sous-menu de Steam de la logithèque, à côté des actions d'installation.
+    if item.rpm_name == "steam" and code != "none":
+        grp.add(
+            win.row(
+                T("fix_steam"), T("fix_steam_sub"), "view-refresh-symbolic",
+                lambda *_: win.show_confirm(
+                    T("fix_steam"), T("fix_steam_confirm"),
+                    lambda: win.run_task(T("fix_steam"), lambda e: (
+                        win.run_cmd_pty(
+                            "pkill -9 steam 2>/dev/null; nohup steam >/dev/null 2>&1 &",
+                            e, as_user=True,
+                        ) == 0,
+                        T("done"),
+                    )),
+                ),
+            )
+        )
     sub.add(grp)
     tb = Adw.ToolbarView()
     hb = Adw.HeaderBar()
@@ -10899,26 +10917,6 @@ def build_page_gaming(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
         win.row(
             T("gaming_log"), T("gaming_log_sub"), "text-x-generic-symbolic",
             _show_session_log,
-        )
-    )
-    page.add(grp)
-
-
-def build_page_fix(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
-    grp = pref_group(title=T("fix_group"), description=T("fix_group_sub"))
-    grp.add(
-        win.row(
-            T("fix_steam"), T("fix_steam_sub"), "view-refresh-symbolic",
-            lambda *_: win.show_confirm(
-                T("fix_steam"), T("fix_steam_confirm"),
-                lambda: win.run_task(T("fix_steam"), lambda e: (
-                    win.run_cmd_pty(
-                        "pkill -9 steam 2>/dev/null; nohup steam >/dev/null 2>&1 &",
-                        e, as_user=True,
-                    ) == 0,
-                    T("done"),
-                )),
-            ),
         )
     )
     page.add(grp)
@@ -15849,7 +15847,6 @@ PAGE_BUILDERS = {
     "hw": build_page_hw,
     "mesa": build_page_mesa,
     "kernel": build_page_kernel,
-    "fix": build_page_fix,
     "ui_lang": build_page_ui_lang,
 }
 

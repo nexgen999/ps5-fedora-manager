@@ -29,6 +29,8 @@ Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
   (codecs audio/vidéo et FFmpeg compris) et « Gaming Mode » sont transférés
   dans « Add Fedora Feature », aux côtés de la gestion mobile et des
   imprimantes.
+- « Divers Fix » quitte la barre latérale : « Relancer Steam » rejoint le
+  sous-menu de Steam dans la logithèque, à côté des actions d'installation.
 - Aucune modification du setup en 1 clic : son plan de 9 étapes ne dépend pas
   des sections de la barre latérale.
 

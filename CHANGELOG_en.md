@@ -27,6 +27,8 @@ French version: [CHANGELOG.md](CHANGELOG.md)
   and stays reachable from the home page. “FX Sound & Video” (including
   audio/video codecs and FFmpeg) and “Gaming Mode” move into “Add Fedora
   Feature”, next to mobile management and printers.
+- “Misc Fixes” leaves the sidebar: “Restart Steam” now sits in Steam's
+  sub-menu in the library, next to the install actions.
 - No change to the one-click setup: its 9-step plan does not depend on the
   sidebar sections.
 
