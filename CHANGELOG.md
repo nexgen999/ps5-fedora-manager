@@ -6,6 +6,15 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.4] — 2026-11-27
+
+### Corrigé
+- **Mise à jour du manager depuis le menu** : elle échouait en « code 1 » sur Fedora 45 car `polkit-gnome` n'existe plus dans les dépôts et **un seul nom introuvable annule toute la transaction dnf**. Le paquet est retiré des dépendances de l'interface (l'agent PolicyKit est fourni par le bureau et déjà détecté par l'application).
+- Le `dnf install` des dépendances utilise `--skip-unavailable` : un paquet absent est ignoré au lieu de faire échouer la commande.
+- Une erreur de dépendances **ne bloque plus la mise à jour du manager** : elle est signalée dans le journal, puis le dépôt est récupéré et l'application réinstallée normalement.
+- `install.sh` : même correction (`--skip-unavailable`, plus de `polkit-gnome`), une installation neuve ne s'arrête plus sur ce paquet.
+- Le message d'aide au lancement ne recommande plus d'installer `polkit-gnome` mais l'agent PolicyKit du bureau (gnome-shell, polkit-kde, mate-polkit, xfce-polkit…).
+
 ## [0.15.3] — 2026-11-27
 
 ### Modifié

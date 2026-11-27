@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.3"
+APP_VERSION = "0.15.4"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -686,6 +686,10 @@ if os.environ.get("DBUS_SESSION_BUS_ADDRESS", "") == "":
 
 POLKIT_POLICY_PATH = "/usr/share/polkit-1/actions/io.github.nexgen999.ps5-manager.policy"
 
+# Dépendances de l'interface. « polkit-gnome » n'y figure plus : le paquet a
+# disparu de Fedora 45 et un seul nom introuvable fait échouer tout le
+# « dnf install ». L'agent PolicyKit est fourni par le bureau (gnome-shell,
+# polkit-kde, mate-polkit, xfce-polkit…) et détecté par polkit_agent_paths().
 INTERFACE_DEPS = [
     "python3",
     "python3-gobject",
@@ -697,7 +701,6 @@ INTERFACE_DEPS = [
     "curl",
     "git",
     "desktop-file-utils",
-    "polkit-gnome",
     "util-linux",
 ]
 
@@ -986,12 +989,13 @@ def show_launch_error(code: int) -> None:
                 body=(
                     "Aucun agent PolicyKit graphique n'est actif dans cette session : "
                     "le mot de passe ne peut pas être demandé depuis l'icône du menu.\n\n"
-                    "• installez l'agent : sudo dnf install polkit-gnome\n"
+                    "• installez l'agent PolicyKit de votre bureau (gnome-shell,\n"
+                    "  polkit-kde, mate-polkit, xfce-polkit… : sudo dnf search polkit)\n"
                     "• ou lancez l'application depuis un terminal :\n"
                     "  pkexec /usr/local/bin/ps5-manager\n\n"
                     "No graphical PolicyKit agent is running, so the password prompt "
-                    "cannot be shown from the menu icon. Install polkit-gnome or start "
-                    "the application from a terminal."
+                    "cannot be shown from the menu icon. Install the PolicyKit agent of "
+                    "your desktop, or start the application from a terminal."
                 ),
             )
             dialog.add_response("close", "Fermer / Close")
@@ -1119,16 +1123,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.15.3",
-    "en": "What is new in 0.15.3",
-    "es": "Novedades de la 0.15.3",
-    "it": "Novità della 0.15.3",
-    "de": "Neu in 0.15.3",
-    "pt": "Novidades da 0.15.3",
+    "fr": "Nouveautés de la 0.15.4",
+    "en": "What is new in 0.15.4",
+    "es": "Novedades de la 0.15.4",
+    "it": "Novità della 0.15.4",
+    "de": "Neu in 0.15.4",
+    "pt": "Novidades da 0.15.4",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15.4 : la mise à jour du manager remarche sous Fedora 45 — polkit-gnome (paquet supprimé) retiré des dépendances, dnf lancé avec --skip-unavailable et une erreur de dépendances ne bloque plus la mise à jour",
         "0.15.3 : pastille d'état (● installé / ○ non installé) sur chaque application de la Logithèque, comme le reste de l'interface — le texte « · Installé (RPM) » du sous-titre est remplacé",
         "0.15.2 : détection correcte des dépôts sous Fedora 41+ (dnf5) — RPM Fusion livré dans /usr/share/dnf5/repos.d et activations de config-manager dans /etc/dnf/repos.override.d",
         "0.15.1 : pastilles d'état (● installé / ◐ partiel / ○ absent) dans les sections Dépendances, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Ventilateur, Hardware Control, Dépôts et Logithèque (AppImage Pool, Gear Lever)",
@@ -1152,6 +1157,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15.4: manager updates work again on Fedora 45 — polkit-gnome (removed package) dropped from the dependencies, dnf runs with --skip-unavailable and a dependency error no longer blocks the update",
         "0.15.3: status badge (● installed / ○ not installed) on every App store entry, matching the rest of the interface — the “· Installed (RPM)” subtitle text is gone",
         "0.15.2: correct repository detection on Fedora 41+ (dnf5) — RPM Fusion ships in /usr/share/dnf5/repos.d and config-manager stores enablement in /etc/dnf/repos.override.d",
         "0.15.1: status badges (● installed / ◐ partial / ○ missing) in the Dependencies, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Fan, Hardware Control, Repositories sections and the App store (AppImage Pool, Gear Lever)",
@@ -1175,6 +1181,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15.4 : la actualización del gestor vuelve a funcionar en Fedora 45 — polkit-gnome (paquete eliminado) fuera de las dependencias, dnf con --skip-unavailable y un error de dependencias ya no bloquea la actualización",
         "0.15.3 : indicador de estado (● instalado / ○ no instalado) en cada aplicación de la Tienda, como el resto de la interfaz — desaparece el texto «· Instalado (RPM)» del subtítulo",
         "0.15.2 : detección correcta de repositorios en Fedora 41+ (dnf5): RPM Fusion se instala en /usr/share/dnf5/repos.d y config-manager guarda la activación en /etc/dnf/repos.override.d",
         "0.15.1 : indicadores de estado (● instalado / ◐ parcial / ○ ausente) en las secciones Dependencias, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Ventilador, Hardware Control, Repositorios y Tienda (AppImage Pool, Gear Lever)",
@@ -1198,6 +1205,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15.4 : l'aggiornamento del gestore torna a funzionare su Fedora 45 — polkit-gnome (pacchetto rimosso) escluso dalle dipendenze, dnf con --skip-unavailable e un errore di dipendenze non blocca più l'aggiornamento",
         "0.15.3 : indicatore di stato (● installato / ○ non installato) su ogni applicazione dell'App store, come il resto dell'interfaccia — sparisce il testo «· Installato (RPM)» dal sottotitolo",
         "0.15.2 : rilevamento corretto dei repository su Fedora 41+ (dnf5): RPM Fusion risiede in /usr/share/dnf5/repos.d e config-manager salva l'attivazione in /etc/dnf/repos.override.d",
         "0.15.1 : indicatori di stato (● installato / ◐ parziale / ○ assente) nelle sezioni Dipendenze, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Ventola, Hardware Control, Repository e App store (AppImage Pool, Gear Lever)",
@@ -1221,6 +1229,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15.4 : die Manager-Aktualisierung funktioniert unter Fedora 45 wieder – polkit-gnome (entferntes Paket) aus den Abhängigkeiten gestrichen, dnf mit --skip-unavailable und ein Abhängigkeitsfehler blockiert die Aktualisierung nicht mehr",
         "0.15.3 : Statusanzeige (● installiert / ○ nicht installiert) bei jeder App im App-Store wie im Rest der Oberfläche – der Text „· Installiert (RPM)“ im Untertitel entfällt",
         "0.15.2 : korrekte Paketquellen-Erkennung unter Fedora 41+ (dnf5) – RPM Fusion liegt in /usr/share/dnf5/repos.d und config-manager speichert Aktivierungen in /etc/dnf/repos.override.d",
         "0.15.1 : Statusanzeigen (● installiert / ◐ teilweise / ○ fehlt) in den Abschnitten Abhängigkeiten, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Lüfter, Hardware Control, Paketquellen und App-Store (AppImage Pool, Gear Lever)",
@@ -1244,6 +1253,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15.4 : a atualização do gestor volta a funcionar no Fedora 45 — polkit-gnome (pacote removido) saiu das dependências, dnf com --skip-unavailable e um erro de dependências já não bloqueia a atualização",
         "0.15.3 : indicador de estado (● instalado / ○ não instalado) em cada aplicação da Loja, como no resto da interface — o texto «· Instalado (RPM)» do subtítulo desaparece",
         "0.15.2 : deteção correta dos repositórios no Fedora 41+ (dnf5): o RPM Fusion fica em /usr/share/dnf5/repos.d e o config-manager guarda a ativação em /etc/dnf/repos.override.d",
         "0.15.1 : indicadores de estado (● instalado / ◐ parcial / ○ ausente) nas secções Dependências, Add Fedora Feature, Gaming Mode, Mesa / Vulkan, Ventoinha, Hardware Control, Repositórios e Loja (AppImage Pool, Gear Lever)",
@@ -7119,6 +7129,12 @@ _L_TABLE = {
         "Easy Effects ist bereits installiert.",
         "O Easy Effects já está instalado.",
     ),
+    "Dépendances non mises à jour (code %d) — mise à jour du manager poursuivie.": (
+        "Dependencias no actualizadas (código %d): se continúa con la actualización del gestor.",
+        "Dipendenze non aggiornate (codice %d): si prosegue con l'aggiornamento del gestore.",
+        "Abhängigkeiten nicht aktualisiert (Code %d) – Aktualisierung des Managers läuft weiter.",
+        "Dependências não atualizadas (código %d): a atualização do gestor continua.",
+    ),
 }
 
 
@@ -8535,11 +8551,20 @@ def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
     def _do_update():
         def _task(emit):
-            rc_deps = win.run_cmd_pty(["dnf", "install", "-y", *INTERFACE_DEPS], emit)
+            # --skip-unavailable : un paquet retiré de Fedora (ou absent du dépôt)
+            # ne doit plus annuler la transaction, ni bloquer la mise à jour.
+            rc_deps = win.run_cmd_pty(
+                ["dnf", "install", "-y", "--skip-unavailable", *INTERFACE_DEPS], emit
+            )
             if rc_deps != 0:
-                return False, T("failed") % rc_deps
+                emit(
+                    _L(
+                        "Dépendances non mises à jour (code %d) — mise à jour du manager poursuivie.",
+                        "Dependencies not updated (code %d) — continuing with the manager update.",
+                    ) % rc_deps
+                )
             # xhost est optionnel mais recommandé sous GNOME Wayland/Xwayland
-            win.run_cmd_pty(["dnf", "install", "-y", "xhost"], emit)
+            win.run_cmd_pty(["dnf", "install", "-y", "--skip-unavailable", "xhost"], emit)
 
             if os.path.isdir(os.path.join(INSTALL_DIR, ".git")):
                 rc = win.run_cmd_pty(["git", "-C", INSTALL_DIR, "fetch", "--all", "--prune"], emit)

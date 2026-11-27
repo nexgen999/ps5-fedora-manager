@@ -7,6 +7,15 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.4] — 2026-11-27
+
+### Fixed
+- **Manager update from the menu**: it failed with “code 1” on Fedora 45 because `polkit-gnome` no longer exists in the repositories and **a single unavailable name aborts the whole dnf transaction**. The package is removed from the interface dependencies (the desktop provides the PolicyKit agent, which the application already detects).
+- The dependency `dnf install` now uses `--skip-unavailable`: a missing package is ignored instead of failing the command.
+- A dependency error **no longer blocks the manager update**: it is reported in the log, then the repository is fetched and the application reinstalled as usual.
+- `install.sh`: same fix (`--skip-unavailable`, no more `polkit-gnome`), a fresh install no longer stops on that package.
+- The launch help message no longer recommends installing `polkit-gnome` but the desktop's PolicyKit agent (gnome-shell, polkit-kde, mate-polkit, xfce-polkit…).
+
 ## [0.15.3] — 2026-11-27
 
 ### Changed
