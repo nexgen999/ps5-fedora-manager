@@ -205,3 +205,17 @@ boîte de bienvenue au prochain démarrage.
   n'existe pas dans DNF/DNF5.
 - Un dépôt ou un paquet absent (par exemple un service `ps5fan` non fourni par
   PS5 Linux Tools) apparaît en ✖ sans interrompre le reste du setup.
+
+## Sauvegardes avant modification
+
+Chaque évolution de la version stable commence par une copie complète du projet
+dans `backup/stable/v<version>/`, où `<version>` est le numéro courant de
+`version.txt` :
+
+```bash
+./tools/backup_stable.sh
+```
+
+La copie contient tout le dépôt sauf `.git/` et `backup/` : pour restaurer, il
+suffit de recopier son contenu par-dessus l'arbre de travail. Voir
+`backup/README.md`.

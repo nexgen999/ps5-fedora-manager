@@ -200,3 +200,16 @@ deleting that file shows the welcome dialogs again on the next start.
   exist in DNF/DNF5.
 - A missing repository or package (for example a `ps5fan` service not provided
   by PS5 Linux Tools) appears as ✖ without interrupting the rest of the setup.
+
+## Backups before changes
+
+Every change to the stable version starts with a full copy of the project in
+`backup/stable/v<version>/`, where `<version>` is the current number in
+`version.txt`:
+
+```bash
+./tools/backup_stable.sh
+```
+
+The copy holds the whole repository except `.git/` and `backup/`: to restore it,
+copy its contents back over the working tree. See `backup/README.md`.

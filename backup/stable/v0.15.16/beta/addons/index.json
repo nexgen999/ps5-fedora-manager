@@ -1,0 +1,2538 @@
+{
+  "schema": 1,
+  "generated": "2026-11-27T04:42:25Z",
+  "addons": [
+    {
+      "id": "ai-clean",
+      "version": "1.0.0",
+      "file": "ai-clean.sh",
+      "section": "aidev",
+      "icon": "user-trash-symbolic",
+      "titles": {
+        "fr": "Nettoyer les images Podman",
+        "en": "Clean Podman images"
+      },
+      "descriptions": {
+        "fr": "podman image prune -f.",
+        "en": "podman image prune -f."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": false,
+      "sha256": "b10efe568fea8ec40aab2bd0c03d0e3df521d6e810284ccc6eeaddcc40ad81b3"
+    },
+    {
+      "id": "ai-diagnostic",
+      "version": "1.0.0",
+      "file": "ai-diagnostic.sh",
+      "section": "aidev",
+      "icon": "utilities-system-monitor-symbolic",
+      "titles": {
+        "fr": "Diagnostic IA",
+        "en": "AI diagnostics"
+      },
+      "descriptions": {
+        "fr": "RAM, GPU et espace disque pour les modèles locaux.",
+        "en": "RAM, GPU and disk space for local models."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": false,
+      "sha256": "5e6af4909d4aa482e92c76dc23d94651a59800b89fab77bcbbbc957f1ff8ecc6"
+    },
+    {
+      "id": "ai-logs",
+      "version": "1.0.0",
+      "file": "ai-logs.sh",
+      "section": "aidev",
+      "icon": "text-x-generic-symbolic",
+      "titles": {
+        "fr": "Journaux Open WebUI",
+        "en": "Open WebUI logs"
+      },
+      "descriptions": {
+        "fr": "podman logs --tail 30 open-webui.",
+        "en": "podman logs --tail 30 open-webui."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": false,
+      "sha256": "2627e3692fb4ba0d77b835793c127a6d8c985fe043fb03ef1fb8ecd0786be787"
+    },
+    {
+      "id": "ai-models",
+      "version": "1.0.0",
+      "file": "ai-models.sh",
+      "section": "aidev",
+      "icon": "applications-science-symbolic",
+      "titles": {
+        "fr": "Modèles en mémoire",
+        "en": "Models in memory"
+      },
+      "descriptions": {
+        "fr": "ollama ps : modèles actuellement chargés.",
+        "en": "ollama ps: models currently loaded."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": false,
+      "sha256": "7d47ea791b8d582955f05438b0f6f435db45c8f7792ce88bd2c66476ce9ebc5c"
+    },
+    {
+      "id": "ai-ollama",
+      "version": "1.0.0",
+      "file": "ai-ollama.sh",
+      "section": "aidev",
+      "icon": "applications-science-symbolic",
+      "titles": {
+        "fr": "Ollama (modèles locaux)",
+        "en": "Ollama (local models)"
+      },
+      "descriptions": {
+        "fr": "Exécute des modèles de langage locaux en une commande.",
+        "en": "Run local language models with a single command."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [
+        "/usr/local/bin/ollama"
+      ],
+      "action": false,
+      "root": true,
+      "sha256": "c1dc2d5eaccad3e2835d9cd23d53279622f830fe9a5c2aa4620ca0b0d2410125"
+    },
+    {
+      "id": "ai-openwebui",
+      "version": "1.0.0",
+      "file": "ai-openwebui.sh",
+      "section": "aidev",
+      "icon": "applications-internet-symbolic",
+      "titles": {
+        "fr": "Open WebUI",
+        "en": "Open WebUI"
+      },
+      "descriptions": {
+        "fr": "Chat web pour les modèles locaux, via un conteneur Podman.",
+        "en": "Web chat for local models, through a Podman container."
+      },
+      "packages": [
+        "podman"
+      ],
+      "needs": [
+        "ai-ollama"
+      ],
+      "check_paths": [],
+      "action": true,
+      "root": false,
+      "sha256": "45b40855f19457dbef874a32ac6ca0db1810651c5ddcbd9852a59fec7070be36"
+    },
+    {
+      "id": "ai-python",
+      "version": "1.0.0",
+      "file": "ai-python.sh",
+      "section": "aidev",
+      "icon": "text-x-python-symbolic",
+      "titles": {
+        "fr": "Python pour l'IA",
+        "en": "Python for AI"
+      },
+      "descriptions": {
+        "fr": "Python, pip, venv et Jupyter pour les expérimentations.",
+        "en": "Python, pip, venv and Jupyter for experiments."
+      },
+      "packages": [
+        "python3",
+        "python3-pip",
+        "python3-virtualenv",
+        "python3-notebook"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "d8ea2d834f59563a02c92c02bd3a2ba2e06ffe0f1332c2ed6c879fcaee2bad20"
+    },
+    {
+      "id": "ai-start",
+      "version": "1.0.0",
+      "file": "ai-start.sh",
+      "section": "aidev",
+      "icon": "media-playback-start-symbolic",
+      "titles": {
+        "fr": "Démarrer les services IA",
+        "en": "Start AI services"
+      },
+      "descriptions": {
+        "fr": "Démarre Ollama et le conteneur Open WebUI.",
+        "en": "Starts Ollama and the Open WebUI container."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "3df39820926a08a4602241baceba9edfa5f94fbcf62878e6d7f3e8444626ed10"
+    },
+    {
+      "id": "ai-status",
+      "version": "1.0.0",
+      "file": "ai-status.sh",
+      "section": "aidev",
+      "icon": "dialog-information-symbolic",
+      "titles": {
+        "fr": "État des conteneurs IA",
+        "en": "AI containers status"
+      },
+      "descriptions": {
+        "fr": "podman ps -a et ollama list.",
+        "en": "podman ps -a and ollama list."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": false,
+      "sha256": "295a2373b8264cc9b458f2dd6a87a8ebbab5a6e9df9a5c176c93973f2525bf75"
+    },
+    {
+      "id": "ai-stop",
+      "version": "1.0.0",
+      "file": "ai-stop.sh",
+      "section": "aidev",
+      "icon": "media-playback-stop-symbolic",
+      "titles": {
+        "fr": "Arrêter les services IA",
+        "en": "Stop AI services"
+      },
+      "descriptions": {
+        "fr": "Arrête Open WebUI et Ollama pour libérer la mémoire.",
+        "en": "Stops Open WebUI and Ollama to free memory."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "83eb52c8d75979cbc9950da524b358bc3c74c725a79034391326ef4cfbac6f81"
+    },
+    {
+      "id": "app-btop",
+      "version": "1.0.0",
+      "file": "app-btop.sh",
+      "section": "library",
+      "icon": "utilities-system-monitor-symbolic",
+      "titles": {
+        "fr": "btop",
+        "en": "btop"
+      },
+      "descriptions": {
+        "fr": "Moniteur de ressources en terminal.",
+        "en": "Resource monitor for the terminal."
+      },
+      "packages": [
+        "btop"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "86a762d81880e976480bd1e49634127b97ee2cd687762e19ab273ac2a1f72fef"
+    },
+    {
+      "id": "app-fastfetch",
+      "version": "1.0.0",
+      "file": "app-fastfetch.sh",
+      "section": "library",
+      "icon": "utilities-terminal-symbolic",
+      "titles": {
+        "fr": "fastfetch",
+        "en": "fastfetch"
+      },
+      "descriptions": {
+        "fr": "Informations système en un écran.",
+        "en": "System information in one screen."
+      },
+      "packages": [
+        "fastfetch"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "3c3dc48f58c2142f4cace8158bc6d58314661bdbbdde3d7605ad256cb6d9bfb3"
+    },
+    {
+      "id": "app-lutris",
+      "version": "1.0.0",
+      "file": "app-lutris.sh",
+      "section": "library",
+      "icon": "applications-games-symbolic",
+      "titles": {
+        "fr": "Lutris",
+        "en": "Lutris"
+      },
+      "descriptions": {
+        "fr": "Gestionnaire de jeux Windows et émulés.",
+        "en": "Game manager for Windows and emulated titles."
+      },
+      "packages": [
+        "lutris"
+      ],
+      "needs": [
+        "repo-rpmfusion"
+      ],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "cea71ff3bf4168ad4ee8d67bad8b61ff21c242dabb791f18551803fefab6aac4"
+    },
+    {
+      "id": "app-steam",
+      "version": "1.0.0",
+      "file": "app-steam.sh",
+      "section": "library",
+      "icon": "applications-games-symbolic",
+      "titles": {
+        "fr": "Steam",
+        "en": "Steam"
+      },
+      "descriptions": {
+        "fr": "Client Steam depuis RPM Fusion.",
+        "en": "Steam client from RPM Fusion."
+      },
+      "packages": [
+        "steam"
+      ],
+      "needs": [
+        "repo-rpmfusion"
+      ],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "634c455d2c18adc01eab1b07245d4136797b759fac9326c1c9aa7faf8294dbcc"
+    },
+    {
+      "id": "audio-easyeffects",
+      "version": "1.0.0",
+      "file": "audio-easyeffects.sh",
+      "section": "audio",
+      "icon": "audio-volume-high-symbolic",
+      "titles": {
+        "fr": "Easy Effects",
+        "en": "Easy Effects"
+      },
+      "descriptions": {
+        "fr": "Égaliseur, réduction de bruit et effets Dolby Atmos via PipeWire.",
+        "en": "Equalizer, noise reduction and Dolby Atmos effects over PipeWire."
+      },
+      "packages": [
+        "easyeffects"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "ed425245c4b8acd762ecf6b21e9ed758f41b0f1c43ce115e3bb23b648b175622"
+    },
+    {
+      "id": "audio-presets-jackhack",
+      "version": "1.0.0",
+      "file": "audio-presets-jackhack.sh",
+      "section": "audio",
+      "icon": "media-playlist-shuffle-symbolic",
+      "titles": {
+        "fr": "Presets communautaires (JackHack96)",
+        "en": "Community presets (JackHack96)"
+      },
+      "descriptions": {
+        "fr": "Dix presets prêts à l'emploi, installés dans le compte de bureau.",
+        "en": "Ten ready-made presets installed in the desktop account."
+      },
+      "packages": [],
+      "needs": [
+        "audio-easyeffects"
+      ],
+      "check_paths": [
+        "~/.config/easyeffects/output"
+      ],
+      "action": false,
+      "root": false,
+      "sha256": "1b87081d1c0a136fc7d8155d71563fad36922328a3232a39fa3ec5da465a8ba6"
+    },
+    {
+      "id": "codecs-av",
+      "version": "1.0.1",
+      "file": "codecs-av.sh",
+      "section": "video",
+      "icon": "video-x-generic-symbolic",
+      "titles": {
+        "fr": "Codecs audio et vidéo",
+        "en": "Audio and video codecs"
+      },
+      "descriptions": {
+        "fr": "GStreamer complet et codecs RPM Fusion (H.264, HEVC, AAC, MP3, Dolby…).",
+        "en": "Full GStreamer plus RPM Fusion codecs (H.264, HEVC, AAC, MP3, Dolby…)."
+      },
+      "packages": [
+        "gstreamer1-plugins-good",
+        "gstreamer1-plugins-bad-free",
+        "gstreamer1-plugins-bad-free-extras",
+        "gstreamer1-plugins-ugly",
+        "gstreamer1-plugin-libav",
+        "gstreamer1-plugins-bad-freeworld",
+        "gstreamer1-plugin-openh264",
+        "libavcodec-freeworld",
+        "lame",
+        "x264-libs",
+        "x265-libs"
+      ],
+      "needs": [
+        "repo-rpmfusion"
+      ],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "717fbd58ef273532b819d1d7980d10437e7d764f95e861099d086aca2592b3c5"
+    },
+    {
+      "id": "deps-32bit",
+      "version": "1.0.0",
+      "file": "deps-32bit.sh",
+      "section": "deps",
+      "icon": "video-display-symbolic",
+      "titles": {
+        "fr": "Bibliothèques graphiques 32 bits",
+        "en": "32-bit graphics stack"
+      },
+      "descriptions": {
+        "fr": "Nécessaires à Steam et aux jeux 32 bits sous Fedora.",
+        "en": "Needed by Steam and 32-bit games on Fedora."
+      },
+      "packages": [
+        "mesa-vulkan-drivers.i686",
+        "mesa-dri-drivers.i686",
+        "libva.i686"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "224a4c3cd9c7b9ed5837786037a6077b2dcf1d60ea77565e243471b7fae3a946"
+    },
+    {
+      "id": "deps-build",
+      "version": "1.0.0",
+      "file": "deps-build.sh",
+      "section": "deps",
+      "icon": "application-x-addon-symbolic",
+      "titles": {
+        "fr": "Outils de compilation",
+        "en": "Build tools"
+      },
+      "descriptions": {
+        "fr": "gcc, make, en-têtes du noyau et dkms pour les modules externes.",
+        "en": "gcc, make, kernel headers and dkms for out-of-tree modules."
+      },
+      "packages": [
+        "gcc",
+        "gcc-c++",
+        "make",
+        "kernel-devel",
+        "dkms",
+        "openssl-devel"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "9abc68e4101dc82b370b6107d6783bb187db5bb37e07aeda1d933f6cf036c921"
+    },
+    {
+      "id": "deps-fuse",
+      "version": "1.0.0",
+      "file": "deps-fuse.sh",
+      "section": "deps",
+      "icon": "application-x-addon-symbolic",
+      "titles": {
+        "fr": "Pile FUSE",
+        "en": "FUSE stack"
+      },
+      "descriptions": {
+        "fr": "fusermount et libfuse pour les AppImage et les runtimes Flatpak.",
+        "en": "fusermount and libfuse for AppImages and Flatpak runtimes."
+      },
+      "packages": [
+        "fuse",
+        "fuse-libs"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "dce6606e63e69d3221183937b9d44a118e30835897e9d0c1077f1238f3ef9292"
+    },
+    {
+      "id": "deps-network",
+      "version": "1.0.0",
+      "file": "deps-network.sh",
+      "section": "deps",
+      "icon": "network-transmit-receive-symbolic",
+      "titles": {
+        "fr": "Outils réseau",
+        "en": "Network tools"
+      },
+      "descriptions": {
+        "fr": "curl, wget, rsync et client ssh.",
+        "en": "curl, wget, rsync and ssh client."
+      },
+      "packages": [
+        "curl",
+        "wget",
+        "rsync",
+        "openssh-clients"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "e31d3f94ad11b2ca6cf98c4583ce8b23dd482ec09faf70680cf6bb7c59b8ec78"
+    },
+    {
+      "id": "deps-node-uninstall",
+      "version": "1.0.0",
+      "file": "deps-node-uninstall.sh",
+      "section": "deps",
+      "icon": "user-trash-symbolic",
+      "titles": {
+        "fr": "Désinstaller Node.js",
+        "en": "Uninstall Node.js"
+      },
+      "descriptions": {
+        "fr": "Supprime nodejs et npm.",
+        "en": "Removes nodejs and npm."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "c61121923d8c55d3fcb90018dcb5494348b3b6b93b3e3b758e2562eabdbc81f0"
+    },
+    {
+      "id": "deps-node",
+      "version": "1.0.0",
+      "file": "deps-node.sh",
+      "section": "deps",
+      "icon": "text-x-script-symbolic",
+      "titles": {
+        "fr": "Node.js et npm",
+        "en": "Node.js and npm"
+      },
+      "descriptions": {
+        "fr": "Environnement JavaScript et gestionnaire de paquets.",
+        "en": "JavaScript runtime and package manager."
+      },
+      "packages": [
+        "nodejs",
+        "npm"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "639261ec0d6cf57f6896cfa5211b6e95d4f7e25671b5dc96153f8f4f6d090de4"
+    },
+    {
+      "id": "deps-python-venv",
+      "version": "1.0.0",
+      "file": "deps-python-venv.sh",
+      "section": "deps",
+      "icon": "folder-new-symbolic",
+      "titles": {
+        "fr": "Créer un environnement Python",
+        "en": "Create a Python virtualenv"
+      },
+      "descriptions": {
+        "fr": "Crée ~/my_project avec venv et affiche les versions.",
+        "en": "Creates ~/my_project with venv and shows the versions."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": false,
+      "sha256": "1dca65cf804597c0f6eeb79b4cf13d90d08a679d5f4baaf82dea2de907b7f66c"
+    },
+    {
+      "id": "deps-python-versions",
+      "version": "1.0.0",
+      "file": "deps-python-versions.sh",
+      "section": "deps",
+      "icon": "dialog-information-symbolic",
+      "titles": {
+        "fr": "Afficher les versions de Python",
+        "en": "Show Python versions"
+      },
+      "descriptions": {
+        "fr": "Versions de python3, pip3 et venv.",
+        "en": "python3, pip3 and venv versions."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": false,
+      "sha256": "e3b65d1d87ce24594250a8779278ca2984b481e26b15c6b044e907a5d76fdf40"
+    },
+    {
+      "id": "deps-tkinter",
+      "version": "1.0.0",
+      "file": "deps-tkinter.sh",
+      "section": "deps",
+      "icon": "text-x-python-symbolic",
+      "titles": {
+        "fr": "Python Tkinter",
+        "en": "Python Tkinter"
+      },
+      "descriptions": {
+        "fr": "Bindings Tk pour les scripts Python à interface graphique.",
+        "en": "Tk bindings for Python GUI scripts."
+      },
+      "packages": [
+        "python3-tkinter"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "0842951a1939d0bdbd5b211f51419f5b9536818fc3f508094e5778581a72d9fa"
+    },
+    {
+      "id": "dev-automation",
+      "version": "1.0.0",
+      "file": "dev-automation.sh",
+      "section": "dev",
+      "icon": "system-run-symbolic",
+      "titles": {
+        "fr": "Automatisation",
+        "en": "Automation"
+      },
+      "descriptions": {
+        "fr": "just, direnv et shellcheck.",
+        "en": "just, direnv and shellcheck."
+      },
+      "packages": [
+        "just",
+        "direnv",
+        "shellcheck"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "8884aac4e5ca9e62ecdbace3734b081907d51c3519ed9db623a0c474af331946"
+    },
+    {
+      "id": "dev-build",
+      "version": "1.0.0",
+      "file": "dev-build.sh",
+      "section": "dev",
+      "icon": "applications-engineering-symbolic",
+      "titles": {
+        "fr": "Socle de compilation",
+        "en": "Build essentials"
+      },
+      "descriptions": {
+        "fr": "gcc, cmake, meson, ninja, autotools, rpmdevtools et rpmlint.",
+        "en": "gcc, cmake, meson, ninja, autotools, rpmdevtools and rpmlint."
+      },
+      "packages": [
+        "gcc",
+        "gcc-c++",
+        "make",
+        "cmake",
+        "meson",
+        "ninja-build",
+        "pkgconf-pkg-config",
+        "autoconf",
+        "automake",
+        "libtool",
+        "patch",
+        "rpmdevtools",
+        "rpmlint"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "83a68dbaaecf2419e8b4aefbe39836a64051265f79ca80bfb8294de4797129fc"
+    },
+    {
+      "id": "dev-cli-search",
+      "version": "1.0.0",
+      "file": "dev-cli-search.sh",
+      "section": "dev",
+      "icon": "edit-find-symbolic",
+      "titles": {
+        "fr": "Recherche et navigation",
+        "en": "Search & navigation"
+      },
+      "descriptions": {
+        "fr": "ripgrep, fd, bat, eza, fzf et zoxide.",
+        "en": "ripgrep, fd, bat, eza, fzf and zoxide."
+      },
+      "packages": [
+        "ripgrep",
+        "fd-find",
+        "bat",
+        "eza",
+        "fzf",
+        "zoxide"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "e85a66411f5b2275da291fc95fafe60c48ba1d3e5adb5e6d8d7b495e942e117a"
+    },
+    {
+      "id": "dev-containers",
+      "version": "1.0.0",
+      "file": "dev-containers.sh",
+      "section": "dev",
+      "icon": "application-x-executable-symbolic",
+      "titles": {
+        "fr": "Conteneurs (Podman, Distrobox, Toolbox)",
+        "en": "Containers (Podman, Distrobox, Toolbox)"
+      },
+      "descriptions": {
+        "fr": "Conteneurs sans root et les outils construits dessus.",
+        "en": "Rootless containers and the tools built on them."
+      },
+      "packages": [
+        "podman",
+        "podman-docker",
+        "buildah",
+        "skopeo",
+        "distrobox",
+        "toolbox"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "31f825704178f9e0048ea46014b497067b1746c6a8918f96bdda69349a27fa6f"
+    },
+    {
+      "id": "dev-data",
+      "version": "1.0.0",
+      "file": "dev-data.sh",
+      "section": "dev",
+      "icon": "applications-utilities-symbolic",
+      "titles": {
+        "fr": "JSON et HTTP",
+        "en": "JSON & HTTP"
+      },
+      "descriptions": {
+        "fr": "jq, yq, httpie, SQLite et son navigateur.",
+        "en": "jq, yq, httpie, SQLite and its browser."
+      },
+      "packages": [
+        "jq",
+        "yq",
+        "httpie",
+        "sqlite",
+        "sqlitebrowser"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "6ac271ed86198296239eb27853651a23b3919b3e538ab8b29c06a159cc641f1f"
+    },
+    {
+      "id": "dev-debug",
+      "version": "1.0.0",
+      "file": "dev-debug.sh",
+      "section": "dev",
+      "icon": "applications-engineering-symbolic",
+      "titles": {
+        "fr": "Debug et profilage",
+        "en": "Debug & profiling"
+      },
+      "descriptions": {
+        "fr": "gdb, lldb, valgrind, heaptrack et sysprof.",
+        "en": "gdb, lldb, valgrind, heaptrack and sysprof."
+      },
+      "packages": [
+        "gdb",
+        "lldb",
+        "valgrind",
+        "heaptrack",
+        "sysprof"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "a6b08501bb31b772339caf31ecdb00d5ecc248f3b6517b6a1b1a3409b7f17747"
+    },
+    {
+      "id": "dev-diagnostic",
+      "version": "1.0.0",
+      "file": "dev-diagnostic.sh",
+      "section": "dev",
+      "icon": "utilities-system-monitor-symbolic",
+      "titles": {
+        "fr": "Diagnostic système",
+        "en": "System diagnostics"
+      },
+      "descriptions": {
+        "fr": "lsof, strace, sysstat, perf, ncdu, duf et hyperfine.",
+        "en": "lsof, strace, sysstat, perf, ncdu, duf and hyperfine."
+      },
+      "packages": [
+        "lsof",
+        "strace",
+        "ltrace",
+        "sysstat",
+        "perf",
+        "ncdu",
+        "duf",
+        "hyperfine"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "eb5957997bae74c6d4167d2a0067df6d27715b3d14b5803c941916f20d73aa33"
+    },
+    {
+      "id": "dev-editors",
+      "version": "1.0.0",
+      "file": "dev-editors.sh",
+      "section": "dev",
+      "icon": "accessories-text-editor-symbolic",
+      "titles": {
+        "fr": "Éditeurs en terminal",
+        "en": "Terminal editors"
+      },
+      "descriptions": {
+        "fr": "Neovim et Helix.",
+        "en": "Neovim and Helix."
+      },
+      "packages": [
+        "neovim",
+        "helix"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "8f6bb0c2149e889d0abc8ed705ee3835d3cf04c5ca61153b71fd4aef45d99741"
+    },
+    {
+      "id": "dev-git-tools",
+      "version": "1.1.0",
+      "file": "dev-git-tools.sh",
+      "section": "dev",
+      "icon": "git-symbolic",
+      "titles": {
+        "fr": "Git et plateformes",
+        "en": "Git & platforms"
+      },
+      "descriptions": {
+        "fr": "Git, git-lfs, CLI GitHub/GitLab, lazygit et git-delta.",
+        "en": "Git, git-lfs, GitHub/GitLab CLIs, lazygit and git-delta."
+      },
+      "packages": [
+        "git",
+        "git-lfs",
+        "gh",
+        "glab",
+        "lazygit",
+        "git-delta"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "57676100c3ae1a47afc129df1640ee104366792b1ae5a930e0682c7ec1d942a1"
+    },
+    {
+      "id": "dev-python-gtk",
+      "version": "1.0.0",
+      "file": "dev-python-gtk.sh",
+      "section": "dev",
+      "icon": "text-x-python-symbolic",
+      "titles": {
+        "fr": "Python + GTK4 / Libadwaita",
+        "en": "Python + GTK4 / Libadwaita"
+      },
+      "descriptions": {
+        "fr": "En-têtes, introspection, paquets de développement gtk4/libadwaita et Blueprint.",
+        "en": "Headers, introspection, gtk4/libadwaita dev packages and Blueprint."
+      },
+      "packages": [
+        "python3-devel",
+        "python3-pip",
+        "python3-virtualenv",
+        "python3-pytest",
+        "gobject-introspection-devel",
+        "gtk4-devel",
+        "libadwaita-devel",
+        "libsecret-devel",
+        "blueprint-compiler",
+        "desktop-file-utils",
+        "appstream",
+        "gtk4-devel-tools",
+        "devhelp"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "4c14b1160ba5116665e4499cabf1619ece63cc77312cbf481ffc011af2ad3505"
+    },
+    {
+      "id": "dev-python-quality",
+      "version": "1.0.0",
+      "file": "dev-python-quality.sh",
+      "section": "dev",
+      "icon": "text-x-python-symbolic",
+      "titles": {
+        "fr": "Qualité Python",
+        "en": "Python quality"
+      },
+      "descriptions": {
+        "fr": "uv, ruff, mypy et pre-commit.",
+        "en": "uv, ruff, mypy and pre-commit."
+      },
+      "packages": [
+        "uv",
+        "ruff",
+        "mypy",
+        "pre-commit"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "546d13b2e835deda50fda42c7ff6a51f74b0a695230aa7657f536e4a519fa97d"
+    },
+    {
+      "id": "dev-python",
+      "version": "1.0.0",
+      "file": "dev-python.sh",
+      "section": "dev",
+      "icon": "text-x-python-symbolic",
+      "titles": {
+        "fr": "Développement Python",
+        "en": "Python development"
+      },
+      "descriptions": {
+        "fr": "En-têtes, débogueur et outils de vérification pour Python.",
+        "en": "Headers, debugger and linting tools for Python."
+      },
+      "packages": [
+        "python3-devel",
+        "python3-debugpy",
+        "python3-flake8",
+        "python3-black"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "b7c1320a48bc4f4f3819a4849b41c54c9bed7471c795ee5d5c4120e6b3378464"
+    },
+    {
+      "id": "dev-rust",
+      "version": "1.0.0",
+      "file": "dev-rust.sh",
+      "section": "dev",
+      "icon": "text-x-script-symbolic",
+      "titles": {
+        "fr": "Rust / Cargo",
+        "en": "Rust / Cargo"
+      },
+      "descriptions": {
+        "fr": "Compilateur, gestionnaire de paquets, formateur et linter.",
+        "en": "Compiler, package manager, formatter and linter."
+      },
+      "packages": [
+        "rust",
+        "cargo",
+        "rustfmt",
+        "clippy"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "a92fc75f101a4b2e2cffc9bd65987ef7ae9edb79ba67e7c07f0946b9f759cd8e"
+    },
+    {
+      "id": "dev-terminal",
+      "version": "1.0.0",
+      "file": "dev-terminal.sh",
+      "section": "dev",
+      "icon": "utilities-terminal-symbolic",
+      "titles": {
+        "fr": "Terminal (tmux, zellij)",
+        "en": "Terminal (tmux, zellij)"
+      },
+      "descriptions": {
+        "fr": "Multiplexeurs de terminal pour les longues sessions.",
+        "en": "Terminal multiplexers for long sessions."
+      },
+      "packages": [
+        "tmux",
+        "zellij"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "4b59b3c38971127679d9ca5b929725b4d809b20bb60dde0da969b920e1bb2e68"
+    },
+    {
+      "id": "dev-virt",
+      "version": "1.0.0",
+      "file": "dev-virt.sh",
+      "section": "dev",
+      "icon": "computer-symbolic",
+      "titles": {
+        "fr": "Virtualisation (KVM / QEMU)",
+        "en": "Virtualisation (KVM / QEMU)"
+      },
+      "descriptions": {
+        "fr": "libvirt, virt-manager, GNOME Boxes et firmware UEFI.",
+        "en": "libvirt, virt-manager, GNOME Boxes and UEFI firmware."
+      },
+      "packages": [
+        "qemu-kvm",
+        "libvirt",
+        "virt-install",
+        "virt-manager",
+        "virt-viewer",
+        "gnome-boxes",
+        "edk2-ovmf",
+        "swtpm",
+        "swtpm-tools"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "1c4bf62b45c0f3ed66835e6dc259f7b683f29cd709a03dcccddc78c30f8ad72c"
+    },
+    {
+      "id": "fan-restart",
+      "version": "1.0.0",
+      "file": "fan-restart.sh",
+      "section": "fan",
+      "icon": "view-refresh-symbolic",
+      "titles": {
+        "fr": "Relancer le service du ventilateur",
+        "en": "Restart the fan service"
+      },
+      "descriptions": {
+        "fr": "systemctl restart ps5fan.service.",
+        "en": "systemctl restart ps5fan.service."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "d0add586f71b771e114ba742f2c8ca55e6aeee58ce14fb418a7bf3102effe904"
+    },
+    {
+      "id": "fan-status",
+      "version": "1.0.0",
+      "file": "fan-status.sh",
+      "section": "fan",
+      "icon": "weather-windy-symbolic",
+      "titles": {
+        "fr": "État du ventilateur et des températures",
+        "en": "Fan and temperature status"
+      },
+      "descriptions": {
+        "fr": "État de ps5fan.service et températures hwmon.",
+        "en": "ps5fan.service state and hwmon temperatures."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": false,
+      "sha256": "3ac7b2b5ab525ab7ab2fb38aa3bd8a1fb882fe91e96da50f6768fac2ee1308b1"
+    },
+    {
+      "id": "fan-tools",
+      "version": "1.0.0",
+      "file": "fan-tools.sh",
+      "section": "fan",
+      "icon": "weather-windy-symbolic",
+      "titles": {
+        "fr": "Contrôle du ventilateur PS5",
+        "en": "PS5 fan control"
+      },
+      "descriptions": {
+        "fr": "Courbe de ventilation et service de température pour la PS5.",
+        "en": "Fan curve and temperature service for the PS5."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [
+        "/usr/local/sbin/ps5_control",
+        "/usr/lib/systemd/system/ps5fan.service"
+      ],
+      "action": false,
+      "root": true,
+      "sha256": "ffafc498ca4e89c359392fe44364c16b3c8c1b21c8a8e346666c9aad014965fe"
+    },
+    {
+      "id": "feature-cockpit",
+      "version": "1.0.0",
+      "file": "feature-cockpit.sh",
+      "section": "features",
+      "icon": "network-server-symbolic",
+      "titles": {
+        "fr": "Cockpit",
+        "en": "Cockpit"
+      },
+      "descriptions": {
+        "fr": "Console web pour les services, journaux et stockage.",
+        "en": "Web console for services, logs and storage."
+      },
+      "packages": [
+        "cockpit",
+        "cockpit-storaged",
+        "cockpit-networkmanager"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "edf60388fe900139d27ad2ae3df61c016826dca335aabd952250b0cf48c68029"
+    },
+    {
+      "id": "feature-mobile",
+      "version": "1.0.0",
+      "file": "feature-mobile.sh",
+      "section": "features",
+      "icon": "phone-symbolic",
+      "titles": {
+        "fr": "Intégration du téléphone",
+        "en": "Phone integration"
+      },
+      "descriptions": {
+        "fr": "Extension GSConnect pour les notifications et le transfert de fichiers.",
+        "en": "GSConnect extension for notifications and file transfer."
+      },
+      "packages": [
+        "gnome-shell-extension-gsconnect",
+        "nautilus-gsconnect"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "87731c27c700c88bade8a7486a09cd22e54db1b18ff665db4f4f3a2931820981"
+    },
+    {
+      "id": "feature-print-off",
+      "version": "1.0.0",
+      "file": "feature-print-off.sh",
+      "section": "features",
+      "icon": "printer-symbolic",
+      "titles": {
+        "fr": "Couper l'impression",
+        "en": "Disable printing"
+      },
+      "descriptions": {
+        "fr": "systemctl disable --now cups.",
+        "en": "systemctl disable --now cups."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "7cb958d0a42d3507c83999b2850009a446611107205fd992264a443ce12697ed"
+    },
+    {
+      "id": "feature-print-on",
+      "version": "1.0.0",
+      "file": "feature-print-on.sh",
+      "section": "features",
+      "icon": "printer-symbolic",
+      "titles": {
+        "fr": "Activer l'impression",
+        "en": "Enable printing"
+      },
+      "descriptions": {
+        "fr": "systemctl enable --now cups.",
+        "en": "systemctl enable --now cups."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "435542cffe822ae53ce3eacd12f57058cb8d6292a643a0d6ad4e044c6100d8f8"
+    },
+    {
+      "id": "feature-print-status",
+      "version": "1.0.0",
+      "file": "feature-print-status.sh",
+      "section": "features",
+      "icon": "dialog-information-symbolic",
+      "titles": {
+        "fr": "État de l'impression",
+        "en": "Printing status"
+      },
+      "descriptions": {
+        "fr": "cups.socket, cups.service et lpstat.",
+        "en": "cups.socket, cups.service and lpstat."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": false,
+      "sha256": "b6933e34b267ab55900aa9f8c6bbd243dfd78824d69fc1668cab6ea3334ed65c"
+    },
+    {
+      "id": "feature-print",
+      "version": "1.0.0",
+      "file": "feature-print.sh",
+      "section": "features",
+      "icon": "printer-symbolic",
+      "titles": {
+        "fr": "Impression (CUPS)",
+        "en": "Printing (CUPS)"
+      },
+      "descriptions": {
+        "fr": "Serveur CUPS, filtres et outil de configuration d'imprimante.",
+        "en": "CUPS server, filters and the printer setup tool."
+      },
+      "packages": [
+        "cups",
+        "cups-filters",
+        "system-config-printer"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "9e01ee9fec20f791a6dd95ae206e602e1984f60e74b453f1a9deddfd94b9d46d"
+    },
+    {
+      "id": "feature-toolbox",
+      "version": "1.0.0",
+      "file": "feature-toolbox.sh",
+      "section": "features",
+      "icon": "utilities-terminal-symbolic",
+      "titles": {
+        "fr": "Toolbox",
+        "en": "Toolbox"
+      },
+      "descriptions": {
+        "fr": "Environnements de développement conteneurisés.",
+        "en": "Containerised development environments."
+      },
+      "packages": [
+        "toolbox"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "0f0a826c4dc6af5307153029aaece8e0f612dd9c08f3b34d6d3196db2c23df6a"
+    },
+    {
+      "id": "ffmpeg-full",
+      "version": "1.0.0",
+      "file": "ffmpeg-full.sh",
+      "section": "video",
+      "icon": "applications-multimedia-symbolic",
+      "titles": {
+        "fr": "FFmpeg (codecs complets)",
+        "en": "FFmpeg (full codecs)"
+      },
+      "descriptions": {
+        "fr": "ffmpeg et libavcodec-freeworld pour tous les formats.",
+        "en": "ffmpeg and libavcodec-freeworld for every format."
+      },
+      "packages": [
+        "ffmpeg",
+        "libavcodec-freeworld"
+      ],
+      "needs": [
+        "repo-rpmfusion"
+      ],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "d63dd1e4b1953fdc2dd39754552cd0a2be7b9dccbd59820ae2ebc1e23710992a"
+    },
+    {
+      "id": "fix-dnf",
+      "version": "1.0.0",
+      "file": "fix-dnf.sh",
+      "section": "fix",
+      "icon": "emblem-system-symbolic",
+      "titles": {
+        "fr": "Reconstruire le cache dnf",
+        "en": "Rebuild the dnf cache"
+      },
+      "descriptions": {
+        "fr": "Corrige « cannot download repomd.xml » et les métadonnées obsolètes.",
+        "en": "Fixes \"cannot download repomd.xml\" and stale metadata errors."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "98c1cf6bb9c7e2bf6459f3fbfb927e0aa579533feebb1d93e7634daf210aaf67"
+    },
+    {
+      "id": "fix-steam",
+      "version": "1.0.0",
+      "file": "fix-steam.sh",
+      "section": "fix",
+      "icon": "applications-games-symbolic",
+      "titles": {
+        "fr": "Réparer Steam",
+        "en": "Repair Steam"
+      },
+      "descriptions": {
+        "fr": "Vide le cache de shaders et l'appcache, puis relance Steam.",
+        "en": "Clears shader cache and appcache, then relaunches Steam."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": false,
+      "sha256": "9d27d20775e8d4e0452c02a6909c9db08150a87b4f6509d5427ac11e65c4ec3a"
+    },
+    {
+      "id": "gaming-gamemode",
+      "version": "1.0.0",
+      "file": "gaming-gamemode.sh",
+      "section": "gaming",
+      "icon": "applications-games-symbolic",
+      "titles": {
+        "fr": "GameMode",
+        "en": "GameMode"
+      },
+      "descriptions": {
+        "fr": "Réglages de performance temporaires pendant un jeu.",
+        "en": "Temporary performance tuning while a game runs."
+      },
+      "packages": [
+        "gamemode"
+      ],
+      "needs": [
+        "repo-rpmfusion"
+      ],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "e0920645ae70b84c875f547412b5d651a6a31542111f3e6a1b828e0e0d12617c"
+    },
+    {
+      "id": "gaming-gamescope",
+      "version": "1.0.0",
+      "file": "gaming-gamescope.sh",
+      "section": "gaming",
+      "icon": "applications-games-symbolic",
+      "titles": {
+        "fr": "Gamescope + MangoHud",
+        "en": "Gamescope + MangoHud"
+      },
+      "descriptions": {
+        "fr": "Micro-compositeur pour jeux en plein écran et surcouche de performance.",
+        "en": "Micro-compositor for full-screen games and a performance overlay."
+      },
+      "packages": [
+        "gamescope",
+        "mangohud"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "ee3ae46520cdea586194df5d82ab3f70d0290432ad7a0a85f27a762c9a38686a"
+    },
+    {
+      "id": "gaming-log",
+      "version": "1.0.0",
+      "file": "gaming-log.sh",
+      "section": "gaming",
+      "icon": "text-x-generic-symbolic",
+      "titles": {
+        "fr": "Afficher le journal de lancement",
+        "en": "Show the launch log"
+      },
+      "descriptions": {
+        "fr": "Dernières lignes des journaux Steam et gamescope.",
+        "en": "Last lines of the Steam and gamescope logs."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": false,
+      "sha256": "e360a003b2dc6ca3801e7718ac4e4b6a4d89ebd1dcb717c3bd35c0f4a8d71c9f"
+    },
+    {
+      "id": "gaming-mangohud",
+      "version": "1.0.0",
+      "file": "gaming-mangohud.sh",
+      "section": "gaming",
+      "icon": "applications-games-symbolic",
+      "titles": {
+        "fr": "MangoHud",
+        "en": "MangoHud"
+      },
+      "descriptions": {
+        "fr": "Surcouche FPS, températures et temps de frame.",
+        "en": "FPS, temperatures and frame-time overlay."
+      },
+      "packages": [
+        "mangohud"
+      ],
+      "needs": [
+        "repo-rpmfusion"
+      ],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "47609d57ce10b562af6c2ca7c4335290c72defe5dfef61d30a9021a74e453d55"
+    },
+    {
+      "id": "gaming-uninstall",
+      "version": "1.0.0",
+      "file": "gaming-uninstall.sh",
+      "section": "gaming",
+      "icon": "user-trash-symbolic",
+      "titles": {
+        "fr": "Désinstaller les outils de jeu",
+        "en": "Uninstall gaming tools"
+      },
+      "descriptions": {
+        "fr": "Supprime Gamescope, GameMode et MangoHud (conserve Steam).",
+        "en": "Removes Gamescope, GameMode and MangoHud (keeps Steam)."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "961dde1a82847c38533bed2babba85a0d21a406a329d1fcb0192ba1bcedfd888"
+    },
+    {
+      "id": "hw-check",
+      "version": "1.0.0",
+      "file": "hw-check.sh",
+      "section": "hardware",
+      "icon": "computer-symbolic",
+      "titles": {
+        "fr": "Vérifier le matériel PS5",
+        "en": "Check PS5 hardware"
+      },
+      "descriptions": {
+        "fr": "Liste les entrées hwmon et les nœuds sysfs PS5.",
+        "en": "Lists hwmon entries and PS5 sysfs nodes."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": false,
+      "sha256": "85f7110d006abf9347790084d7fa3d40015316d441b7fbe54495bceb089ef308"
+    },
+    {
+      "id": "hw-decky-loader",
+      "version": "1.0.0",
+      "file": "hw-decky-loader.sh",
+      "section": "hardware",
+      "icon": "applications-games-symbolic",
+      "titles": {
+        "fr": "Decky Loader",
+        "en": "Decky Loader"
+      },
+      "descriptions": {
+        "fr": "Chargeur de plugins utilisé par le plugin PS5 Hardware Control.",
+        "en": "Plugin loader used by the PS5 Hardware Control plugin."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [
+        "~/homebrew"
+      ],
+      "action": false,
+      "root": false,
+      "sha256": "aadddeede7b1c11aa3436633bbe12d9c77236813a7c0d43043befbd91cb3066f"
+    },
+    {
+      "id": "hw-decky-ps5-plugin",
+      "version": "1.0.0",
+      "file": "hw-decky-ps5-plugin.sh",
+      "section": "hardware",
+      "icon": "applications-system-symbolic",
+      "titles": {
+        "fr": "Plugin PS5 Hardware Control",
+        "en": "PS5 Hardware Control plugin"
+      },
+      "descriptions": {
+        "fr": "Plugin Decky pour piloter le ventilateur et les LED de la PS5.",
+        "en": "Decky plugin to control the PS5 fan and LEDs."
+      },
+      "packages": [],
+      "needs": [
+        "hw-decky-loader"
+      ],
+      "check_paths": [
+        "~/homebrew/plugins/ps5-hardware-control",
+        "/home/*/homebrew/plugins/ps5-hardware-control"
+      ],
+      "action": false,
+      "root": false,
+      "sha256": "6cd7694c6e8360bb541144e310ab0bd6729c8a30e0f28f0de9d07b47b532bc63"
+    },
+    {
+      "id": "hw-hwcon-gui",
+      "version": "1.0.1",
+      "file": "hw-hwcon-gui.sh",
+      "section": "hardware",
+      "icon": "applications-system-symbolic",
+      "titles": {
+        "fr": "Hardware Control (interface)",
+        "en": "Hardware Control GUI"
+      },
+      "descriptions": {
+        "fr": "Interface PyQt6 pour le contrôleur de ventilateur et de LED (installe PyQt6).",
+        "en": "PyQt6 interface for the PS5 fan and LED controller (installs PyQt6)."
+      },
+      "packages": [
+        "python3-PyQt6"
+      ],
+      "needs": [],
+      "check_paths": [
+        "/opt/ps5-hwcon-gui/src/pyproject.toml"
+      ],
+      "action": false,
+      "root": true,
+      "sha256": "d55988c8c87686ddfa23708728b712fdd8ef13968a3dc71b46cec007098a8505"
+    },
+    {
+      "id": "hw-uninstall",
+      "version": "1.0.0",
+      "file": "hw-uninstall.sh",
+      "section": "hardware",
+      "icon": "user-trash-symbolic",
+      "titles": {
+        "fr": "Désinstaller Hardware Control",
+        "en": "Uninstall Hardware Control"
+      },
+      "descriptions": {
+        "fr": "Supprime l'interface et ses unités systemd (conserve Python).",
+        "en": "Removes the GUI and its systemd units (keeps Python)."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "66cc80a7456be7b6a517e09357e607c2ad2645bc74c266fffadce0b78c735078"
+    },
+    {
+      "id": "hw-update-check",
+      "version": "1.0.0",
+      "file": "hw-update-check.sh",
+      "section": "hardware",
+      "icon": "software-update-available-symbolic",
+      "titles": {
+        "fr": "Vérifier les mises à jour",
+        "en": "Check for updates"
+      },
+      "descriptions": {
+        "fr": "Compare l'interface Hardware Control installée avec GitHub.",
+        "en": "Compares the installed Hardware Control GUI with GitHub."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": false,
+      "sha256": "acc2fa460331c064892db13967615d3db9c13776e9745c1528c662746cb550c6"
+    },
+    {
+      "id": "kernel-headers",
+      "version": "1.0.0",
+      "file": "kernel-headers.sh",
+      "section": "kernel",
+      "icon": "drive-harddisk-symbolic",
+      "titles": {
+        "fr": "En-têtes du noyau",
+        "en": "Kernel headers"
+      },
+      "descriptions": {
+        "fr": "En-têtes correspondant au noyau courant, pour compiler des modules.",
+        "en": "Headers matching the running kernel, for module builds."
+      },
+      "packages": [
+        "kernel-headers",
+        "kernel-devel"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "2a0bd3825bfd6d7ac190c01d712bb727850da751ccf9e68063080a3f96977ceb"
+    },
+    {
+      "id": "kernel-latest",
+      "version": "1.0.0",
+      "file": "kernel-latest.sh",
+      "section": "kernel",
+      "icon": "drive-harddisk-symbolic",
+      "titles": {
+        "fr": "Noyau le plus récent",
+        "en": "Latest kernel"
+      },
+      "descriptions": {
+        "fr": "Installe et indique le noyau le plus récent disponible.",
+        "en": "Installs and reports the newest kernel available."
+      },
+      "packages": [
+        "kernel"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "4a46a135720567caa740d2f7166a1f95281e35d36234272389744070c626c6d0"
+    },
+    {
+      "id": "kernel-ps5",
+      "version": "1.0.0",
+      "file": "kernel-ps5.sh",
+      "section": "kernel",
+      "icon": "drive-harddisk-symbolic",
+      "titles": {
+        "fr": "Correctifs noyau PS5",
+        "en": "PS5 kernel patches"
+      },
+      "descriptions": {
+        "fr": "Jeu de correctifs ps5-linux et dépôts d'outils (sources seules, pas de compilation).",
+        "en": "ps5-linux patch set and tools repositories (sources only, no kernel build)."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [
+        "/usr/src/ps5-linux"
+      ],
+      "action": false,
+      "root": true,
+      "sha256": "2166d5b98575d6bcf7997c195b20b8744d88a8d527f014161f942d1b71ccabe9"
+    },
+    {
+      "id": "lang-all",
+      "version": "1.0.0",
+      "file": "lang-all.sh",
+      "section": "lang",
+      "icon": "preferences-desktop-locale-symbolic",
+      "titles": {
+        "fr": "Installer tous les paquets de langue",
+        "en": "Install every language pack"
+      },
+      "descriptions": {
+        "fr": "fr, en, es, it, de, pt, ja, zh et ru.",
+        "en": "fr, en, es, it, de, pt, ja, zh and ru."
+      },
+      "packages": [
+        "langpacks-fr",
+        "langpacks-es",
+        "langpacks-it",
+        "langpacks-de",
+        "langpacks-pt",
+        "langpacks-ja",
+        "langpacks-zh_CN",
+        "langpacks-ru"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "49676469217752d40b4d398a39b2adac4022a399f5616d71ff57ccdca56fafab"
+    },
+    {
+      "id": "lang-de",
+      "version": "1.0.0",
+      "file": "lang-de.sh",
+      "section": "lang",
+      "icon": "preferences-desktop-locale-symbolic",
+      "titles": {
+        "fr": "Paquet de langue Allemand",
+        "en": "German language pack"
+      },
+      "descriptions": {
+        "fr": "Traductions Allemand pour le système et les applications.",
+        "en": "German translations for the system and applications."
+      },
+      "packages": [
+        "langpacks-de"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "c861c60ca486451d605cb3d7d89c7dc5ad1e1dd5b2c53a0ed68e087738cdfc03"
+    },
+    {
+      "id": "lang-es",
+      "version": "1.0.0",
+      "file": "lang-es.sh",
+      "section": "lang",
+      "icon": "preferences-desktop-locale-symbolic",
+      "titles": {
+        "fr": "Paquet de langue Espagnol",
+        "en": "Spanish language pack"
+      },
+      "descriptions": {
+        "fr": "Traductions Espagnol pour le système et les applications.",
+        "en": "Spanish translations for the system and applications."
+      },
+      "packages": [
+        "langpacks-es"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "8e26e320b5b93a5880e4f28dcfe0bf14476a3c4b433fb6192810a70ef8ed5b3e"
+    },
+    {
+      "id": "lang-fr",
+      "version": "1.0.0",
+      "file": "lang-fr.sh",
+      "section": "lang",
+      "icon": "preferences-desktop-locale-symbolic",
+      "titles": {
+        "fr": "Paquet de langue Français",
+        "en": "French language pack"
+      },
+      "descriptions": {
+        "fr": "Traductions Français pour le système et les applications.",
+        "en": "French translations for the system and applications."
+      },
+      "packages": [
+        "langpacks-fr"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "3a8a2042f6cb66af85cd3375a2b517c2fc50be5665d77106a07eca39eb77f4c0"
+    },
+    {
+      "id": "lang-it",
+      "version": "1.0.0",
+      "file": "lang-it.sh",
+      "section": "lang",
+      "icon": "preferences-desktop-locale-symbolic",
+      "titles": {
+        "fr": "Paquet de langue Italien",
+        "en": "Italian language pack"
+      },
+      "descriptions": {
+        "fr": "Traductions Italien pour le système et les applications.",
+        "en": "Italian translations for the system and applications."
+      },
+      "packages": [
+        "langpacks-it"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "1acdb3b53c071f5e56a00f50f17c5e29a066eb86d968218a3185ec3e59b806c6"
+    },
+    {
+      "id": "lang-ja",
+      "version": "1.0.0",
+      "file": "lang-ja.sh",
+      "section": "lang",
+      "icon": "preferences-desktop-locale-symbolic",
+      "titles": {
+        "fr": "Paquet de langue Japonais",
+        "en": "Japanese language pack"
+      },
+      "descriptions": {
+        "fr": "Traductions Japonais pour le système et les applications.",
+        "en": "Japanese translations for the system and applications."
+      },
+      "packages": [
+        "langpacks-ja"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "887b4df47baead91ab9a17ac90f8f5c4c5bea714bfb7bb6b477255c7b679e401"
+    },
+    {
+      "id": "lang-pt",
+      "version": "1.0.0",
+      "file": "lang-pt.sh",
+      "section": "lang",
+      "icon": "preferences-desktop-locale-symbolic",
+      "titles": {
+        "fr": "Paquet de langue Portugais",
+        "en": "Portuguese language pack"
+      },
+      "descriptions": {
+        "fr": "Traductions Portugais pour le système et les applications.",
+        "en": "Portuguese translations for the system and applications."
+      },
+      "packages": [
+        "langpacks-pt"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "e4c4054442344ae957cd136500167feaf39869385de5d03e540baa919c91be72"
+    },
+    {
+      "id": "maint-clean",
+      "version": "1.0.0",
+      "file": "maint-clean.sh",
+      "section": "maint",
+      "icon": "user-trash-symbolic",
+      "titles": {
+        "fr": "Nettoyer le cache des paquets",
+        "en": "Clean the package cache"
+      },
+      "descriptions": {
+        "fr": "Supprime les paquets en cache et les dépendances inutilisées.",
+        "en": "Removes cached packages and unused dependencies."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "d7e58c00e6f3136c92b9d2dd4d8706c483fd74353704d882ea932c67643c3fdb"
+    },
+    {
+      "id": "maint-desktop-db",
+      "version": "1.0.0",
+      "file": "maint-desktop-db.sh",
+      "section": "maint",
+      "icon": "applications-other-symbolic",
+      "titles": {
+        "fr": "Reconstruire la base des applications",
+        "en": "Rebuild desktop database"
+      },
+      "descriptions": {
+        "fr": "update-desktop-database pour les menus système et utilisateur.",
+        "en": "update-desktop-database for system and user menus."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "0b601c0bf09e4c3f30104e9588c206dcb5401c66a182e7ec4e62cab5a7f18b9a"
+    },
+    {
+      "id": "maint-disk",
+      "version": "1.0.0",
+      "file": "maint-disk.sh",
+      "section": "maint",
+      "icon": "drive-harddisk-symbolic",
+      "titles": {
+        "fr": "Rapport d'utilisation du disque",
+        "en": "Disk usage report"
+      },
+      "descriptions": {
+        "fr": "df -h et les dix plus gros dossiers du dossier personnel.",
+        "en": "df -h and the ten largest folders in your home."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": false,
+      "sha256": "68bb21c39223bd9837da71ed4884162da67c7b0874929dfde88b2400d7866716"
+    },
+    {
+      "id": "maint-flatpak",
+      "version": "1.0.0",
+      "file": "maint-flatpak.sh",
+      "section": "maint",
+      "icon": "software-store-symbolic",
+      "titles": {
+        "fr": "Mettre à jour les applications Flatpak",
+        "en": "Update Flatpak apps"
+      },
+      "descriptions": {
+        "fr": "Met à jour les runtimes Flatpak et supprime les inutilisés.",
+        "en": "Updates Flatpak runtimes and removes unused ones."
+      },
+      "packages": [],
+      "needs": [
+        "repo-flathub"
+      ],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "e3095263a732d2a6c676f4726cc33c902b67267de3cdd248a27b77bd9041a5fb"
+    },
+    {
+      "id": "maint-fonts",
+      "version": "1.0.0",
+      "file": "maint-fonts.sh",
+      "section": "maint",
+      "icon": "font-x-generic-symbolic",
+      "titles": {
+        "fr": "Reconstruire le cache des polices",
+        "en": "Rebuild font cache"
+      },
+      "descriptions": {
+        "fr": "fc-cache -f pour les polices système et utilisateur.",
+        "en": "fc-cache -f for system and user fonts."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "27aee119cd3217c9d3eb59541b226962506020647c86e9c8496f587792fe9a12"
+    },
+    {
+      "id": "maint-journal",
+      "version": "1.0.0",
+      "file": "maint-journal.sh",
+      "section": "maint",
+      "icon": "text-x-generic-symbolic",
+      "titles": {
+        "fr": "Réduire le journal système",
+        "en": "Shrink the system journal"
+      },
+      "descriptions": {
+        "fr": "Conserve les 100 derniers Mo du journal systemd.",
+        "en": "Keeps the last 100 MB of systemd journal."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "609c2cd50c7a7e49eb18a9e29920437059f403072c6d9ad1149816eb431db07b"
+    },
+    {
+      "id": "maint-kde-menu",
+      "version": "1.0.0",
+      "file": "maint-kde-menu.sh",
+      "section": "maint",
+      "icon": "view-refresh-symbolic",
+      "titles": {
+        "fr": "Reconstruire le cache du menu KDE",
+        "en": "Rebuild KDE menu cache"
+      },
+      "descriptions": {
+        "fr": "kbuildsycoca (KDE uniquement, sans effet ailleurs).",
+        "en": "kbuildsycoca (KDE only, harmless elsewhere)."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": false,
+      "sha256": "2ee0e20072d4e86ba7541584baafff9b672a5fcdf410e669fba2dd0bda8547ca"
+    },
+    {
+      "id": "maint-old-kernels",
+      "version": "1.0.0",
+      "file": "maint-old-kernels.sh",
+      "section": "maint",
+      "icon": "drive-harddisk-symbolic",
+      "titles": {
+        "fr": "Supprimer les anciens noyaux",
+        "en": "Remove old kernels"
+      },
+      "descriptions": {
+        "fr": "Conserve le noyau courant et le plus récent.",
+        "en": "Keeps the running kernel and the newest one."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "8c473e0801fe5940057d43378ff83c4891812bb344a042804fb799291b601092"
+    },
+    {
+      "id": "maint-thumbs",
+      "version": "1.0.0",
+      "file": "maint-thumbs.sh",
+      "section": "maint",
+      "icon": "image-x-generic-symbolic",
+      "titles": {
+        "fr": "Vider le cache des vignettes",
+        "en": "Clear thumbnail cache"
+      },
+      "descriptions": {
+        "fr": "Supprime le cache de vignettes de l'utilisateur.",
+        "en": "Removes the per-user thumbnail cache."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": false,
+      "sha256": "2262be557744fc8bf289c05be03ca34dbd50218eadaafc6b7016418662a05d31"
+    },
+    {
+      "id": "maint-tmp",
+      "version": "1.0.0",
+      "file": "maint-tmp.sh",
+      "section": "maint",
+      "icon": "folder-temp-symbolic",
+      "titles": {
+        "fr": "Nettoyer les fichiers temporaires",
+        "en": "Clean temporary files"
+      },
+      "descriptions": {
+        "fr": "Lance systemd-tmpfiles --clean (fichiers de plus de 10 jours).",
+        "en": "Runs systemd-tmpfiles --clean (files older than 10 days)."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "612851a9d12a8683655b7eefcdff4143376b0c1ffeb40b42b87c07f2a8e11435"
+    },
+    {
+      "id": "maint-trim",
+      "version": "1.0.0",
+      "file": "maint-trim.sh",
+      "section": "maint",
+      "icon": "drive-harddisk-symbolic",
+      "titles": {
+        "fr": "TRIM du SSD",
+        "en": "SSD trim"
+      },
+      "descriptions": {
+        "fr": "Minuterie TRIM hebdomadaire pour le disque interne.",
+        "en": "Weekly TRIM timer for the internal drive."
+      },
+      "packages": [
+        "util-linux"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "230d8f75661f1dcfb36e36d42eabd618794cce5b2e59895e41ea283bcc648a51"
+    },
+    {
+      "id": "mesa-freeworld",
+      "version": "1.0.0",
+      "file": "mesa-freeworld.sh",
+      "section": "mesa",
+      "icon": "video-display-symbolic",
+      "titles": {
+        "fr": "Mesa freeworld (VA-API)",
+        "en": "Mesa freeworld (VA-API)"
+      },
+      "descriptions": {
+        "fr": "Décodage vidéo matériel pour GPU AMD et Intel.",
+        "en": "Hardware video decoding for AMD and Intel GPUs."
+      },
+      "packages": [
+        "mesa-va-drivers-freeworld",
+        "mesa-vdpau-drivers-freeworld"
+      ],
+      "needs": [
+        "repo-rpmfusion"
+      ],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "56b742735a1b86c394df029dea5ffa1b2844813c1004b9757c36897d6d73799f"
+    },
+    {
+      "id": "mesa-radv",
+      "version": "1.0.0",
+      "file": "mesa-radv.sh",
+      "section": "mesa",
+      "icon": "video-display-symbolic",
+      "titles": {
+        "fr": "Forcer le pilote Vulkan RADV",
+        "en": "Force the RADV Vulkan driver"
+      },
+      "descriptions": {
+        "fr": "Écrit AMD_VULKAN_ICD=RADV pour la session (GPU AMD).",
+        "en": "Writes AMD_VULKAN_ICD=RADV for the session (AMD GPUs)."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [
+        "~/.config/environment.d/50-radv.conf"
+      ],
+      "action": false,
+      "root": false,
+      "sha256": "dabc522b7cafcc64fdf6f5e7241199771e00a686f69806f603bbae5eb8f7ad09"
+    },
+    {
+      "id": "mesa-summary",
+      "version": "1.0.0",
+      "file": "mesa-summary.sh",
+      "section": "mesa",
+      "icon": "dialog-information-symbolic",
+      "titles": {
+        "fr": "Résumé graphique",
+        "en": "Graphics summary"
+      },
+      "descriptions": {
+        "fr": "Résumé vulkaninfo et glxinfo.",
+        "en": "vulkaninfo and glxinfo summary."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": false,
+      "sha256": "b6020929c6d79909e2d42d9a67cbc0ba1d26a5e6f38e08f67c4b5f441e857cc8"
+    },
+    {
+      "id": "mesa-tools",
+      "version": "1.0.0",
+      "file": "mesa-tools.sh",
+      "section": "mesa",
+      "icon": "video-display-symbolic",
+      "titles": {
+        "fr": "Outils de diagnostic Mesa",
+        "en": "Mesa diagnostic tools"
+      },
+      "descriptions": {
+        "fr": "glxinfo, eglinfo et les démos Mesa.",
+        "en": "glxinfo, eglinfo and the Mesa demos."
+      },
+      "packages": [
+        "mesa-demos"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "4d040cb58f96e29211f4dd2ffb0285f7e62257992d609de7b4493f3c36679d38"
+    },
+    {
+      "id": "mesa-update",
+      "version": "1.0.0",
+      "file": "mesa-update.sh",
+      "section": "mesa",
+      "icon": "software-update-available-symbolic",
+      "titles": {
+        "fr": "Mettre à jour Mesa",
+        "en": "Update Mesa"
+      },
+      "descriptions": {
+        "fr": "dnf upgrade pour mesa et les paquets Vulkan.",
+        "en": "dnf upgrade for mesa and Vulkan packages."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "3304e2d3565a3bab5cb169ff8b6586c75f39d876ee198f25bbfc7c0607b018dc"
+    },
+    {
+      "id": "mesa-vulkan",
+      "version": "1.0.0",
+      "file": "mesa-vulkan.sh",
+      "section": "mesa",
+      "icon": "video-display-symbolic",
+      "titles": {
+        "fr": "Outils Vulkan",
+        "en": "Vulkan tools"
+      },
+      "descriptions": {
+        "fr": "vulkaninfo, vulkan-tools et en-têtes.",
+        "en": "vulkaninfo, vulkan-tools and headers."
+      },
+      "packages": [
+        "vulkan-tools",
+        "vulkan-loader-devel"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "334b5dfb6a9e47a6ad1477cafc67bc2ff5887e960354b47e87d3a44f117980e3"
+    },
+    {
+      "id": "power-profiles",
+      "version": "1.0.0",
+      "file": "power-profiles.sh",
+      "section": "power",
+      "icon": "preferences-system-power-symbolic",
+      "titles": {
+        "fr": "Profils d'alimentation",
+        "en": "Power profiles"
+      },
+      "descriptions": {
+        "fr": "Profils équilibré, performance et économie d'énergie.",
+        "en": "Balanced, performance and power-saver profiles."
+      },
+      "packages": [
+        "power-profiles-daemon"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "86a585446ba5a9b68519a17e47e46c61b7df967beeaf0453789838f9b7bde863"
+    },
+    {
+      "id": "power-tlp",
+      "version": "1.0.0",
+      "file": "power-tlp.sh",
+      "section": "power",
+      "icon": "battery-good-symbolic",
+      "titles": {
+        "fr": "TLP",
+        "en": "TLP"
+      },
+      "descriptions": {
+        "fr": "Gestion avancée de l'énergie pour portables et consoles portables.",
+        "en": "Advanced power management for laptops and handhelds."
+      },
+      "packages": [
+        "tlp",
+        "tlp-rdw"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "f29ec72f8765d3bffe6794e861a3b6bed49d8a18acb71f9ba04b5ff1b10d6255"
+    },
+    {
+      "id": "repo-flathub",
+      "version": "1.0.0",
+      "file": "repo-flathub.sh",
+      "section": "repos",
+      "icon": "software-store-symbolic",
+      "titles": {
+        "fr": "Flathub",
+        "en": "Flathub"
+      },
+      "descriptions": {
+        "fr": "Ajoute le dépôt Flathub pour les applications Flatpak.",
+        "en": "Adds the Flathub remote for Flatpak applications."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [
+        "/var/lib/flatpak/repo"
+      ],
+      "action": false,
+      "root": true,
+      "sha256": "e6513b8655296205cc70588a77aaa7ae14ef5ed5b5656e38c51e9dd54905a151"
+    },
+    {
+      "id": "repo-rpmfusion",
+      "version": "1.0.0",
+      "file": "repo-rpmfusion.sh",
+      "section": "repos",
+      "icon": "network-server-symbolic",
+      "titles": {
+        "fr": "RPM Fusion (free + nonfree)",
+        "en": "RPM Fusion (free + nonfree)"
+      },
+      "descriptions": {
+        "fr": "Ajoute les dépôts RPM Fusion free et nonfree.",
+        "en": "Adds the RPM Fusion free and nonfree repositories."
+      },
+      "packages": [
+        "rpmfusion-free-release",
+        "rpmfusion-nonfree-release"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "a84efc76b99ac715e8052b04839b033a394aafd1ab8a3f2e65e7bb1f7cd26565"
+    },
+    {
+      "id": "repos-openh264",
+      "version": "1.0.0",
+      "file": "repos-openh264.sh",
+      "section": "repos",
+      "icon": "folder-download-symbolic",
+      "titles": {
+        "fr": "Activer le dépôt OpenH264",
+        "en": "Enable OpenH264 repository"
+      },
+      "descriptions": {
+        "fr": "OpenH264 de Cisco pour l'encodage WebRTC.",
+        "en": "Cisco OpenH264 for WebRTC encoding."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [
+        "/etc/yum.repos.d/fedora-cisco-openh264.repo"
+      ],
+      "action": false,
+      "root": true,
+      "sha256": "e7f1df13ed8f55d394b4e46420721da8174f7c940a64b95a92cf48752dd54680"
+    },
+    {
+      "id": "repos-refresh",
+      "version": "1.0.0",
+      "file": "repos-refresh.sh",
+      "section": "repos",
+      "icon": "view-refresh-symbolic",
+      "titles": {
+        "fr": "Rafraîchir les métadonnées des dépôts",
+        "en": "Refresh repository metadata"
+      },
+      "descriptions": {
+        "fr": "dnf clean expire-cache && dnf makecache.",
+        "en": "dnf clean expire-cache && dnf makecache."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "3dc25c2180de203f8b67c1e5185486b06c418a9589ed9281c4eb51316cd9bc3c"
+    },
+    {
+      "id": "services-bulk",
+      "version": "1.0.0",
+      "file": "services-bulk.sh",
+      "section": "services",
+      "icon": "system-run-symbolic",
+      "titles": {
+        "fr": "Couper les daemons inutiles",
+        "en": "Stop unnecessary daemons"
+      },
+      "descriptions": {
+        "fr": "Bluetooth, impression, Avahi et ModemManager.",
+        "en": "Bluetooth, printing, Avahi and ModemManager."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "406a15cfcb61f97fef8df94f41d2bf5c42e4e9a56eb842702577aefeab766ac3"
+    },
+    {
+      "id": "update-beta",
+      "version": "1.0.0",
+      "file": "update-beta.sh",
+      "section": "update",
+      "icon": "software-update-available-symbolic",
+      "titles": {
+        "fr": "Mettre à jour le manager",
+        "en": "Update the manager itself"
+      },
+      "descriptions": {
+        "fr": "git pull dans le dépôt qui contient ce dossier beta.",
+        "en": "git pull in the repository that contains this beta folder."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": false,
+      "sha256": "a49c88b00f6abf5c81f4095b8ffd828511ea2343e7357ed81de14fad8f009266"
+    },
+    {
+      "id": "update-system",
+      "version": "1.0.0",
+      "file": "update-system.sh",
+      "section": "update",
+      "icon": "software-update-available-symbolic",
+      "titles": {
+        "fr": "Mettre à jour Fedora et tous les paquets",
+        "en": "Update Fedora and all packages"
+      },
+      "descriptions": {
+        "fr": "dnf upgrade --refresh, puis indique si un redémarrage est nécessaire.",
+        "en": "dnf upgrade --refresh, then reports whether a reboot is needed."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "3488174f30facba9d36b950896ab3f1f9dc7aac36497354ab61b16b5bc6e03e1"
+    },
+    {
+      "id": "update-uninstall",
+      "version": "1.0.0",
+      "file": "update-uninstall.sh",
+      "section": "update",
+      "icon": "user-trash-symbolic",
+      "titles": {
+        "fr": "Désinstaller le manager",
+        "en": "Uninstall the manager"
+      },
+      "descriptions": {
+        "fr": "Supprime /opt/ps5-manager et son lanceur (installation stable).",
+        "en": "Removes /opt/ps5-manager and its launcher (stable install)."
+      },
+      "packages": [],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "09cb3348b12356be9daf655add29a0fa09bb250f5a38b553affb1f38a1af2cee"
+    },
+    {
+      "id": "web-certbot",
+      "version": "1.0.0",
+      "file": "web-certbot.sh",
+      "section": "websrv",
+      "icon": "security-high-symbolic",
+      "titles": {
+        "fr": "Certbot (HTTPS)",
+        "en": "Certbot (HTTPS)"
+      },
+      "descriptions": {
+        "fr": "Certificats Let's Encrypt pour Apache et nginx.",
+        "en": "Let's Encrypt certificates for Apache and nginx."
+      },
+      "packages": [
+        "certbot",
+        "python3-certbot-apache",
+        "python3-certbot-nginx"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "3cbb9c40436f077edefa58dc27dd5847e4f62474ffc7141f897d54e63c7899d1"
+    },
+    {
+      "id": "web-db",
+      "version": "1.0.0",
+      "file": "web-db.sh",
+      "section": "websrv",
+      "icon": "network-server-symbolic",
+      "titles": {
+        "fr": "MariaDB",
+        "en": "MariaDB"
+      },
+      "descriptions": {
+        "fr": "Serveur de base de données pour les applications web.",
+        "en": "Database server for web applications."
+      },
+      "packages": [
+        "mariadb-server"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "4867f05c094d607aa661058518aa3aba9ce40fa13368a5d0360281a9f2995958"
+    },
+    {
+      "id": "web-httpd",
+      "version": "1.0.0",
+      "file": "web-httpd.sh",
+      "section": "websrv",
+      "icon": "network-server-symbolic",
+      "titles": {
+        "fr": "Apache httpd + PHP",
+        "en": "Apache httpd + PHP"
+      },
+      "descriptions": {
+        "fr": "Serveur web Apache avec le module PHP.",
+        "en": "Apache web server with the PHP module."
+      },
+      "packages": [
+        "httpd",
+        "php",
+        "php-mysqlnd"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "d8d048cf6b160cfbf2a852ebad25d61d7ccd5f37ef94ee6ec13fb298198e6d8d"
+    },
+    {
+      "id": "web-nginx",
+      "version": "1.0.0",
+      "file": "web-nginx.sh",
+      "section": "websrv",
+      "icon": "network-server-symbolic",
+      "titles": {
+        "fr": "nginx",
+        "en": "nginx"
+      },
+      "descriptions": {
+        "fr": "Serveur web léger et reverse proxy.",
+        "en": "Lightweight web server and reverse proxy."
+      },
+      "packages": [
+        "nginx"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": false,
+      "root": true,
+      "sha256": "a1004da95d24fe3aebf1ee1a2b0676aba8fb18b3f83c72b09f0cf5ebb8585013"
+    },
+    {
+      "id": "web-openssh",
+      "version": "1.0.0",
+      "file": "web-openssh.sh",
+      "section": "websrv",
+      "icon": "network-server-symbolic",
+      "titles": {
+        "fr": "Serveur OpenSSH",
+        "en": "OpenSSH server"
+      },
+      "descriptions": {
+        "fr": "Shell distant, démarré et activé après l'installation.",
+        "en": "Remote shell, started and enabled after install."
+      },
+      "packages": [
+        "openssh-server"
+      ],
+      "needs": [],
+      "check_paths": [],
+      "action": true,
+      "root": true,
+      "sha256": "c768166e7c04052b908309e046574fce6a3a8f7a9a39e1cb8ed00d5c6429f093"
+    }
+  ]
+}

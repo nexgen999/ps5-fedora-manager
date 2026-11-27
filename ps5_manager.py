@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.16"
+APP_VERSION = "0.15.17"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1133,6 +1133,7 @@ _RELEASE_NOTES_TITLE = {
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15.17 : nouvelle page d'accueil « PS5 Fedora Manager » — logos PlayStation et Fedora, version stable installée, et accès rapide à la mise à jour du manager, à la langue de l'interface et au journal, qui s'ouvrent en sous-page avec un bouton retour",
         "0.15.14 : la bêta s'ouvre enfin — plus de sous-classe des widgets Adwaita déclarés finaux (Adw.SwitchRow, Adw.PreferencesPage) que PyGObject 3.54 refuse, et autorisation X11 de l'utilisateur par `xhost +SI:localuser` pour que GTK ne s'arrête plus sur « Authorization required »",
         "0.15.13 : le lancement de la bêta est fiabilisé et devient visible — environnement de session nettoyé (HOME, XDG_RUNTIME_DIR, XAUTHORITY, bus), repli X11 automatique, vérification de GTK4/libadwaita avant démarrage, journal dans /tmp/ps5-manager-beta.log et option « Lancer dans un terminal »",
         "0.15.12 : nouvelle option « Installer et essayer la version bêta » dans la mise à jour du manager — elle récupère la bêta du dépôt et la lance en tant qu'utilisateur, sans toucher à la version stable",
@@ -1167,6 +1168,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15.17: new “PS5 Fedora Manager” home page — PlayStation and Fedora logos, the installed stable version, and quick access to manager updates, interface language and the log, each opening as a sub-page with a back button",
         "0.15.14: the beta finally opens — no more subclassing of Adwaita widgets declared final (Adw.SwitchRow, Adw.PreferencesPage), which PyGObject 3.54 rejects, and X11 access granted to the user through `xhost +SI:localuser` so GTK no longer stops on “Authorization required”",
         "0.15.13: launching the beta is now reliable and visible — cleaned session environment (HOME, XDG_RUNTIME_DIR, XAUTHORITY, bus), automatic X11 fallback, a GTK4/libadwaita check before starting, a log in /tmp/ps5-manager-beta.log and a “Launch in a terminal” option",
         "0.15.12: new “Install and try the beta release” option in the manager update page — it fetches the beta from the repository and launches it as your user, without touching the stable version",
@@ -1201,6 +1203,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15.17: nueva página de inicio «PS5 Fedora Manager» — logotipos de PlayStation y Fedora, versión estable instalada y acceso rápido a la actualización del gestor, al idioma de la interfaz y al registro, que se abren como subpágina con botón de volver",
         "0.15.14 : la beta ya se abre — sin subclases de widgets Adwaita declarados finales (Adw.SwitchRow, Adw.PreferencesPage), que PyGObject 3.54 rechaza, y con acceso X11 del usuario mediante `xhost +SI:localuser` para que GTK no se detenga en «Authorization required»",
         "0.15.13 : el inicio de la beta es más fiable y visible — entorno de sesión limpio (HOME, XDG_RUNTIME_DIR, XAUTHORITY, bus), repliegue automático a X11, comprobación de GTK4/libadwaita antes de arrancar, registro en /tmp/ps5-manager-beta.log y opción «Ejecutar en un terminal»",
         "0.15.12 : nueva opción «Instalar y probar la versión beta» en la actualización del gestor — descarga la beta del repositorio y la inicia como tu usuario, sin tocar la versión estable",
@@ -1235,6 +1238,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15.17: nuova pagina iniziale «PS5 Fedora Manager» — loghi PlayStation e Fedora, versione stabile installata e accesso rapido all'aggiornamento del gestore, alla lingua dell'interfaccia e al registro, che si aprono come sottopagina con pulsante indietro",
         "0.15.14 : la beta finalmente si apre — niente più sottoclassi di widget Adwaita dichiarati finali (Adw.SwitchRow, Adw.PreferencesPage), che PyGObject 3.54 rifiuta, e accesso X11 dell'utente tramite `xhost +SI:localuser` così GTK non si ferma più su «Authorization required»",
         "0.15.13 : l'avvio della beta è più affidabile e visibile — ambiente di sessione ripulito (HOME, XDG_RUNTIME_DIR, XAUTHORITY, bus), fallback automatico a X11, controllo di GTK4/libadwaita prima dell'avvio, registro in /tmp/ps5-manager-beta.log e opzione «Avvia in un terminale»",
         "0.15.12 : nuova opzione «Installa e prova la versione beta» nell'aggiornamento del gestore — scarica la beta dal repository e la avvia come utente, senza toccare la versione stabile",
@@ -1269,6 +1273,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15.17: neue Startseite „PS5 Fedora Manager“ – PlayStation- und Fedora-Logos, installierte stabile Version und Schnellzugriff auf Manager-Update, Oberflächensprache und Protokoll, die als Unterseite mit Zurück-Schaltfläche öffnen",
         "0.15.14 : die Beta öffnet sich endlich – keine Unterklassen von als final deklarierten Adwaita-Widgets mehr (Adw.SwitchRow, Adw.PreferencesPage), die PyGObject 3.54 ablehnt, und X11-Zugriff für den Benutzer über `xhost +SI:localuser`, damit GTK nicht mehr an „Authorization required“ scheitert",
         "0.15.13 : der Start der Beta ist zuverlässiger und sichtbar – bereinigte Sitzungsumgebung (HOME, XDG_RUNTIME_DIR, XAUTHORITY, Bus), automatischer X11-Fallback, GTK4/libadwaita-Prüfung vor dem Start, Protokoll in /tmp/ps5-manager-beta.log und Option „Im Terminal starten“",
         "0.15.12 : neue Option „Beta-Version installieren und ausprobieren“ in der Manager-Aktualisierung – lädt die Beta aus dem Repository und startet sie als Benutzer, ohne die stabile Version anzutasten",
@@ -1303,6 +1308,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15.17: nova página inicial «PS5 Fedora Manager» — logótipos PlayStation e Fedora, versão estável instalada e acesso rápido à atualização do gestor, ao idioma da interface e ao registo, que abrem como subpágina com botão de voltar",
         "0.15.14 : a beta abre finalmente — sem subclasses de widgets Adwaita declarados finais (Adw.SwitchRow, Adw.PreferencesPage), que o PyGObject 3.54 recusa, e com acesso X11 do utilizador via `xhost +SI:localuser` para o GTK deixar de parar em «Authorization required»",
         "0.15.13 : o arranque da beta é mais fiável e visível — ambiente de sessão limpo (HOME, XDG_RUNTIME_DIR, XAUTHORITY, bus), recurso automático a X11, verificação de GTK4/libadwaita antes de arrancar, registo em /tmp/ps5-manager-beta.log e opção «Executar num terminal»",
         "0.15.12 : nova opção «Instalar e experimentar a versão beta» na atualização do gestor — obtém a beta do repositório e inicia-a como utilizador, sem tocar na versão estável",
@@ -2054,6 +2060,13 @@ class SystemThemeSync:
 STRINGS = {
     "fr": {
         "app_title": "PS5 Fedora Manager",
+        "sec_home": "PS5 Fedora Manager",
+        "home_tagline": "Gestionnaire complet pour Fedora sur PlayStation 5",
+        "home_version": "Version %s",
+        "home_pick": "Accès rapide",
+        "home_update_sub": "Installer les mises à jour du manager",
+        "home_lang_sub": "Changer la langue de l'interface",
+        "home_logs_sub": "Journal de la session et journal en direct",
         "search_placeholder": "Rechercher une option ou un logiciel…",
         "sys_group_session": "Session",
         "sys_group_software": "Logiciels",
@@ -2504,6 +2517,13 @@ STRINGS = {
     },
     "en": {
         "app_title": "PS5 Fedora Manager",
+        "sec_home": "PS5 Fedora Manager",
+        "home_tagline": "Complete manager for Fedora on PlayStation 5",
+        "home_version": "Version %s",
+        "home_pick": "Quick access",
+        "home_update_sub": "Install manager updates",
+        "home_lang_sub": "Change the interface language",
+        "home_logs_sub": "Session log and live log",
         "search_placeholder": "Search an option or software…",
         "sys_group_session": "Session",
         "sys_group_software": "Software",
@@ -2968,6 +2988,13 @@ LANG_LABELS = {
 
 
 STRINGS['es'] = {'app_title': 'PS5 Fedora Manager',
+    'sec_home': 'PS5 Fedora Manager',
+    'home_tagline': 'Gestor completo para Fedora en PlayStation 5',
+    'home_version': 'Versión %s',
+    'home_pick': 'Acceso rápido',
+    'home_update_sub': 'Instalar las actualizaciones del gestor',
+    'home_lang_sub': 'Cambiar el idioma de la interfaz',
+    'home_logs_sub': 'Registro de la sesión y registro en directo',
  'search_placeholder': 'Buscar una opción o un programa…',
  'sys_group_session': 'Sesión',
  'sys_group_software': 'Software',
@@ -3413,6 +3440,13 @@ STRINGS['es'] = {'app_title': 'PS5 Fedora Manager',
 
 
 STRINGS['it'] = {'app_title': 'PS5 Fedora Manager',
+    'sec_home': 'PS5 Fedora Manager',
+    'home_tagline': 'Gestore completo per Fedora su PlayStation 5',
+    'home_version': 'Versione %s',
+    'home_pick': 'Accesso rapido',
+    'home_update_sub': 'Installa gli aggiornamenti del gestore',
+    'home_lang_sub': "Cambia la lingua dell'interfaccia",
+    'home_logs_sub': 'Registro della sessione e registro in tempo reale',
  'search_placeholder': "Cerca un'opzione o un programma…",
  'sys_group_session': 'Sessione',
  'sys_group_software': 'Software',
@@ -3854,6 +3888,13 @@ STRINGS['it'] = {'app_title': 'PS5 Fedora Manager',
 
 
 STRINGS['de'] = {'app_title': 'PS5 Fedora Manager',
+    'sec_home': 'PS5 Fedora Manager',
+    'home_tagline': 'Kompletter Manager für Fedora auf der PlayStation 5',
+    'home_version': 'Version %s',
+    'home_pick': 'Schnellzugriff',
+    'home_update_sub': 'Updates des Managers installieren',
+    'home_lang_sub': 'Sprache der Oberfläche ändern',
+    'home_logs_sub': 'Sitzungsprotokoll und Live-Protokoll',
  'search_placeholder': 'Option oder Programm suchen…',
  'sys_group_session': 'Sitzung',
  'sys_group_software': 'Software',
@@ -4295,6 +4336,13 @@ STRINGS['de'] = {'app_title': 'PS5 Fedora Manager',
 
 
 STRINGS['pt'] = {'app_title': 'PS5 Fedora Manager',
+    'sec_home': 'PS5 Fedora Manager',
+    'home_tagline': 'Gestor completo para Fedora na PlayStation 5',
+    'home_version': 'Versão %s',
+    'home_pick': 'Acesso rápido',
+    'home_update_sub': 'Instalar as atualizações do gestor',
+    'home_lang_sub': 'Alterar o idioma da interface',
+    'home_logs_sub': 'Registo da sessão e registo em direto',
  'search_placeholder': 'Pesquisar uma opção ou um programa…',
  'sys_group_session': 'Sessão',
  'sys_group_software': 'Software',
@@ -5800,33 +5848,32 @@ class SetupWindow(Adw.Window):
 # Définition des 15 sections de la barre latérale
 # ------------------------------------------------------------------------------
 SECTIONS = [
-    # Groupe 1
-    ("logs", "utilities-terminal-symbolic", "sec_logs", 1),
-    ("library", "system-software-install-symbolic", "sec_library", 1),
-    ("aidev", "applications-development-symbolic", "sec_aidev", 1),
-    ("dev", "applications-engineering-symbolic", "sec_dev", 1),
-    ("websrv", "network-server-symbolic", "sec_web", 1),
-    ("easy", "preferences-other-symbolic", "sec_easy", 1),
-    ("services", "system-run-symbolic", "sec_services", 1),
-    ("fx", "audio-volume-high-symbolic", "sec_fx", 1),
-    ("deps", "application-x-addon-symbolic", "sec_deps", 1),
-    ("gaming", "input-gaming-symbolic", "sec_gaming", 1),
-    ("features", "application-x-executable-symbolic", "sec_features", 1),
-    # Groupe 2
-    ("update", "software-update-available-symbolic", "sec_update", 2),
-    ("lang", "preferences-desktop-locale-symbolic", "sec_lang", 2),
-    ("repos", "network-server-symbolic", "sec_repos", 2),
-    ("users", "system-users-symbolic", "sec_users", 2),
-    ("fedora", "system-software-update-symbolic", "sec_fedora", 2),
-    ("maint", "applications-engineering-symbolic", "sec_maint", 2),
-    # Groupe 3
-    ("power", "preferences-system-power-symbolic", "sec_power", 3),
-    ("fan", "weather-windy-symbolic", "sec_fan", 3),
-    ("hw", "applications-system-symbolic", "sec_hw", 3),
-    ("mesa", "video-display-symbolic", "sec_mesa", 3),
-    ("kernel", "drive-harddisk-symbolic", "sec_kernel", 3),
-    ("fix", "view-refresh-symbolic", "sec_fix", 3),
-    ("ui_lang", "preferences-desktop-keyboard-symbolic", "sec_ui_lang", 3),
+    # Groupe 1 — accueil : mise à jour du manager, langue, journal
+    ("home", "applications-games-symbolic", "sec_home", 1),
+    # Groupe 2 — logiciels et réglages de l'édition
+    ("library", "system-software-install-symbolic", "sec_library", 2),
+    ("aidev", "applications-development-symbolic", "sec_aidev", 2),
+    ("dev", "applications-engineering-symbolic", "sec_dev", 2),
+    ("websrv", "network-server-symbolic", "sec_web", 2),
+    ("easy", "preferences-other-symbolic", "sec_easy", 2),
+    ("services", "system-run-symbolic", "sec_services", 2),
+    ("fx", "audio-volume-high-symbolic", "sec_fx", 2),
+    ("deps", "application-x-addon-symbolic", "sec_deps", 2),
+    ("gaming", "input-gaming-symbolic", "sec_gaming", 2),
+    ("features", "application-x-executable-symbolic", "sec_features", 2),
+    # Groupe 3 — système Fedora
+    ("repos", "network-server-symbolic", "sec_repos", 3),
+    ("users", "system-users-symbolic", "sec_users", 3),
+    ("fedora", "system-software-update-symbolic", "sec_fedora", 3),
+    ("maint", "applications-engineering-symbolic", "sec_maint", 3),
+    # Groupe 4 — matériel, noyau, réparation
+    ("power", "preferences-system-power-symbolic", "sec_power", 4),
+    ("fan", "weather-windy-symbolic", "sec_fan", 4),
+    ("hw", "applications-system-symbolic", "sec_hw", 4),
+    ("mesa", "video-display-symbolic", "sec_mesa", 4),
+    ("kernel", "drive-harddisk-symbolic", "sec_kernel", 4),
+    ("fix", "view-refresh-symbolic", "sec_fix", 4),
+    ("ui_lang", "preferences-desktop-keyboard-symbolic", "sec_ui_lang", 4),
 ]
 
 
@@ -7794,7 +7841,10 @@ class SystemInfoWindow(Adw.Window):
         row = plain_row(Adw.ActionRow, title=label, subtitle=value)
         row.set_subtitle_selectable(True)
         if icon:
-            row.add_prefix(Gtk.Image.new_from_icon_name(icon))
+            if sec_id == "home":
+                row.add_prefix(_logo_image("icon.png", 20, icon))
+            else:
+                row.add_prefix(Gtk.Image.new_from_icon_name(icon))
         group.add(row)
         self._copy_lines.append(f"{label} : {value}")
         return row
@@ -7808,6 +7858,30 @@ class SystemInfoWindow(Adw.Window):
 
     def _on_open_log(self, *_args: Any) -> None:
         self._parent.open_live_log(follow=False)
+
+
+def _logo_path(filename: str) -> str:
+    """Chemin d'un logo : installation d'abord, puis à côté du script."""
+    for base in (INSTALL_DIR, os.path.dirname(os.path.abspath(__file__))):
+        candidate = os.path.join(base, filename)
+        if os.path.isfile(candidate):
+            return candidate
+    return ""
+
+
+def _logo_image(filename: str, size: int, fallback: str) -> Gtk.Widget:
+    """Logo depuis le disque s'il existe, sinon icône du thème en secours."""
+    path = _logo_path(filename)
+    if path:
+        pic = Gtk.Picture.new_for_filename(path)
+        pic.set_content_fit(Gtk.ContentFit.CONTAIN)
+        pic.set_can_shrink(True)
+        pic.set_size_request(size, size)
+        return pic
+    image = Gtk.Image.new_from_icon_name(fallback)
+    image.set_pixel_size(size)
+    image.set_size_request(size, size)
+    return image
 
 
 class Ps5ManagerWindow(Adw.ApplicationWindow):
@@ -7824,7 +7898,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         self.auto_log_opened = False
         self.log_window: Optional[TextLogWindow] = None
         self.setup_window: Optional["SetupWindow"] = None
-        self.active_section = "logs"
+        self.active_section = "home"
         self.sidebar_rows: dict[str, Adw.ActionRow] = {}
 
         self.busy_spinner = Gtk.Spinner()
@@ -7852,7 +7926,7 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         keys.connect("key-pressed", self._on_secret_shortcut)
         self.add_controller(keys)
 
-        self._select_section("logs")
+        self._select_section("home")
 
         # Vérification de mise à jour en arrière-plan (l'ouverture reste instantanée)
         self.start_auto_update()
@@ -7987,10 +8061,26 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
     def _select_section(self, sec_id: str) -> None:
         self.active_section = sec_id
         row = self.sidebar_rows.get(sec_id)
-        if row:
-            self.sidebar_list.select_row(row)
         page = self._make_section_page(sec_id)
-        self.nav.replace([page])
+        if row is not None:
+            self.sidebar_list.select_row(row)
+            self.nav.replace([page])
+            return
+        # Page rattachée à l'accueil (mise à jour, langue, journal) : l'accueil
+        # reste la racine de la pile pour garder le bouton retour.
+        home_row = self.sidebar_rows.get("home")
+        if home_row is not None:
+            self.sidebar_list.select_row(home_row)
+            self.nav.replace([self._make_section_page("home")])
+            self.nav.push(page)
+        else:
+            self.nav.replace([page])
+
+    def _open_sub_section(self, sec_id: str) -> None:
+        """Ouvre une page rattachée à l'accueil, sans quitter l'accueil."""
+        self.active_section = sec_id
+        self.nav.push(self._make_section_page(sec_id))
+        self.split.set_show_content(True)
 
     def rebuild_ui_for_language(self) -> None:
         for sec_id, row in self.sidebar_rows.items():
@@ -8010,14 +8100,8 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
             menu_model.append(T("about"), "win.show-about")
         self._select_section(self.active_section)
 
-    def _make_section_page(self, sec_id: str) -> Adw.NavigationPage:
-        sec_meta = next((s for s in SECTIONS if s[0] == sec_id), SECTIONS[0])
-        title = T(sec_meta[2])
-
-        toolbar = Adw.ToolbarView()
-        header = Adw.HeaderBar()
-        header.set_title_widget(Adw.WindowTitle(title=title))
-
+    def _pack_busy_controls(self, header: Adw.HeaderBar) -> None:
+        """Spinner d'activité + accès au journal en direct, à droite."""
         if self.busy_spinner.get_parent() is not None:
             self.busy_spinner.unparent()
         header.pack_end(self.busy_spinner)
@@ -8026,6 +8110,81 @@ class Ps5ManagerWindow(Adw.ApplicationWindow):
         log_btn.connect("clicked", lambda *_: self.open_live_log(follow=True))
         header.pack_end(log_btn)
 
+    def _make_home_page(self) -> Adw.NavigationPage:
+        """Accueil : logo PlayStation + Fedora, version stable et accès rapide."""
+        toolbar = Adw.ToolbarView()
+        header = Adw.HeaderBar()
+        title_box = Gtk.Box(spacing=8, valign=Gtk.Align.CENTER)
+        title_box.append(_logo_image("icon.png", 22, "applications-games-symbolic"))
+        title_box.append(Adw.WindowTitle(title=APP_NAME))
+        header.set_title_widget(title_box)
+        self._pack_busy_controls(header)
+        toolbar.add_top_bar(header)
+
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=22)
+        box.set_margin_top(34)
+        box.set_margin_bottom(34)
+        box.set_margin_start(18)
+        box.set_margin_end(18)
+
+        hero = Gtk.Box(spacing=20, halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER)
+        hero.append(_logo_image("icon.png", 104, "applications-games-symbolic"))
+        hero.append(_logo_image("icons/fedora.png", 60, "distributor-logo-fedora"))
+        head_text = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4, valign=Gtk.Align.CENTER)
+        head_text.append(Gtk.Label(label=APP_NAME, xalign=0, css_classes=["title-1"]))
+        tagline = Gtk.Label(
+            label=T("home_tagline"), xalign=0, wrap=True, css_classes=["dim-label"]
+        )
+        tagline.set_max_width_chars(42)
+        head_text.append(tagline)
+        head_text.append(
+            Gtk.Label(
+                label=T("home_version") % APP_VERSION,
+                xalign=0,
+                css_classes=["dim-label", "caption"],
+            )
+        )
+        hero.append(head_text)
+        box.append(hero)
+
+        box.append(Gtk.Label(label=T("home_pick"), xalign=0, css_classes=["heading"]))
+
+        entries = (
+            ("update", "software-update-available-symbolic", "home_update_sub"),
+            ("lang", "preferences-desktop-locale-symbolic", "home_lang_sub"),
+            ("logs", "utilities-terminal-symbolic", "home_logs_sub"),
+        )
+        quick = Gtk.ListBox()
+        quick.add_css_class("boxed-list")
+        quick.set_selection_mode(Gtk.SelectionMode.NONE)
+        for sec_id, icon, sub_key in entries:
+            quick.append(
+                self.row(
+                    T(f"sec_{sec_id}"),
+                    T(sub_key),
+                    icon,
+                    lambda *_args, s=sec_id: self._open_sub_section(s),
+                )
+            )
+        box.append(quick)
+
+        clamp = Adw.Clamp(maximum_size=720)
+        clamp.set_child(box)
+        scroll = Gtk.ScrolledWindow(vexpand=True, hexpand=True)
+        scroll.set_child(clamp)
+        toolbar.set_content(scroll)
+        return Adw.NavigationPage(child=toolbar, title=APP_NAME)
+
+    def _make_section_page(self, sec_id: str) -> Adw.NavigationPage:
+        if sec_id == "home":
+            return self._make_home_page()
+        sec_meta = next((s for s in SECTIONS if s[0] == sec_id), SECTIONS[0])
+        title = T(sec_meta[2])
+
+        toolbar = Adw.ToolbarView()
+        header = Adw.HeaderBar()
+        header.set_title_widget(Adw.WindowTitle(title=title))
+        self._pack_busy_controls(header)
         toolbar.add_top_bar(header)
 
         pref_page = Adw.PreferencesPage()

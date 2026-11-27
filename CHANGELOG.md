@@ -6,6 +6,26 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.17] — 2026-11-27
+
+### Modifié
+- **Nouvelle page d'accueil « PS5 Fedora Manager »** en tête de la barre
+  latérale : logos PlayStation et Fedora, nom de l'application et numéro de la
+  version stable installée, puis un accès rapide à « Mise à jour du manager »,
+  « Langues & clavier » et « Journal / Logs ». Ces trois pages s'ouvrent en
+  sous-page, avec un bouton retour vers l'accueil.
+- Elles quittent la liste principale : la barre latérale garde ses trois
+  groupes d'outils, inchangés, sous l'accueil.
+- L'application démarre sur l'accueil (le journal reste accessible en un clic
+  depuis l'accueil et depuis le bouton journal de chaque page).
+- Aucune modification du setup en 1 clic : son plan de 9 étapes ne dépend pas
+  des sections de la barre latérale.
+
+### Ajouté
+- `backup/stable/v<version>/` : copie complète du projet avant chaque
+  modification de la version stable, avec `tools/backup_stable.sh` pour la créer
+  et `backup/README.md` pour la restauration.
+
 ## [0.15.16] — 2026-11-27
 
 ### Corrigé

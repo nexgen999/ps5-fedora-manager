@@ -7,6 +7,25 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.17] — 2026-11-27
+
+### Changed
+- **New “PS5 Fedora Manager” home page** at the top of the sidebar:
+  PlayStation and Fedora logos, application name and installed stable version,
+  then quick access to “Manager update”, “Languages & keyboard” and
+  “Logs”. Those three pages open as sub-pages with a back button.
+- They leave the main list: the sidebar keeps its three unchanged tool groups
+  below the home page.
+- The application now starts on the home page (logs stay one click away, from
+  the home page and from the log button of every page).
+- No change to the one-click setup: its 9-step plan does not depend on the
+  sidebar sections.
+
+### Added
+- `backup/stable/v<version>/`: full copy of the project before each change to
+  the stable version, with `tools/backup_stable.sh` to create it and
+  `backup/README.md` for restoring.
+
 ## [0.15.16] — 2026-11-27
 
 ### Fixed
