@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.12"
+APP_VERSION = "0.15.13"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1133,6 +1133,7 @@ _RELEASE_NOTES_TITLE = {
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15.13 : le lancement de la bêta est fiabilisé et devient visible — environnement de session nettoyé (HOME, XDG_RUNTIME_DIR, XAUTHORITY, bus), repli X11 automatique, vérification de GTK4/libadwaita avant démarrage, journal dans /tmp/ps5-manager-beta.log et option « Lancer dans un terminal »",
         "0.15.12 : nouvelle option « Installer et essayer la version bêta » dans la mise à jour du manager — elle récupère la bêta du dépôt et la lance en tant qu'utilisateur, sans toucher à la version stable",
         "0.15.11 : traductions complètes de la page Services et de la réinitialisation (7 textes qui restaient en anglais) et lien « Historique complet » dans À propos",
         "0.15.10 : fenêtre « À propos » repensée — 900 × 740 px au lieu de la colonne étroite d'Adw.AboutDialog, avec le logo, les liens (site web, problèmes), les informations techniques et les nouveautés dans une carte lisible",
@@ -1165,6 +1166,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15.13: launching the beta is now reliable and visible — cleaned session environment (HOME, XDG_RUNTIME_DIR, XAUTHORITY, bus), automatic X11 fallback, a GTK4/libadwaita check before starting, a log in /tmp/ps5-manager-beta.log and a “Launch in a terminal” option",
         "0.15.12: new “Install and try the beta release” option in the manager update page — it fetches the beta from the repository and launches it as your user, without touching the stable version",
         "0.15.11: full translations for the Services page and the reset section (7 texts that stayed English) and a “Full changelog” link in About",
         "0.15.10: redesigned “About” window — 900 × 740 px instead of Adw.AboutDialog’s narrow column, with the logo, links (website, issues), technical information and the release notes in a readable card",
@@ -1197,6 +1199,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15.13 : el inicio de la beta es más fiable y visible — entorno de sesión limpio (HOME, XDG_RUNTIME_DIR, XAUTHORITY, bus), repliegue automático a X11, comprobación de GTK4/libadwaita antes de arrancar, registro en /tmp/ps5-manager-beta.log y opción «Ejecutar en un terminal»",
         "0.15.12 : nueva opción «Instalar y probar la versión beta» en la actualización del gestor — descarga la beta del repositorio y la inicia como tu usuario, sin tocar la versión estable",
         "0.15.11 : traducciones completas de la página Servicios y de la reinicialización (7 textos que seguían en inglés) y enlace «Historial completo» en Acerca de",
         "0.15.10 : ventana «Acerca de» rediseñada — 900 × 740 px en lugar de la columna estrecha de Adw.AboutDialog, con el logotipo, los enlaces (sitio web, problemas), la información técnica y las novedades en una tarjeta legible",
@@ -1229,6 +1232,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15.13 : l'avvio della beta è più affidabile e visibile — ambiente di sessione ripulito (HOME, XDG_RUNTIME_DIR, XAUTHORITY, bus), fallback automatico a X11, controllo di GTK4/libadwaita prima dell'avvio, registro in /tmp/ps5-manager-beta.log e opzione «Avvia in un terminale»",
         "0.15.12 : nuova opzione «Installa e prova la versione beta» nell'aggiornamento del gestore — scarica la beta dal repository e la avvia come utente, senza toccare la versione stabile",
         "0.15.11 : traduzioni complete della pagina Servizi e della reimpostazione (7 testi rimasti in inglese) e link «Cronologia completa» in Informazioni",
         "0.15.10 : finestra «Informazioni» ridisegnata — 900 × 740 px al posto della colonna stretta di Adw.AboutDialog, con logo, link (sito web, problemi), informazioni tecniche e novità in una scheda leggibile",
@@ -1261,6 +1265,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15.13 : der Start der Beta ist zuverlässiger und sichtbar – bereinigte Sitzungsumgebung (HOME, XDG_RUNTIME_DIR, XAUTHORITY, Bus), automatischer X11-Fallback, GTK4/libadwaita-Prüfung vor dem Start, Protokoll in /tmp/ps5-manager-beta.log und Option „Im Terminal starten“",
         "0.15.12 : neue Option „Beta-Version installieren und ausprobieren“ in der Manager-Aktualisierung – lädt die Beta aus dem Repository und startet sie als Benutzer, ohne die stabile Version anzutasten",
         "0.15.11 : vollständige Übersetzungen für die Dienste-Seite und das Zurücksetzen (7 Texte waren noch englisch) und ein Link „Vollständiger Verlauf“ im Über-Fenster",
         "0.15.10 : „Über“-Fenster neu gestaltet – 900 × 740 px statt der schmalen Spalte von Adw.AboutDialog, mit Logo, Links (Webseite, Probleme), technischen Informationen und den Versionshinweisen in einer gut lesbaren Karte",
@@ -1293,6 +1298,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15.13 : o arranque da beta é mais fiável e visível — ambiente de sessão limpo (HOME, XDG_RUNTIME_DIR, XAUTHORITY, bus), recurso automático a X11, verificação de GTK4/libadwaita antes de arrancar, registo em /tmp/ps5-manager-beta.log e opção «Executar num terminal»",
         "0.15.12 : nova opção «Instalar e experimentar a versão beta» na atualização do gestor — obtém a beta do repositório e inicia-a como utilizador, sem tocar na versão estável",
         "0.15.11 : traduções completas da página Serviços e da reposição (7 textos que ficavam em inglês) e ligação «Histórico completo» em Sobre",
         "0.15.10 : janela «Sobre» redesenhada — 900 × 740 px em vez da coluna estreita do Adw.AboutDialog, com o logótipo, as ligações (site, problemas), as informações técnicas e as novidades num cartão legível",
@@ -8950,6 +8956,15 @@ BETA_STRINGS: dict[str, dict[str, str]] = {
         "launch_sub": "Édition modulaire : 107 greffons, 6 langues, pages Noyau, Dépôts et Comptes",
         "launched": "Version bêta lancée — la version stable reste intacte",
         "root": "La bêta ne peut pas être lancée en root",
+        "terminal": "Lancer dans un terminal",
+        "terminal_sub": "Affiche les erreurs en direct — utile si rien ne s'ouvre",
+        "terminal_missing": "Aucun terminal trouvé pour lancer la bêta",
+        "log": "Voir le journal de la bêta",
+        "log_sub": "/tmp/ps5-manager-beta.log",
+        "log_title": "Journal de la bêta",
+        "preflight": "La bêta ne peut pas démarrer",
+        "crash": "La bêta s'est arrêtée (code %s)",
+        "empty_log": "Journal vide : le processus n'a rien écrit.",
     },
     "en": {
         "group": "Beta release",
@@ -8961,6 +8976,15 @@ BETA_STRINGS: dict[str, dict[str, str]] = {
         "launch_sub": "Modular edition: 107 addons, 6 languages, Kernel, Repositories and Accounts pages",
         "launched": "Beta launched — the stable version is untouched",
         "root": "The beta cannot run as root",
+        "terminal": "Launch in a terminal",
+        "terminal_sub": "Shows errors live — useful when nothing opens",
+        "terminal_missing": "No terminal found to launch the beta",
+        "log": "View the beta log",
+        "log_sub": "/tmp/ps5-manager-beta.log",
+        "log_title": "Beta log",
+        "preflight": "The beta cannot start",
+        "crash": "The beta exited (code %s)",
+        "empty_log": "Empty log: the process wrote nothing.",
     },
     "es": {
         "group": "Versión beta",
@@ -8972,6 +8996,15 @@ BETA_STRINGS: dict[str, dict[str, str]] = {
         "launch_sub": "Edición modular: 107 complementos, 6 idiomas, páginas Núcleo, Repositorios y Cuentas",
         "launched": "Beta iniciada — la versión estable sigue intacta",
         "root": "La beta no puede ejecutarse como root",
+        "terminal": "Ejecutar en un terminal",
+        "terminal_sub": "Muestra los errores en directo — útil si no se abre nada",
+        "terminal_missing": "No se encontró ningún terminal para iniciar la beta",
+        "log": "Ver el registro de la beta",
+        "log_sub": "/tmp/ps5-manager-beta.log",
+        "log_title": "Registro de la beta",
+        "preflight": "La beta no puede iniciarse",
+        "crash": "La beta se detuvo (código %s)",
+        "empty_log": "Registro vacío: el proceso no escribió nada.",
     },
     "it": {
         "group": "Versione beta",
@@ -8983,6 +9016,15 @@ BETA_STRINGS: dict[str, dict[str, str]] = {
         "launch_sub": "Edizione modulare: 107 plugin, 6 lingue, pagine Kernel, Repository e Account",
         "launched": "Beta avviata — la versione stabile resta intatta",
         "root": "La beta non può essere avviata come root",
+        "terminal": "Avvia in un terminale",
+        "terminal_sub": "Mostra gli errori in diretta — utile se non si apre nulla",
+        "terminal_missing": "Nessun terminale trovato per avviare la beta",
+        "log": "Vedi il registro della beta",
+        "log_sub": "/tmp/ps5-manager-beta.log",
+        "log_title": "Registro della beta",
+        "preflight": "La beta non può avviarsi",
+        "crash": "La beta si è chiusa (codice %s)",
+        "empty_log": "Registro vuoto: il processo non ha scritto nulla.",
     },
     "de": {
         "group": "Beta-Version",
@@ -8994,6 +9036,15 @@ BETA_STRINGS: dict[str, dict[str, str]] = {
         "launch_sub": "Modulare Ausgabe: 107 Erweiterungen, 6 Sprachen, Seiten Kernel, Paketquellen und Konten",
         "launched": "Beta gestartet – die stabile Version bleibt unverändert",
         "root": "Die Beta kann nicht als root gestartet werden",
+        "terminal": "Im Terminal starten",
+        "terminal_sub": "Zeigt Fehler live – nützlich, wenn sich nichts öffnet",
+        "terminal_missing": "Kein Terminal gefunden, um die Beta zu starten",
+        "log": "Beta-Protokoll ansehen",
+        "log_sub": "/tmp/ps5-manager-beta.log",
+        "log_title": "Beta-Protokoll",
+        "preflight": "Die Beta kann nicht starten",
+        "crash": "Die Beta wurde beendet (Code %s)",
+        "empty_log": "Leeres Protokoll: der Prozess hat nichts geschrieben.",
     },
     "pt": {
         "group": "Versão beta",
@@ -9005,6 +9056,15 @@ BETA_STRINGS: dict[str, dict[str, str]] = {
         "launch_sub": "Edição modular: 107 extensões, 6 idiomas, páginas Núcleo, Repositórios e Contas",
         "launched": "Beta iniciada — a versão estável fica intacta",
         "root": "A beta não pode ser executada como root",
+        "terminal": "Executar num terminal",
+        "terminal_sub": "Mostra os erros em direto — útil se nada abrir",
+        "terminal_missing": "Nenhum terminal encontrado para iniciar a beta",
+        "log": "Ver o registo da beta",
+        "log_sub": "/tmp/ps5-manager-beta.log",
+        "log_title": "Registo da beta",
+        "preflight": "A beta não consegue arrancar",
+        "crash": "A beta terminou (código %s)",
+        "empty_log": "Registo vazio: o processo não escreveu nada.",
     },
 }
 
@@ -9028,31 +9088,124 @@ def beta_present() -> bool:
     return os.path.isfile(os.path.join(BETA_DIR, "run.py"))
 
 
-def launch_beta() -> bool:
-    """Démarre beta/run.py en tant qu'utilisateur réel, sans bloquer l'interface."""
+BETA_LOG_PATH = os.path.join(tempfile.gettempdir(), "ps5-manager-beta.log")
+
+BETA_PREFLIGHT_CODE = "\n".join(
+    (
+        "import gi",
+        "gi.require_version('Gtk', '4.0')",
+        "gi.require_version('Adw', '1')",
+        "from gi.repository import Gtk, Adw",
+        "print('GTK', Gtk.get_major_version(), Gtk.get_minor_version(),"
+        " 'libadwaita', Adw.get_major_version(), Adw.get_minor_version())",
+    )
+)
+
+
+def _beta_env() -> dict[str, str]:
+    """Environnement de la bêta : celui de l'utilisateur réel, jamais celui de root.
+
+    Lancée depuis la stable (root via pkexec), la bêta hériterait sinon d'un HOME,
+    d'un XAUTHORITY ou d'un XDG_RUNTIME_DIR de root : GTK ne trouverait alors ni
+    l'affichage ni le bus de session et la fenêtre ne s'ouvrirait pas.
+    """
+    env = user_env()
+    if REAL_USER != "root":
+        home = REAL_HOME or f"/home/{REAL_USER}"
+        env["HOME"] = home
+        env["USER"] = REAL_USER
+        env["LOGNAME"] = REAL_USER
+        env["XDG_RUNTIME_DIR"] = runtime_dir
+        env.setdefault("DISPLAY", ":0")
+        wayland = os.environ.get("WAYLAND_DISPLAY", "")
+        if not wayland and os.path.isdir(runtime_dir):
+            try:
+                for name in sorted(os.listdir(runtime_dir)):
+                    if name.startswith("wayland-") and not name.endswith(".lock"):
+                        wayland = name
+                        break
+            except OSError:
+                wayland = ""
+        if wayland:
+            env["WAYLAND_DISPLAY"] = wayland
+        xauthority = os.path.join(home, ".Xauthority")
+        if os.path.isfile(xauthority):
+            env["XAUTHORITY"] = xauthority
+        else:
+            env.pop("XAUTHORITY", None)
+        bus = os.path.join(runtime_dir, "bus")
+        if os.path.exists(bus):
+            env["DBUS_SESSION_BUS_ADDRESS"] = f"unix:path={bus}"
+        else:
+            env.pop("DBUS_SESSION_BUS_ADDRESS", None)
+    env["PYTHONUNBUFFERED"] = "1"
+    return env
+
+
+def _beta_popen_kwargs(env: dict[str, str]) -> dict[str, Any]:
+    if os.geteuid() == 0 and REAL_USER != "root":
+        home = env.get("HOME", "/tmp")
+        return {
+            "user": REAL_UID,
+            "group": REAL_GID,
+            "extra_groups": REAL_GROUPS,
+            "cwd": home if os.path.isdir(home) else "/tmp",
+            "env": env,
+        }
+    return {"env": env}
+
+
+def beta_preflight(timeout: float = 20.0) -> tuple[bool, str]:
+    """Vérifie que GTK4 et libadwaita sont utilisables par l'utilisateur réel."""
+    if not beta_present():
+        return False, "beta/run.py absent"
+    cmd = [sys.executable, "-c", BETA_PREFLIGHT_CODE]
+    try:
+        proc = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            **_beta_popen_kwargs(_beta_env()),
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return False, f"{' '.join(cmd)}\n{exc}"
+    parts = [(proc.stdout or "").strip(), (proc.stderr or "").strip()]
+    detail = "\n".join(part for part in parts if part)
+    return proc.returncode == 0, detail or f"code {proc.returncode}"
+
+
+def spawn_beta(backend: str = "") -> Any:
+    """Lance beta/run.py en tant qu'utilisateur réel, sortie dans BETA_LOG_PATH."""
     entry = os.path.join(BETA_DIR, "run.py")
     if not os.path.isfile(entry) or REAL_USER == "root":
-        return False
-    log_path = os.path.join(tempfile.gettempdir(), "ps5-manager-beta.log")
+        return None
+    env = _beta_env()
+    if backend:
+        env["GDK_BACKEND"] = backend
+    cmd = [sys.executable, entry]
     try:
-        log = open(log_path, "ab")
+        log = open(BETA_LOG_PATH, "wb")
     except OSError:
-        log = subprocess.DEVNULL  # type: ignore[assignment]
+        log = None  # type: ignore[assignment]
+    if log is not None:
+        log.write(f"[beta] {' '.join(cmd)} — backend={backend or 'auto'} — uid={REAL_UID}\n".encode())
+        log.flush()
     try:
-        subprocess.Popen(
-            [sys.executable, entry],
+        proc = subprocess.Popen(
+            cmd,
             stdin=subprocess.DEVNULL,
-            stdout=log,
-            stderr=log,
+            stdout=log or subprocess.DEVNULL,
+            stderr=log or subprocess.DEVNULL,
             start_new_session=True,
-            **user_subprocess_kwargs(),
+            **_beta_popen_kwargs(env),
         )
-    except OSError:
-        return False
+    except (OSError, ValueError):
+        return None
     finally:
-        if log is not subprocess.DEVNULL:
-            log.close()  # type: ignore[union-attr]
-    return True
+        if log is not None:
+            log.close()
+    return proc
 
 
 def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
@@ -9183,6 +9336,56 @@ def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     beta_grp = pref_group(title=_bt("group"))
     installed_version = beta_version() if beta_present() else ""
 
+    def _beta_log_text(prefix: str = "") -> str:
+        try:
+            with open(BETA_LOG_PATH, encoding="utf-8", errors="replace") as handle:
+                tail = "".join(handle.readlines()[-80:]).strip()
+        except OSError:
+            tail = ""
+        body = tail or _bt("empty_log")
+        return f"{prefix}\n\n{body}" if prefix else body
+
+    def _show_beta_log(prefix: str = "") -> None:
+        win.show_text_modal(_bt("log_title"), _beta_log_text(prefix))
+
+    def _watch_beta(proc: Any, on_dead: Callable[[int], None]) -> None:
+        """Attend 2,5 s : fenêtre ouverte → toast, processus mort → diagnostic."""
+
+        def _poll() -> bool:
+            code = proc.poll()
+            if code is None:
+                win.toast(_bt("launched"))
+                return False
+            on_dead(code)
+            return False
+
+        GLib.timeout_add(2500, _poll)
+
+    def _start_beta() -> None:
+        if not beta_present():
+            win.toast(_bt("missing"))
+            return
+        ok, detail = beta_preflight()
+        if not ok:
+            win.show_text_modal(_bt("preflight"), detail)
+            return
+
+        def _give_up(code: int) -> None:
+            _show_beta_log(_bt("crash") % code)
+
+        def _retry_x11(code: int) -> None:
+            proc_x11 = spawn_beta("x11")
+            if proc_x11 is None:
+                _give_up(code)
+                return
+            _watch_beta(proc_x11, _give_up)
+
+        proc = spawn_beta("")
+        if proc is None:
+            win.toast(_bt("root"))
+            return
+        _watch_beta(proc, _retry_x11)
+
     def _install_beta():
         def _task(emit):
             if os.path.isdir(os.path.join(INSTALL_DIR, ".git")):
@@ -9198,17 +9401,21 @@ def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
                 return False, _bt("missing")
             version = beta_version() or "beta"
             emit(_bt("installed") % version)
-            if not launch_beta():
-                return False, _bt("root")
-            return True, _bt("launched")
+            GLib.idle_add(_start_beta)
+            return True, _bt("installed") % version
 
         win.run_task(T("mgr_update"), _task, lambda _ok, msg: win.toast(msg))
 
     def _run_beta():
+        _start_beta()
+
+    def _beta_in_terminal() -> None:
         if not beta_present():
             win.toast(_bt("missing"))
             return
-        win.toast(_bt("launched") if launch_beta() else _bt("root"))
+        entry = os.path.join(BETA_DIR, "run.py")
+        if not _launch_in_terminal(f"{sys.executable} {entry}"):
+            win.toast(_bt("terminal_missing"))
 
     beta_grp.add(
         win.row(
@@ -9224,6 +9431,22 @@ def build_page_update(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
             _bt("launch_sub"),
             "media-playback-start-symbolic",
             lambda *_: _run_beta(),
+        )
+    )
+    beta_grp.add(
+        win.row(
+            _bt("terminal"),
+            _bt("terminal_sub"),
+            "utilities-terminal-symbolic",
+            lambda *_: _beta_in_terminal(),
+        )
+    )
+    beta_grp.add(
+        win.row(
+            _bt("log"),
+            _bt("log_sub"),
+            "text-x-generic-symbolic",
+            lambda *_: _show_beta_log(),
         )
     )
     page.add(beta_grp)

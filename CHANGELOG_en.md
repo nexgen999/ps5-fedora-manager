@@ -7,6 +7,26 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.13] — 2026-11-27
+
+### Fixed
+- **“Launch the beta release” opened no window.** The beta inherited root's
+  environment (from the manager's elevation): `HOME`, `XAUTHORITY`,
+  `XDG_RUNTIME_DIR` and the session bus did not match the real user, so GTK
+  found neither the display nor the bus and the process exited silently. The
+  launcher now builds a clean session environment (`HOME`, `USER`,
+  `XDG_RUNTIME_DIR`, `WAYLAND_DISPLAY` detected in `/run/user/<uid>`, the
+  user's `XAUTHORITY`, `DBUS_SESSION_BUS_ADDRESS`), uses `Popen(user=…,
+  group=…, extra_groups=…)` and **retries on X11** (`GDK_BACKEND=x11`) if the
+  first attempt stops.
+
+### Added
+- **Visible diagnostics**: a GTK4/libadwaita check as the user before launching
+  (explicit message when PyGObject or libadwaita is missing), output kept in
+  `/tmp/ps5-manager-beta.log`, and two new rows “Launch in a terminal” (live
+  errors) and “View the beta log”. A failure shows the log instead of a toast.
+- Six-language texts completed (9 more keys).
+
 ## [0.15.12] — 2026-11-27
 
 ### Added

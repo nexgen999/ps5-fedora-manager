@@ -6,6 +6,28 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.13] — 2026-11-27
+
+### Corrigé
+- **« Lancer la version bêta » n'ouvrait aucune fenêtre.** La bêta était lancée
+  avec l'environnement de root (hérité de l'élévation du manager) : `HOME`,
+  `XAUTHORITY`, `XDG_RUNTIME_DIR` et le bus de session ne correspondaient pas à
+  l'utilisateur réel, donc GTK ne trouvait ni l'affichage ni le bus et le
+  processus mourait sans rien montrer. Le lancement construit désormais un
+  environnement de session propre (`HOME`, `USER`, `XDG_RUNTIME_DIR`,
+  `WAYLAND_DISPLAY` détecté dans `/run/user/<uid>`, `XAUTHORITY` de
+  l'utilisateur, `DBUS_SESSION_BUS_ADDRESS`), passe par `Popen(user=…,
+  group=…, extra_groups=…)` et **retente en X11** (`GDK_BACKEND=x11`) si le
+  premier essai s'arrête.
+
+### Ajouté
+- **Diagnostic visible** : vérification de GTK4/libadwaita par l'utilisateur
+  avant le lancement (message explicite si PyGObject ou libadwaita manque),
+  sortie conservée dans `/tmp/ps5-manager-beta.log`, et deux nouvelles lignes
+  « Lancer dans un terminal » (erreurs en direct) et « Voir le journal de la
+  bêta ». Un échec affiche le journal au lieu d'un simple toast.
+- Textes des six langues complétés (9 clés de plus).
+
 ## [0.15.12] — 2026-11-27
 
 ### Ajouté
