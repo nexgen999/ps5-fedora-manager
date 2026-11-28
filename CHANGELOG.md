@@ -6,6 +6,28 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.22] — 2026-11-28
+
+### Corrigé
+- **Steam Flatpak se refermait aussitôt dans la session Gaming.** Le journal
+  montrait le démarrage du Flatpak puis `Primary child shut down` sans erreur.
+  Sans bus de session D-Bus, le bac à sable Flatpak ne peut pas démarrer
+  (`gaming-session` tourne sur un TTY, où logind crée `/run/user/<uid>/bus`
+  sans l'exporter).
+  - La session exporte `XDG_RUNTIME_DIR` et `DBUS_SESSION_BUS_ADDRESS`
+    (`unix:path=/run/user/<uid>/bus`) avant de lancer Gamescope.
+  - À défaut de bus utilisateur, elle se replie sur `dbus-run-session`.
+  - Le journal affiche le bus retenu et la ligne de commande complète
+    (`lancement : …`).
+- **Écran noir sans retour possible (HDR en 4K60).** `HDR output enabled` puis
+  une boucle de `xwm: Failed to prepare 1-layer flip (Invalid argument)` : en
+  10 bits, un lien HDMI/DP 4K60 n'a pas la bande passante nécessaire, Gamescope
+  tourne sans jamais rien afficher et la session reste bloquée.
+  - Un chien de garde lit la sortie de Gamescope : au-delà de 20 échecs
+    d'affichage, il arrête la session et rend la main au bureau.
+  - Le journal indique alors la consigne : désactiver HDR dans Steam
+    (*Paramètres > Affichage*) puis relancer le mode Gaming.
+
 ## [0.15.21] — 2026-11-28
 
 ### Corrigé

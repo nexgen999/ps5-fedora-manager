@@ -59,6 +59,12 @@ Steam peut être le paquet rpm (commande `steam`) **ou** le Flatpak
 session Gaming choisit le lanceur disponible au démarrage ; `--mangoapp` n'est
 utilisé qu'avec le rpm, un Flatpak filtrant `LD_PRELOAD`.
 
+Un Flatpak a besoin d'un **bus de session D-Bus** : sur un TTY, logind crée
+`/run/user/<uid>/bus` sans l'exporter, et le bac à sable se refermait aussitôt
+(`Primary child shut down`). La session l'exporte désormais elle-même (repli
+`dbus-run-session` s'il n'existe pas), et journalise le bus retenu ainsi que la
+ligne de commande complète de Gamescope.
+
 ## Utilisation au quotidien
 
 ```bash
@@ -118,7 +124,9 @@ cas s'est produit — `steam introuvable`, `aucun /dev/dri/card* lisible` ou
 |---|---|
 | Écran noir au démarrage | `journalctl -b -u gdm` (ou `sddm`, `lightdm`) et `session-switch.log` |
 | Retour bureau impossible | la session du bureau est mal résolue : vérifier `/usr/share/xsessions/` |
-| La session Gaming revient aussitôt au bureau | `gaming-session.log` : `steam introuvable` (Steam Flatpak), `aucun /dev/dri/card* lisible` (groupes `video`/`render`) ou `gamescope termine (code N)` |
+| La session Gaming revient aussitôt au bureau | `gaming-session.log` : `steam introuvable` (Steam Flatpak), `aucun /dev/dri/card* lisible` (groupes `video`/`render`), `Primary child shut down` (bus D-Bus absent) ou `gamescope termine (code N)` |
+| Écran noir puis « affichage impossible » | HDR activé par Steam en 4K60 : l'enchaînement `HDR output enabled` / `Failed to prepare 1-layer flip` montre que le lien n'a pas la bande passante du 10 bits. Dans Steam : *Paramètres > Affichage* → désactiver HDR, puis relancer le mode Gaming |
+| Steam Flatpak se referme aussitôt | le bac à sable exige un bus D-Bus de session : la session exporte `unix:path=/run/user/<uid>/bus` (ou se replie sur `dbus-run-session`) ; vérifier la ligne `bus de session` dans le journal |
 | `switch-session` demande un mot de passe | règle polkit absente : relancer le script d'installation |
 | Steam ne démarre pas en Big Picture | lancer `steam -gamepadui` en terminal pour voir l'erreur |
 | Deux sessions « Gaming » | ancien script d'un autre bureau : lancer le script `uninstall` correspondant |

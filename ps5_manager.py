@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.21"
+APP_VERSION = "0.15.22"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -206,6 +206,21 @@ export XDG_SESSION_TYPE=wayland
 export GAMESCOPE_MODE_SAVE_FILE="$HOME/.config/gamescope/modes.cfg"
 mkdir -p "$HOME/.config/gamescope" 2>/dev/null || true
 
+# Steam installe en Flatpak : le bac a sable exige un bus de session D-Bus et
+# un XDG_RUNTIME_DIR. Dans une session TTY, logind cree /run/user/<uid>/bus mais
+# ne l'exporte pas : sans ces variables, le Flatpak se referme aussitot
+# ("Primary child shut down" dans le journal, sans aucun message d'erreur).
+if [ -z "${XDG_RUNTIME_DIR:-}" ] || [ ! -d "${XDG_RUNTIME_DIR:-/nonexistent}" ]; then
+  export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+  mkdir -p -m 700 "$XDG_RUNTIME_DIR" 2>/dev/null || true
+fi
+if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ] && [ -S "$XDG_RUNTIME_DIR/bus" ]; then
+  export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
+fi
+if [ -n "${DBUS_SESSION_BUS_ADDRESS:-}" ]; then
+  echo "bus de session : $DBUS_SESSION_BUS_ADDRESS"
+fi
+
 # --mangoapp precharge MangoApp dans le processus lance par Gamescope : un
 # Flatpak filtre LD_PRELOAD, l'option n'aurait aucun effet (on la reserve au
 # paquet rpm).
@@ -216,9 +231,54 @@ else
   echo "--mangoapp non utilise (Steam Flatpak ou mangoapp absent)"
 fi
 
-gamescope "${FLAGS[@]}" -e -- "${STEAM_CMD[@]}" -steamdeck -steamos3
-RC=$?
+LAUNCH=(gamescope "${FLAGS[@]}" -e -- "${STEAM_CMD[@]}" -steamdeck -steamos3)
+if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ]; then
+  if command -v dbus-run-session >/dev/null 2>&1; then
+    LAUNCH=(dbus-run-session -- "${LAUNCH[@]}")
+    echo "aucun bus utilisateur : dbus-run-session fournit le bus de session"
+  else
+    echo "aucun bus de session D-Bus : Steam Flatpak risque de se refermer aussitot"
+  fi
+fi
+echo "lancement : ${LAUNCH[*]}"
+
+# Ecran noir : en 10 bits (HDR) sur un 4K60, le lien HDMI/DP n'a pas la bande
+# passante necessaire ; Gamescope echoue alors chaque composition et reste
+# bloque sans rien afficher. Au-dela de 20 echecs d'affilee, on l'arrete pour
+# rendre la main au bureau avec une consigne au lieu de laisser un ecran noir.
+BLACK=""
+GLOG=$(mktemp "${TMPDIR:-/tmp}/ps5-gaming.XXXXXX" 2>/dev/null || true)
+if [ -n "$GLOG" ]; then
+  "${LAUNCH[@]}" >>"$GLOG" 2>&1 </dev/null &
+  GPID=$!
+  (
+    while kill -0 "$GPID" 2>/dev/null; do
+      sleep 5
+      n=$(grep -c 'Failed to prepare 1-layer flip' "$GLOG" 2>/dev/null || true)
+      [ "${n:-0}" -ge 20 ] 2>/dev/null || continue
+      echo "ecran noir : Gamescope echoue a afficher le mode choisi (HDR 10 bits ?)" >>"$GLOG"
+      kill -TERM "$GPID" 2>/dev/null || true
+      sleep 5
+      kill -KILL "$GPID" 2>/dev/null || true
+      break
+    done
+  ) &
+  WPID=$!
+  wait "$GPID"
+  RC=$?
+  kill "$WPID" 2>/dev/null || true
+  cat "$GLOG"
+  if grep -q 'ecran noir : Gamescope' "$GLOG" 2>/dev/null; then BLACK=1; fi
+  rm -f "$GLOG"
+else
+  "${LAUNCH[@]}"
+  RC=$?
+fi
 echo "gamescope termine (code $RC)"
+if [ -n "$BLACK" ]; then
+  echo "affichage impossible : desactive HDR dans Steam (Parametres > Affichage) puis relance le mode Gaming"
+  echo "note : un televiseur 4K en 10 bits depasse la bande passante du lien ; 4K60 sans HDR fonctionne"
+fi
 
 REQUEST=""
 if [ -f "$NEXT" ]; then
@@ -1190,16 +1250,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.15.21",
-    "en": "What is new in 0.15.21",
-    "es": "Novedades de la 0.15.21",
-    "it": "Novità della 0.15.21",
-    "de": "Neu in 0.15.21",
-    "pt": "Novidades da 0.15.21",
+    "fr": "Nouveautés de la 0.15.22",
+    "en": "What is new in 0.15.22",
+    "es": "Novedades de la 0.15.22",
+    "it": "Novità della 0.15.22",
+    "de": "Neu in 0.15.22",
+    "pt": "Novidades da 0.15.22",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15.22 : session Gaming — un bus D-Bus est fourni à Steam Flatpak (il ne se referme plus aussitôt) et un écran noir HDR rend la main au bureau au lieu de bloquer",
         "0.15.21 : le mode Gaming lance Steam installé en Flatpak (cas de Budgie, où le paquet rpm ne s'installe pas) — la session ne renvoie plus au bureau avec « steam introuvable »",
         "0.15.20 : la fenêtre « Système » du menu burger s'ouvre à nouveau — une variable restée d'un copier-coller dans la construction de ses lignes la faisait échouer avant l'affichage",
         "0.15.19 : le mode Gaming (Gamescope) refonctionne sous Budgie — la session du bureau est résolue à l'exécution (Budgie 10.10 est passé en Wayland sous SDDM), un `Session=` inconnu ne laisse plus la console sur l'écran de connexion et le journal note la carte DRM, les groupes de l'utilisateur et la bascule",
@@ -1239,6 +1300,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15.22: Gaming session — Flatpak Steam now gets a D-Bus session bus (it no longer quits at once) and an HDR black screen hands control back to the desktop instead of hanging",
         "0.15.21: Gaming Mode launches Steam installed as a Flatpak (the Budgie case, where the rpm package does not install) — the session no longer drops back to the desktop with “steam introuvable”",
         "0.15.20: the “System” window of the hamburger menu opens again — a variable left over from a copy-paste in the way its rows are built made it fail before it could be shown",
         "0.15.19: Gaming Mode (Gamescope) works under Budgie again — the desktop session is resolved at runtime (Budgie 10.10 moved to Wayland under SDDM), an unknown `Session=` no longer leaves the console on the login screen, and the log records the DRM device, the user's groups and the switch",
@@ -1278,6 +1340,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15.22: sesión Gaming — Steam Flatpak recibe un bus de sesión D-Bus (ya no se cierra de inmediato) y una pantalla negra HDR devuelve al escritorio en vez de quedarse bloqueada",
         "0.15.21: el modo Gaming lanza Steam instalado como Flatpak (el caso de Budgie, donde el paquete rpm no se instala) — la sesión ya no vuelve al escritorio con «steam introuvable»",
         "0.15.20: la ventana «Sistema» del menú se abre de nuevo — una variable que quedó de un copiar y pegar en la construcción de sus filas la hacía fallar antes de mostrarse",
         "0.15.19: el modo Gaming (Gamescope) vuelve a funcionar en Budgie — la sesión del escritorio se resuelve en ejecución (Budgie 10.10 pasó a Wayland bajo SDDM), un `Session=` desconocido ya no deja la consola en la pantalla de inicio de sesión y el registro anota la tarjeta DRM, los grupos del usuario y el cambio de sesión",
@@ -1317,6 +1380,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15.22: sessione Gaming — Steam Flatpak riceve un bus di sessione D-Bus (non si chiude più subito) e uno schermo nero HDR restituisce il desktop invece di bloccarsi",
         "0.15.21: la modalità Gaming avvia Steam installato come Flatpak (il caso di Budgie, dove il pacchetto rpm non si installa) — la sessione non torna più al desktop con «steam introuvable»",
         "0.15.20: la finestra «Sistema» del menu si apre di nuovo — una variabile rimasta da un copia e incolla nella costruzione delle sue righe la faceva fallire prima di essere mostrata",
         "0.15.19: la modalità Gaming (Gamescope) torna a funzionare su Budgie — la sessione del desktop viene risolta all'esecuzione (Budgie 10.10 è passato a Wayland sotto SDDM), un `Session=` sconosciuto non lascia più la console sulla schermata di accesso e il log annota la scheda DRM, i gruppi dell'utente e il cambio di sessione",
@@ -1356,6 +1420,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15.22: Gaming-Sitzung — Flatpak-Steam erhält einen D-Bus-Sitzungsbus (beendet sich nicht mehr sofort) und ein schwarzer HDR-Bildschirm gibt den Desktop zurück statt zu hängen",
         "0.15.21: Der Gaming-Modus startet Steam als Flatpak (der Budgie-Fall, in dem sich das rpm-Paket nicht installieren lässt) — die Sitzung fällt nicht mehr mit „steam introuvable“ zum Desktop zurück",
         "0.15.20: Das Fenster „System“ im Burger-Menü öffnet wieder — eine beim Kopieren übrig gebliebene Variable im Aufbau seiner Zeilen ließ es vor dem Anzeigen scheitern",
         "0.15.19: Der Gaming-Modus (Gamescope) funktioniert unter Budgie wieder — die Desktop-Sitzung wird zur Laufzeit ermittelt (Budgie 10.10 ist auf Wayland unter SDDM umgestiegen), ein unbekanntes `Session=` lässt die Konsole nicht mehr am Anmeldebildschirm hängen und das Protokoll notiert DRM-Gerät, Benutzergruppen und Umschaltung",
@@ -1395,6 +1460,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15.22: sessão Gaming — o Steam Flatpak passa a ter um bus de sessão D-Bus (já não fecha logo de imediato) e um ecrã negro HDR devolve o ambiente em vez de ficar bloqueado",
         "0.15.21: o modo Gaming lança o Steam instalado como Flatpak (o caso do Budgie, onde o pacote rpm não se instala) — a sessão já não volta ao ambiente com «steam introuvable»",
         "0.15.20: a janela «Sistema» do menu volta a abrir — uma variável deixada de um copiar e colar na construção das suas linhas fazia-a falhar antes de ser mostrada",
         "0.15.19: o modo Gaming (Gamescope) volta a funcionar no Budgie — a sessão do ambiente é resolvida em execução (o Budgie 10.10 passou a Wayland sob SDDM), um `Session=` desconhecido já não deixa a consola no ecrã de início de sessão e o registo anota a placa DRM, os grupos do utilizador e a mudança de sessão",

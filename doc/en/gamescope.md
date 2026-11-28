@@ -59,6 +59,12 @@ Steam may be the rpm package (`steam` command) **or** the
 install. The Gaming session picks whichever launcher is available;
 `--mangoapp` is only used with the rpm, since a Flatpak filters `LD_PRELOAD`.
 
+A Flatpak needs a **D-Bus session bus**: on a TTY, logind creates
+`/run/user/<uid>/bus` without exporting it, and the sandbox used to quit at
+once (`Primary child shut down`). The session now exports it itself (falling
+back to `dbus-run-session` when none exists) and logs the bus used as well as
+Gamescope's full command line.
+
 ## Daily use
 
 ```bash
@@ -118,7 +124,9 @@ happened — `steam introuvable`, `aucun /dev/dri/card* lisible` or
 |---|---|
 | Black screen at boot | `journalctl -b -u gdm` (or `sddm`, `lightdm`) and `session-switch.log` |
 | Cannot return to the desktop | desktop session not resolved: check `/usr/share/xsessions/` |
-| The Gaming session drops straight back to the desktop | `gaming-session.log`: `steam introuvable` (Flatpak Steam), `aucun /dev/dri/card* lisible` (`video`/`render` groups) or `gamescope termine (code N)` |
+| The Gaming session drops straight back to the desktop | `gaming-session.log`: `steam introuvable` (Flatpak Steam), `aucun /dev/dri/card* lisible` (`video`/`render` groups), `Primary child shut down` (no D-Bus bus) or `gamescope termine (code N)` |
+| Black screen then “affichage impossible” | Steam enabled HDR at 4K60: `HDR output enabled` followed by `Failed to prepare 1-layer flip` means the link has no 10-bit bandwidth. In Steam: *Settings > Display* → turn HDR off, then start Gaming Mode again |
+| Flatpak Steam quits at once | the sandbox needs a D-Bus session bus: the session exports `unix:path=/run/user/<uid>/bus` (or falls back to `dbus-run-session`); check the `bus de session` line in the log |
 | `switch-session` asks for a password | polkit rule missing: re-run the install script |
 | Steam does not start in Big Picture | run `steam -gamepadui` in a terminal to see the error |
 | Two “Gaming” sessions | leftover script from another desktop: run the matching `uninstall` |

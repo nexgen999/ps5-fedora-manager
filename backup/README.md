@@ -26,3 +26,4 @@ cp -a backup/stable/v0.15.17/. /opt/ps5-manager/
 | `v0.15.18` | version 0.15.18 avant la correction du mode Gamescope sous Budgie |
 | `v0.15.19` | version 0.15.19 avant la réparation de la fenêtre « Système » |
 | `v0.15.20` | version 0.15.20 avant la prise en charge de Steam en Flatpak |
+| `v0.15.21` | version 0.15.21 avant le bus D-Bus du Flatpak et le garde-fou écran noir |

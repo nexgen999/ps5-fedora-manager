@@ -7,6 +7,27 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.22] — 2026-11-28
+
+### Fixed
+- **Flatpak Steam quit at once in the Gaming session.** The log showed the
+  Flatpak starting and then `Primary child shut down` without any error.
+  Without a D-Bus session bus the Flatpak sandbox cannot start
+  (`gaming-session` runs on a TTY, where logind creates
+  `/run/user/<uid>/bus` without exporting it).
+  - The session exports `XDG_RUNTIME_DIR` and `DBUS_SESSION_BUS_ADDRESS`
+    (`unix:path=/run/user/<uid>/bus`) before starting Gamescope.
+  - Without a user bus it falls back to `dbus-run-session`.
+  - The log shows the bus used and the full command line (`lancement : …`).
+- **Black screen with no way back (HDR at 4K60).** `HDR output enabled` then a
+  loop of `xwm: Failed to prepare 1-layer flip (Invalid argument)`: in 10-bit,
+  a 4K60 HDMI/DP link lacks the bandwidth, Gamescope spins without ever drawing
+  and the session stays stuck.
+  - A watchdog reads Gamescope's output: past 20 failed presentations it stops
+    the session and hands control back to the desktop.
+  - The log then states what to do: turn HDR off in Steam
+    (*Settings > Display*) and start Gaming Mode again.
+
 ## [0.15.21] — 2026-11-28
 
 ### Fixed
