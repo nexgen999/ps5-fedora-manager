@@ -17,7 +17,7 @@ Two ways to install the Gamescope / Steam Big Picture session:
 | `gamescope_uninstall_kde.sh` | KDE |
 | `gamescope_install_cinnamon.sh` | Cinnamon (LightDM) |
 | `gamescope_uninstall_cinnamon.sh` | Cinnamon |
-| `gamescope_install_budgie.sh` | Budgie (LightDM) |
+| `gamescope_install_budgie.sh` | Budgie (SDDM since Fedora 44, LightDM before) |
 | `gamescope_uninstall_budgie.sh` | Budgie |
 
 ## Usage

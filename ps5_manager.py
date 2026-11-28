@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.18"
+APP_VERSION = "0.15.19"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -106,8 +106,10 @@ if ! command -v steam >/dev/null 2>&1; then
   warn "Installe Steam depuis la Logitheque de PS5 Fedora Manager."
 fi
 mkdir -p /var/log/ps5-manager
-touch /var/log/ps5-manager/gaming-session.log 2>/dev/null || true
-chmod 666 /var/log/ps5-manager/gaming-session.log 2>/dev/null || true
+for lf in gaming-session.log session-switch.log; do
+  touch "/var/log/ps5-manager/$lf" 2>/dev/null || true
+  chmod 666 "/var/log/ps5-manager/$lf" 2>/dev/null || true
+done
 
 step "AccountsService : session __SESSION_LABEL__ pour $U"
 AS="/var/lib/AccountsService/users/$U"
@@ -173,6 +175,19 @@ if ! command -v steam >/dev/null 2>&1; then
   echo "steam introuvable : retour au bureau"
   switch_to desktop
   exit 1
+fi
+# Ecran noir : Gamescope n'a pas pu ouvrir la carte DRM. On note la carte et
+# les groupes de l'utilisateur dans le journal (video et render demandent une
+# reconnexion complete apres usermod).
+DRM_OK=""
+for d in /dev/dri/card*; do
+  if [ -r "$d" ]; then DRM_OK="$d"; break; fi
+done
+if [ -z "$DRM_OK" ]; then
+  echo "aucun /dev/dri/card* lisible par $(id -un) (groupes : $(id -nG))"
+  echo "ajoute l'utilisateur aux groupes video et render puis redemarre"
+else
+  echo "carte DRM : $DRM_OK (groupes : $(id -nG))"
 fi
 
 # Pas de composition imbriquee : Gamescope doit piloter directement le DRM.
@@ -290,7 +305,29 @@ shift
 [ "$(id -u)" -eq 0 ] || { echo "root requis" >&2; exit 1; }
 [ -n "$USER_ID" ] || { echo "utilisateur inconnu : $U" >&2; exit 1; }
 
-DESKTOP_SESSION="__SESSION__"
+LOG="/var/log/ps5-manager/session-switch.log"
+log_msg() { printf '%s %s\n' "$(date '+%F %T')" "$*" >>"$LOG" 2>/dev/null || true; }
+
+# Certains bureaux changent de nom (ou de type) de session selon la version :
+# Budgie 10.10 est passe de X11/LightDM a Wayland/SDDM en Fedora 44. Un
+# Session= absent de /usr/share/{wayland-,x}sessions laisse la console sur
+# l'ecran de connexion : le nom est donc resolu ici, a l'execution.
+session_installed() {
+  [ -f "/usr/share/xsessions/$1.desktop" ] || \
+    [ -f "/usr/share/wayland-sessions/$1.desktop" ]
+}
+resolve_desktop_session() {
+  local c saved
+  for c in __SESSION_CANDIDATES__; do
+    if session_installed "$c"; then printf '%s\n' "$c"; return 0; fi
+  done
+  saved=$(sed -n 's/^Session=//p' "/var/lib/AccountsService/users/$U" 2>/dev/null | head -n 1)
+  if [ -n "$saved" ] && [ "$saved" != "steam" ] && session_installed "$saved"; then
+    printf '%s\n' "$saved"; return 0
+  fi
+  return 1
+}
+DESKTOP_SESSION="$(resolve_desktop_session)" || DESKTOP_SESSION=""
 TARGET="${1:-}"
 
 # Gestionnaire de connexion reellement utilise par systemd
@@ -309,14 +346,27 @@ CURRENT=$(busctl get-property org.freedesktop.Accounts \
   /org/freedesktop/Accounts/User"$USER_ID" \
   org.freedesktop.Accounts.User Session 2>/dev/null | awk -F'"' '{print $2}')
 
-case "$TARGET" in
-  desktop|"$DESKTOP_SESSION") TARGET="$DESKTOP_SESSION" ;;
-  steam|gamescope|game|gaming) TARGET="steam" ;;
-  "")
-    if [ "$CURRENT" = "steam" ]; then TARGET="$DESKTOP_SESSION"; else TARGET="steam"; fi
-    ;;
-  *) echo "session inconnue : $TARGET" >&2; exit 2 ;;
-esac
+if [ "$TARGET" = "desktop" ] || \
+   { [ -n "$DESKTOP_SESSION" ] && [ "$TARGET" = "$DESKTOP_SESSION" ]; }; then
+  TARGET="desktop"
+elif [ "$TARGET" = "steam" ] || [ "$TARGET" = "gamescope" ] || \
+     [ "$TARGET" = "game" ] || [ "$TARGET" = "gaming" ]; then
+  TARGET="steam"
+elif [ -z "$TARGET" ]; then
+  if [ "$CURRENT" = "steam" ]; then TARGET="desktop"; else TARGET="steam"; fi
+else
+  echo "session inconnue : $TARGET" >&2; exit 2
+fi
+
+if [ "$TARGET" = "desktop" ]; then
+  if [ -z "$DESKTOP_SESSION" ]; then
+    log_msg "session de bureau introuvable (__SESSION_LABEL__) : bascule annulee"
+    echo "session de bureau introuvable (__SESSION_LABEL__) : rien n'a ete modifie" >&2
+    exit 3
+  fi
+  TARGET="$DESKTOP_SESSION"
+fi
+log_msg "bascule : ${1:-auto} -> $TARGET (actuelle : ${CURRENT:-?}, bureau : ${DESKTOP_SESSION:-?}, gestionnaire : $DM)"
 
 # 1. AccountsService : session que le gestionnaire de connexion doit demarrer
 busctl call org.freedesktop.Accounts /org/freedesktop/Accounts/User"$USER_ID" \
@@ -570,6 +620,7 @@ def _gaming_script(kind: str) -> str:
         text.replace("__USER__", REAL_USER)
         .replace("__HOME__", REAL_HOME or f"/home/{REAL_USER}")
         .replace("__DESK_NAME__", desk_name)
+        .replace("__SESSION_CANDIDATES__", " ".join(desktop_session_candidates()))
         .replace("__SESSION_LABEL__", DESKTOP_LABEL)
         .replace("__SESSION__", DESKTOP_SESSION)
         .replace("__DM_SERVICE__", DM_SERVICE)
@@ -1123,16 +1174,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.15.18",
-    "en": "What is new in 0.15.18",
-    "es": "Novedades de la 0.15.18",
-    "it": "Novità della 0.15.18",
-    "de": "Neu in 0.15.18",
-    "pt": "Novidades da 0.15.18",
+    "fr": "Nouveautés de la 0.15.19",
+    "en": "What is new in 0.15.19",
+    "es": "Novedades de la 0.15.19",
+    "it": "Novità della 0.15.19",
+    "de": "Neu in 0.15.19",
+    "pt": "Novidades da 0.15.19",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15.19 : le mode Gaming (Gamescope) refonctionne sous Budgie — la session du bureau est résolue à l'exécution (Budgie 10.10 est passé en Wayland sous SDDM), un `Session=` inconnu ne laisse plus la console sur l'écran de connexion et le journal note la carte DRM, les groupes de l'utilisateur et la bascule",
         "0.15.18 : « Bon à savoir » d'Add Fedora Feature se range dans une sous-page, l'accueil n'affiche plus deux fois le numéro de build et « Relancer Steam » rejoint le sous-menu de Steam de la logithèque",
         "0.15.17 : nouvelle page d'accueil « PS5 Fedora Manager » — logos PlayStation et Fedora, version stable installée, et accès rapide à la mise à jour du manager, à la langue de l'interface et au journal, qui s'ouvrent en sous-page avec un bouton retour",
         "0.15.14 : la bêta s'ouvre enfin — plus de sous-classe des widgets Adwaita déclarés finaux (Adw.SwitchRow, Adw.PreferencesPage) que PyGObject 3.54 refuse, et autorisation X11 de l'utilisateur par `xhost +SI:localuser` pour que GTK ne s'arrête plus sur « Authorization required »",
@@ -1169,6 +1221,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15.19: Gaming Mode (Gamescope) works under Budgie again — the desktop session is resolved at runtime (Budgie 10.10 moved to Wayland under SDDM), an unknown `Session=` no longer leaves the console on the login screen, and the log records the DRM device, the user's groups and the switch",
         "0.15.18: “Good to know” in Add Fedora Feature moves into a sub-page, the home page no longer shows the build number twice and “Restart Steam” joins Steam's sub-menu in the library",
         "0.15.17: new “PS5 Fedora Manager” home page — PlayStation and Fedora logos, the installed stable version, and quick access to manager updates, interface language and the log, each opening as a sub-page with a back button",
         "0.15.14: the beta finally opens — no more subclassing of Adwaita widgets declared final (Adw.SwitchRow, Adw.PreferencesPage), which PyGObject 3.54 rejects, and X11 access granted to the user through `xhost +SI:localuser` so GTK no longer stops on “Authorization required”",
@@ -1205,6 +1258,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15.19: el modo Gaming (Gamescope) vuelve a funcionar en Budgie — la sesión del escritorio se resuelve en ejecución (Budgie 10.10 pasó a Wayland bajo SDDM), un `Session=` desconocido ya no deja la consola en la pantalla de inicio de sesión y el registro anota la tarjeta DRM, los grupos del usuario y el cambio de sesión",
         "0.15.18: «Good to know» de Add Fedora Feature pasa a una subpágina, la página de inicio ya no muestra dos veces el número de compilación y «Restart Steam» se une al submenú de Steam de la biblioteca",
         "0.15.17: nueva página de inicio «PS5 Fedora Manager» — logotipos de PlayStation y Fedora, versión estable instalada y acceso rápido a la actualización del gestor, al idioma de la interfaz y al registro, que se abren como subpágina con botón de volver",
         "0.15.14 : la beta ya se abre — sin subclases de widgets Adwaita declarados finales (Adw.SwitchRow, Adw.PreferencesPage), que PyGObject 3.54 rechaza, y con acceso X11 del usuario mediante `xhost +SI:localuser` para que GTK no se detenga en «Authorization required»",
@@ -1241,6 +1295,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15.19: la modalità Gaming (Gamescope) torna a funzionare su Budgie — la sessione del desktop viene risolta all'esecuzione (Budgie 10.10 è passato a Wayland sotto SDDM), un `Session=` sconosciuto non lascia più la console sulla schermata di accesso e il log annota la scheda DRM, i gruppi dell'utente e il cambio di sessione",
         "0.15.18: «Good to know» di Add Fedora Feature passa in una sottopagina, la pagina iniziale non mostra più due volte il numero di build e «Restart Steam» entra nel sottomenu di Steam della libreria",
         "0.15.17: nuova pagina iniziale «PS5 Fedora Manager» — loghi PlayStation e Fedora, versione stabile installata e accesso rapido all'aggiornamento del gestore, alla lingua dell'interfaccia e al registro, che si aprono come sottopagina con pulsante indietro",
         "0.15.14 : la beta finalmente si apre — niente più sottoclassi di widget Adwaita dichiarati finali (Adw.SwitchRow, Adw.PreferencesPage), che PyGObject 3.54 rifiuta, e accesso X11 dell'utente tramite `xhost +SI:localuser` così GTK non si ferma più su «Authorization required»",
@@ -1277,6 +1332,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15.19: Der Gaming-Modus (Gamescope) funktioniert unter Budgie wieder — die Desktop-Sitzung wird zur Laufzeit ermittelt (Budgie 10.10 ist auf Wayland unter SDDM umgestiegen), ein unbekanntes `Session=` lässt die Konsole nicht mehr am Anmeldebildschirm hängen und das Protokoll notiert DRM-Gerät, Benutzergruppen und Umschaltung",
         "0.15.18: „Good to know“ in Add Fedora Feature wandert in eine Unterseite, die Startseite zeigt die Build-Nummer nicht mehr doppelt und „Restart Steam“ steht im Steam-Untermenü der Bibliothek",
         "0.15.17: neue Startseite „PS5 Fedora Manager“ – PlayStation- und Fedora-Logos, installierte stabile Version und Schnellzugriff auf Manager-Update, Oberflächensprache und Protokoll, die als Unterseite mit Zurück-Schaltfläche öffnen",
         "0.15.14 : die Beta öffnet sich endlich – keine Unterklassen von als final deklarierten Adwaita-Widgets mehr (Adw.SwitchRow, Adw.PreferencesPage), die PyGObject 3.54 ablehnt, und X11-Zugriff für den Benutzer über `xhost +SI:localuser`, damit GTK nicht mehr an „Authorization required“ scheitert",
@@ -1313,6 +1369,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15.19: o modo Gaming (Gamescope) volta a funcionar no Budgie — a sessão do ambiente é resolvida em execução (o Budgie 10.10 passou a Wayland sob SDDM), um `Session=` desconhecido já não deixa a consola no ecrã de início de sessão e o registo anota a placa DRM, os grupos do utilizador e a mudança de sessão",
         "0.15.18: «Good to know» do Add Fedora Feature passa para uma subpágina, a página inicial já não mostra duas vezes o número de compilação e «Restart Steam» junta-se ao submenu do Steam da biblioteca",
         "0.15.17: nova página inicial «PS5 Fedora Manager» — logótipos PlayStation e Fedora, versão estável instalada e acesso rápido à atualização do gestor, ao idioma da interface e ao registo, que abrem como subpágina com botão de voltar",
         "0.15.14 : a beta abre finalmente — sem subclasses de widgets Adwaita declarados finais (Adw.SwitchRow, Adw.PreferencesPage), que o PyGObject 3.54 recusa, e com acesso X11 do utilizador via `xhost +SI:localuser` para o GTK deixar de parar em «Authorization required»",
@@ -1398,6 +1455,26 @@ DESKTOP_SESSIONS = {
     "budgie": "budgie-desktop",
     "unknown": "gnome",
 }
+# Noms de session réellement installés, par ordre de préférence, dans
+# /usr/share/wayland-sessions puis /usr/share/xsessions. Budgie 10.10 est
+# passé en Wayland sous SDDM (Fedora 44) et chaque distribution nomme la
+# session différemment : un Session= inconnu laisse le gestionnaire de
+# connexion sur sa session par défaut, donc la console ne revient plus au
+# bureau après le mode Gaming.
+DESKTOP_SESSION_CANDIDATES = {
+    "gnome": ("gnome", "gnome-xorg", "ubuntu"),
+    "kde": ("plasma", "plasmawayland"),
+    "cinnamon": ("cinnamon", "cinnamon2d"),
+    "budgie": (
+        "budgie-desktop",
+        "budgie",
+        "budgie-wayland",
+        "ubuntu-budgie-desktop",
+    ),
+    "unknown": ("gnome", "gnome-xorg"),
+}
+# Dossiers de sessions lus par les gestionnaires de connexion
+SESSION_DIRS = ("/usr/share/wayland-sessions", "/usr/share/xsessions")
 DESKTOP_NAMES = {
     "gdm": "GDM",
     "sddm": "SDDM",
@@ -1544,9 +1621,45 @@ def _accounts_service_session() -> str:
     return ""
 
 
+def desktop_session_candidates() -> tuple[str, ...]:
+    """Noms de session possibles pour le bureau détecté."""
+    return DESKTOP_SESSION_CANDIDATES.get(
+        DESKTOP_ID, DESKTOP_SESSION_CANDIDATES["unknown"]
+    )
+
+
+def _session_installed(name: str) -> bool:
+    """Le fichier de session `name`.desktop existe-t-il ?"""
+    return bool(name) and any(
+        os.path.isfile(os.path.join(folder, f"{name}.desktop"))
+        for folder in SESSION_DIRS
+    )
+
+
+def resolve_desktop_session() -> str:
+    """Session du bureau réellement installée (budgie-desktop, plasma…).
+
+    Le nom écrit dans AccountsService et dans l'auto-connexion doit désigner
+    un fichier présent dans /usr/share/wayland-sessions ou
+    /usr/share/xsessions : sinon le gestionnaire de connexion démarre sa
+    session par défaut et le retour au bureau après le mode Gaming échoue.
+    Budgie 10.10 (Fedora 44) a changé de nom et de type de session (X11/LightDM
+    → Wayland/SDDM), d'où la résolution à l'exécution.
+    """
+    candidates = desktop_session_candidates()
+    for name in candidates:
+        if _session_installed(name):
+            return name
+    # Session déjà enregistrée par AccountsService (installation d'origine)
+    saved = _accounts_service_session()
+    if _session_installed(saved):
+        return saved
+    return candidates[0]
+
+
 DESKTOP_ID = detect_desktop()
 DESKTOP_LABEL = DESKTOP_LABELS.get(DESKTOP_ID, "?")
-DESKTOP_SESSION = _accounts_service_session() or DESKTOP_SESSIONS.get(DESKTOP_ID, "gnome")
+DESKTOP_SESSION = resolve_desktop_session()
 DISPLAY_MANAGER = detect_display_manager()
 DISPLAY_MANAGER_LABEL = DESKTOP_NAMES.get(DISPLAY_MANAGER, DISPLAY_MANAGER)
 DM_SERVICE = f"{DISPLAY_MANAGER}.service"
@@ -10903,6 +11016,7 @@ def build_page_gaming(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
 
     def _show_session_log(*_args: Any) -> None:
         paths = ["/var/log/ps5-manager/gaming-session.log"]
+        paths.append("/var/log/ps5-manager/session-switch.log")
         if REAL_HOME:
             paths.append(
                 os.path.join(REAL_HOME, ".cache/ps5-manager/gaming-session.log")

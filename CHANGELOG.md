@@ -6,6 +6,33 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.19] — 2026-11-28
+
+### Corrigé
+- **Mode Gaming (Gamescope) sous Budgie** : Budgie 10.10 (Fedora 44) est
+  passé de X11/LightDM à Wayland/SDDM et le nom de session écrit dans
+  AccountsService et dans l'auto-connexion n'était plus forcément installé.
+  Le gestionnaire de connexion retombait alors sur sa session par défaut : la
+  console restait sur l'écran de connexion au lieu de revenir au bureau, et le
+  mode Gaming semblait ne pas fonctionner.
+  - La session du bureau est désormais **résolue à l'exécution** dans
+    `/usr/share/wayland-sessions` puis `/usr/share/xsessions`, avec les noms
+    connus de chaque bureau (`budgie-desktop`, `budgie`, `budgie-wayland`,
+    `ubuntu-budgie-desktop` pour Budgie).
+  - « Basculer Session » employait le nom figé au moment de l'installation ;
+    il le revérifie à chaque bascule et **refuse la bascule** (message clair,
+    code 3) plutôt que d'écrire une session inexistante.
+  - Une session enregistrée par une ancienne installation (par exemple
+    `gnome` sur une machine passée à Budgie) ne prime plus sur le bureau
+    détecté.
+
+### Ajouté
+- **Journal de bascule de session** : `/var/log/ps5-manager/session-switch.log`
+  note chaque demande (session visée, session courante, bureau et gestionnaire
+  de connexion) ; il s'affiche avec le journal de session depuis Gaming Mode.
+- **Diagnostic de l'écran noir** : le journal de session indique la carte DRM
+  ouverte et les groupes de l'utilisateur (`video`, `render`).
+
 ## [0.15.18] — 2026-11-27
 
 ### Modifié

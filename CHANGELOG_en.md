@@ -7,6 +7,32 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.19] — 2026-11-28
+
+### Fixed
+- **Gaming Mode (Gamescope) under Budgie**: Budgie 10.10 (Fedora 44) moved
+  from X11/LightDM to Wayland/SDDM, and the session name written to
+  AccountsService and to the autologin config was no longer necessarily
+  installed. The display manager then fell back to its default session: the
+  console stayed on the login screen instead of returning to the desktop, and
+  Gaming Mode appeared to be broken.
+  - The desktop session is now **resolved at runtime** in
+    `/usr/share/wayland-sessions` then `/usr/share/xsessions`, using the names
+    each desktop is known by (`budgie-desktop`, `budgie`, `budgie-wayland`,
+    `ubuntu-budgie-desktop` for Budgie).
+  - “Switch Session” used the name frozen at install time; it now re-checks it
+    on every switch and **refuses the switch** (clear message, exit code 3)
+    instead of writing a session that does not exist.
+  - A session recorded by an earlier installation (for instance `gnome` on a
+    machine switched to Budgie) no longer overrides the detected desktop.
+
+### Added
+- **Session switch log**: `/var/log/ps5-manager/session-switch.log` records
+  every request (target session, current session, desktop and display
+  manager); it is shown next to the session log from Gaming Mode.
+- **Black screen diagnostics**: the session log now reports the opened DRM
+  device and the user's groups (`video`, `render`).
+
 ## [0.15.18] — 2026-11-27
 
 ### Changed
