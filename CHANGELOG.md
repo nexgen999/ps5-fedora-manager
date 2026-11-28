@@ -6,6 +6,35 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.23] — 2026-11-28
+
+### Ajouté
+- **Mode Gaming sous KDE Plasma (Fedora 45)** : la session Gaming installe et
+  utilise Steam en **paquet rpm** (RPM Fusion nonfree, version alignée sur
+  `rpm -E %fedora`), au lieu de dépendre du seul Flatpak.
+  - `steam` et `steam-devices` sont installés par le script quand le paquet est
+    absent, RPM Fusion étant activé au préalable si nécessaire ; le Flatpak
+    reste le repli quand l'installation échoue.
+  - L'auto-connexion SDDM et la session `plasma` étaient déjà résolues à
+    l'exécution : rien d'autre ne change pour Plasma.
+- **Compatibilité pilote du HDR/DTM (tone mapping)** : Gamescope n'active
+  `--hdr-enabled` (DTM, plus `--hdr-itm-enabled` pour le contenu SDR) que si
+  - le pilote est **amdgpu/RADV** — NVIDIA et Intel restent en SDR ;
+  - l'écran annonce le HDR dans son **EDID** (bloc CTA-861, tag étendu `0x06`) ;
+  - la sortie n'est pas en 4K/60, où le 10 bits dépasse la bande passante.
+
+  Sinon la session note la raison et sort en SDR 8 bits.
+  `PS5_GAMING_HDR=1` force le HDR, `PS5_GAMING_HDR=0` le désactive.
+- **Logithèque, GNOME uniquement** : nouvelle option **« Bypass script
+  compatibility »**, un interrupteur qui applique
+  `gsettings set org.gnome.shell disable-extension-version-validation true`
+  (ou `false`) dans la session de l'utilisateur réel. Le groupe n'apparaît que
+  sous GNOME, comme l'Extension Manager.
+
+### Modifié
+- `gaming-session.log` note le pilote, la version de Mesa, la sortie et le mode
+  détectés, puis `HDR/DTM : actif …` ou `HDR/DTM : inactif (raison)`.
+
 ## [0.15.22] — 2026-11-28
 
 ### Corrigé

@@ -65,6 +65,38 @@ Un Flatpak a besoin d'un **bus de session D-Bus** : sur un TTY, logind crée
 `dbus-run-session` s'il n'existe pas), et journalise le bus retenu ainsi que la
 ligne de commande complète de Gamescope.
 
+## KDE Plasma (Fedora 45) et Steam en RPM
+
+Sous KDE Plasma, la session Gaming utilise le **paquet rpm** `steam` (RPM
+Fusion nonfree). Le script d'installation l'installe quand la commande manque :
+RPM Fusion est activé pour la version courante de Fedora (`rpm -E %fedora`, 45
+incluse), puis `steam` et `steam-devices` sont installés ; le Flatpak ne sert
+que de repli si l'installation échoue. L'auto-connexion SDDM
+(`/etc/sddm.conf.d/zz-ps5-manager-autologin.conf`) et le nom de session
+(`plasma`) sont résolus à l'exécution, donc la bascule et le retour au bureau
+fonctionnent sans réglage supplémentaire.
+
+## HDR / DTM et compatibilité des pilotes
+
+Gamescope n'active le HDR — et son tone mapping dynamique (DTM) — que si les
+trois conditions sont réunies :
+
+| Condition | Trace dans le journal |
+|---|---|
+| pilote **amdgpu/RADV** (NVIDIA et Intel restent en SDR) | `pilote : amd, Mesa 25.x, sortie DP-1 2560x1440` |
+| écran annonçant le HDR dans son **EDID** (bloc CTA-861, tag étendu `0x06`) | idem |
+| sortie non 4K/60 (le 10 bits n'a pas la bande passante du lien) | idem |
+
+La session ajoute alors `--hdr-enabled --hdr-itm-enabled` et écrit
+`HDR/DTM : actif (…)` ; sinon elle écrit
+`HDR/DTM : inactif (<raison>) : sortie SDR 8 bits` et lance Gamescope en 8 bits.
+Pour forcer ou couper le HDR : `PS5_GAMING_HDR=1` ou `PS5_GAMING_HDR=0` dans
+l'environnement de la session.
+
+Le HDR du bureau KDE (Configuration du système > Affichage) n'est pas transmis à
+Gamescope : la session repart de l'EDID. Si l'image reste délavée en HDR,
+relancer avec `PS5_GAMING_HDR=0`.
+
 ## Utilisation au quotidien
 
 ```bash
@@ -127,6 +159,9 @@ cas s'est produit — `steam introuvable`, `aucun /dev/dri/card* lisible` ou
 | La session Gaming revient aussitôt au bureau | `gaming-session.log` : `steam introuvable` (Steam Flatpak), `aucun /dev/dri/card* lisible` (groupes `video`/`render`), `Primary child shut down` (bus D-Bus absent) ou `gamescope termine (code N)` |
 | Écran noir puis « affichage impossible » | HDR activé par Steam en 4K60 : l'enchaînement `HDR output enabled` / `Failed to prepare 1-layer flip` montre que le lien n'a pas la bande passante du 10 bits. Dans Steam : *Paramètres > Affichage* → désactiver HDR, puis relancer le mode Gaming |
 | Steam Flatpak se referme aussitôt | le bac à sable exige un bus D-Bus de session : la session exporte `unix:path=/run/user/<uid>/bus` (ou se replie sur `dbus-run-session`) ; vérifier la ligne `bus de session` dans le journal |
+| `HDR/DTM : inactif` alors que l'écran est HDR | la session n'active le HDR que sur amdgpu, avec un EDID HDR et hors 4K/60 : vérifier `pilote :` et la raison entre parenthèses ; `PS5_GAMING_HDR=1` force l'essai |
+| Image délavée ou blanche en HDR | le tone mapping ne correspond pas à l'écran : relancer avec `PS5_GAMING_HDR=0` (SDR) et laisser HDR désactivé dans Steam |
+| Steam rpm absent sous KDE Plasma | relancer l'installation du mode Gaming (RPM Fusion + `steam`) ou installer Steam depuis la Logithèque, puis vérifier `Steam rpm : …` dans le journal |
 | `switch-session` demande un mot de passe | règle polkit absente : relancer le script d'installation |
 | Steam ne démarre pas en Big Picture | lancer `steam -gamepadui` en terminal pour voir l'erreur |
 | Deux sessions « Gaming » | ancien script d'un autre bureau : lancer le script `uninstall` correspondant |

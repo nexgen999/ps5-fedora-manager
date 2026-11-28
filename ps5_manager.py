@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.22"
+APP_VERSION = "0.15.23"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -101,6 +101,9 @@ for g in video render; do
     usermod -aG "$g" "$U" >/dev/null 2>&1 || warn "ajout au groupe $g impossible"
   fi
 done
+
+__STEAM_RPM_BLOCK__
+
 if ! command -v steam >/dev/null 2>&1 && ! { command -v flatpak >/dev/null 2>&1 && flatpak info com.valvesoftware.Steam >/dev/null 2>&1; }; then
   warn "Steam n'est pas installe (ni paquet rpm, ni Flatpak com.valvesoftware.Steam)."
   warn "Installe Steam depuis la Logitheque de PS5 Fedora Manager."
@@ -171,8 +174,9 @@ if ! command -v gamescope >/dev/null 2>&1; then
   switch_to desktop
   exit 1
 fi
-# Steam : paquet rpm s'il existe, sinon le Flatpak (sous Budgie, seul le
-# Flatpak s'installe). La commande complete sert au lancement dans Gamescope
+# Steam : paquet rpm s'il existe (KDE Plasma et Fedora 45, installe par le
+# script d'installation), sinon le Flatpak (sous Budgie, seul le Flatpak
+# s'installe). La commande complete sert au lancement dans Gamescope
 # et a la fermeture demandee par Steam via steamos-session-select.
 STEAM_CMD=()
 if command -v steam >/dev/null 2>&1; then
@@ -221,6 +225,81 @@ if [ -n "${DBUS_SESSION_BUS_ADDRESS:-}" ]; then
   echo "bus de session : $DBUS_SESSION_BUS_ADDRESS"
 fi
 
+# --- Pilote graphique : DRM/KMS et HDR/DTM (tone mapping) ---
+# Le HDR de Gamescope passe par la metadata HDR10 du pilote KMS. Chez Fedora
+# 45, seul amdgpu/RADV l'expose de facon fiable : NVIDIA et Intel restent en
+# SDR. Le DTM (tone mapping dynamique) vient de --hdr-enabled, et le tone
+# mapping inverse du contenu SDR de --hdr-itm-enabled.
+GPU=""
+for vf in /sys/class/drm/card[0-9]*/device/vendor; do
+  case "$(cat "$vf" 2>/dev/null || true)" in
+    0x1002) GPU="amd" ;;
+    0x10de) GPU="nvidia" ;;
+    0x8086) GPU="intel" ;;
+    *) continue ;;
+  esac
+  break
+done
+[ -n "$GPU" ] || GPU="inconnu"
+MESA="$(rpm -q --qf '%{VERSION}' mesa-dri-drivers 2>/dev/null | head -n 1 || true)"
+CONN=""
+MODE=""
+for p in /sys/class/drm/card[0-9]*-*/; do
+  [ "$(cat "${p}status" 2>/dev/null || true)" = "connected" ] || continue
+  CONN="${p%/}"
+  MODE="$(head -n 1 "${p}modes" 2>/dev/null || true)"
+  break
+done
+echo "pilote : $GPU, Mesa ${MESA:-?}${CONN:+, sortie ${CONN##*/} ${MODE:-?}}"
+
+# HDR annonce par l'ecran : bloc CTA-861 (tag etendu 0x06) dans l'EDID.
+HDR_EDID=""
+if [ -n "$CONN" ] && [ -r "$CONN/edid" ] && command -v python3 >/dev/null 2>&1; then
+  HDR_EDID="$(python3 - "$CONN/edid" <<'PY' 2>/dev/null || true
+import sys
+try:
+    data = open(sys.argv[1], "rb").read()
+except OSError:
+    sys.exit(0)
+off = 128
+while off + 4 <= len(data) and data[off] == 0x02:
+    end = min(off + data[off + 2], len(data))
+    i = off + 4
+    while i < end:
+        tag, length = data[i] >> 5, data[i] & 0x1F
+        if tag == 7 and length and i + 1 < len(data) and data[i + 1] == 0x06:
+            print("1")
+            sys.exit(0)
+        i += length + 1
+    off = end
+PY
+)"
+fi
+
+HDR_FLAGS=()
+HDR_REASON=""
+if [ "${PS5_GAMING_HDR:-}" = "0" ]; then
+  HDR_REASON="desactive par PS5_GAMING_HDR=0"
+elif ! gamescope --help 2>&1 | grep -q -- '--hdr-enabled'; then
+  HDR_REASON="ce Gamescope ne connait pas --hdr-enabled"
+elif [ "$GPU" != "amd" ] && [ "${PS5_GAMING_HDR:-}" != "1" ]; then
+  HDR_REASON="pilote $GPU : HDR/DTM fiable seulement avec amdgpu"
+elif [ "$HDR_EDID" != "1" ] && [ "${PS5_GAMING_HDR:-}" != "1" ]; then
+  HDR_REASON="l'ecran n'annonce pas de HDR dans son EDID"
+elif [ -n "$MODE" ] && [ "${MODE%x*}" -ge 3840 ] 2>/dev/null; then
+  HDR_REASON="$MODE en 10 bits : pas la bande passante du lien"
+else
+  HDR_FLAGS=(--hdr-enabled)
+  if gamescope --help 2>&1 | grep -qE -- '--hdr-itm-(enabled|enable)'; then
+    HDR_FLAGS+=(--hdr-itm-enabled)
+  fi
+fi
+if [ "${#HDR_FLAGS[@]}" -gt 0 ]; then
+  echo "HDR/DTM : actif (${HDR_FLAGS[*]}) — tone mapping Gamescope, pilote $GPU"
+else
+  echo "HDR/DTM : inactif (${HDR_REASON:-non disponible}) : sortie SDR 8 bits"
+fi
+
 # --mangoapp precharge MangoApp dans le processus lance par Gamescope : un
 # Flatpak filtre LD_PRELOAD, l'option n'aurait aucun effet (on la reserve au
 # paquet rpm).
@@ -229,6 +308,9 @@ if [ "${STEAM_CMD[0]}" = "steam" ] && command -v mangoapp >/dev/null 2>&1; then
   FLAGS=(--mangoapp)
 else
   echo "--mangoapp non utilise (Steam Flatpak ou mangoapp absent)"
+fi
+if [ "${#HDR_FLAGS[@]}" -gt 0 ]; then
+  FLAGS+=("${HDR_FLAGS[@]}")
 fi
 
 LAUNCH=(gamescope "${FLAGS[@]}" -e -- "${STEAM_CMD[@]}" -steamdeck -steamos3)
@@ -688,6 +770,47 @@ def _gaming_scaling_block() -> str:
     )
 
 
+def _gaming_steam_rpm_block() -> str:
+    """Installation de Steam en RPM pour la session Gaming (KDE Plasma).
+
+    Sous KDE Plasma (Fedora 45) la session utilise le paquet rpm : il vient de
+    RPM Fusion nonfree, dont la version doit correspondre a celle de Fedora.
+    Les autres bureaux gardent le comportement precedent (installation depuis
+    la Logitheque) et le repli Flatpak.
+    """
+    if DESKTOP_ID != "kde":
+        return (
+            "# Steam rpm : installer depuis la Logitheque (la session Gaming\n"
+            "# l'utilise en priorite quand il est present).\n"
+        )
+    return r"""step "Steam rpm (RPM Fusion) pour la session Gaming"
+if ! command -v steam >/dev/null 2>&1; then
+  FED="$(rpm -E %fedora 2>/dev/null || true)"
+  if [ -n "$FED" ]; then
+    if ! ls /etc/yum.repos.d/rpmfusion-nonfree*.repo >/dev/null 2>&1; then
+      dnf install -y \
+        "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$FED.noarch.rpm" \
+        "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$FED.noarch.rpm" \
+        >/dev/null 2>&1 || warn "activation de RPM Fusion impossible"
+    fi
+    dnf install -y steam >/dev/null 2>&1 \
+      || warn "installation de Steam rpm impossible : repli sur le Flatpak"
+    # steam-devices (regles udev des manettes) est optionnel : son absence ne
+    # doit pas faire echouer l'installation de Steam.
+    if command -v steam >/dev/null 2>&1; then
+      dnf install -y steam-devices >/dev/null 2>&1 || true
+    fi
+  fi
+  if ! command -v steam >/dev/null 2>&1; then
+    warn "Steam rpm absent : la session Gaming utilisera le Flatpak s'il est installe"
+  fi
+fi
+if command -v steam >/dev/null 2>&1; then
+  echo "Steam rpm : $(rpm -q --qf '%{VERSION}' steam 2>/dev/null | head -n 1)"
+fi
+"""
+
+
 def _gaming_script(kind: str) -> str:
     """Rend le script Gamescope demande pour l'utilisateur courant."""
     text = GAMING_INSTALL_SCRIPT if kind == "install" else GAMING_UNINSTALL_SCRIPT
@@ -704,6 +827,7 @@ def _gaming_script(kind: str) -> str:
         .replace("__GAMING_ICON_B64__", ICONS_B64.get("gamescope", ""))
         .replace("__AUTOLOGIN_BLOCK__", _gaming_autologin_block())
         .replace("__SCALING_BLOCK__", _gaming_scaling_block())
+        .replace("__STEAM_RPM_BLOCK__", _gaming_steam_rpm_block())
     )
 
 
@@ -1250,16 +1374,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.15.22",
-    "en": "What is new in 0.15.22",
-    "es": "Novedades de la 0.15.22",
-    "it": "Novità della 0.15.22",
-    "de": "Neu in 0.15.22",
-    "pt": "Novidades da 0.15.22",
+    "fr": "Nouveautés de la 0.15.23",
+    "en": "What is new in 0.15.23",
+    "es": "Novedades de la 0.15.23",
+    "it": "Novità della 0.15.23",
+    "de": "Neu in 0.15.23",
+    "pt": "Novidades da 0.15.23",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15.23 : la session Gaming passe sous KDE Plasma (Fedora 45) avec Steam en paquet rpm, et n'active le HDR/DTM que si le pilote amdgpu, l'écran (EDID) et la bande passante du lien le permettent ; la Logithèque gagne l'option GNOME « Bypass script compatibility »",
         "0.15.22 : session Gaming — un bus D-Bus est fourni à Steam Flatpak (il ne se referme plus aussitôt) et un écran noir HDR rend la main au bureau au lieu de bloquer",
         "0.15.21 : le mode Gaming lance Steam installé en Flatpak (cas de Budgie, où le paquet rpm ne s'installe pas) — la session ne renvoie plus au bureau avec « steam introuvable »",
         "0.15.20 : la fenêtre « Système » du menu burger s'ouvre à nouveau — une variable restée d'un copier-coller dans la construction de ses lignes la faisait échouer avant l'affichage",
@@ -1300,6 +1425,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15.23: the Gaming session works on KDE Plasma (Fedora 45) with Steam as an rpm package, and only enables HDR/DTM when the amdgpu driver, the display (EDID) and the link bandwidth allow it; the app store gains the GNOME-only “Bypass script compatibility” option",
         "0.15.22: Gaming session — Flatpak Steam now gets a D-Bus session bus (it no longer quits at once) and an HDR black screen hands control back to the desktop instead of hanging",
         "0.15.21: Gaming Mode launches Steam installed as a Flatpak (the Budgie case, where the rpm package does not install) — the session no longer drops back to the desktop with “steam introuvable”",
         "0.15.20: the “System” window of the hamburger menu opens again — a variable left over from a copy-paste in the way its rows are built made it fail before it could be shown",
@@ -1340,6 +1466,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15.23: la sesión Gaming funciona en KDE Plasma (Fedora 45) con Steam en paquete rpm y solo activa HDR/DTM si el controlador amdgpu, la pantalla (EDID) y el ancho de banda del enlace lo permiten; la tienda añade la opción «Bypass script compatibility» exclusiva de GNOME",
         "0.15.22: sesión Gaming — Steam Flatpak recibe un bus de sesión D-Bus (ya no se cierra de inmediato) y una pantalla negra HDR devuelve al escritorio en vez de quedarse bloqueada",
         "0.15.21: el modo Gaming lanza Steam instalado como Flatpak (el caso de Budgie, donde el paquete rpm no se instala) — la sesión ya no vuelve al escritorio con «steam introuvable»",
         "0.15.20: la ventana «Sistema» del menú se abre de nuevo — una variable que quedó de un copiar y pegar en la construcción de sus filas la hacía fallar antes de mostrarse",
@@ -1380,6 +1507,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15.23: la sessione Gaming funziona su KDE Plasma (Fedora 45) con Steam come pacchetto rpm e attiva HDR/DTM solo se il driver amdgpu, lo schermo (EDID) e la larghezza di banda del collegamento lo consentono; lo store aggiunge l'opzione «Bypass script compatibility» riservata a GNOME",
         "0.15.22: sessione Gaming — Steam Flatpak riceve un bus di sessione D-Bus (non si chiude più subito) e uno schermo nero HDR restituisce il desktop invece di bloccarsi",
         "0.15.21: la modalità Gaming avvia Steam installato come Flatpak (il caso di Budgie, dove il pacchetto rpm non si installa) — la sessione non torna più al desktop con «steam introuvable»",
         "0.15.20: la finestra «Sistema» del menu si apre di nuovo — una variabile rimasta da un copia e incolla nella costruzione delle sue righe la faceva fallire prima di essere mostrata",
@@ -1420,6 +1548,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15.23: Die Gaming-Sitzung läuft unter KDE Plasma (Fedora 45) mit Steam als rpm-Paket und schaltet HDR/DTM nur ein, wenn amdgpu-Treiber, Bildschirm (EDID) und Bandbreite der Verbindung es erlauben; der App-Store erhält die GNOME-Option „Bypass script compatibility“",
         "0.15.22: Gaming-Sitzung — Flatpak-Steam erhält einen D-Bus-Sitzungsbus (beendet sich nicht mehr sofort) und ein schwarzer HDR-Bildschirm gibt den Desktop zurück statt zu hängen",
         "0.15.21: Der Gaming-Modus startet Steam als Flatpak (der Budgie-Fall, in dem sich das rpm-Paket nicht installieren lässt) — die Sitzung fällt nicht mehr mit „steam introuvable“ zum Desktop zurück",
         "0.15.20: Das Fenster „System“ im Burger-Menü öffnet wieder — eine beim Kopieren übrig gebliebene Variable im Aufbau seiner Zeilen ließ es vor dem Anzeigen scheitern",
@@ -1460,6 +1589,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15.23: a sessão Gaming funciona no KDE Plasma (Fedora 45) com o Steam em pacote rpm e só ativa HDR/DTM se o driver amdgpu, o ecrã (EDID) e a largura de banda da ligação o permitirem; a loja ganha a opção «Bypass script compatibility» exclusiva do GNOME",
         "0.15.22: sessão Gaming — o Steam Flatpak passa a ter um bus de sessão D-Bus (já não fecha logo de imediato) e um ecrã negro HDR devolve o ambiente em vez de ficar bloqueado",
         "0.15.21: o modo Gaming lança o Steam instalado como Flatpak (o caso do Budgie, onde o pacote rpm não se instala) — a sessão já não volta ao ambiente com «steam introuvable»",
         "0.15.20: a janela «Sistema» do menu volta a abrir — uma variável deixada de um copiar e colar na construção das suas linhas fazia-a falhar antes de ser mostrada",
@@ -2496,6 +2626,9 @@ STRINGS = {
         # 12. Library
         "lib_title": "Logithèque PS5",
         "lib_sub": "Installer, mettre à jour, vérifier ou désinstaller les applications essentielles",
+        "lib_gnome_ext_sub": "Extension Manager : extensions GNOME Shell et validation des versions",
+        "lib_gnome_bypass": "Bypass script compatibility",
+        "lib_gnome_bypass_sub": "Autorise les extensions qui ne déclarent pas la version de GNOME Shell (org.gnome.shell disable-extension-version-validation)",
         "lib_cat_gaming": "Gaming",
         "lib_cat_gaming_sub": "Lanceurs de jeux, couches de compatibilité Proton et plugins Steam",
         "lib_cat_browser": "Navigateurs",
@@ -2955,6 +3088,9 @@ STRINGS = {
         # 12. Library
         "lib_title": "PS5 Software Library",
         "lib_sub": "Install, update, check or uninstall essential applications",
+        "lib_gnome_ext_sub": "Extension Manager: GNOME Shell extensions and version validation",
+        "lib_gnome_bypass": "Bypass script compatibility",
+        "lib_gnome_bypass_sub": "Allows extensions that do not declare the GNOME Shell version (org.gnome.shell disable-extension-version-validation)",
         "lib_cat_gaming": "Gaming",
         "lib_cat_gaming_sub": "Game launchers, Proton compatibility tools and Steam plugins",
         "lib_cat_browser": "Web Browsers",
@@ -3409,6 +3545,9 @@ STRINGS['es'] = {'app_title': 'PS5 Fedora Manager',
  'logs_none': 'Todavía no hay ningún registro guardado.',
  'lib_title': 'Tienda de aplicaciones PS5',
  'lib_sub': 'Instalar, actualizar, comprobar o desinstalar las aplicaciones esenciales',
+ 'lib_gnome_ext_sub': 'Extension Manager: extensiones de GNOME Shell y validación de versiones',
+ 'lib_gnome_bypass': 'Bypass script compatibility',
+ 'lib_gnome_bypass_sub': 'Permite las extensiones que no declaran la versión de GNOME Shell (org.gnome.shell disable-extension-version-validation)',
  'lib_cat_gaming': 'Gaming',
  'lib_cat_gaming_sub': 'Lanzadores de juegos, capas de compatibilidad Proton y plugins de '
                        'Steam',
@@ -3863,6 +4002,9 @@ STRINGS['it'] = {'app_title': 'PS5 Fedora Manager',
  'logs_none': 'Nessun registro salvato per ora.',
  'lib_title': 'App store PS5',
  'lib_sub': 'Installa, aggiorna, verifica o disinstalla le applicazioni essenziali',
+ 'lib_gnome_ext_sub': 'Extension Manager: estensioni di GNOME Shell e convalida delle versioni',
+ 'lib_gnome_bypass': 'Bypass script compatibility',
+ 'lib_gnome_bypass_sub': 'Consente le estensioni che non dichiarano la versione di GNOME Shell (org.gnome.shell disable-extension-version-validation)',
  'lib_cat_gaming': 'Gaming',
  'lib_cat_gaming_sub': 'Launcher di giochi, livelli di compatibilità Proton e plugin Steam',
  'lib_cat_browser': 'Browser',
@@ -4313,6 +4455,9 @@ STRINGS['de'] = {'app_title': 'PS5 Fedora Manager',
  'logs_none': 'Noch kein Protokoll gespeichert.',
  'lib_title': 'PS5-App-Store',
  'lib_sub': 'Wichtige Anwendungen installieren, aktualisieren, prüfen oder entfernen',
+ 'lib_gnome_ext_sub': 'Extension Manager: GNOME-Shell-Erweiterungen und Versionsprüfung',
+ 'lib_gnome_bypass': 'Bypass script compatibility',
+ 'lib_gnome_bypass_sub': 'Erlaubt Erweiterungen, die die GNOME-Shell-Version nicht angeben (org.gnome.shell disable-extension-version-validation)',
  'lib_cat_gaming': 'Gaming',
  'lib_cat_gaming_sub': 'Spiele-Launcher, Proton-Kompatibilitätsschichten und Steam-Plugins',
  'lib_cat_browser': 'Browser',
@@ -4763,6 +4908,9 @@ STRINGS['pt'] = {'app_title': 'PS5 Fedora Manager',
  'logs_none': 'Nenhum registro salvo por enquanto.',
  'lib_title': 'Loja de aplicativos PS5',
  'lib_sub': 'Instalar, atualizar, verificar ou desinstalar as aplicações essenciais',
+ 'lib_gnome_ext_sub': 'Extension Manager: extensões do GNOME Shell e validação de versões',
+ 'lib_gnome_bypass': 'Bypass script compatibility',
+ 'lib_gnome_bypass_sub': 'Permite as extensões que não declaram a versão do GNOME Shell (org.gnome.shell disable-extension-version-validation)',
  'lib_cat_gaming': 'Gaming',
  'lib_cat_gaming_sub': 'Lançadores de jogos, camadas de compatibilidade Proton e plugins do '
                        'Steam',
@@ -8957,6 +9105,47 @@ def _fill_software_status(
     threading.Thread(target=_worker, daemon=True).start()
 
 
+GNOME_BYPASS_SCHEMA = "org.gnome.shell"
+GNOME_BYPASS_KEY = "disable-extension-version-validation"
+
+
+def gnome_extension_validation_disabled() -> bool:
+    """Vrai si la validation de version des extensions GNOME est contournee.
+
+    La valeur est lue dans la session de l'utilisateur reel : l'application
+    tourne en root (pkexec) et ecrirait sinon dans le dconf de root.
+    """
+    try:
+        res = subprocess.run(
+            ["gsettings", "get", GNOME_BYPASS_SCHEMA, GNOME_BYPASS_KEY],
+            capture_output=True,
+            text=True,
+            timeout=3,
+            **user_subprocess_kwargs(),
+        )
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return res.stdout.strip().strip("'\"") == "true"
+
+
+def _set_gnome_extension_validation(
+    win: "Ps5ManagerWindow", switch: Any, enabled: bool
+) -> None:
+    """Applique org.gnome.shell disable-extension-version-validation."""
+    value = "true" if enabled else "false"
+
+    def _task(emit: Callable[[str], None]) -> tuple[bool, str]:
+        cmd = ["gsettings", "set", GNOME_BYPASS_SCHEMA, GNOME_BYPASS_KEY, value]
+        rc = win.run_cmd_pty(cmd, emit, as_user=True)
+        return rc == 0, T("done") if rc == 0 else T("failed") % rc
+
+    def _done(ok: bool, _msg: str) -> None:
+        if not ok and switch is not None:
+            switch.set_active(not enabled)
+
+    win.run_task(T("lib_gnome_bypass"), _task, on_done=_done)
+
+
 def build_page_library(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None:
     seen_categories: set[str] = set()
     pending: list[tuple[Adw.ActionRow, SoftwareItem, Gtk.Label]] = []
@@ -9001,6 +9190,38 @@ def build_page_library(win: Ps5ManagerWindow, page: Adw.PreferencesPage) -> None
         page.add(grp)
 
     _fill_software_status(win, pending)
+
+    # Option propre a GNOME : l'Extension Manager refuse les extensions qui ne
+    # declarent pas la version du Shell. La validation se contourne avec
+    # `org.gnome.shell disable-extension-version-validation` (cle dconf de
+    # l'utilisateur, pas de root). Le groupe n'apparait que sous GNOME.
+    if DESKTOP_ID == "gnome":
+        g_ext = pref_group(
+            title="GNOME Extension Manager", description=T("lib_gnome_ext_sub")
+        )
+        bypass = Gtk.Switch(valign=Gtk.Align.CENTER)
+        bypass.set_active(gnome_extension_validation_disabled())
+        bypass_row = plain_row(
+            Adw.ActionRow,
+            title=T("lib_gnome_bypass"),
+            subtitle=T("lib_gnome_bypass_sub"),
+        )
+        bypass_row.set_activatable(True)
+        bypass_row.add_prefix(
+            Gtk.Image.new_from_icon_name("application-x-addon-symbolic")
+        )
+        bypass_row.add_suffix(bypass)
+
+        def _toggle_bypass(*_args: Any) -> None:
+            bypass.set_active(not bypass.get_active())
+
+        def _apply_bypass(sw: Gtk.Switch, _pspec: Any) -> None:
+            _set_gnome_extension_validation(win, sw, sw.get_active())
+
+        bypass_row.connect("activated", _toggle_bypass)
+        bypass.connect("notify::active", _apply_bypass)
+        g_ext.add(bypass_row)
+        page.add(g_ext)
 
     g_ai = pref_group(title=T("sec_aidev"), description=T("aidev_open_sub"))
     g_ai.add(

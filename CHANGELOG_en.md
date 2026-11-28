@@ -7,6 +7,35 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.23] — 2026-11-28
+
+### Added
+- **Gaming mode on KDE Plasma (Fedora 45)**: the Gaming session installs and
+  uses Steam as an **rpm package** (RPM Fusion nonfree, release matching
+  `rpm -E %fedora`) instead of relying on the Flatpak alone.
+  - `steam` and `steam-devices` are installed by the script when the package is
+    missing, with RPM Fusion enabled first when needed; the Flatpak remains the
+    fallback when the installation fails.
+  - SDDM autologin and the `plasma` session were already resolved at runtime,
+    so nothing else changes for Plasma.
+- **Driver compatibility for HDR/DTM (tone mapping)**: Gamescope only enables
+  `--hdr-enabled` (DTM, plus `--hdr-itm-enabled` for SDR content) when
+  - the driver is **amdgpu/RADV** — NVIDIA and Intel stay on SDR;
+  - the display advertises HDR in its **EDID** (CTA-861 block, extended tag `0x06`);
+  - the output is not 4K/60, where 10-bit exceeds the link bandwidth.
+
+  Otherwise the session logs the reason and starts in 8-bit SDR.
+  `PS5_GAMING_HDR=1` forces HDR, `PS5_GAMING_HDR=0` disables it.
+- **App store, GNOME only**: new **“Bypass script compatibility”** option, a
+  switch that applies
+  `gsettings set org.gnome.shell disable-extension-version-validation true`
+  (or `false`) in the real user's session. The group is only shown on GNOME,
+  like the Extension Manager.
+
+### Changed
+- `gaming-session.log` now records the detected driver, Mesa version, output and
+  mode, then `HDR/DTM : actif …` or `HDR/DTM : inactif (raison)`.
+
 ## [0.15.22] — 2026-11-28
 
 ### Fixed

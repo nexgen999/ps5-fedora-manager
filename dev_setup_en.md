@@ -71,6 +71,7 @@ French version: [dev_setup.md](dev_setup.md)
 | --- | --- |
 | Bazaar | `flatpak install --system -y flathub io.github.kolunmi.Bazaar` |
 | GNOME Extension Manager (GNOME only, removed elsewhere) | `flatpak install --system -y flathub com.mattjakeman.ExtensionManager` |
+| Bypass script compatibility (GNOME only, in the app store) | `gsettings set org.gnome.shell disable-extension-version-validation true` (user) |
 | Steam | `dnf install -y steam` (RPM Fusion enabled beforehand) |
 | Heroic Games Launcher | `flatpak install --system -y flathub com.heroicgameslauncher.hgl` |
 | ProtonUp-Qt | `flatpak install --system -y flathub net.davidotek.pupgui2` |
@@ -131,6 +132,12 @@ Notes:
   `/etc/lightdm/lightdm.conf`. The restored session is the detected desktop
   (`gnome`, `plasma`, `cinnamon`, `budgie-desktop`) instead of a hard-coded
   “gnome”. The 1.5 scaling factor of the login screen is only applied on GDM.
+- **KDE Plasma and Steam rpm**: the Gaming section script installs Steam as an
+  rpm package (RPM Fusion nonfree, matching `rpm -E %fedora`) and the session
+  uses it first. Gamescope HDR/DTM is only enabled on amdgpu, with a display
+  advertising HDR in its EDID and outside 4K/60; otherwise the session starts in
+  SDR (`HDR/DTM : inactif (reason)` in `gaming-session.log`).
+  `PS5_GAMING_HDR=1` forces HDR, `PS5_GAMING_HDR=0` disables it.
 - **Gaming Mode**: the `steam` session
   (`/usr/share/wayland-sessions/steam.desktop`) runs `/usr/bin/gamescope-session`,
   which runs Gamescope and, once Steam closes, switches the console back to the
