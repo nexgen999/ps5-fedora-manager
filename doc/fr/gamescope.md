@@ -54,6 +54,11 @@ Le script résout le nom **réel** de la session du bureau au runtime (par exemp
 `budgie-desktop`, `budgie`, `ubuntu-budgie-desktop`), pour que le retour « desktop »
 fonctionne même si l'identifiant de session a changé.
 
+Steam peut être le paquet rpm (commande `steam`) **ou** le Flatpak
+`com.valvesoftware.Steam` — le cas de Budgie, où le rpm ne s'installe pas. La
+session Gaming choisit le lanceur disponible au démarrage ; `--mangoapp` n'est
+utilisé qu'avec le rpm, un Flatpak filtrant `LD_PRELOAD`.
+
 ## Utilisation au quotidien
 
 ```bash

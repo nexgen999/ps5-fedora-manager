@@ -7,6 +7,24 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.21] — 2026-11-28
+
+### Fixed
+- **Gaming Mode with Steam as a Flatpak**: under Budgie the `steam` rpm does
+  not install, only the `com.valvesoftware.Steam` Flatpak works.
+  `gamescope-session` only looked for the `steam` command and returned to the
+  desktop immediately (`steam introuvable : retour au bureau` in
+  `gaming-session.log`).
+  - The session now resolves the launcher: `steam` (rpm) otherwise
+    `flatpak run com.valvesoftware.Steam`, and runs
+    `gamescope -e -- <launcher> -steamdeck -steamos3`.
+  - `steamos-session-select` shuts Steam down the same way
+    (`steam -shutdown` or `flatpak run com.valvesoftware.Steam -shutdown`).
+  - `--mangoapp` is kept for the rpm package only: a Flatpak filters
+    `LD_PRELOAD`, so the option had no effect.
+  - The install no longer warns that Steam is missing when the Flatpak is
+    present.
+
 ## [0.15.20] — 2026-11-28
 
 ### Fixed

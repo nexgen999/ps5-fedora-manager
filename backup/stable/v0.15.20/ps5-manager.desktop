@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=PS5 Fedora Manager
+Comment=Gestionnaire système, matériel et logiciels pour PS5 Linux (GTK4 / Libadwaita)
+Exec=/usr/local/bin/ps5-manager
+Icon=/usr/share/pixmaps/ps5-manager.png
+Terminal=false
+Type=Application
+Categories=System;Settings;
+Keywords=PS5;Fedora;Manager;Fan;Kernel;GTK4;Adwaita;
+StartupNotify=true

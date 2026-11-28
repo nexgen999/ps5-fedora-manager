@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.20"
+APP_VERSION = "0.15.21"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -101,8 +101,8 @@ for g in video render; do
     usermod -aG "$g" "$U" >/dev/null 2>&1 || warn "ajout au groupe $g impossible"
   fi
 done
-if ! command -v steam >/dev/null 2>&1; then
-  warn "Steam n'est pas installe : le mode Gaming restera sur un ecran noir."
+if ! command -v steam >/dev/null 2>&1 && ! { command -v flatpak >/dev/null 2>&1 && flatpak info com.valvesoftware.Steam >/dev/null 2>&1; }; then
+  warn "Steam n'est pas installe (ni paquet rpm, ni Flatpak com.valvesoftware.Steam)."
   warn "Installe Steam depuis la Logitheque de PS5 Fedora Manager."
 fi
 mkdir -p /var/log/ps5-manager
@@ -171,11 +171,21 @@ if ! command -v gamescope >/dev/null 2>&1; then
   switch_to desktop
   exit 1
 fi
-if ! command -v steam >/dev/null 2>&1; then
-  echo "steam introuvable : retour au bureau"
+# Steam : paquet rpm s'il existe, sinon le Flatpak (sous Budgie, seul le
+# Flatpak s'installe). La commande complete sert au lancement dans Gamescope
+# et a la fermeture demandee par Steam via steamos-session-select.
+STEAM_CMD=()
+if command -v steam >/dev/null 2>&1; then
+  STEAM_CMD=(steam)
+elif command -v flatpak >/dev/null 2>&1 && \
+     flatpak info com.valvesoftware.Steam >/dev/null 2>&1; then
+  STEAM_CMD=(flatpak run com.valvesoftware.Steam)
+else
+  echo "steam introuvable (ni paquet rpm, ni Flatpak com.valvesoftware.Steam) : retour au bureau"
   switch_to desktop
   exit 1
 fi
+echo "Steam : ${STEAM_CMD[*]}"
 # Ecran noir : Gamescope n'a pas pu ouvrir la carte DRM. On note la carte et
 # les groupes de l'utilisateur dans le journal (video et render demandent une
 # reconnexion complete apres usermod).
@@ -196,14 +206,17 @@ export XDG_SESSION_TYPE=wayland
 export GAMESCOPE_MODE_SAVE_FILE="$HOME/.config/gamescope/modes.cfg"
 mkdir -p "$HOME/.config/gamescope" 2>/dev/null || true
 
+# --mangoapp precharge MangoApp dans le processus lance par Gamescope : un
+# Flatpak filtre LD_PRELOAD, l'option n'aurait aucun effet (on la reserve au
+# paquet rpm).
 FLAGS=()
-if command -v mangoapp >/dev/null 2>&1; then
+if [ "${STEAM_CMD[0]}" = "steam" ] && command -v mangoapp >/dev/null 2>&1; then
   FLAGS=(--mangoapp)
 else
-  echo "mangoapp absent : lancement sans --mangoapp"
+  echo "--mangoapp non utilise (Steam Flatpak ou mangoapp absent)"
 fi
 
-gamescope "${FLAGS[@]}" -e -- steam -steamdeck -steamos3
+gamescope "${FLAGS[@]}" -e -- "${STEAM_CMD[@]}" -steamdeck -steamos3
 RC=$?
 echo "gamescope termine (code $RC)"
 
@@ -234,6 +247,9 @@ case "${1:-desktop}" in
 esac
 if command -v steam >/dev/null 2>&1; then
   timeout 10 steam -shutdown >/dev/null 2>&1 || true
+elif command -v flatpak >/dev/null 2>&1 && \
+     flatpak info com.valvesoftware.Steam >/dev/null 2>&1; then
+  timeout 15 flatpak run com.valvesoftware.Steam -shutdown >/dev/null 2>&1 || true
 fi
 exit 0
 SH
@@ -1174,16 +1190,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.15.20",
-    "en": "What is new in 0.15.20",
-    "es": "Novedades de la 0.15.20",
-    "it": "Novità della 0.15.20",
-    "de": "Neu in 0.15.20",
-    "pt": "Novidades da 0.15.20",
+    "fr": "Nouveautés de la 0.15.21",
+    "en": "What is new in 0.15.21",
+    "es": "Novedades de la 0.15.21",
+    "it": "Novità della 0.15.21",
+    "de": "Neu in 0.15.21",
+    "pt": "Novidades da 0.15.21",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15.21 : le mode Gaming lance Steam installé en Flatpak (cas de Budgie, où le paquet rpm ne s'installe pas) — la session ne renvoie plus au bureau avec « steam introuvable »",
         "0.15.20 : la fenêtre « Système » du menu burger s'ouvre à nouveau — une variable restée d'un copier-coller dans la construction de ses lignes la faisait échouer avant l'affichage",
         "0.15.19 : le mode Gaming (Gamescope) refonctionne sous Budgie — la session du bureau est résolue à l'exécution (Budgie 10.10 est passé en Wayland sous SDDM), un `Session=` inconnu ne laisse plus la console sur l'écran de connexion et le journal note la carte DRM, les groupes de l'utilisateur et la bascule",
         "0.15.18 : « Bon à savoir » d'Add Fedora Feature se range dans une sous-page, l'accueil n'affiche plus deux fois le numéro de build et « Relancer Steam » rejoint le sous-menu de Steam de la logithèque",
@@ -1222,6 +1239,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15.21: Gaming Mode launches Steam installed as a Flatpak (the Budgie case, where the rpm package does not install) — the session no longer drops back to the desktop with “steam introuvable”",
         "0.15.20: the “System” window of the hamburger menu opens again — a variable left over from a copy-paste in the way its rows are built made it fail before it could be shown",
         "0.15.19: Gaming Mode (Gamescope) works under Budgie again — the desktop session is resolved at runtime (Budgie 10.10 moved to Wayland under SDDM), an unknown `Session=` no longer leaves the console on the login screen, and the log records the DRM device, the user's groups and the switch",
         "0.15.18: “Good to know” in Add Fedora Feature moves into a sub-page, the home page no longer shows the build number twice and “Restart Steam” joins Steam's sub-menu in the library",
@@ -1260,6 +1278,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15.21: el modo Gaming lanza Steam instalado como Flatpak (el caso de Budgie, donde el paquete rpm no se instala) — la sesión ya no vuelve al escritorio con «steam introuvable»",
         "0.15.20: la ventana «Sistema» del menú se abre de nuevo — una variable que quedó de un copiar y pegar en la construcción de sus filas la hacía fallar antes de mostrarse",
         "0.15.19: el modo Gaming (Gamescope) vuelve a funcionar en Budgie — la sesión del escritorio se resuelve en ejecución (Budgie 10.10 pasó a Wayland bajo SDDM), un `Session=` desconocido ya no deja la consola en la pantalla de inicio de sesión y el registro anota la tarjeta DRM, los grupos del usuario y el cambio de sesión",
         "0.15.18: «Good to know» de Add Fedora Feature pasa a una subpágina, la página de inicio ya no muestra dos veces el número de compilación y «Restart Steam» se une al submenú de Steam de la biblioteca",
@@ -1298,6 +1317,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15.21: la modalità Gaming avvia Steam installato come Flatpak (il caso di Budgie, dove il pacchetto rpm non si installa) — la sessione non torna più al desktop con «steam introuvable»",
         "0.15.20: la finestra «Sistema» del menu si apre di nuovo — una variabile rimasta da un copia e incolla nella costruzione delle sue righe la faceva fallire prima di essere mostrata",
         "0.15.19: la modalità Gaming (Gamescope) torna a funzionare su Budgie — la sessione del desktop viene risolta all'esecuzione (Budgie 10.10 è passato a Wayland sotto SDDM), un `Session=` sconosciuto non lascia più la console sulla schermata di accesso e il log annota la scheda DRM, i gruppi dell'utente e il cambio di sessione",
         "0.15.18: «Good to know» di Add Fedora Feature passa in una sottopagina, la pagina iniziale non mostra più due volte il numero di build e «Restart Steam» entra nel sottomenu di Steam della libreria",
@@ -1336,6 +1356,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15.21: Der Gaming-Modus startet Steam als Flatpak (der Budgie-Fall, in dem sich das rpm-Paket nicht installieren lässt) — die Sitzung fällt nicht mehr mit „steam introuvable“ zum Desktop zurück",
         "0.15.20: Das Fenster „System“ im Burger-Menü öffnet wieder — eine beim Kopieren übrig gebliebene Variable im Aufbau seiner Zeilen ließ es vor dem Anzeigen scheitern",
         "0.15.19: Der Gaming-Modus (Gamescope) funktioniert unter Budgie wieder — die Desktop-Sitzung wird zur Laufzeit ermittelt (Budgie 10.10 ist auf Wayland unter SDDM umgestiegen), ein unbekanntes `Session=` lässt die Konsole nicht mehr am Anmeldebildschirm hängen und das Protokoll notiert DRM-Gerät, Benutzergruppen und Umschaltung",
         "0.15.18: „Good to know“ in Add Fedora Feature wandert in eine Unterseite, die Startseite zeigt die Build-Nummer nicht mehr doppelt und „Restart Steam“ steht im Steam-Untermenü der Bibliothek",
@@ -1374,6 +1395,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15.21: o modo Gaming lança o Steam instalado como Flatpak (o caso do Budgie, onde o pacote rpm não se instala) — a sessão já não volta ao ambiente com «steam introuvable»",
         "0.15.20: a janela «Sistema» do menu volta a abrir — uma variável deixada de um copiar e colar na construção das suas linhas fazia-a falhar antes de ser mostrada",
         "0.15.19: o modo Gaming (Gamescope) volta a funcionar no Budgie — a sessão do ambiente é resolvida em execução (o Budgie 10.10 passou a Wayland sob SDDM), um `Session=` desconhecido já não deixa a consola no ecrã de início de sessão e o registo anota a placa DRM, os grupos do utilizador e a mudança de sessão",
         "0.15.18: «Good to know» do Add Fedora Feature passa para uma subpágina, a página inicial já não mostra duas vezes o número de compilação e «Restart Steam» junta-se ao submenu do Steam da biblioteca",

@@ -54,6 +54,11 @@ The script resolves the **actual** desktop session name at runtime (for instance
 `budgie-desktop`, `budgie`, `ubuntu-budgie-desktop`), so the “desktop” switch back keeps
 working even if the session id changed.
 
+Steam may be the rpm package (`steam` command) **or** the
+`com.valvesoftware.Steam` Flatpak — the Budgie case, where the rpm does not
+install. The Gaming session picks whichever launcher is available;
+`--mangoapp` is only used with the rpm, since a Flatpak filters `LD_PRELOAD`.
+
 ## Daily use
 
 ```bash

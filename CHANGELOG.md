@@ -6,6 +6,24 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.21] — 2026-11-28
+
+### Corrigé
+- **Mode Gaming avec Steam en Flatpak** : sous Budgie, le paquet rpm `steam`
+  ne s'installe pas, seul le Flatpak `com.valvesoftware.Steam` fonctionne.
+  `gamescope-session` ne cherchait que la commande `steam` et renvoyait
+  aussitôt au bureau (`steam introuvable : retour au bureau` dans
+  `gaming-session.log`).
+  - La session résout maintenant le lanceur : `steam` (rpm) sinon
+    `flatpak run com.valvesoftware.Steam`, et lance
+    `gamescope -e -- <lanceur> -steamdeck -steamos3`.
+  - `steamos-session-select` ferme Steam de la même façon
+    (`steam -shutdown` ou `flatpak run com.valvesoftware.Steam -shutdown`).
+  - `--mangoapp` est réservé au paquet rpm : un Flatpak filtre `LD_PRELOAD`,
+    l'option restait sans effet.
+  - L'installation ne prévient plus que Steam est absent quand le Flatpak est
+    présent.
+
 ## [0.15.20] — 2026-11-28
 
 ### Corrigé
