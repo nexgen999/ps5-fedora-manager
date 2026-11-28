@@ -160,6 +160,7 @@ happened — `steam introuvable`, `aucun /dev/dri/card* lisible` or
 | Black screen then “affichage impossible” | Steam enabled HDR at 4K60: `HDR output enabled` followed by `Failed to prepare 1-layer flip` means the link has no 10-bit bandwidth. In Steam: *Settings > Display* → turn HDR off, then start Gaming Mode again |
 | Flatpak Steam quits at once | the sandbox needs a D-Bus session bus: the session exports `unix:path=/run/user/<uid>/bus` (or falls back to `dbus-run-session`); check the `bus de session` line in the log |
 | `HDR/DTM : inactif` while the display is HDR | HDR is only enabled on amdgpu, with an HDR EDID and outside 4K/60: check the `pilote :` line and the reason in brackets; `PS5_GAMING_HDR=1` forces a try |
+| `gamescope: unrecognized option` with HDR | the installed build rejects the HDR options: the log shows `HDR/DTM : desactive (…)` then a second `lancement : gamescope …` line without HDR — that is the intended 8-bit SDR fallback. The inverse tone mapping name is taken from `gamescope --help`; check the version with `gamescope --version` |
 | Washed-out or white picture in HDR | the tone mapping does not match the display: restart with `PS5_GAMING_HDR=0` (SDR) and leave HDR off in Steam |
 | Steam rpm missing on KDE Plasma | re-run the Gaming mode install (RPM Fusion + `steam`) or install Steam from the app store, then check `Steam rpm : …` in the log |
 | `switch-session` asks for a password | polkit rule missing: re-run the install script |

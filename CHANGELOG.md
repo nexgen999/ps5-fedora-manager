@@ -6,6 +6,21 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.24] — 2026-11-28
+
+### Corrigé
+- **Le mode Gaming ne démarrait pas quand Gamescope refusait le HDR.** Le nom
+  de l'option de tone mapping inverse dépend du build : `--hdr-itm-enabled` ou
+  `--hdr-itm-enable`. La session testait les deux mais ajoutait toujours
+  `--hdr-itm-enabled`, si bien qu'un Gamescope annonçant l'autre orthographe
+  sortait sur `unrecognized option` et rendait la main au bureau.
+  - L'option est maintenant reprise exactement telle que `gamescope --help`
+    l'annonce ; si aucune des deux n'existe, seule `--hdr-enabled` est ajoutée.
+  - Si Gamescope refuse une option, sort en erreur moins de 10 s après le
+    lancement ou tombe dans l'écran noir HDR, la session relance une fois sans
+    `--hdr-enabled` / `--hdr-itm*` et note
+    `HDR/DTM : desactivé (…) : relance en SDR 8 bits`.
+
 ## [0.15.23] — 2026-11-28
 
 ### Ajouté

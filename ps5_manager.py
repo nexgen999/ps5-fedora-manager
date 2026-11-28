@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.23"
+APP_VERSION = "0.15.24"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -290,8 +290,15 @@ elif [ -n "$MODE" ] && [ "${MODE%x*}" -ge 3840 ] 2>/dev/null; then
   HDR_REASON="$MODE en 10 bits : pas la bande passante du lien"
 else
   HDR_FLAGS=(--hdr-enabled)
-  if gamescope --help 2>&1 | grep -qE -- '--hdr-itm-(enabled|enable)'; then
+  # Le nom du tone mapping inverse depend du build : on reprend exactement
+  # celui que ce Gamescope annonce, sinon il sort en erreur
+  # « unrecognized option » au lieu de demarrer.
+  if gamescope --help 2>&1 | grep -q -- '--hdr-itm-enabled'; then
     HDR_FLAGS+=(--hdr-itm-enabled)
+  elif gamescope --help 2>&1 | grep -q -- '--hdr-itm-enable'; then
+    HDR_FLAGS+=(--hdr-itm-enable)
+  else
+    echo "tone mapping inverse (ITM) : option inconnue de ce Gamescope, ignoree"
   fi
 fi
 if [ "${#HDR_FLAGS[@]}" -gt 0 ]; then
@@ -313,48 +320,86 @@ if [ "${#HDR_FLAGS[@]}" -gt 0 ]; then
   FLAGS+=("${HDR_FLAGS[@]}")
 fi
 
-LAUNCH=(gamescope "${FLAGS[@]}" -e -- "${STEAM_CMD[@]}" -steamdeck -steamos3)
+DBUS_WRAP=""
 if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ]; then
   if command -v dbus-run-session >/dev/null 2>&1; then
-    LAUNCH=(dbus-run-session -- "${LAUNCH[@]}")
+    DBUS_WRAP=1
     echo "aucun bus utilisateur : dbus-run-session fournit le bus de session"
   else
     echo "aucun bus de session D-Bus : Steam Flatpak risque de se refermer aussitot"
   fi
 fi
-echo "lancement : ${LAUNCH[*]}"
 
-# Ecran noir : en 10 bits (HDR) sur un 4K60, le lien HDMI/DP n'a pas la bande
-# passante necessaire ; Gamescope echoue alors chaque composition et reste
-# bloque sans rien afficher. Au-dela de 20 echecs d'affilee, on l'arrete pour
-# rendre la main au bureau avec une consigne au lieu de laisser un ecran noir.
+# run_gamescope [options...] : lance Gamescope puis Steam et surveille l'ecran
+# noir. En 10 bits (HDR) sur un 4K60, le lien HDMI/DP n'a pas la bande passante
+# necessaire ; Gamescope echoue alors chaque composition et reste bloque sans
+# rien afficher. Au-dela de 20 echecs d'affilee, on l'arrete pour rendre la
+# main au bureau avec une consigne au lieu de laisser un ecran noir.
+# OPT_ERR signale que Gamescope a refuse une option de la ligne de commande,
+# FAST_FAIL qu'il est sorti en erreur aussitot (HDR refuse par le pilote).
 BLACK=""
-GLOG=$(mktemp "${TMPDIR:-/tmp}/ps5-gaming.XXXXXX" 2>/dev/null || true)
-if [ -n "$GLOG" ]; then
-  "${LAUNCH[@]}" >>"$GLOG" 2>&1 </dev/null &
-  GPID=$!
+OPT_ERR=""
+FAST_FAIL=""
+RC=0
+run_gamescope() {
+  local -a cmd=(gamescope "$@" -e -- "${STEAM_CMD[@]}" -steamdeck -steamos3)
+  local glog gpid wpid n t0
+  [ "$DBUS_WRAP" = "1" ] && cmd=(dbus-run-session -- "${cmd[@]}")
+  echo "lancement : ${cmd[*]}"
+  BLACK=""
+  OPT_ERR=""
+  FAST_FAIL=""
+  t0=$(date +%s)
+  glog=$(mktemp "${TMPDIR:-/tmp}/ps5-gaming.XXXXXX" 2>/dev/null || true)
+  if [ -z "$glog" ]; then
+    "${cmd[@]}"
+    RC=$?
+    if [ "$RC" -ne 0 ] && [ "$(( $(date +%s) - t0 ))" -le 10 ]; then FAST_FAIL=1; fi
+    return 0
+  fi
+  "${cmd[@]}" >>"$glog" 2>&1 </dev/null &
+  gpid=$!
   (
-    while kill -0 "$GPID" 2>/dev/null; do
+    while kill -0 "$gpid" 2>/dev/null; do
       sleep 5
-      n=$(grep -c 'Failed to prepare 1-layer flip' "$GLOG" 2>/dev/null || true)
+      n=$(grep -c 'Failed to prepare 1-layer flip' "$glog" 2>/dev/null || true)
       [ "${n:-0}" -ge 20 ] 2>/dev/null || continue
-      echo "ecran noir : Gamescope echoue a afficher le mode choisi (HDR 10 bits ?)" >>"$GLOG"
-      kill -TERM "$GPID" 2>/dev/null || true
+      echo "ecran noir : Gamescope echoue a afficher le mode choisi (HDR 10 bits ?)" >>"$glog"
+      kill -TERM "$gpid" 2>/dev/null || true
       sleep 5
-      kill -KILL "$GPID" 2>/dev/null || true
+      kill -KILL "$gpid" 2>/dev/null || true
       break
     done
   ) &
-  WPID=$!
-  wait "$GPID"
+  wpid=$!
+  wait "$gpid"
   RC=$?
-  kill "$WPID" 2>/dev/null || true
-  cat "$GLOG"
-  if grep -q 'ecran noir : Gamescope' "$GLOG" 2>/dev/null; then BLACK=1; fi
-  rm -f "$GLOG"
-else
-  "${LAUNCH[@]}"
-  RC=$?
+  kill "$wpid" 2>/dev/null || true
+  cat "$glog"
+  if grep -q 'ecran noir : Gamescope' "$glog" 2>/dev/null; then BLACK=1; fi
+  if grep -qiE 'unrecognized option|unknown option|invalid option' "$glog" 2>/dev/null; then OPT_ERR=1; fi
+  rm -f "$glog"
+  if [ "$RC" -ne 0 ] && [ "$(( $(date +%s) - t0 ))" -le 10 ]; then FAST_FAIL=1; fi
+  return 0
+}
+
+run_gamescope "${FLAGS[@]}"
+if [ "${#HDR_FLAGS[@]}" -gt 0 ] && { [ -n "$OPT_ERR" ] || [ -n "$BLACK" ] || [ -n "$FAST_FAIL" ]; }; then
+  # HDR refuse (option inconnue, sortie immediate, ecran noir) : on relance en
+  # SDR plutot que de laisser l'utilisateur devant une session qui ne demarre
+  # pas.
+  if [ -n "$OPT_ERR" ]; then
+    echo "Gamescope a refuse une option de la ligne de commande (voir ci-dessus)"
+  fi
+  echo "HDR/DTM : desactive (Gamescope n'a pas demarre avec ${HDR_FLAGS[*]}) : relance en SDR 8 bits"
+  HDR_FLAGS=()
+  FLAGS=()
+  if [ "${STEAM_CMD[0]}" = "steam" ] && command -v mangoapp >/dev/null 2>&1; then
+    FLAGS=(--mangoapp)
+  fi
+  run_gamescope "${FLAGS[@]}"
+elif [ -n "$OPT_ERR" ]; then
+  echo "Gamescope a refuse une option de la ligne de commande (voir ci-dessus) : verifie la version de gamescope"
 fi
 echo "gamescope termine (code $RC)"
 if [ -n "$BLACK" ]; then
@@ -1374,16 +1419,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.15.23",
-    "en": "What is new in 0.15.23",
-    "es": "Novedades de la 0.15.23",
-    "it": "Novità della 0.15.23",
-    "de": "Neu in 0.15.23",
-    "pt": "Novidades da 0.15.23",
+    "fr": "Nouveautés de la 0.15.24",
+    "en": "What is new in 0.15.24",
+    "es": "Novedades de la 0.15.24",
+    "it": "Novità della 0.15.24",
+    "de": "Neu in 0.15.24",
+    "pt": "Novidades da 0.15.24",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15.24 : le mode Gaming démarre même quand Gamescope refuse le HDR — l'option de tone mapping inverse (--hdr-itm-enabled / --hdr-itm-enable) est reprise telle que ce build l'annonce, et une option refusée, une sortie immédiate ou un écran noir relancent la session en SDR 8 bits au lieu de laisser une erreur",
         "0.15.23 : la session Gaming passe sous KDE Plasma (Fedora 45) avec Steam en paquet rpm, et n'active le HDR/DTM que si le pilote amdgpu, l'écran (EDID) et la bande passante du lien le permettent ; la Logithèque gagne l'option GNOME « Bypass script compatibility »",
         "0.15.22 : session Gaming — un bus D-Bus est fourni à Steam Flatpak (il ne se referme plus aussitôt) et un écran noir HDR rend la main au bureau au lieu de bloquer",
         "0.15.21 : le mode Gaming lance Steam installé en Flatpak (cas de Budgie, où le paquet rpm ne s'installe pas) — la session ne renvoie plus au bureau avec « steam introuvable »",
@@ -1425,6 +1471,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15.24: Gaming Mode now starts even when Gamescope rejects HDR — the inverse tone mapping option (--hdr-itm-enabled / --hdr-itm-enable) is reused exactly as that build advertises it, and a rejected option, an immediate exit or a black screen relaunch the session in 8-bit SDR instead of leaving an error",
         "0.15.23: the Gaming session works on KDE Plasma (Fedora 45) with Steam as an rpm package, and only enables HDR/DTM when the amdgpu driver, the display (EDID) and the link bandwidth allow it; the app store gains the GNOME-only “Bypass script compatibility” option",
         "0.15.22: Gaming session — Flatpak Steam now gets a D-Bus session bus (it no longer quits at once) and an HDR black screen hands control back to the desktop instead of hanging",
         "0.15.21: Gaming Mode launches Steam installed as a Flatpak (the Budgie case, where the rpm package does not install) — the session no longer drops back to the desktop with “steam introuvable”",
@@ -1466,6 +1513,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15.24: el modo Gaming arranca aunque Gamescope rechace HDR — la opción de tone mapping inverso (--hdr-itm-enabled / --hdr-itm-enable) se reutiliza tal como la anuncia esa compilación, y una opción rechazada, una salida inmediata o una pantalla negra relanzan la sesión en SDR de 8 bits en lugar de dejar un error",
         "0.15.23: la sesión Gaming funciona en KDE Plasma (Fedora 45) con Steam en paquete rpm y solo activa HDR/DTM si el controlador amdgpu, la pantalla (EDID) y el ancho de banda del enlace lo permiten; la tienda añade la opción «Bypass script compatibility» exclusiva de GNOME",
         "0.15.22: sesión Gaming — Steam Flatpak recibe un bus de sesión D-Bus (ya no se cierra de inmediato) y una pantalla negra HDR devuelve al escritorio en vez de quedarse bloqueada",
         "0.15.21: el modo Gaming lanza Steam instalado como Flatpak (el caso de Budgie, donde el paquete rpm no se instala) — la sesión ya no vuelve al escritorio con «steam introuvable»",
@@ -1507,6 +1555,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15.24: la modalità Gaming si avvia anche quando Gamescope rifiuta l'HDR — l'opzione di tone mapping inverso (--hdr-itm-enabled / --hdr-itm-enable) viene ripresa esattamente come la dichiara quella build, e un'opzione rifiutata, un'uscita immediata o uno schermo nero rilanciano la sessione in SDR a 8 bit invece di lasciare un errore",
         "0.15.23: la sessione Gaming funziona su KDE Plasma (Fedora 45) con Steam come pacchetto rpm e attiva HDR/DTM solo se il driver amdgpu, lo schermo (EDID) e la larghezza di banda del collegamento lo consentono; lo store aggiunge l'opzione «Bypass script compatibility» riservata a GNOME",
         "0.15.22: sessione Gaming — Steam Flatpak riceve un bus di sessione D-Bus (non si chiude più subito) e uno schermo nero HDR restituisce il desktop invece di bloccarsi",
         "0.15.21: la modalità Gaming avvia Steam installato come Flatpak (il caso di Budgie, dove il pacchetto rpm non si installa) — la sessione non torna più al desktop con «steam introuvable»",
@@ -1548,6 +1597,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15.24: Der Gaming-Modus startet auch, wenn Gamescope HDR ablehnt — die Option für inverse Tonzuordnung (--hdr-itm-enabled / --hdr-itm-enable) wird genau so übernommen, wie dieser Build sie angibt, und eine abgelehnte Option, ein sofortiger Abbruch oder ein schwarzer Bildschirm starten die Sitzung neu in 8-Bit-SDR statt eine Fehlermeldung zu hinterlassen",
         "0.15.23: Die Gaming-Sitzung läuft unter KDE Plasma (Fedora 45) mit Steam als rpm-Paket und schaltet HDR/DTM nur ein, wenn amdgpu-Treiber, Bildschirm (EDID) und Bandbreite der Verbindung es erlauben; der App-Store erhält die GNOME-Option „Bypass script compatibility“",
         "0.15.22: Gaming-Sitzung — Flatpak-Steam erhält einen D-Bus-Sitzungsbus (beendet sich nicht mehr sofort) und ein schwarzer HDR-Bildschirm gibt den Desktop zurück statt zu hängen",
         "0.15.21: Der Gaming-Modus startet Steam als Flatpak (der Budgie-Fall, in dem sich das rpm-Paket nicht installieren lässt) — die Sitzung fällt nicht mehr mit „steam introuvable“ zum Desktop zurück",
@@ -1589,6 +1639,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15.24: o modo Gaming arranca mesmo quando o Gamescope recusa HDR — a opção de tone mapping inverso (--hdr-itm-enabled / --hdr-itm-enable) é reaproveitada tal como esse build a anuncia, e uma opção recusada, uma saída imediata ou um ecrã negro relançam a sessão em SDR de 8 bits em vez de deixar um erro",
         "0.15.23: a sessão Gaming funciona no KDE Plasma (Fedora 45) com o Steam em pacote rpm e só ativa HDR/DTM se o driver amdgpu, o ecrã (EDID) e a largura de banda da ligação o permitirem; a loja ganha a opção «Bypass script compatibility» exclusiva do GNOME",
         "0.15.22: sessão Gaming — o Steam Flatpak passa a ter um bus de sessão D-Bus (já não fecha logo de imediato) e um ecrã negro HDR devolve o ambiente em vez de ficar bloqueado",
         "0.15.21: o modo Gaming lança o Steam instalado como Flatpak (o caso do Budgie, onde o pacote rpm não se instala) — a sessão já não volta ao ambiente com «steam introuvable»",

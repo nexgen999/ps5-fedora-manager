@@ -7,6 +7,21 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.24] — 2026-11-28
+
+### Fixed
+- **Gaming Mode did not start when Gamescope rejected HDR.** The name of the
+  inverse tone mapping option depends on the build: `--hdr-itm-enabled` or
+  `--hdr-itm-enable`. The session tested both but always added
+  `--hdr-itm-enabled`, so a Gamescope advertising the other spelling exited on
+  `unrecognized option` and handed control back to the desktop.
+  - The option is now reused exactly as `gamescope --help` advertises it; when
+    neither exists, only `--hdr-enabled` is added.
+  - If Gamescope rejects an option, exits with an error less than 10 s after
+    launch, or hits the HDR black screen, the session relaunches once without
+    `--hdr-enabled` / `--hdr-itm*` and logs
+    `HDR/DTM : desactivé (…) : relance en SDR 8 bits`.
+
 ## [0.15.23] — 2026-11-28
 
 ### Added

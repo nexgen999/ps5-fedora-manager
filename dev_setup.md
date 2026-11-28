@@ -138,7 +138,10 @@ Remarques :
   l'utilise en priorité. Le HDR/DTM de Gamescope n'est activé que pour amdgpu,
   avec un écran qui annonce le HDR dans son EDID et hors 4K/60 ; sinon la
   session sort en SDR (`HDR/DTM : inactif (raison)` dans `gaming-session.log`).
-  `PS5_GAMING_HDR=1` force le HDR, `PS5_GAMING_HDR=0` le coupe.
+  `PS5_GAMING_HDR=1` force le HDR, `PS5_GAMING_HDR=0` le coupe. Si Gamescope
+  refuse une option HDR (`unrecognized option`), sort aussitôt ou affiche un
+  écran noir, la session relance une fois sans HDR
+  (`HDR/DTM : desactive (…) : relance en SDR 8 bits`).
 - **Mode Gaming** : la session `steam`
   (`/usr/share/wayland-sessions/steam.desktop`) lance `/usr/bin/gamescope-session`,
   qui exécute Gamescope puis, à la fermeture de Steam, rebascule la console sur la

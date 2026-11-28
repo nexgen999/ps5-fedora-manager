@@ -28,3 +28,4 @@ cp -a backup/stable/v0.15.17/. /opt/ps5-manager/
 | `v0.15.20` | version 0.15.20 avant la prise en charge de Steam en Flatpak |
 | `v0.15.21` | version 0.15.21 avant le bus D-Bus du Flatpak et le garde-fou écran noir |
 | `v0.15.22` | version 0.15.22 avant la session Gaming KDE Plasma (Steam rpm, HDR/DTM) et l'option GNOME de la Logithèque |
+| `v0.15.23` | version 0.15.23 avant le repli SDR quand Gamescope refuse une option HDR |
