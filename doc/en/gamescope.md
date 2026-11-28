@@ -85,12 +85,35 @@ $ ls /usr/share/wayland-sessions/
 $ which gamescope-session switch-session
 ```
 
+## Diagnosis (before any fix)
+
+`tools/diagnostic_gaming.sh` collects, **read-only**, everything needed to find
+out why the Gaming session closes immediately — desktop and session variables,
+the real display manager, installed sessions (`wayland-sessions` /
+`xsessions`), the AccountsService `Session=`, SDDM / LightDM / GDM autologin,
+the Gaming Mode files, `/dev/dri` access and groups, the presence of
+`gamescope`, `steam` and a Flatpak Steam, the manager logs and the systemd
+journal.
+
+```bash
+cd /opt/ps5-manager
+sudo bash tools/diagnostic_gaming.sh | tee ~/diagnostic-gaming.txt
+```
+
+The file contains no password and no Steam data: it can be shared as is. It
+changes nothing.
+
+Read section 12 first: `gaming-session.log` tells which of the three cases
+happened — `steam introuvable`, `aucun /dev/dri/card* lisible` or
+`gamescope termine (code N)`.
+
 ## Troubleshooting
 
 | Symptom | Hint |
 |---|---|
 | Black screen at boot | `journalctl -b -u gdm` (or `sddm`, `lightdm`) and `session-switch.log` |
 | Cannot return to the desktop | desktop session not resolved: check `/usr/share/xsessions/` |
+| The Gaming session drops straight back to the desktop | `gaming-session.log`: `steam introuvable` (Flatpak Steam), `aucun /dev/dri/card* lisible` (`video`/`render` groups) or `gamescope termine (code N)` |
 | `switch-session` asks for a password | polkit rule missing: re-run the install script |
 | Steam does not start in Big Picture | run `steam -gamepadui` in a terminal to see the error |
 | Two “Gaming” sessions | leftover script from another desktop: run the matching `uninstall` |

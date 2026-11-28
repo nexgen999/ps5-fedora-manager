@@ -85,12 +85,35 @@ $ ls /usr/share/wayland-sessions/
 $ which gamescope-session switch-session
 ```
 
+## Diagnostic (avant tout correctif)
+
+`tools/diagnostic_gaming.sh` collecte en **lecture seule** tout ce qu'il faut
+pour savoir pourquoi la session Gaming se referme — bureau et variables de
+session, gestionnaire de connexion réel, sessions installées
+(`wayland-sessions` / `xsessions`), `Session=` d'AccountsService, auto-connexion
+SDDM / LightDM / GDM, fichiers du mode Gaming, accès `/dev/dri` et groupes,
+présence de `gamescope`, `steam` et d'un Steam Flatpak, journaux du manager et
+journal systemd.
+
+```bash
+cd /opt/ps5-manager
+sudo bash tools/diagnostic_gaming.sh | tee ~/diagnostic-gaming.txt
+```
+
+Le fichier ne contient aucun mot de passe ni donnée Steam : il peut être
+partagé tel quel. Il ne modifie rien.
+
+À lire en premier, section 12 : `gaming-session.log` indique lequel des trois
+cas s'est produit — `steam introuvable`, `aucun /dev/dri/card* lisible` ou
+`gamescope termine (code N)`.
+
 ## Dépannage
 
 | Symptôme | Piste |
 |---|---|
 | Écran noir au démarrage | `journalctl -b -u gdm` (ou `sddm`, `lightdm`) et `session-switch.log` |
 | Retour bureau impossible | la session du bureau est mal résolue : vérifier `/usr/share/xsessions/` |
+| La session Gaming revient aussitôt au bureau | `gaming-session.log` : `steam introuvable` (Steam Flatpak), `aucun /dev/dri/card* lisible` (groupes `video`/`render`) ou `gamescope termine (code N)` |
 | `switch-session` demande un mot de passe | règle polkit absente : relancer le script d'installation |
 | Steam ne démarre pas en Big Picture | lancer `steam -gamepadui` en terminal pour voir l'erreur |
 | Deux sessions « Gaming » | ancien script d'un autre bureau : lancer le script `uninstall` correspondant |
