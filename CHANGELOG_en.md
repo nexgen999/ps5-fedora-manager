@@ -7,6 +7,15 @@ does not use Git tags yet, so versions match `APP_VERSION` in `ps5_manager.py`.
 
 French version: [CHANGELOG.md](CHANGELOG.md)
 
+## [0.15.20] — 2026-11-28
+
+### Fixed
+- **“System” window from the hamburger menu no longer opened**: the way its
+  rows were built tested a `sec_id` variable left over from a copy-paste of
+  the sidebar row builder. The exception (`NameError`) happened on the first
+  row, the window was never created and clicking “System” showed nothing at
+  all, with no message. The row now uses the requested icon directly.
+
 ## [0.15.19] — 2026-11-28
 
 ### Fixed

@@ -41,7 +41,7 @@ from typing import Any, Callable, Optional
 # ------------------------------------------------------------------------------
 APP_ID = "io.github.nexgen999.Ps5Manager"
 APP_NAME = "PS5 Fedora Manager"
-APP_VERSION = "0.15.19"
+APP_VERSION = "0.15.20"
 INSTALL_DIR = "/opt/ps5-manager"
 REPO_URL = os.environ.get(
     "PS5_MANAGER_REPO", "https://github.com/nexgen999/ps5-fedora-manager.git"
@@ -1174,16 +1174,17 @@ if hasattr(Adw, "AccentColor"):
 # Notes de version localisées (Adw.AboutDialog n'accepte que p, ul, ol, li, a)
 # ------------------------------------------------------------------------------
 _RELEASE_NOTES_TITLE = {
-    "fr": "Nouveautés de la 0.15.19",
-    "en": "What is new in 0.15.19",
-    "es": "Novedades de la 0.15.19",
-    "it": "Novità della 0.15.19",
-    "de": "Neu in 0.15.19",
-    "pt": "Novidades da 0.15.19",
+    "fr": "Nouveautés de la 0.15.20",
+    "en": "What is new in 0.15.20",
+    "es": "Novedades de la 0.15.20",
+    "it": "Novità della 0.15.20",
+    "de": "Neu in 0.15.20",
+    "pt": "Novidades da 0.15.20",
 }
 
 _RELEASE_NOTES_ITEMS = {
     "fr": [
+        "0.15.20 : la fenêtre « Système » du menu burger s'ouvre à nouveau — une variable restée d'un copier-coller dans la construction de ses lignes la faisait échouer avant l'affichage",
         "0.15.19 : le mode Gaming (Gamescope) refonctionne sous Budgie — la session du bureau est résolue à l'exécution (Budgie 10.10 est passé en Wayland sous SDDM), un `Session=` inconnu ne laisse plus la console sur l'écran de connexion et le journal note la carte DRM, les groupes de l'utilisateur et la bascule",
         "0.15.18 : « Bon à savoir » d'Add Fedora Feature se range dans une sous-page, l'accueil n'affiche plus deux fois le numéro de build et « Relancer Steam » rejoint le sous-menu de Steam de la logithèque",
         "0.15.17 : nouvelle page d'accueil « PS5 Fedora Manager » — logos PlayStation et Fedora, version stable installée, et accès rapide à la mise à jour du manager, à la langue de l'interface et au journal, qui s'ouvrent en sous-page avec un bouton retour",
@@ -1221,6 +1222,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : catégorie « Add Fedora Feature » (mobile, imprimantes &amp; scanners)",
     ],
     "en": [
+        "0.15.20: the “System” window of the hamburger menu opens again — a variable left over from a copy-paste in the way its rows are built made it fail before it could be shown",
         "0.15.19: Gaming Mode (Gamescope) works under Budgie again — the desktop session is resolved at runtime (Budgie 10.10 moved to Wayland under SDDM), an unknown `Session=` no longer leaves the console on the login screen, and the log records the DRM device, the user's groups and the switch",
         "0.15.18: “Good to know” in Add Fedora Feature moves into a sub-page, the home page no longer shows the build number twice and “Restart Steam” joins Steam's sub-menu in the library",
         "0.15.17: new “PS5 Fedora Manager” home page — PlayStation and Fedora logos, the installed stable version, and quick access to manager updates, interface language and the log, each opening as a sub-page with a back button",
@@ -1258,6 +1260,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4: “Add Fedora Feature” category (mobile, printers &amp; scanners)",
     ],
     "es": [
+        "0.15.20: la ventana «Sistema» del menú se abre de nuevo — una variable que quedó de un copiar y pegar en la construcción de sus filas la hacía fallar antes de mostrarse",
         "0.15.19: el modo Gaming (Gamescope) vuelve a funcionar en Budgie — la sesión del escritorio se resuelve en ejecución (Budgie 10.10 pasó a Wayland bajo SDDM), un `Session=` desconocido ya no deja la consola en la pantalla de inicio de sesión y el registro anota la tarjeta DRM, los grupos del usuario y el cambio de sesión",
         "0.15.18: «Good to know» de Add Fedora Feature pasa a una subpágina, la página de inicio ya no muestra dos veces el número de compilación y «Restart Steam» se une al submenú de Steam de la biblioteca",
         "0.15.17: nueva página de inicio «PS5 Fedora Manager» — logotipos de PlayStation y Fedora, versión estable instalada y acceso rápido a la actualización del gestor, al idioma de la interfaz y al registro, que se abren como subpágina con botón de volver",
@@ -1295,6 +1298,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoría «Add Fedora Feature» (móvil, impresoras y escáneres)",
     ],
     "it": [
+        "0.15.20: la finestra «Sistema» del menu si apre di nuovo — una variabile rimasta da un copia e incolla nella costruzione delle sue righe la faceva fallire prima di essere mostrata",
         "0.15.19: la modalità Gaming (Gamescope) torna a funzionare su Budgie — la sessione del desktop viene risolta all'esecuzione (Budgie 10.10 è passato a Wayland sotto SDDM), un `Session=` sconosciuto non lascia più la console sulla schermata di accesso e il log annota la scheda DRM, i gruppi dell'utente e il cambio di sessione",
         "0.15.18: «Good to know» di Add Fedora Feature passa in una sottopagina, la pagina iniziale non mostra più due volte il numero di build e «Restart Steam» entra nel sottomenu di Steam della libreria",
         "0.15.17: nuova pagina iniziale «PS5 Fedora Manager» — loghi PlayStation e Fedora, versione stabile installata e accesso rapido all'aggiornamento del gestore, alla lingua dell'interfaccia e al registro, che si aprono come sottopagina con pulsante indietro",
@@ -1332,6 +1336,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : categoria «Add Fedora Feature» (mobile, stampanti e scanner)",
     ],
     "de": [
+        "0.15.20: Das Fenster „System“ im Burger-Menü öffnet wieder — eine beim Kopieren übrig gebliebene Variable im Aufbau seiner Zeilen ließ es vor dem Anzeigen scheitern",
         "0.15.19: Der Gaming-Modus (Gamescope) funktioniert unter Budgie wieder — die Desktop-Sitzung wird zur Laufzeit ermittelt (Budgie 10.10 ist auf Wayland unter SDDM umgestiegen), ein unbekanntes `Session=` lässt die Konsole nicht mehr am Anmeldebildschirm hängen und das Protokoll notiert DRM-Gerät, Benutzergruppen und Umschaltung",
         "0.15.18: „Good to know“ in Add Fedora Feature wandert in eine Unterseite, die Startseite zeigt die Build-Nummer nicht mehr doppelt und „Restart Steam“ steht im Steam-Untermenü der Bibliothek",
         "0.15.17: neue Startseite „PS5 Fedora Manager“ – PlayStation- und Fedora-Logos, installierte stabile Version und Schnellzugriff auf Manager-Update, Oberflächensprache und Protokoll, die als Unterseite mit Zurück-Schaltfläche öffnen",
@@ -1369,6 +1374,7 @@ _RELEASE_NOTES_ITEMS = {
         "0.4 : Kategorie „Add Fedora Feature“ (Mobilgeräte, Drucker &amp; Scanner)",
     ],
     "pt": [
+        "0.15.20: a janela «Sistema» do menu volta a abrir — uma variável deixada de um copiar e colar na construção das suas linhas fazia-a falhar antes de ser mostrada",
         "0.15.19: o modo Gaming (Gamescope) volta a funcionar no Budgie — a sessão do ambiente é resolvida em execução (o Budgie 10.10 passou a Wayland sob SDDM), um `Session=` desconhecido já não deixa a consola no ecrã de início de sessão e o registo anota a placa DRM, os grupos do utilizador e a mudança de sessão",
         "0.15.18: «Good to know» do Add Fedora Feature passa para uma subpágina, a página inicial já não mostra duas vezes o número de compilação e «Restart Steam» junta-se ao submenu do Steam da biblioteca",
         "0.15.17: nova página inicial «PS5 Fedora Manager» — logótipos PlayStation e Fedora, versão estável instalada e acesso rápido à atualização do gestor, ao idioma da interface e ao registo, que abrem como subpágina com botão de voltar",
@@ -7976,10 +7982,7 @@ class SystemInfoWindow(Adw.Window):
         row = plain_row(Adw.ActionRow, title=label, subtitle=value)
         row.set_subtitle_selectable(True)
         if icon:
-            if sec_id == "home":
-                row.add_prefix(_logo_image("icon.png", 18, icon))
-            else:
-                row.add_prefix(Gtk.Image.new_from_icon_name(icon))
+            row.add_prefix(Gtk.Image.new_from_icon_name(icon))
         group.add(row)
         self._copy_lines.append(f"{label} : {value}")
         return row

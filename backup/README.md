@@ -24,3 +24,4 @@ cp -a backup/stable/v0.15.17/. /opt/ps5-manager/
 | `v0.15.16` | dernière version avant la page d'accueil « PS5 Fedora Manager » |
 | `v0.15.17` | version 0.15.17 avant le déplacement de « Langue de l'interface » |
 | `v0.15.18` | version 0.15.18 avant la correction du mode Gamescope sous Budgie |
+| `v0.15.19` | version 0.15.19 avant la réparation de la fenêtre « Système » |

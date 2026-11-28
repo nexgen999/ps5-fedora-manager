@@ -6,6 +6,16 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; le
 
 Version anglaise : [CHANGELOG_en.md](CHANGELOG_en.md)
 
+## [0.15.20] — 2026-11-28
+
+### Corrigé
+- **Fenêtre « Système » du menu burger qui ne s'ouvrait plus** : la
+  construction de ses lignes testait une variable `sec_id` restée d'un
+  copier-coller du générateur de lignes de la barre latérale. L'exception
+  (`NameError`) survenait à la première ligne, la fenêtre n'était jamais créée
+  et le clic sur « Système » ne montrait rien, sans message. La ligne utilise
+  désormais directement l'icône demandée.
+
 ## [0.15.19] — 2026-11-28
 
 ### Corrigé
